@@ -9,7 +9,7 @@ import { BackIcon } from '../../components/icons';
 import { ProgressBar } from '../../components/ProgressBar';
 import { getTheme } from '../../content/catalog';
 import type { Deck, Theme } from '../../content';
-import { DECK_ACTION_LABEL } from '../../study/copy';
+import { useT } from '../../i18n';
 import { today } from '../../study/clock';
 import { deckAction, deckStats, themeStats } from '../../study/rules';
 import { dueCardIds } from '../../study/srs';
@@ -26,26 +26,28 @@ function goBack() {
 export default function ThemeScreen() {
   const { themeId } = useLocalSearchParams<{ themeId: string }>();
   const { colors } = useTheme();
+  const t = useT();
   const theme = getTheme(String(themeId));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <IconButton label="Voltar" onPress={goBack}>
+        <IconButton label={t.common.back} onPress={goBack}>
           <BackIcon color={colors.ink} />
         </IconButton>
         <AppText font="mono" size={11} tone="muted" style={styles.kicker}>
-          Tema
+          {t.theme.kicker}
         </AppText>
         <ThemeToggle />
       </View>
-      {theme ? <ThemeContent theme={theme} /> : <AppText style={styles.missing}>Tema não encontrado.</AppText>}
+      {theme ? <ThemeContent theme={theme} /> : <AppText style={styles.missing}>{t.common.themeNotFound}</AppText>}
     </SafeAreaView>
   );
 }
 
 function ThemeContent({ theme }: { theme: Theme }) {
   const { colors } = useTheme();
+  const t = useT();
   const progress = useStudyStore((s) => s.progress);
   const stats = themeStats(theme, progress);
 
@@ -75,19 +77,19 @@ function ThemeContent({ theme }: { theme: Theme }) {
 
       <View
         accessible
-        accessibilityLabel={`${stats.known} de ${stats.total} cards que você sabe`}
+        accessibilityLabel={t.theme.knownLabel(stats.known, stats.total)}
         style={[styles.stats, { backgroundColor: colors.surface, borderColor: colors.line }]}
       >
         <AppText font="monoMedium" size={22}>{`${stats.known}/${stats.total}`}</AppText>
         <AppText size={12} tone="muted">
-          cards que você sabe
+          {t.theme.knownCaption}
         </AppText>
       </View>
 
       <ReviewToday theme={theme} />
 
       <AppText font="bold" size={17} style={{ marginTop: spacing.xs }}>
-        Decks
+        {t.theme.decks}
       </AppText>
       {theme.decks.map((deck, i) => (
         <DeckItem key={deck.id} theme={theme} deck={deck} index={i} />
@@ -98,6 +100,7 @@ function ThemeContent({ theme }: { theme: Theme }) {
 
 function ReviewToday({ theme }: { theme: Theme }) {
   const { colors } = useTheme();
+  const t = useT();
   const schedule = useStudyStore((s) => s.schedule);
   const due = dueCardIds(theme, schedule, today()).length;
   return (
@@ -108,18 +111,18 @@ function ReviewToday({ theme }: { theme: Theme }) {
       ]}
     >
       <AppText font="mono" size={11} tone={due ? 'warn' : 'muted'} style={styles.caps}>
-        Revisão de hoje
+        {t.theme.reviewKicker}
       </AppText>
       {due ? (
         <>
-          <AppText font="semibold" size={16}>{`${due} ${due === 1 ? 'card' : 'cards'} para revisar hoje`}</AppText>
+          <AppText font="semibold" size={16}>{t.theme.dueToday(due)}</AppText>
           <View style={{ flexDirection: 'row' }}>
-            <Button title="Revisar agora" onPress={() => router.push(`/review/${theme.id}`)} />
+            <Button title={t.theme.reviewNow} onPress={() => router.push(`/review/${theme.id}`)} />
           </View>
         </>
       ) : (
         <AppText size={14} tone="muted">
-          Nada para revisar hoje.
+          {t.theme.nothingToReview}
         </AppText>
       )}
     </View>
@@ -128,9 +131,10 @@ function ReviewToday({ theme }: { theme: Theme }) {
 
 function DeckItem({ theme, deck, index }: { theme: Theme; deck: Deck; index: number }) {
   const { colors } = useTheme();
+  const t = useT();
   const progress = useStudyStore((s) => s.progress);
   const stats = deckStats(theme.id, deck, progress);
-  const action = DECK_ACTION_LABEL[deckAction(stats)];
+  const action = t.deckAction[deckAction(stats)];
 
   return (
     <View style={[styles.deck, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -149,7 +153,7 @@ function DeckItem({ theme, deck, index }: { theme: Theme; deck: Deck; index: num
               {deck.description}
             </AppText>
           ) : null}
-          <AppText size={12} tone="muted">{`${stats.total} cards`}</AppText>
+          <AppText size={12} tone="muted">{t.theme.deckCards(stats.total)}</AppText>
         </View>
       </View>
       <View style={styles.progressRow}>
@@ -161,7 +165,7 @@ function DeckItem({ theme, deck, index }: { theme: Theme; deck: Deck; index: num
       <View style={{ flexDirection: 'row' }}>
         <Button
           title={action}
-          accessibilityLabel={`${action} ${deck.title}`}
+          accessibilityLabel={t.theme.deckActionLabel(action, deck.title)}
           onPress={() => router.push(`/study/${theme.id}/${deck.id}`)}
         />
       </View>

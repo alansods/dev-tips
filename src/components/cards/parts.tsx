@@ -17,12 +17,12 @@ export function TypeChip({ label }: { label: string }) {
   );
 }
 
-export function SupplementBadge() {
+export function SupplementBadge({ label }: { label: string }) {
   const { colors } = useTheme();
   return (
     <View style={[styles.chip, styles.outlined, { borderColor: colors.warn }]}>
       <AppText font="mono" size={11} tone="warn" style={styles.caps}>
-        Complemento
+        {label}
       </AppText>
     </View>
   );

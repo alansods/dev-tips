@@ -8,7 +8,7 @@ import { ProgressRing } from '../../components/ProgressRing';
 import { Screen } from '../../components/Screen';
 import { catalog } from '../../content/catalog';
 import type { Theme } from '../../content';
-import { ANSWER_LABEL } from '../../study/copy';
+import { useT } from '../../i18n';
 import { deckStats, themeStats } from '../../study/rules';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -26,6 +26,7 @@ export default function ProgressScreen() {
 
 function ThemeProgress({ theme }: { theme: Theme }) {
   const { colors } = useTheme();
+  const t = useT();
   const progress = useStudyStore((s) => s.progress);
   const resetTheme = useStudyStore((s) => s.resetTheme);
   const [confirming, setConfirming] = useState(false);
@@ -37,23 +38,23 @@ function ThemeProgress({ theme }: { theme: Theme }) {
   return (
     <View testID={`theme-progress-${theme.id}`} style={{ gap: spacing.lg }}>
       <View style={[styles.hero, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-        <ProgressRing percent={percent} label={`${percent}% do tema dominado`} />
+        <ProgressRing percent={percent} label={t.progress.ring(percent)} />
         <View style={{ flex: 1, gap: 4 }}>
           <AppText font="semibold" size={16} accessibilityRole="header">
             {theme.title}
           </AppText>
-          <AppText size={13} tone="muted">{`${stats.known} de ${stats.total} cards dominados.`}</AppText>
+          <AppText size={13} tone="muted">{t.progress.mastered(stats.known, stats.total)}</AppText>
         </View>
       </View>
 
       <View style={styles.counts}>
-        <Count value={stats.known} label={ANSWER_LABEL.known.short} bg={colors.accentSoft} tone="accentText" />
-        <Count value={stats.unknown} label="para revisar" bg={colors.warnSoft} tone="warn" />
-        <Count value={unseen} label="não vistos" bg={colors.surface2} tone="ink" />
+        <Count value={stats.known} label={t.answer.known.short} bg={colors.accentSoft} tone="accentText" />
+        <Count value={stats.unknown} label={t.progress.toReview} bg={colors.warnSoft} tone="warn" />
+        <Count value={unseen} label={t.progress.unseen} bg={colors.surface2} tone="ink" />
       </View>
 
       <AppText font="bold" size={17}>
-        Por deck
+        {t.progress.byDeck}
       </AppText>
       {theme.decks.map((deck) => {
         const ds = deckStats(theme.id, deck, progress);
@@ -71,20 +72,20 @@ function ThemeProgress({ theme }: { theme: Theme }) {
       })}
 
       <View style={styles.legend}>
-        <Legend color={colors.accent} label={ANSWER_LABEL.known.short} />
-        <Legend color={colors.warn} label="para revisar" />
+        <Legend color={colors.accent} label={t.answer.known.short} />
+        <Legend color={colors.warn} label={t.progress.toReview} />
       </View>
 
       {confirming ? (
         <View style={[styles.confirm, { backgroundColor: colors.surface, borderColor: colors.warn }]}>
-          <AppText font="semibold">Zerar o progresso deste tema?</AppText>
+          <AppText font="semibold">{t.progress.confirmTitle}</AppText>
           <AppText size={13} tone="muted">
-            Todas as respostas deste tema serão apagadas. Isso não pode ser desfeito.
+            {t.progress.confirmBody}
           </AppText>
           <View style={styles.row}>
-            <Button title="Cancelar" variant="secondary" onPress={() => setConfirming(false)} />
+            <Button title={t.common.cancel} variant="secondary" onPress={() => setConfirming(false)} />
             <Button
-              title="Zerar"
+              title={t.progress.confirm}
               variant="warn"
               onPress={() => {
                 resetTheme(theme.id);
@@ -95,7 +96,7 @@ function ThemeProgress({ theme }: { theme: Theme }) {
         </View>
       ) : (
         <View style={styles.row}>
-          <Button title="Zerar progresso" variant="secondary" onPress={() => setConfirming(true)} />
+          <Button title={t.progress.reset} variant="secondary" onPress={() => setConfirming(true)} />
         </View>
       )}
     </View>

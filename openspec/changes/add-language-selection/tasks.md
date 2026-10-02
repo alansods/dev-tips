@@ -23,10 +23,10 @@
 
 ## 5. Migrar a interface para o dicionário (Interface traduzida)
 
-- [ ] 5.1 Testes falhando em inglês para sessão, resumo, revisão, tela do tema, aba Progresso e Glossário (cenários "Sessão em inglês" e "Rótulo acessível traduzido")
-- [ ] 5.2 Migrar os literais de `src/study/copy.ts`, `StudySession.tsx`, `src/app/**`, `src/glossary/**` e `src/components/**` para `useT()`
-- [ ] 5.3 Teste de varredura que falha com literais de UI fora de `src/i18n/` (com lista de exceções)
-- [ ] 5.4 Testes passando, incluindo os existentes em PT-BR
+- [x] 5.1 Testes falhando em inglês para sessão, resumo, revisão, tela do tema, aba Progresso e Glossário (cenários "Sessão em inglês" e "Rótulo acessível traduzido")
+- [x] 5.2 Migrar os literais de `src/study/copy.ts`, `StudySession.tsx`, `src/app/**`, `src/glossary/**` e `src/components/**` para `useT()`
+- [x] 5.3 Teste de varredura que falha com literais de UI fora de `src/i18n/` (com lista de exceções)
+- [x] 5.4 Testes passando, incluindo os existentes em PT-BR
 
 ## 6. Tradução de conteúdo: schema e validação (content-model)
 

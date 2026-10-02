@@ -2,7 +2,9 @@ import { fireEvent, screen } from '@testing-library/react-native';
 import { useState } from 'react';
 
 import type { Card, StepCard } from '../../../content';
-import { FRONT_PROMPT } from '../../../study/copy';
+import { ptBR } from '../../../i18n/pt-BR';
+
+const FRONT_PROMPT = ptBR.card.frontPrompt;
 import { cardById, crudTheme, renderWithTheme } from '../../../test-utils';
 import { CardFace } from '../CardFace';
 

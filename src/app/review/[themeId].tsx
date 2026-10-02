@@ -9,22 +9,22 @@ import { today } from '../../study/clock';
 import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
 import { StudySession, leaveToTheme } from '../../study/StudySession';
+import { useT } from '../../i18n';
 import { useTheme } from '../../theme/ThemeProvider';
 import { spacing } from '../../theme/tokens';
-
-export const REVIEW_TITLE = 'Revisão de hoje';
 
 export default function ReviewScreen() {
   const { themeId } = useLocalSearchParams<{ themeId: string }>();
   const { colors } = useTheme();
+  const t = useT();
   const theme = getTheme(String(themeId));
 
   if (!theme) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, padding: spacing.lg, gap: spacing.md }}>
-        <AppText>Tema não encontrado.</AppText>
+        <AppText>{t.common.themeNotFound}</AppText>
         <View style={{ flexDirection: 'row' }}>
-          <Button title="Voltar" variant="secondary" onPress={() => leaveToTheme(String(themeId))} />
+          <Button title={t.common.back} variant="secondary" onPress={() => leaveToTheme(String(themeId))} />
         </View>
       </SafeAreaView>
     );
@@ -32,7 +32,7 @@ export default function ReviewScreen() {
   return (
     <StudySession
       theme={theme}
-      title={REVIEW_TITLE}
+      title={t.session.reviewTitle}
       initialIds={() => dueCardIds(theme, useStudyStore.getState().schedule, today())}
     />
   );

@@ -7,7 +7,7 @@ import { catalog } from '../../content/catalog';
 import { getGlossary } from '../../content';
 import { searchTerms, type GlossaryEntry } from '../../glossary/search';
 import { TermSheet } from '../../glossary/TermSheet';
-import { ANSWER_LABEL } from '../../study/copy';
+import { useT } from '../../i18n';
 import { progressKey } from '../../study/rules';
 import { useStudyStore } from '../../study/store';
 import { useFontsReady } from '../../theme/fonts';
@@ -25,6 +25,7 @@ const preview = (text: string) => (text.length > 92 ? `${text.slice(0, 90).trimE
 
 export default function GlossaryScreen() {
   const { colors } = useTheme();
+  const t = useT();
   const fontsReady = useFontsReady();
   const progress = useStudyStore((s) => s.progress);
   const [query, setQuery] = useState('');
@@ -38,8 +39,8 @@ export default function GlossaryScreen() {
       <Screen>
         <View style={[styles.search, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <TextInput
-            accessibilityLabel="Buscar termo"
-            placeholder="Buscar termo ou definição (ex.: CORS, DTO)"
+            accessibilityLabel={t.glossary.searchLabel}
+            placeholder={t.glossary.searchPlaceholder}
             placeholderTextColor={colors.muted}
             value={query}
             onChangeText={setQuery}
@@ -50,12 +51,12 @@ export default function GlossaryScreen() {
           />
         </View>
         <AppText font="mono" size={12} tone="muted">
-          {`${entries.length} ${entries.length === 1 ? 'termo' : 'termos'}`}
+          {t.glossary.count(entries.length)}
         </AppText>
 
         {entries.length === 0 ? (
           <AppText tone="muted" style={styles.empty}>
-            Nenhum termo encontrado.
+            {t.glossary.empty}
           </AppText>
         ) : (
           <View style={[styles.list, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -67,7 +68,7 @@ export default function GlossaryScreen() {
                   testID="glossary-item"
                   accessibilityRole="button"
                   accessibilityLabel={entry.concept.term}
-                  accessibilityHint="Abre a definição"
+                  accessibilityHint={t.glossary.openHint}
                   onPress={() => setOpen(entry)}
                   style={({ pressed }) => [styles.item, { borderColor: colors.line, opacity: pressed ? 0.7 : 1 }]}
                 >
@@ -77,7 +78,7 @@ export default function GlossaryScreen() {
                     </AppText>
                     {status ? (
                       <AppText font="mono" size={11} tone={status === 'known' ? 'accentText' : 'warn'}>
-                        {status === 'known' ? ANSWER_LABEL.known.short : 'revisar'}
+                        {status === 'known' ? t.answer.known.short : t.glossary.reviewBadge}
                       </AppText>
                     ) : null}
                   </View>

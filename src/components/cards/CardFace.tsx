@@ -12,7 +12,7 @@ import type {
   StepCard,
   Theme,
 } from '../../content';
-import { CARD_TYPE_LABEL, FRONT_PROMPT, OPERATION_NAME } from '../../study/copy';
+import { useT } from '../../i18n';
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
@@ -33,16 +33,17 @@ type Props = {
 };
 
 export function CardFace({ card, theme, side, variantId, onSelectVariant, onOpenTerm }: Props) {
-  const label = card.type === 'step' ? `Passo ${card.number}` : CARD_TYPE_LABEL[card.type];
+  const t = useT();
+  const label = card.type === 'step' ? t.card.stepNumber(card.number) : t.card.types[card.type];
   return (
     <View style={styles.face}>
       <View style={styles.chips}>
         <TypeChip label={label} />
-        {card.origin === 'supplement' && <SupplementBadge />}
+        {card.origin === 'supplement' && <SupplementBadge label={t.card.supplement} />}
       </View>
       <Body card={card} theme={theme} side={side} variantId={variantId} onSelectVariant={onSelectVariant} />
       {side === 'back' && onOpenTerm ? (
-        <TermChips theme={theme} termIds={card.relatedTerms} onOpen={onOpenTerm} title="Termos relacionados" />
+        <TermChips theme={theme} termIds={card.relatedTerms} onOpen={onOpenTerm} title={t.card.relatedTerms} />
       ) : null}
     </View>
   );
@@ -83,6 +84,7 @@ const Prompt = ({ children }: { children: string }) => (
 
 function Endpoint({ card, side }: { card: EndpointCard; side: Side }) {
   const { colors } = useTheme();
+  const t = useT();
   if (side === 'front') {
     return (
       <View style={styles.gap}>
@@ -96,18 +98,18 @@ function Endpoint({ card, side }: { card: EndpointCard; side: Side }) {
             {card.path}
           </AppText>
         </View>
-        <Prompt>{FRONT_PROMPT.endpoint}</Prompt>
+        <Prompt>{t.card.frontPrompt.endpoint}</Prompt>
       </View>
     );
   }
   return (
     <View style={styles.gap}>
-      <AppText font="bold" size={20}>{`${card.operation} · ${OPERATION_NAME[card.operation]}`}</AppText>
+      <AppText font="bold" size={20}>{`${card.operation} · ${t.card.operation[card.operation]}`}</AppText>
       <AppText size={15}>{card.description}</AppText>
       <View style={styles.row}>
-        <StatusBox title="Sucesso" value={String(card.successStatus)} tone="accentText" bg={colors.accentSoft} />
+        <StatusBox title={t.card.success} value={String(card.successStatus)} tone="accentText" bg={colors.accentSoft} />
         {card.errorStatuses?.length ? (
-          <StatusBox title="Erros" value={card.errorStatuses.join(' · ')} tone="warn" bg={colors.warnSoft} />
+          <StatusBox title={t.card.errors} value={card.errorStatuses.join(' · ')} tone="warn" bg={colors.warnSoft} />
         ) : null}
       </View>
       <AppText font="mono" size={12.5} tone="muted">{`${card.method} ${card.path}`}</AppText>
@@ -139,12 +141,13 @@ function StatusBox({
 }
 
 function Step({ card, theme, side, variantId, onSelectVariant }: Props & { card: StepCard }) {
+  const t = useT();
   if (side === 'front') {
     return (
       <View style={styles.gap}>
         <Title>{card.title}</Title>
         <AppText size={16}>{card.whatIs}</AppText>
-        <Prompt>{FRONT_PROMPT.step}</Prompt>
+        <Prompt>{t.card.frontPrompt.step}</Prompt>
       </View>
     );
   }
@@ -167,12 +170,13 @@ function Step({ card, theme, side, variantId, onSelectVariant }: Props & { card:
 
 function Compare({ card, theme, side }: { card: CompareCard; theme: Theme; side: Side }) {
   const { colors } = useTheme();
+  const t = useT();
   if (side === 'front') {
     return (
       <View style={styles.gap}>
         <Title>{card.concept}</Title>
         <AppText size={16}>{card.explanation}</AppText>
-        <Prompt>{FRONT_PROMPT.compare}</Prompt>
+        <Prompt>{t.card.frontPrompt.compare}</Prompt>
       </View>
     );
   }
@@ -204,11 +208,12 @@ function Compare({ card, theme, side }: { card: CompareCard; theme: Theme; side:
 }
 
 function Concept({ card, side }: { card: ConceptCard; side: Side }) {
+  const t = useT();
   if (side === 'front') {
     return (
       <View style={styles.gap}>
         <Title>{card.term}</Title>
-        <Prompt>{FRONT_PROMPT.concept}</Prompt>
+        <Prompt>{t.card.frontPrompt.concept}</Prompt>
       </View>
     );
   }
@@ -244,11 +249,12 @@ function Code({ card, side }: { card: CodeCard; side: Side }) {
 }
 
 function Question({ card, side }: { card: QuestionCard; side: Side }) {
+  const t = useT();
   if (side === 'front') {
     return (
       <View style={styles.gap}>
         <Title>{card.question}</Title>
-        <Prompt>{FRONT_PROMPT.question}</Prompt>
+        <Prompt>{t.card.frontPrompt.question}</Prompt>
       </View>
     );
   }
