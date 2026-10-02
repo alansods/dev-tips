@@ -1,0 +1,1294 @@
+{
+  "id": "crud-4-frameworks",
+  "title": "O mesmo CRUD em quatro frameworks",
+  "description": "Vamos construir um CRUD completo de produtos (criar, listar, buscar, atualizar e apagar) e ver, etapa por etapa, como cada framework resolve a mesma coisa.",
+  "variants": [
+    {
+      "id": "express",
+      "name": "Express",
+      "language": "JavaScript/TypeScript"
+    },
+    {
+      "id": "spring",
+      "name": "Spring Boot",
+      "language": "Java"
+    },
+    {
+      "id": "nest",
+      "name": "NestJS",
+      "language": "TypeScript"
+    },
+    {
+      "id": "fastapi",
+      "name": "FastAPI",
+      "language": "Python"
+    }
+  ],
+  "compareColumns": [
+    {
+      "id": "frontend",
+      "label": "Frontend"
+    },
+    {
+      "id": "spring",
+      "label": "Spring Boot"
+    },
+    {
+      "id": "express",
+      "label": "Express"
+    },
+    {
+      "id": "nest",
+      "label": "NestJS"
+    },
+    {
+      "id": "fastapi",
+      "label": "FastAPI"
+    }
+  ],
+  "decks": [
+    {
+      "id": "o-que-vamos-criar",
+      "title": "O que vamos criar",
+      "description": "Os cinco endpoints do CRUD: método, caminho, operação e status.",
+      "cards": [
+        {
+          "type": "endpoint",
+          "id": "endpoint-create",
+          "method": "POST",
+          "path": "/products",
+          "operation": "C",
+          "description": "Cria um produto",
+          "successStatus": 201,
+          "errorStatuses": [
+            400
+          ],
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http",
+            "dto",
+            "validacao"
+          ]
+        },
+        {
+          "type": "endpoint",
+          "id": "endpoint-list",
+          "method": "GET",
+          "path": "/products",
+          "operation": "R",
+          "description": "Lista os produtos, em páginas",
+          "successStatus": 200,
+          "errorStatuses": [
+            400
+          ],
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http",
+            "json"
+          ]
+        },
+        {
+          "type": "endpoint",
+          "id": "endpoint-get",
+          "method": "GET",
+          "path": "/products/{id}",
+          "operation": "R",
+          "description": "Busca um produto pelo id",
+          "successStatus": 200,
+          "errorStatuses": [
+            404
+          ],
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http"
+          ]
+        },
+        {
+          "type": "endpoint",
+          "id": "endpoint-update",
+          "method": "PUT",
+          "path": "/products/{id}",
+          "operation": "U",
+          "description": "Atualiza um produto",
+          "successStatus": 200,
+          "errorStatuses": [
+            400,
+            404
+          ],
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http",
+            "dto"
+          ]
+        },
+        {
+          "type": "endpoint",
+          "id": "endpoint-delete",
+          "method": "DELETE",
+          "path": "/products/{id}",
+          "operation": "D",
+          "description": "Apaga um produto",
+          "successStatus": 204,
+          "errorStatuses": [
+            404
+          ],
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "passo-a-passo",
+      "title": "Passo a passo",
+      "description": "As 16 etapas do CRUD, com o código dos quatro frameworks lado a lado.",
+      "cards": [
+        {
+          "type": "step",
+          "id": "step-01",
+          "number": 1,
+          "title": "Criar o projeto",
+          "whatIs": "Criar a pasta do projeto com a estrutura inicial.",
+          "whyItMatters": "Alguns frameworks têm um gerador que já monta tudo (como o npm create vite que você usa no frontend). Outros você monta na mão.",
+          "snippets": {
+            "express": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "mkdir products-express\ncd products-express\nnpm init -y",
+              "note": "Sem gerador. Você começa com uma pasta vazia e um package.json e monta o resto."
+            },
+            "spring": {
+              "file": "start.spring.io",
+              "language": "text",
+              "code": "# No site start.spring.io, escolha:\n#   Project: Maven   Language: Java\n#   Dependencies: Spring Web, Spring Data JPA,\n#                 PostgreSQL Driver, Validation\n# Clique em Generate, descompacte e abra a pasta.",
+              "note": "Gerador no site. Você marca o que quer e baixa um projeto pronto."
+            },
+            "nest": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "npm i -g @nestjs/cli\nnest new products-nest\ncd products-nest\nnest g resource products",
+              "note": "Gerador por linha de comando. O nest g resource já cria controller, service, módulo e DTOs de products."
+            },
+            "fastapi": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "mkdir products-fastapi\ncd products-fastapi\npython -m venv .venv\nsource .venv/bin/activate",
+              "note": "Sem gerador. Você cria um venv (Python), que isola as bibliotecas do projeto."
+            }
+          },
+          "relatedTerms": [
+            "framework",
+            "venv"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-02",
+          "number": 2,
+          "title": "Instalar as bibliotecas",
+          "whatIs": "Baixar as bibliotecas que o projeto usa: o framework, o driver do PostgreSQL e a ferramenta de validação.",
+          "whyItMatters": "Mostra o quanto cada framework já traz pronto. O Express traz pouco; o Spring traz quase tudo.",
+          "snippets": {
+            "express": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "npm install express pg zod cors\nnpm install -D typescript tsx @types/node \\\n  @types/express @types/pg @types/cors \\\n  vitest supertest @types/supertest",
+              "note": "Você escolhe cada peça: pg fala com o banco, zod valida, cors libera o frontend."
+            },
+            "spring": {
+              "file": "pom.xml",
+              "language": "xml",
+              "code": "<!-- Já veio do gerador. O pom.xml é o\n     \"package.json\" do Java. -->\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-web</artifactId>\n</dependency>\n<dependency>\n  <groupId>org.springframework.boot</groupId>\n  <artifactId>spring-boot-starter-data-jpa</artifactId>\n</dependency>",
+              "note": "Não precisa instalar nada à mão: o Maven baixa tudo ao rodar o projeto."
+            },
+            "nest": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "npm install @nestjs/typeorm typeorm pg \\\n  class-validator class-transformer",
+              "note": "typeorm é o ORM; class-validator faz a validação."
+            },
+            "fastapi": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "pip install \"fastapi[standard]\" sqlalchemy \"psycopg[binary]\"\npip freeze > requirements.txt",
+              "note": "pip é o \"npm\" do Python e requirements.txt é a lista de dependências."
+            }
+          },
+          "relatedTerms": [
+            "framework",
+            "orm",
+            "validacao"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-03",
+          "number": 3,
+          "title": "Subir o banco e conectar",
+          "whatIs": "Ligar o PostgreSQL com Docker (o mesmo docker-compose.yml serve para os quatro) e dizer à API onde o banco está.",
+          "whyItMatters": "O endereço e a senha do banco ficam fora do código, numa variável de ambiente ou arquivo de configuração.",
+          "snippets": {
+            "express": {
+              "file": ".env + src/db.ts",
+              "language": "ts",
+              "code": "# .env\nDATABASE_URL=postgres://products:products@localhost:5432/productsdb\n\n// src/db.ts\nimport pg from 'pg';\nexport const pool = new pg.Pool({\n  connectionString: process.env.DATABASE_URL,\n});",
+              "note": "Você cria o pool de conexões manualmente."
+            },
+            "spring": {
+              "file": "application.properties",
+              "language": "properties",
+              "code": "spring.datasource.url=jdbc:postgresql://localhost:5432/productsdb\nspring.datasource.username=products\nspring.datasource.password=products\nspring.jpa.hibernate.ddl-auto=update",
+              "note": "Só configuração, sem código. O ddl-auto=update faz o Spring criar a tabela sozinho."
+            },
+            "nest": {
+              "file": "src/app.module.ts",
+              "language": "ts",
+              "code": "@Module({\n  imports: [\n    TypeOrmModule.forRoot({\n      type: 'postgres',\n      url: process.env.DATABASE_URL,\n      autoLoadEntities: true,\n      synchronize: true, // cria a tabela (só em dev)\n    }),\n    ProductsModule,\n  ],\n})\nexport class AppModule {}",
+              "note": "Configurado dentro de um módulo, usando decorators."
+            },
+            "fastapi": {
+              "file": "app/database.py",
+              "language": "python",
+              "code": "import os\nfrom sqlalchemy import create_engine\nfrom sqlalchemy.orm import sessionmaker\n\nengine = create_engine(os.getenv(\"DATABASE_URL\"))\nSessionLocal = sessionmaker(bind=engine)\n\ndef get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()",
+              "note": "get_db abre uma sessão com o banco para cada pedido e fecha no final."
+            }
+          },
+          "relatedTerms": [
+            "docker",
+            "variavel-de-ambiente",
+            "pool-de-conexoes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "docker-compose",
+          "origin": "supplement",
+          "title": "docker-compose.yml",
+          "body": "O Passo 3 diz que o mesmo docker-compose.yml serve para os quatro frameworks, mas não mostra o arquivo. Ele sobe o PostgreSQL usado por todas as versões.",
+          "snippet": {
+            "file": "docker-compose.yml",
+            "language": "yaml",
+            "code": "services:\n  db:\n    image: postgres:16\n    container_name: products-db\n    environment:\n      POSTGRES_USER: products\n      POSTGRES_PASSWORD: products\n      POSTGRES_DB: productsdb\n    ports:\n      - \"5432:5432\"",
+            "note": "Suba com docker compose up -d. O container products-db é o mesmo usado no Passo 15 para abrir o psql."
+          },
+          "relatedTerms": [
+            "docker",
+            "variavel-de-ambiente"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-04",
+          "number": 4,
+          "title": "Definir a tabela de produtos",
+          "whatIs": "Descrever as colunas da tabela: id, nome, descrição, preço, estoque e data de criação.",
+          "whyItMatters": "Com ORM você escreve uma classe (entidade) e ele cria a tabela. Sem ORM, como no Express do guia, você escreve o SQL da tabela.",
+          "snippets": {
+            "express": {
+              "file": "db/init.sql",
+              "language": "sql",
+              "code": "CREATE TABLE IF NOT EXISTS products (\n  id          SERIAL PRIMARY KEY,\n  name        VARCHAR(100)   NOT NULL,\n  description VARCHAR(500),\n  price       NUMERIC(12, 2) NOT NULL CHECK (price > 0),\n  stock       INTEGER        NOT NULL CHECK (stock >= 0),\n  created_at  TIMESTAMPTZ    NOT NULL DEFAULT now()\n);",
+              "note": "SQL puro. E à parte uma interface Product no TypeScript."
+            },
+            "spring": {
+              "file": "Product.java",
+              "language": "java",
+              "code": "@Entity\n@Table(name = \"products\")\npublic class Product {\n  @Id\n  @GeneratedValue(strategy = GenerationType.IDENTITY)\n  private Long id;\n\n  @Column(nullable = false, length = 100)\n  private String name;\n\n  @Column(length = 500)\n  private String description;\n\n  @Column(nullable = false, precision = 12, scale = 2)\n  private BigDecimal price;\n\n  @Column(nullable = false)\n  private Integer stock;\n\n  @CreationTimestamp\n  private Instant createdAt;\n  // getters e setters\n}",
+              "note": "Classe com anotações. O @Entity diz \"isto é uma tabela\"."
+            },
+            "nest": {
+              "file": "product.entity.ts",
+              "language": "ts",
+              "code": "@Entity('products')\nexport class Product {\n  @PrimaryGeneratedColumn()\n  id: number;\n\n  @Column({ length: 100 })\n  name: string;\n\n  @Column({ length: 500, nullable: true })\n  description: string | null;\n\n  @Column('numeric', {\n    precision: 12, scale: 2,\n    transformer: { to: (v: number) => v, from: (v: string) => Number(v) },\n  })\n  price: number;\n\n  @Column('int')\n  stock: number;\n\n  @CreateDateColumn()\n  createdAt: Date;\n}",
+              "note": "Muito parecido com o Spring. O transformer converte o preço, que o banco devolve como texto, em número."
+            },
+            "fastapi": {
+              "file": "app/models.py",
+              "language": "python",
+              "code": "class Product(Base):\n    __tablename__ = \"products\"\n\n    id: Mapped[int] = mapped_column(primary_key=True)\n    name: Mapped[str] = mapped_column(String(100))\n    description: Mapped[str | None] = mapped_column(String(500))\n    price: Mapped[Decimal] = mapped_column(Numeric(12, 2))\n    stock: Mapped[int]\n    created_at: Mapped[datetime] = mapped_column(\n        server_default=func.now())\n\n# em main.py: Base.metadata.create_all(engine)",
+              "note": "Classe Python. Os tipos (Mapped[int]) dizem o tipo da coluna."
+            }
+          },
+          "relatedTerms": [
+            "entidade",
+            "orm",
+            "sql"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-05",
+          "number": 5,
+          "title": "Definir e validar os dados de entrada",
+          "whatIs": "Dizer como deve ser o JSON que o frontend envia (o DTO) e quais regras ele precisa cumprir.",
+          "whyItMatters": "Se alguém mandar preço negativo, a API recusa com status 400 antes de chegar no banco. É a mesma ideia de validar um formulário com Zod no frontend.",
+          "snippets": {
+            "express": {
+              "file": "product.schema.ts",
+              "language": "ts",
+              "code": "export const productSchema = z.object({\n  name: z.string().min(3).max(100),\n  description: z.string().max(500).optional(),\n  price: z.number().positive('O preço deve ser maior que zero'),\n  stock: z.number().int().min(0),\n});\n\nexport type ProductInput = z.infer<typeof productSchema>;",
+              "note": "Zod, igual ao frontend. O tipo TypeScript sai do próprio schema."
+            },
+            "spring": {
+              "file": "ProductRequest.java",
+              "language": "java",
+              "code": "public record ProductRequest(\n  @NotBlank @Size(min = 3, max = 100) String name,\n  @Size(max = 500) String description,\n  @NotNull @Positive BigDecimal price,\n  @NotNull @PositiveOrZero Integer stock\n) {}",
+              "note": "Anotações em cada campo. record é uma classe só de dados."
+            },
+            "nest": {
+              "file": "create-product.dto.ts",
+              "language": "ts",
+              "code": "export class CreateProductDto {\n  @IsString() @Length(3, 100)\n  name: string;\n\n  @IsOptional() @IsString() @MaxLength(500)\n  description?: string;\n\n  @IsPositive()\n  price: number;\n\n  @IsInt() @Min(0)\n  stock: number;\n}\n\n// main.ts: liga a validação para toda a API\napp.useGlobalPipes(new ValidationPipe({ whitelist: true }));",
+              "note": "Classe com decorators, no mesmo estilo do Spring."
+            },
+            "fastapi": {
+              "file": "app/schemas.py",
+              "language": "python",
+              "code": "class ProductIn(BaseModel):\n    name: str = Field(min_length=3, max_length=100)\n    description: str | None = Field(default=None, max_length=500)\n    price: Decimal = Field(gt=0)\n    stock: int = Field(ge=0)\n\nclass ProductOut(ProductIn):\n    id: int\n    created_at: datetime\n    model_config = ConfigDict(from_attributes=True)",
+              "note": "Pydantic. A validação acontece sozinha só por usar essa classe na rota."
+            }
+          },
+          "relatedTerms": [
+            "dto",
+            "validacao",
+            "status-http"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-06",
+          "number": 6,
+          "title": "Montar a estrutura em camadas",
+          "whatIs": "Criar os três arquivos que todo CRUD vai usar e ligá-los entre si: Repository (fala com o banco), Service (regras) e Controller (recebe o pedido e responde).",
+          "whyItMatters": "Nos próximos 5 passos cada operação do CRUD vai passar por essas três camadas, sempre nessa ordem: controller → service → repository → banco.",
+          "snippets": {
+            "express": {
+              "file": "routes + app.ts + errors.ts",
+              "language": "ts",
+              "code": "// src/errors.ts\nexport class NotFoundError extends Error {}\n\n// src/products/product.routes.ts\nexport const productRoutes = Router();\nproductRoutes.post('/', controller.create);\nproductRoutes.get('/', controller.list);\nproductRoutes.get('/:id', controller.get);\nproductRoutes.put('/:id', controller.update);\nproductRoutes.delete('/:id', controller.remove);\n\n// src/app.ts\napp.use(express.json()); // transforma o corpo em objeto\napp.use('/products', productRoutes);\n\n// o service importa o repository e o controller\n// importa o service: import * as service from ...",
+              "note": "Ligação por import. Cada camada é um arquivo com funções; não há injeção de dependência."
+            },
+            "spring": {
+              "file": "Repository, Service e Controller",
+              "language": "java",
+              "code": "// ProductRepository.java (pronto, sem SQL)\npublic interface ProductRepository\n    extends JpaRepository<Product, Long> {}\n\n// ProductService.java\n@Service\npublic class ProductService {\n  private final ProductRepository repository;\n  public ProductService(ProductRepository repository) {\n    this.repository = repository;\n  }\n}\n\n// ProductController.java\n@RestController\n@RequestMapping(\"/products\")\npublic class ProductController {\n  private final ProductService service;\n  public ProductController(ProductService service) {\n    this.service = service;\n  }\n}\n\n// ProductNotFoundException.java\npublic class ProductNotFoundException extends RuntimeException {\n  public ProductNotFoundException(Long id) {\n    super(\"Produto não encontrado: \" + id);\n  }\n}",
+              "note": "Ligação pelo construtor. O Spring cria cada classe e entrega a outra pronta (injeção de dependência)."
+            },
+            "nest": {
+              "file": "products.module.ts + service + controller",
+              "language": "ts",
+              "code": "// products.module.ts\n@Module({\n  imports: [TypeOrmModule.forFeature([Product])],\n  controllers: [ProductsController],\n  providers: [ProductsService],\n})\nexport class ProductsModule {}\n\n// products.service.ts\n@Injectable()\nexport class ProductsService {\n  constructor(\n    @InjectRepository(Product)\n    private readonly repo: Repository<Product>,\n  ) {}\n}\n\n// products.controller.ts\n@Controller('products')\nexport class ProductsController {\n  constructor(private readonly service: ProductsService) {}\n}",
+              "note": "Ligação pelo construtor + módulo. O módulo diz ao Nest quais peças existem. O repository vem pronto do TypeORM."
+            },
+            "fastapi": {
+              "file": "main.py + router.py + service.py",
+              "language": "python",
+              "code": "# app/router.py\nrouter = APIRouter(prefix=\"/products\", tags=[\"products\"])\n\n# app/main.py\napp = FastAPI()\nBase.metadata.create_all(engine)\napp.include_router(router)\n\n# app/service.py (funções que recebem a sessão do banco)\nclass ProductNotFound(Exception):\n    def __init__(self, product_id: int):\n        super().__init__(f\"Produto não encontrado: {product_id}\")\n\n# Não há repository: a sessão (db) faz esse papel.\n# Cada rota recebe db via Depends(get_db).",
+              "note": "Ligação por import + Depends(). O FastAPI entrega a sessão do banco em cada rota."
+            }
+          },
+          "relatedTerms": [
+            "controller",
+            "service",
+            "repository",
+            "injecao-de-dependencia",
+            "decorator-anotacao"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-07",
+          "number": 7,
+          "title": "C: Criar produto",
+          "whatIs": "POST /products com o produto no corpo. Responde 201 Created com o produto salvo (já com id).",
+          "whyItMatters": "O controller valida o corpo, o service manda salvar, o repository insere no banco e devolve a linha criada.",
+          "snippets": {
+            "express": {
+              "file": "repository + service + controller",
+              "language": "ts",
+              "code": "// product.repository.ts\nexport async function insert(input: ProductInput) {\n  const { rows } = await pool.query<ProductRow>(\n    `INSERT INTO products (name, description, price, stock)\n     VALUES ($1, $2, $3, $4) RETURNING *`,\n    [input.name, input.description ?? null, input.price, input.stock],\n  );\n  return toProduct(rows[0]);\n}\n\n// product.service.ts\nexport const create = (input: ProductInput) =>\n  repository.insert(input);\n\n// product.controller.ts\nexport async function create(req: Request, res: Response) {\n  const input = productSchema.parse(req.body);\n  const created = await service.create(input);\n  res.status(201).location('/products/' + created.id).json(created);\n}",
+              "note": "O toProduct converte a linha do banco (snake_case, preço como texto) para o formato do JS."
+            },
+            "spring": {
+              "file": "Service + Controller",
+              "language": "java",
+              "code": "// ProductService.java\npublic Product create(ProductRequest req) {\n  Product p = new Product();\n  p.setName(req.name());\n  p.setDescription(req.description());\n  p.setPrice(req.price());\n  p.setStock(req.stock());\n  return repository.save(p); // INSERT gerado pelo JPA\n}\n\n// ProductController.java\n@PostMapping\npublic ResponseEntity<Product> create(\n    @Valid @RequestBody ProductRequest req) {\n  Product p = service.create(req);\n  return ResponseEntity\n    .created(URI.create(\"/products/\" + p.getId()))\n    .body(p);\n}",
+              "note": "repository.save() já existe. @Valid valida o corpo antes de entrar no método."
+            },
+            "nest": {
+              "file": "service + controller",
+              "language": "ts",
+              "code": "// products.service.ts\ncreate(dto: CreateProductDto) {\n  const product = this.repo.create(dto); // monta o objeto\n  return this.repo.save(product);        // INSERT\n}\n\n// products.controller.ts\n@Post() // 201 por padrão\ncreate(@Body() dto: CreateProductDto) {\n  return this.service.create(dto);\n}",
+              "note": "O ValidationPipe global valida o DTO automaticamente."
+            },
+            "fastapi": {
+              "file": "service.py + router.py",
+              "language": "python",
+              "code": "# service.py\ndef create_product(db: Session, data: ProductIn) -> Product:\n    product = Product(**data.model_dump())\n    db.add(product)\n    db.commit()\n    db.refresh(product)  # recarrega id e created_at\n    return product\n\n# router.py\n@router.post(\"\", response_model=ProductOut, status_code=201)\ndef create(data: ProductIn, db: Session = Depends(get_db)):\n    return service.create_product(db, data)",
+              "note": "model_dump() transforma o Pydantic em dicionário; espalha os campos (como o spread do JS)."
+            }
+          },
+          "relatedTerms": [
+            "controller",
+            "service",
+            "repository",
+            "status-http"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "express-to-product",
+          "origin": "supplement",
+          "variant": "express",
+          "title": "ProductRow e toProduct",
+          "body": "O Passo 7 usa ProductRow e toProduct, e o Passo 4 cita a interface Product, mas nenhum dos três aparece no material. A linha chega do banco em snake_case e com o preço como texto; toProduct converte para o formato do JS.",
+          "snippet": {
+            "file": "src/products/product.repository.ts",
+            "language": "ts",
+            "code": "// linha como vem do banco (snake_case, NUMERIC como texto)\nexport interface ProductRow {\n  id: number;\n  name: string;\n  description: string | null;\n  price: string;\n  stock: number;\n  created_at: Date;\n}\n\n// formato usado no resto da API\nexport interface Product {\n  id: number;\n  name: string;\n  description: string | null;\n  price: number;\n  stock: number;\n  createdAt: Date;\n}\n\nexport function toProduct(row: ProductRow): Product {\n  return {\n    id: row.id,\n    name: row.name,\n    description: row.description,\n    price: Number(row.price),\n    stock: row.stock,\n    createdAt: row.created_at,\n  };\n}",
+            "note": "O pg devolve NUMERIC como texto para não perder precisão; por isso o Number(row.price)."
+          },
+          "relatedTerms": [
+            "repository",
+            "sql"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-08",
+          "number": 8,
+          "title": "R: Listar produtos",
+          "whatIs": "GET /products?page=0&size=10. Responde 200 com uma página de produtos.",
+          "whyItMatters": "Com milhares de produtos você não quer devolver tudo de uma vez. A resposta segue o mesmo formato nos quatro: { content, page, size, totalElements, totalPages }.",
+          "snippets": {
+            "express": {
+              "file": "repository + service + controller",
+              "language": "ts",
+              "code": "// product.repository.ts\nexport async function findPage(page: number, size: number) {\n  const [data, count] = await Promise.all([\n    pool.query<ProductRow>(\n      'SELECT * FROM products ORDER BY id LIMIT $1 OFFSET $2',\n      [size, page * size]),\n    pool.query<{ count: string }>('SELECT COUNT(*) FROM products'),\n  ]);\n  return { items: data.rows.map(toProduct),\n           total: Number(count.rows[0].count) };\n}\n\n// product.service.ts\nexport async function list(page: number, size: number) {\n  const { items, total } = await repository.findPage(page, size);\n  return { content: items, page, size, totalElements: total,\n           totalPages: Math.ceil(total / size) };\n}\n\n// product.controller.ts\nexport async function list(req: Request, res: Response) {\n  const { page, size } = pageQuerySchema.parse(req.query);\n  res.json(await service.list(page, size));\n}",
+              "note": "Você escreve o LIMIT/OFFSET e o COUNT na mão."
+            },
+            "spring": {
+              "file": "Service + Controller",
+              "language": "java",
+              "code": "// ProductService.java\npublic Page<Product> list(Pageable pageable) {\n  return repository.findAll(pageable);\n}\n\n// ProductController.java\n@GetMapping\npublic Page<Product> list(\n    @PageableDefault(size = 10, sort = \"id\") Pageable pageable) {\n  return service.list(pageable);\n}\n// ?page=0&size=10 é lido automaticamente",
+              "note": "Paginação pronta. O Spring lê page e size da URL e monta a resposta."
+            },
+            "nest": {
+              "file": "service + controller",
+              "language": "ts",
+              "code": "// products.service.ts\nasync findAll(page: number, size: number) {\n  const [content, totalElements] = await this.repo.findAndCount({\n    order: { id: 'ASC' },\n    skip: page * size,\n    take: size,\n  });\n  return { content, page, size, totalElements,\n           totalPages: Math.ceil(totalElements / size) };\n}\n\n// products.controller.ts\n@Get()\nfindAll(\n  @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,\n  @Query('size', new DefaultValuePipe(10), ParseIntPipe) size: number,\n) {\n  return this.service.findAll(page, size);\n}",
+              "note": "findAndCount busca a página e o total numa chamada só."
+            },
+            "fastapi": {
+              "file": "schemas.py + service.py + router.py",
+              "language": "python",
+              "code": "# schemas.py\nclass ProductPage(BaseModel):\n    content: list[ProductOut]\n    page: int\n    size: int\n    totalElements: int\n    totalPages: int\n\n# service.py\ndef list_products(db: Session, page: int, size: int):\n    items = db.scalars(select(Product).order_by(Product.id)\n                       .offset(page * size).limit(size)).all()\n    total = db.scalar(select(func.count()).select_from(Product))\n    return {\"content\": items, \"page\": page, \"size\": size,\n            \"totalElements\": total,\n            \"totalPages\": math.ceil(total / size)}\n\n# router.py\n@router.get(\"\", response_model=ProductPage)\ndef list_all(page: int = Query(0, ge=0),\n             size: int = Query(10, ge=1, le=100),\n             db: Session = Depends(get_db)):\n    return service.list_products(db, page, size)",
+              "note": "Query(0, ge=0) define valor padrão e regra (maior ou igual a 0)."
+            }
+          },
+          "relatedTerms": [
+            "endpoint",
+            "json"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "express-query-schemas",
+          "origin": "supplement",
+          "variant": "express",
+          "title": "pageQuerySchema e idParamSchema",
+          "body": "O Passo 8 usa pageQuerySchema, e os Passos 9 a 11 usam idParamSchema, mas os dois schemas não aparecem no material. Eles ficam ao lado do productSchema do Passo 5.",
+          "snippet": {
+            "file": "src/products/product.schema.ts",
+            "language": "ts",
+            "code": "// ?page=0&size=10 chega como texto: z.coerce converte para número\nexport const pageQuerySchema = z.object({\n  page: z.coerce.number().int().min(0).default(0),\n  size: z.coerce.number().int().min(1).max(100).default(10),\n});\n\n// /products/:id chega como texto: \"1\" -> 1\nexport const idParamSchema = z.object({\n  id: z.coerce.number().int().positive(),\n});",
+            "note": "Os limites (size entre 1 e 100) são os mesmos do Query(10, ge=1, le=100) do FastAPI no Passo 8."
+          },
+          "relatedTerms": [
+            "validacao",
+            "endpoint"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-09",
+          "number": 9,
+          "title": "R: Buscar um produto",
+          "whatIs": "GET /products/1. Responde 200 com o produto, ou 404 se ele não existir.",
+          "whyItMatters": "O repository só diz \"não achei\". Quem transforma isso em erro é o service. Esse método get é reaproveitado no atualizar e no apagar.",
+          "snippets": {
+            "express": {
+              "file": "repository + service + controller",
+              "language": "ts",
+              "code": "// product.repository.ts\nexport async function findById(id: number) {\n  const { rows } = await pool.query<ProductRow>(\n    'SELECT * FROM products WHERE id = $1', [id]);\n  return rows[0] ? toProduct(rows[0]) : null;\n}\n\n// product.service.ts\nexport async function get(id: number) {\n  const product = await repository.findById(id);\n  if (!product) throw new NotFoundError('Produto não encontrado: ' + id);\n  return product;\n}\n\n// product.controller.ts\nexport async function get(req: Request, res: Response) {\n  const { id } = idParamSchema.parse(req.params); // \"1\" -> 1\n  res.json(await service.get(id));\n}",
+              "note": "O id chega da URL como texto; o Zod (z.coerce.number()) converte."
+            },
+            "spring": {
+              "file": "Service + Controller",
+              "language": "java",
+              "code": "// ProductService.java\npublic Product get(Long id) {\n  return repository.findById(id)\n    .orElseThrow(() -> new ProductNotFoundException(id));\n}\n\n// ProductController.java\n@GetMapping(\"/{id}\")\npublic Product get(@PathVariable Long id) {\n  return service.get(id);\n}",
+              "note": "findById devolve um Optional (uma \"caixa\" que pode estar vazia)."
+            },
+            "nest": {
+              "file": "service + controller",
+              "language": "ts",
+              "code": "// products.service.ts\nasync findOne(id: number) {\n  const product = await this.repo.findOneBy({ id });\n  if (!product) {\n    throw new NotFoundException('Produto não encontrado: ' + id);\n  }\n  return product;\n}\n\n// products.controller.ts\n@Get(':id')\nfindOne(@Param('id', ParseIntPipe) id: number) {\n  return this.service.findOne(id);\n}",
+              "note": "ParseIntPipe converte o id e responde 400 se não for número."
+            },
+            "fastapi": {
+              "file": "service.py + router.py",
+              "language": "python",
+              "code": "# service.py\ndef get_product(db: Session, product_id: int) -> Product:\n    product = db.get(Product, product_id)\n    if product is None:\n        raise ProductNotFound(product_id)\n    return product\n\n# router.py\n@router.get(\"/{product_id}\", response_model=ProductOut)\ndef get_one(product_id: int, db: Session = Depends(get_db)):\n    return service.get_product(db, product_id)",
+              "note": "Só por declarar product_id: int, o FastAPI converte e valida."
+            }
+          },
+          "relatedTerms": [
+            "repository",
+            "service",
+            "status-http"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-10",
+          "number": 10,
+          "title": "U: Atualizar produto",
+          "whatIs": "PUT /products/1 com o produto completo no corpo. Responde 200 com o produto atualizado, ou 404.",
+          "whyItMatters": "Valida o id e o corpo, confere se o produto existe, troca os campos e salva.",
+          "snippets": {
+            "express": {
+              "file": "repository + service + controller",
+              "language": "ts",
+              "code": "// product.repository.ts\nexport async function update(id: number, input: ProductInput) {\n  const { rows } = await pool.query<ProductRow>(\n    `UPDATE products\n     SET name = $1, description = $2, price = $3, stock = $4\n     WHERE id = $5 RETURNING *`,\n    [input.name, input.description ?? null, input.price, input.stock, id],\n  );\n  return rows[0] ? toProduct(rows[0]) : null;\n}\n\n// product.service.ts\nexport async function update(id: number, input: ProductInput) {\n  const product = await repository.update(id, input);\n  if (!product) throw new NotFoundError('Produto não encontrado: ' + id);\n  return product;\n}\n\n// product.controller.ts\nexport async function update(req: Request, res: Response) {\n  const { id } = idParamSchema.parse(req.params);\n  const input = productSchema.parse(req.body);\n  res.json(await service.update(id, input));\n}",
+              "note": "Se nenhuma linha foi atualizada, o produto não existia: vira 404."
+            },
+            "spring": {
+              "file": "Service + Controller",
+              "language": "java",
+              "code": "// ProductService.java\npublic Product update(Long id, ProductRequest req) {\n  Product p = get(id); // 404 se não existir\n  p.setName(req.name());\n  p.setDescription(req.description());\n  p.setPrice(req.price());\n  p.setStock(req.stock());\n  return repository.save(p); // vira UPDATE porque já tem id\n}\n\n// ProductController.java\n@PutMapping(\"/{id}\")\npublic Product update(@PathVariable Long id,\n                      @Valid @RequestBody ProductRequest req) {\n  return service.update(id, req);\n}",
+              "note": "O mesmo save() faz INSERT ou UPDATE, dependendo se o objeto já tem id."
+            },
+            "nest": {
+              "file": "service + controller",
+              "language": "ts",
+              "code": "// products.service.ts\nasync update(id: number, dto: CreateProductDto) {\n  const product = await this.findOne(id); // 404 se não existir\n  Object.assign(product, dto);            // copia os campos novos\n  return this.repo.save(product);         // UPDATE\n}\n\n// products.controller.ts\n@Put(':id')\nupdate(@Param('id', ParseIntPipe) id: number,\n       @Body() dto: CreateProductDto) {\n  return this.service.update(id, dto);\n}",
+              "note": "Reaproveita o findOne do passo anterior."
+            },
+            "fastapi": {
+              "file": "service.py + router.py",
+              "language": "python",
+              "code": "# service.py\ndef update_product(db: Session, product_id: int, data: ProductIn):\n    product = get_product(db, product_id)  # 404 se não existir\n    for field, value in data.model_dump().items():\n        setattr(product, field, value)\n    db.commit()\n    db.refresh(product)\n    return product\n\n# router.py\n@router.put(\"/{product_id}\", response_model=ProductOut)\ndef update(product_id: int, data: ProductIn,\n           db: Session = Depends(get_db)):\n    return service.update_product(db, product_id, data)",
+              "note": "setattr troca cada campo; o commit grava no banco."
+            }
+          },
+          "relatedTerms": [
+            "service",
+            "status-http"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-11",
+          "number": 11,
+          "title": "D: Apagar produto",
+          "whatIs": "DELETE /products/1. Responde 204 No Content (deu certo, sem corpo), ou 404.",
+          "whyItMatters": "Valida o id, apaga e confere se alguma linha foi realmente apagada.",
+          "snippets": {
+            "express": {
+              "file": "repository + service + controller",
+              "language": "ts",
+              "code": "// product.repository.ts\nexport async function remove(id: number) {\n  const result = await pool.query(\n    'DELETE FROM products WHERE id = $1', [id]);\n  return (result.rowCount ?? 0) > 0; // apagou alguma linha?\n}\n\n// product.service.ts\nexport async function remove(id: number) {\n  const deleted = await repository.remove(id);\n  if (!deleted) throw new NotFoundError('Produto não encontrado: ' + id);\n}\n\n// product.controller.ts\nexport async function remove(req: Request, res: Response) {\n  const { id } = idParamSchema.parse(req.params);\n  await service.remove(id);\n  res.status(204).send();\n}",
+              "note": "A função se chama remove porque delete é palavra reservada no JS."
+            },
+            "spring": {
+              "file": "Service + Controller",
+              "language": "java",
+              "code": "// ProductService.java\npublic void delete(Long id) {\n  if (!repository.existsById(id)) {\n    throw new ProductNotFoundException(id);\n  }\n  repository.deleteById(id);\n}\n\n// ProductController.java\n@DeleteMapping(\"/{id}\")\n@ResponseStatus(HttpStatus.NO_CONTENT)\npublic void delete(@PathVariable Long id) {\n  service.delete(id);\n}",
+              "note": "@ResponseStatus define o 204."
+            },
+            "nest": {
+              "file": "service + controller",
+              "language": "ts",
+              "code": "// products.service.ts\nasync remove(id: number) {\n  const result = await this.repo.delete(id);\n  if (!result.affected) {\n    throw new NotFoundException('Produto não encontrado: ' + id);\n  }\n}\n\n// products.controller.ts\n@Delete(':id')\n@HttpCode(204)\nremove(@Param('id', ParseIntPipe) id: number) {\n  return this.service.remove(id);\n}",
+              "note": "affected diz quantas linhas foram apagadas."
+            },
+            "fastapi": {
+              "file": "service.py + router.py",
+              "language": "python",
+              "code": "# service.py\ndef delete_product(db: Session, product_id: int) -> None:\n    product = get_product(db, product_id)  # 404 se não existir\n    db.delete(product)\n    db.commit()\n\n# router.py\n@router.delete(\"/{product_id}\", status_code=204)\ndef delete(product_id: int, db: Session = Depends(get_db)):\n    service.delete_product(db, product_id)",
+              "note": "status_code=204 na própria rota."
+            }
+          },
+          "relatedTerms": [
+            "status-http",
+            "sql"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-12",
+          "number": 12,
+          "title": "Tratar erros em um lugar só",
+          "whatIs": "Um ponto central que transforma erros em respostas: \"não encontrado\" vira 404, dados inválidos viram 400.",
+          "whyItMatters": "Sem isso, cada rota precisaria de try/catch. É parecido com um error boundary no React.",
+          "snippets": {
+            "express": {
+              "file": "error-handler.ts",
+              "language": "ts",
+              "code": "export const errorHandler: ErrorRequestHandler =\n  (err, _req, res, _next) => {\n    if (err instanceof ZodError) {\n      return res.status(400).json({ message: 'Dados inválidos' });\n    }\n    if (err instanceof NotFoundError) {\n      return res.status(404).json({ message: err.message });\n    }\n    res.status(500).json({ message: 'Erro interno' });\n  };\n\n// app.ts: registrar por último\napp.use(errorHandler);",
+              "note": "Um Middleware especial com 4 parâmetros. Sem o 4º, o Express não reconhece."
+            },
+            "spring": {
+              "file": "GlobalExceptionHandler.java",
+              "language": "java",
+              "code": "@RestControllerAdvice\npublic class GlobalExceptionHandler {\n\n  @ExceptionHandler(ProductNotFoundException.class)\n  @ResponseStatus(HttpStatus.NOT_FOUND)\n  public Map<String, Object> notFound(ProductNotFoundException e) {\n    return Map.of(\"status\", 404, \"message\", e.getMessage());\n  }\n  // outro @ExceptionHandler para erros de validação (400)\n}",
+              "note": "Uma classe com um método por tipo de erro."
+            },
+            "nest": {
+              "file": "(já vem pronto)",
+              "language": "ts",
+              "code": "// Nada a fazer para o básico:\n// NotFoundException      -> 404\n// ValidationPipe falhou  -> 400\n// erro inesperado        -> 500\n\n// Para personalizar o formato: crie um ExceptionFilter",
+              "note": "O mais pronto dos quatro."
+            },
+            "fastapi": {
+              "file": "app/main.py",
+              "language": "python",
+              "code": "@app.exception_handler(ProductNotFound)\nasync def not_found(request, exc):\n    return JSONResponse(status_code=404,\n                        content={\"message\": str(exc)})\n\n# Erros de validação já são tratados sozinhos,\n# mas o FastAPI responde 422 (e não 400).",
+              "note": "Atenção: validação no FastAPI devolve 422 por padrão."
+            }
+          },
+          "relatedTerms": [
+            "middleware",
+            "status-http",
+            "decorator-anotacao"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-13",
+          "number": 13,
+          "title": "Liberar o frontend (CORS)",
+          "whatIs": "Autorizar o endereço do seu frontend (ex.: localhost:5173) a chamar a API.",
+          "whyItMatters": "Sem isso aparece aquele erro de CORS no console do navegador, mesmo com a API funcionando.",
+          "snippets": {
+            "express": {
+              "file": "app.ts",
+              "language": "ts",
+              "code": "app.use(cors({\n  origin: ['http://localhost:5173', 'http://localhost:3000'],\n}));",
+              "note": "Um pacote extra, uma linha."
+            },
+            "spring": {
+              "file": "CorsConfig.java",
+              "language": "java",
+              "code": "@Configuration\npublic class CorsConfig implements WebMvcConfigurer {\n  @Override\n  public void addCorsMappings(CorsRegistry registry) {\n    registry.addMapping(\"/**\")\n      .allowedOrigins(\"http://localhost:5173\")\n      .allowedMethods(\"GET\", \"POST\", \"PUT\", \"DELETE\");\n  }\n}",
+              "note": "Uma classe de configuração."
+            },
+            "nest": {
+              "file": "main.ts",
+              "language": "ts",
+              "code": "const app = await NestFactory.create(AppModule);\napp.enableCors({ origin: ['http://localhost:5173'] });\nawait app.listen(8080);",
+              "note": "Uma linha, já embutida no Nest."
+            },
+            "fastapi": {
+              "file": "app/main.py",
+              "language": "python",
+              "code": "app.add_middleware(\n    CORSMiddleware,\n    allow_origins=[\"http://localhost:5173\"],\n    allow_methods=[\"*\"],\n    allow_headers=[\"*\"],\n)",
+              "note": "Um middleware que já vem no FastAPI."
+            }
+          },
+          "relatedTerms": [
+            "cors",
+            "middleware"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-14",
+          "number": 14,
+          "title": "Rodar a API",
+          "whatIs": "O comando para ligar a API em modo de desenvolvimento, que reinicia sozinha quando você salva um arquivo.",
+          "whyItMatters": "Equivale ao npm run dev do frontend.",
+          "snippets": {
+            "express": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "npm run dev\n# script: tsx watch --env-file=.env src/server.ts",
+              "note": "API em http://localhost:8080"
+            },
+            "spring": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "./mvnw spring-boot:run",
+              "note": "A primeira vez demora porque o Maven baixa as dependências."
+            },
+            "nest": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "npm run start:dev",
+              "note": "Já vem configurado pelo gerador."
+            },
+            "fastapi": {
+              "file": "terminal",
+              "language": "bash",
+              "code": "fastapi dev app/main.py",
+              "note": "Bônus: abra http://localhost:8000/docs para ver e testar a API numa página pronta."
+            }
+          },
+          "relatedTerms": [
+            "variavel-de-ambiente",
+            "api"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "express-server",
+          "origin": "supplement",
+          "variant": "express",
+          "title": "server.ts",
+          "body": "O Passo 14 roda tsx watch --env-file=.env src/server.ts, mas o server.ts não aparece no material. Ele só importa o app e liga a API na porta 8080.",
+          "snippet": {
+            "file": "src/server.ts",
+            "language": "ts",
+            "code": "import { app } from './app';\n\nconst port = Number(process.env.PORT ?? 8080);\n\napp.listen(port, () => {\n  console.log(`API em http://localhost:${port}`);\n});",
+            "note": "Para isso o app.ts do Passo 6 exporta o app (export const app = express();). Separar app e server é o que permite ao teste do Passo 16 usar request(app) sem abrir a porta."
+          },
+          "relatedTerms": [
+            "variavel-de-ambiente",
+            "api"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-15",
+          "number": 15,
+          "title": "Testar o CRUD na mão",
+          "whatIs": "Chamar cada operação do CRUD pelo terminal com curl, na ordem: criar, listar, buscar, atualizar e apagar.",
+          "whyItMatters": "Os comandos são iguais para os quatro; só muda a porta. Também vale testar um erro (preço negativo deve dar 400, ou 422 no FastAPI).",
+          "snippets": {
+            "express": {
+              "file": "terminal (porta 8080)",
+              "language": "bash",
+              "code": "B=http://localhost:8080/products\n\n# C: criar\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado\",\"price\":299.90,\"stock\":15}'\n\n# R: listar\ncurl \"$B?page=0&size=10\"\n\n# R: buscar\ncurl $B/1\n\n# U: atualizar\ncurl -X PUT $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado RGB\",\"price\":349.90,\"stock\":10}'\n\n# D: apagar\ncurl -i -X DELETE $B/1\n\n# erro: preço negativo\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Mouse\",\"price\":-5,\"stock\":1}'",
+              "note": "Ver os dados no banco: docker exec -it products-db psql -U products productsdb -c \"SELECT * FROM products;\""
+            },
+            "spring": {
+              "file": "terminal (porta 8080)",
+              "language": "bash",
+              "code": "B=http://localhost:8080/products\n\n# C: criar\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado\",\"price\":299.90,\"stock\":15}'\n\n# R: listar\ncurl \"$B?page=0&size=10\"\n\n# R: buscar\ncurl $B/1\n\n# U: atualizar\ncurl -X PUT $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado RGB\",\"price\":349.90,\"stock\":10}'\n\n# D: apagar\ncurl -i -X DELETE $B/1\n\n# erro: preço negativo\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Mouse\",\"price\":-5,\"stock\":1}'",
+              "note": "Mesmos comandos. O formato da listagem vem do Page do Spring (com alguns campos a mais)."
+            },
+            "nest": {
+              "file": "terminal (porta 8080)",
+              "language": "bash",
+              "code": "B=http://localhost:8080/products\n\n# C: criar\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado\",\"price\":299.90,\"stock\":15}'\n\n# R: listar\ncurl \"$B?page=0&size=10\"\n\n# R: buscar\ncurl $B/1\n\n# U: atualizar\ncurl -X PUT $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado RGB\",\"price\":349.90,\"stock\":10}'\n\n# D: apagar\ncurl -i -X DELETE $B/1\n\n# erro: preço negativo\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Mouse\",\"price\":-5,\"stock\":1}'",
+              "note": "Mesmos comandos, já que o main.ts usa app.listen(8080)."
+            },
+            "fastapi": {
+              "file": "terminal (porta 8000)",
+              "language": "bash",
+              "code": "B=http://localhost:8000/products\n\n# C: criar\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado\",\"price\":299.90,\"stock\":15}'\n\n# R: listar\ncurl \"$B?page=0&size=10\"\n\n# R: buscar\ncurl $B/1\n\n# U: atualizar\ncurl -X PUT $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado RGB\",\"price\":349.90,\"stock\":10}'\n\n# D: apagar\ncurl -i -X DELETE $B/1\n\n# erro: preço negativo\ncurl -i -X POST $B -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Mouse\",\"price\":-5,\"stock\":1}'",
+              "note": "Ou abra http://localhost:8000/docs e teste cada operação clicando."
+            }
+          },
+          "relatedTerms": [
+            "crud",
+            "endpoint",
+            "requisicao-e-resposta",
+            "docker"
+          ]
+        },
+        {
+          "type": "step",
+          "id": "step-16",
+          "number": 16,
+          "title": "Testar automaticamente",
+          "whatIs": "Um teste que chama a API e confere a resposta. Exemplo: pedir um produto que não existe deve dar 404.",
+          "whyItMatters": "Nos exemplos o service é um Mock, então o teste roda sem banco, como quando você mocka uma chamada de API no Vitest.",
+          "snippets": {
+            "express": {
+              "file": "product.routes.test.ts",
+              "language": "ts",
+              "code": "vi.mock('./product.service.js');\n\nit('retorna 404 quando não existe', async () => {\n  vi.mocked(service.get)\n    .mockRejectedValue(new NotFoundError('...'));\n\n  const res = await request(app).get('/products/99');\n  expect(res.status).toBe(404);\n});",
+              "note": "Vitest + Supertest. Bem familiar para quem vem do frontend."
+            },
+            "spring": {
+              "file": "ProductControllerTest.java",
+              "language": "java",
+              "code": "@WebMvcTest(ProductController.class)\nclass ProductControllerTest {\n  @Autowired MockMvc mockMvc;\n  @MockitoBean ProductService service;\n\n  @Test\n  void retorna404() throws Exception {\n    when(service.get(99L))\n      .thenThrow(new ProductNotFoundException(99L));\n    mockMvc.perform(get(\"/products/99\"))\n      .andExpect(status().isNotFound());\n  }\n}",
+              "note": "JUnit + Mockito + MockMvc."
+            },
+            "nest": {
+              "file": "products.e2e-spec.ts",
+              "language": "ts",
+              "code": "it('retorna 404 quando não existe', () => {\n  return request(app.getHttpServer())\n    .get('/products/99')\n    .expect(404);\n});",
+              "note": "Jest + Supertest, já configurados pelo gerador."
+            },
+            "fastapi": {
+              "file": "tests/test_products.py",
+              "language": "python",
+              "code": "client = TestClient(app)\n\ndef test_retorna_404():\n    r = client.get(\"/products/99\")\n    assert r.status_code == 404",
+              "note": "pytest + TestClient. Aqui precisaria de banco ou de sobrescrever get_db."
+            }
+          },
+          "relatedTerms": [
+            "mock",
+            "service",
+            "status-http"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mapa-mental",
+      "title": "Mapa mental",
+      "description": "O mesmo conceito no frontend, em Spring Boot, Express, NestJS e FastAPI.",
+      "cards": [
+        {
+          "type": "compare",
+          "id": "cmp-ponto-de-entrada",
+          "concept": "Ponto de entrada",
+          "explanation": "O arquivo que liga tudo quando o programa começa.",
+          "values": {
+            "frontend": "main.tsx / index.js",
+            "spring": "ProductsApplication",
+            "express": "server.ts + app.ts",
+            "nest": "main.ts",
+            "fastapi": "app/main.py"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-rotas-endpoints",
+          "concept": "Rotas / endpoints",
+          "explanation": "Os endereços que o frontend chama.",
+          "values": {
+            "frontend": "As URLs que o fetch chama",
+            "spring": "@RestController",
+            "express": "Router + funções controller",
+            "nest": "@Controller('products')",
+            "fastapi": "APIRouter + @router.get(...)"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-regras-de-negocio",
+          "concept": "Regras de negócio",
+          "explanation": "Onde ficam as decisões (\"se não existe, é erro\").",
+          "values": {
+            "frontend": "Hooks / services",
+            "spring": "@Service",
+            "express": "funções em product.service.ts",
+            "nest": "@Injectable() Service",
+            "fastapi": "funções em service.py"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-acesso-ao-banco",
+          "concept": "Acesso ao banco",
+          "explanation": "A parte que busca e salva dados.",
+          "values": {
+            "frontend": "Arquivo de chamadas de API (api/products.ts)",
+            "spring": "Repository (JpaRepository, gerado)",
+            "express": "product.repository.ts (SQL escrito por você, via pg)",
+            "nest": "Repository<Product> (TypeORM)",
+            "fastapi": "Session do SQLAlchemy (sem arquivo de repository)"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-tabela-modelo-de-dados",
+          "concept": "Tabela / modelo de dados",
+          "explanation": "Como a tabela do banco aparece no código.",
+          "values": {
+            "frontend": "type Product = {...}",
+            "spring": "@Entity (JPA/Hibernate)",
+            "express": "sem ORM: tabela em init.sql + interface TS",
+            "nest": "@Entity (TypeORM)",
+            "fastapi": "model SQLAlchemy (Mapped[...])"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-dto",
+          "concept": "DTO",
+          "explanation": "O formato dos dados que entram e saem da API.",
+          "values": {
+            "frontend": "Types de request/response",
+            "spring": "record",
+            "express": "schema Zod + tipo inferido",
+            "nest": "classe com decorators",
+            "fastapi": "modelo Pydantic"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-validacao",
+          "concept": "Validação",
+          "explanation": "Checar se os dados recebidos são válidos.",
+          "values": {
+            "frontend": "Zod / Yup no formulário",
+            "spring": "Bean Validation (@NotBlank, @Positive)",
+            "express": "Zod",
+            "nest": "class-validator + ValidationPipe",
+            "fastapi": "Pydantic (automática pelos type hints)"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-injecao-de-dependencia",
+          "concept": "Injeção de dependência",
+          "explanation": "O framework entrega pronto aquilo que a classe precisa.",
+          "values": {
+            "frontend": "Props / Context",
+            "spring": "Construtor (o Spring injeta)",
+            "express": "Não existe (imports diretos)",
+            "nest": "Construtor + Modules",
+            "fastapi": "Depends()"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-erros-globais",
+          "concept": "Erros globais",
+          "explanation": "Um lugar só que transforma erros em respostas.",
+          "values": {
+            "frontend": "try/catch / error boundary",
+            "spring": "@RestControllerAdvice",
+            "express": "Middleware de erro (4 parâmetros)",
+            "nest": "NotFoundException pronta + filtros",
+            "fastapi": "@app.exception_handler"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-cors",
+          "concept": "CORS",
+          "explanation": "Permitir que o frontend chame a API.",
+          "values": {
+            "frontend": "Erro que aparece no navegador",
+            "spring": "WebMvcConfigurer",
+            "express": "pacote cors",
+            "nest": "app.enableCors()",
+            "fastapi": "CORSMiddleware"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-configuracao",
+          "concept": "Configuração",
+          "explanation": "Onde ficam endereço do banco, senhas e portas.",
+          "values": {
+            "frontend": ".env",
+            "spring": "application.properties",
+            "express": ".env (--env-file)",
+            "nest": "AppModule (TypeOrmModule.forRoot)",
+            "fastapi": "variável DATABASE_URL (os.getenv)"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-dependencias",
+          "concept": "Dependências",
+          "explanation": "A lista de bibliotecas do projeto e quem instala.",
+          "values": {
+            "frontend": "package.json + npm",
+            "spring": "pom.xml + Maven (./mvnw)",
+            "express": "package.json + npm",
+            "nest": "package.json + npm",
+            "fastapi": "requirements.txt + pip + venv"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-gerador-de-projeto",
+          "concept": "Gerador de projeto",
+          "explanation": "Ferramenta que cria a estrutura inicial.",
+          "values": {
+            "frontend": "npm create vite",
+            "spring": "start.spring.io",
+            "express": "nenhum (npm init manual)",
+            "nest": "Nest CLI",
+            "fastapi": "nenhum (venv + pip install)"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-rodar-em-dev",
+          "concept": "Rodar em dev",
+          "explanation": "Comando para ligar enquanto programa.",
+          "values": {
+            "frontend": "npm run dev",
+            "spring": "./mvnw spring-boot:run",
+            "express": "npm run dev (tsx watch)",
+            "nest": "npm run start:dev",
+            "fastapi": "fastapi dev app/main.py"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-testes",
+          "concept": "Testes",
+          "explanation": "Ferramentas para testar automaticamente.",
+          "values": {
+            "frontend": "Vitest / Jest",
+            "spring": "JUnit + Mockito + MockMvc",
+            "express": "Vitest + Supertest",
+            "nest": "Jest + Supertest",
+            "fastapi": "pytest + TestClient"
+          }
+        },
+        {
+          "type": "compare",
+          "id": "cmp-documentacao-da-api",
+          "concept": "Documentação da API",
+          "explanation": "Página que lista e deixa testar os endpoints.",
+          "values": {
+            "frontend": "Swagger/OpenAPI (consumido)",
+            "spring": "springdoc (extra)",
+            "express": "não incluída",
+            "nest": "@nestjs/swagger (extra)",
+            "fastapi": "automática em /docs"
+          }
+        }
+      ]
+    },
+    {
+      "id": "glossario",
+      "title": "Glossário",
+      "description": "Os termos técnicos usados no tema.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "api",
+          "term": "API",
+          "definition": "Um programa que fica rodando num servidor esperando pedidos. O frontend pede (\"me dá o produto 1\") e a API responde com dados, geralmente em JSON.",
+          "relatedTerms": [
+            "json",
+            "requisicao-e-resposta"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "crud",
+          "term": "CRUD",
+          "definition": "Sigla para as quatro operações básicas: Create (criar), Read (ler), Update (atualizar) e Delete (apagar).",
+          "relatedTerms": [
+            "endpoint"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "endpoint",
+          "term": "Endpoint (rota)",
+          "definition": "Um endereço da API, formado por método + caminho. Ex.: GET /products/1. É a URL que o seu fetch chama.",
+          "relatedTerms": [
+            "api",
+            "controller"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "framework",
+          "term": "Framework",
+          "definition": "Um conjunto de ferramentas prontas que dá a estrutura do projeto. Express, Spring Boot, NestJS e FastAPI são frameworks para criar APIs."
+        },
+        {
+          "type": "concept",
+          "id": "requisicao-e-resposta",
+          "term": "Requisição e resposta",
+          "definition": "Requisição é o pedido que chega na API (método, URL, corpo). Resposta é o que a API devolve (status e dados).",
+          "relatedTerms": [
+            "status-http",
+            "json"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "status-http",
+          "term": "Status HTTP",
+          "definition": "Número que diz como foi a resposta. 200 deu certo, 201 criado, 204 deu certo sem conteúdo, 400 dados errados, 404 não encontrado, 500 erro no servidor.",
+          "relatedTerms": [
+            "requisicao-e-resposta"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "json",
+          "term": "JSON",
+          "definition": "O formato de texto usado para enviar dados entre frontend e API. É o mesmo formato de objeto que você já usa em JavaScript.",
+          "relatedTerms": [
+            "api"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "sql",
+          "term": "SQL",
+          "definition": "A linguagem usada para falar com o banco de dados. Ex.: SELECT * FROM products WHERE id = 1.",
+          "relatedTerms": [
+            "orm"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "orm",
+          "term": "ORM",
+          "definition": "Uma biblioteca que escreve o SQL por você. Você mexe com classes e objetos e ela traduz para comandos do banco. Exemplos: JPA/Hibernate (Java), TypeORM (Nest), SQLAlchemy (Python).",
+          "relatedTerms": [
+            "sql",
+            "entidade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "entidade",
+          "term": "Entidade (model)",
+          "definition": "A representação de uma tabela do banco no código. A classe Product com id, name, price vira a tabela products.",
+          "relatedTerms": [
+            "orm",
+            "dto"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "dto",
+          "term": "DTO (Data Transfer Object)",
+          "definition": "O formato dos dados que entram ou saem da API. Ex.: para criar um produto, o frontend manda só name, description, price e stock; o id e a data quem gera é o banco. Esse \"molde\" de entrada é o DTO. É como os types de request e response que você cria no frontend.",
+          "relatedTerms": [
+            "validacao",
+            "entidade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "validacao",
+          "term": "Validação",
+          "definition": "Checar se os dados recebidos fazem sentido antes de salvar. Ex.: preço precisa ser maior que zero. Se não passar, a API responde 400.",
+          "relatedTerms": [
+            "dto",
+            "status-http"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "controller",
+          "term": "Controller",
+          "definition": "A parte do código que recebe a requisição, chama quem faz o trabalho e devolve a resposta. É a \"porta de entrada\" de cada rota.",
+          "relatedTerms": [
+            "service",
+            "endpoint"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "service",
+          "term": "Service",
+          "definition": "A parte com as regras de negócio. Ex.: \"se o produto não existe, isso é um erro\". Não sabe nada de HTTP nem de SQL.",
+          "relatedTerms": [
+            "controller",
+            "repository"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "repository",
+          "term": "Repository",
+          "definition": "A única parte que conversa com o banco de dados. Busca, salva, atualiza e apaga.",
+          "relatedTerms": [
+            "service",
+            "orm"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "injecao-de-dependencia",
+          "term": "Injeção de dependência",
+          "definition": "Em vez de uma classe criar o que precisa (new ProductService()), o framework cria e entrega pronto no construtor. Parecido com receber algo por props ou Context no React.",
+          "relatedTerms": [
+            "service",
+            "decorator-anotacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "decorator-anotacao",
+          "term": "Decorator / anotação",
+          "definition": "Aquelas marcações com @ em cima de classes e métodos, como @Controller ou @GetMapping. Elas dizem ao framework o que aquela classe ou método é.",
+          "relatedTerms": [
+            "controller"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "middleware",
+          "term": "Middleware",
+          "definition": "Uma função que roda no meio do caminho, antes de a requisição chegar na rota (ou depois de dar erro). Ex.: transformar o texto do corpo em objeto.",
+          "relatedTerms": [
+            "cors"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cors",
+          "term": "CORS",
+          "definition": "Regra de segurança do navegador. Se o frontend está em localhost:5173 e a API em localhost:8080, a API precisa dizer explicitamente que aceita pedidos dessa origem.",
+          "relatedTerms": [
+            "middleware"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "variavel-de-ambiente",
+          "term": "Variável de ambiente",
+          "definition": "Configuração que fica fora do código, num arquivo .env ou no servidor. Ex.: o endereço do banco. Assim você não escreve senha no código.",
+          "relatedTerms": [
+            "docker"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pool-de-conexoes",
+          "term": "Pool de conexões",
+          "definition": "Um grupo de conexões com o banco abertas e reaproveitadas. Abrir uma conexão nova a cada pedido seria lento.",
+          "relatedTerms": [
+            "sql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "docker",
+          "term": "Docker",
+          "definition": "Ferramenta que roda programas (como o PostgreSQL) em \"caixinhas\" isoladas, sem precisar instalar direto no seu computador.",
+          "relatedTerms": [
+            "variavel-de-ambiente"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mock",
+          "term": "Mock",
+          "definition": "Uma versão falsa de uma parte do código usada em testes. Ex.: fingir que o service respondeu \"não encontrado\" sem precisar de banco.",
+          "relatedTerms": [
+            "service"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "venv",
+          "term": "venv (Python)",
+          "definition": "Uma pasta isolada com as bibliotecas do projeto Python. Faz o papel que a node_modules faz no Node.",
+          "relatedTerms": [
+            "framework"
+          ]
+        }
+      ]
+    }
+  ]
+}
