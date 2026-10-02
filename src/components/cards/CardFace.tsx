@@ -7,6 +7,7 @@ import { CARD_TYPE_LABEL, FRONT_PROMPT, OPERATION_NAME } from '../../study/copy'
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
+import { TermChips } from '../../glossary/TermChips';
 import { CodeBlock, SupplementBadge, TypeChip, VariantTabs } from './parts';
 
 export type Side = 'front' | 'back';
@@ -18,9 +19,11 @@ type Props = {
   /** Aba de framework selecionada (cards step). */
   variantId: string;
   onSelectVariant: (id: string) => void;
+  /** Quando presente, o verso mostra os termos relacionados como chips que chamam esta função. */
+  onOpenTerm?: (termId: string) => void;
 };
 
-export function CardFace({ card, theme, side, variantId, onSelectVariant }: Props) {
+export function CardFace({ card, theme, side, variantId, onSelectVariant, onOpenTerm }: Props) {
   const label = card.type === 'step' ? `Passo ${card.number}` : CARD_TYPE_LABEL[card.type];
   return (
     <View style={styles.face}>
@@ -29,6 +32,9 @@ export function CardFace({ card, theme, side, variantId, onSelectVariant }: Prop
         {card.origin === 'supplement' && <SupplementBadge />}
       </View>
       <Body card={card} theme={theme} side={side} variantId={variantId} onSelectVariant={onSelectVariant} />
+      {side === 'back' && onOpenTerm ? (
+        <TermChips theme={theme} termIds={card.relatedTerms} onOpen={onOpenTerm} title="Termos relacionados" />
+      ) : null}
     </View>
   );
 }

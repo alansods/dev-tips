@@ -21,13 +21,6 @@ O app SHALL ter 3 abas inferiores, nesta ordem: **Temas**, **Glossário** e **Pr
 - **WHEN** a barra de abas é exibida
 - **THEN** as abas aparecem na ordem Temas, Glossário, Progresso, cada uma com rótulo visível
 
-### Requirement: Telas provisórias
-Enquanto a change de glossário não for implementada, a aba Glossário SHALL exibir o título da tela e uma mensagem informando que o conteúdo ainda vai chegar.
-
-#### Scenario: Glossário provisório
-- **WHEN** o usuário abre a aba Glossário
-- **THEN** vê o título "Glossário" e uma mensagem de que a tela ainda está em construção
-
 ### Requirement: Tema claro e escuro
 O app SHALL ter um modo claro e um modo escuro, com as cores do design aprovado. Por padrão, o modo SHALL seguir a configuração do sistema. O cabeçalho SHALL ter um botão para alternar o modo manualmente. A escolha manual SHALL prevalecer sobre o sistema e SHALL ser lembrada entre aberturas do app. O botão MUST ter rótulo de acessibilidade que diga para qual modo ele muda.
 

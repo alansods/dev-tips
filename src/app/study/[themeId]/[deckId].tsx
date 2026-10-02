@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMemo, useReducer } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +10,7 @@ import { IconButton } from '../../../components/IconButton';
 import { CloseIcon } from '../../../components/icons';
 import { ProgressBar } from '../../../components/ProgressBar';
 import { getTheme } from '../../../content/catalog';
+import { TermSheet } from '../../../glossary/TermSheet';
 import type { Card, Deck, Theme } from '../../../content';
 import { CARD_TYPE_LABEL } from '../../../study/copy';
 import {
@@ -59,6 +60,7 @@ function Session({ theme, deck }: { theme: Theme; deck: Deck }) {
     initialSession(sessionCardIds(theme.id, deck, useStudyStore.getState().progress)),
   );
   const cardsById = useMemo(() => new Map(deck.cards.map((c) => [c.id, c])), [deck]);
+  const [openTerm, setOpenTerm] = useState<string | null>(null);
 
   const exit = () => leave(theme.id);
 
@@ -109,6 +111,7 @@ function Session({ theme, deck }: { theme: Theme; deck: Deck }) {
               side="back"
               variantId={variantId}
               onSelectVariant={(id) => setVariant(theme.id, id)}
+              onOpenTerm={setOpenTerm}
             />
           ) : (
             <Pressable
@@ -136,6 +139,7 @@ function Session({ theme, deck }: { theme: Theme; deck: Deck }) {
           <Button title="Mostrar resposta" onPress={() => dispatch({ type: 'reveal' })} />
         )}
       </View>
+      <TermSheet theme={theme} termId={openTerm} onChangeTerm={setOpenTerm} onClose={() => setOpenTerm(null)} />
     </SafeAreaView>
   );
 }

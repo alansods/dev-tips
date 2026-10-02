@@ -61,15 +61,6 @@ describe('Requirement: Navegação por abas', () => {
   });
 });
 
-describe('Requirement: Telas provisórias', () => {
-  it('Glossário provisório', async () => {
-    await renderApp();
-    fireEvent.press(tab('Glossário'));
-    expect(screen.getAllByRole('heading', { name: 'Glossário' }).length).toBeGreaterThan(0);
-    expect(screen.getByText(/em construção/i)).toBeOnTheScreen();
-  });
-});
-
 describe('Requirement: Home mínima', () => {
   it('Lista de temas', async () => {
     await renderApp();
