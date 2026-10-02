@@ -57,3 +57,19 @@ export function MoonIcon({ color, size = 20 }: IconProps) {
     </Svg>
   );
 }
+
+export function BackIcon({ color, size = 20 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M15 18l-6-6 6-6" {...stroke(color)} />
+    </Svg>
+  );
+}
+
+export function CloseIcon({ color, size = 20 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M18 6L6 18M6 6l12 12" {...stroke(color)} />
+    </Svg>
+  );
+}
