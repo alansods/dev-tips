@@ -236,3 +236,13 @@ describe('Requirement: Identidade do tema (Fundamentos web)', () => {
     expect(screen.queryByText('FastAPI')).toBeNull();
   });
 });
+
+describe('Requirement: Animação de virar o card (na sessão)', () => {
+  it('Botões disponíveis durante a animação', async () => {
+    await open(`/study/${THEME}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    // sem avançar timers: a animação ainda está em curso, mas os botões já existem
+    expect(screen.getByRole('button', { name: 'Não sei' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Sei' })).toBeOnTheScreen();
+  });
+});

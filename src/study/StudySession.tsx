@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
-import { useMemo, useReducer, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect, useMemo, useReducer, useState } from 'react';
+import { Animated, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '../components/AppText';
@@ -14,8 +14,10 @@ import { TermSheet } from '../glossary/TermSheet';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { CARD_TYPE_LABEL } from './copy';
+import { flipDuration } from './motion';
 import { cardTitle, initialSession, sessionReducer, summary, type SessionState } from './rules';
 import { useStudyStore } from './store';
+import { useReducedMotion } from './useReducedMotion';
 
 export function leaveToTheme(themeId: string) {
   if (router.canGoBack()) router.back();
@@ -41,6 +43,31 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
   const [state, dispatch] = useReducer(sessionReducer, undefined, () => initialSession(initialIds()));
   const cardsById = useMemo(() => new Map(theme.decks.flatMap((d) => d.cards).map((c) => [c.id, c])), [theme]);
   const [openTerm, setOpenTerm] = useState<string | null>(null);
+  const reducedMotion = useReducedMotion();
+  // 0 = de lado (90°, invisível), 1 = de frente. Anima só quando o verso é pedido.
+  const [flip] = useState(() => new Animated.Value(1));
+  useEffect(() => {
+    if (!state.revealed) {
+      flip.setValue(1);
+      return;
+    }
+    const duration = flipDuration(reducedMotion);
+    if (duration === 0) {
+      flip.setValue(1);
+      return;
+    }
+    flip.setValue(0);
+    const animation = Animated.timing(flip, { toValue: 1, duration, useNativeDriver: Platform.OS !== 'web' });
+    animation.start();
+    return () => animation.stop();
+  }, [state.revealed, state.index, reducedMotion, flip]);
+  const flipStyle = {
+    opacity: flip,
+    transform: [
+      { perspective: 900 },
+      { rotateY: flip.interpolate({ inputRange: [0, 1], outputRange: ['90deg', '0deg'] }) },
+    ],
+  };
 
   const exit = () => leaveToTheme(theme.id);
 
@@ -85,14 +112,16 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
       <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <ScrollView contentContainerStyle={styles.cardContent}>
           {state.revealed ? (
-            <CardFace
-              card={card}
-              theme={theme}
-              side="back"
-              variantId={variantId}
-              onSelectVariant={(id) => setVariant(theme.id, id)}
-              onOpenTerm={setOpenTerm}
-            />
+            <Animated.View style={flipStyle}>
+              <CardFace
+                card={card}
+                theme={theme}
+                side="back"
+                variantId={variantId}
+                onSelectVariant={(id) => setVariant(theme.id, id)}
+                onOpenTerm={setOpenTerm}
+              />
+            </Animated.View>
           ) : (
             <Pressable
               accessibilityRole="button"

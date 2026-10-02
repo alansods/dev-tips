@@ -40,6 +40,7 @@ export function TermChips({ theme, termIds, onOpen, title }: Props) {
             accessibilityLabel={c.term}
             accessibilityHint="Abre a definição"
             onPress={() => onOpen(c.id)}
+            hitSlop={{ top: 4, bottom: 4 }}
             style={({ pressed }) => [styles.chip, { borderColor: colors.accentText, opacity: pressed ? 0.7 : 1 }]}
           >
             <AppText font="medium" size={13} tone="accentText">

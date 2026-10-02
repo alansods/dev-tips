@@ -46,7 +46,8 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "icons": "node scripts/generate-icons.js"
   },
   "private": true,
   "jest": {
