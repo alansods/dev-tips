@@ -60,3 +60,17 @@ describe('Requirement: Catálogo de temas no app', () => {
     expect(getTheme('nao-existe')).toBeUndefined();
   });
 });
+
+describe('Requirement: Tradução de um tema', () => {
+  it('todo translations/<idioma>.json do repositório está registrado, e vice-versa', () => {
+    const { translationRegistry } = jest.requireActual('../translations') as typeof import('../translations');
+    const onDisk = themeFolders().flatMap((folder) => {
+      const dir = path.join(THEMES_DIR, folder, 'translations');
+      return fs.existsSync(dir) ? fs.readdirSync(dir).map((f) => `${folder}/${f.replace(/\.json$/, '')}`) : [];
+    });
+    const registered = Object.entries(translationRegistry).flatMap(([id, langs]) =>
+      Object.keys(langs).map((lang) => `${id}/${lang}`),
+    );
+    expect(registered.sort()).toEqual(onDisk.sort());
+  });
+});

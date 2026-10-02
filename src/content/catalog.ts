@@ -8,7 +8,10 @@
 
 import crud4Frameworks from '../../content/themes/crud-4-frameworks/theme.json';
 import fundamentosWeb from '../../content/themes/fundamentos-web/theme.json';
+import type { Language } from '../i18n/language';
 import { themeSchema, type Theme } from './schema';
+import { localizeTheme, themeTranslationSchema } from './translation';
+import { translationRegistry } from './translations';
 
 const registry: unknown[] = [crud4Frameworks, fundamentosWeb];
 
@@ -16,6 +19,29 @@ export const catalog: readonly Theme[] = registry.map((raw) => themeSchema.parse
 
 export function getTheme(id: string): Theme | undefined {
   return catalog.find((theme) => theme.id === id);
+}
+
+const localized = new Map<Language, readonly Theme[]>();
+
+/**
+ * O catálogo no idioma pedido: PT-BR é o conteúdo original; nos outros idiomas,
+ * cada tema recebe a tradução registrada, campo a campo. Memorizado por idioma
+ * quando usa o registro padrão.
+ */
+export function getCatalog(
+  language: Language,
+  translations: Record<string, Record<string, unknown>> = translationRegistry,
+): readonly Theme[] {
+  if (language === 'pt-BR') return catalog;
+  const useCache = translations === translationRegistry;
+  const cached = useCache ? localized.get(language) : undefined;
+  if (cached) return cached;
+  const themes = catalog.map((theme) => {
+    const raw = translations[theme.id]?.[language];
+    return localizeTheme(theme, raw === undefined ? undefined : themeTranslationSchema.parse(raw));
+  });
+  if (useCache) localized.set(language, themes);
+  return themes;
 }
 
 /** Compara as pastas de content/themes com os ids registrados, nos dois sentidos. */

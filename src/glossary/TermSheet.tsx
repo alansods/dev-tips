@@ -5,6 +5,7 @@ import { AppText } from '../components/AppText';
 import { IconButton } from '../components/IconButton';
 import { CloseIcon } from '../components/icons';
 import type { Theme } from '../content';
+import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { TermChips, conceptsOf } from './TermChips';
@@ -20,6 +21,7 @@ type Props = {
 /** Gaveta inferior com a definição de um termo e os termos relacionados a ele. */
 export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
   const { colors } = useTheme();
+  const t = useT();
   const concept = termId ? conceptsOf(theme).get(termId) : undefined;
 
   return (
@@ -27,7 +29,7 @@ export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
       <View style={styles.root}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Fechar definição"
+          accessibilityLabel={t.glossary.closeDefinition}
           onPress={onClose}
           style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(5,8,12,0.55)' }]}
         />
@@ -37,9 +39,9 @@ export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
               <View style={[styles.handle, { backgroundColor: colors.line }]} />
               <View style={styles.head}>
                 <AppText font="mono" size={11} tone="accentText" style={styles.kicker}>
-                  Glossário
+                  {t.glossary.kicker}
                 </AppText>
-                <IconButton label="Fechar" onPress={onClose}>
+                <IconButton label={t.common.close} onPress={onClose}>
                   <CloseIcon color={colors.ink} size={18} />
                 </IconButton>
               </View>
@@ -54,7 +56,7 @@ export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
                   theme={theme}
                   termIds={concept.relatedTerms}
                   onOpen={onChangeTerm}
-                  title="Termos relacionados"
+                  title={t.card.relatedTerms}
                 />
               </ScrollView>
             </View>

@@ -4,8 +4,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '../../components/AppText';
 import { ProgressBar } from '../../components/ProgressBar';
 import { Screen } from '../../components/Screen';
-import { catalog } from '../../content/catalog';
+import { useCatalog } from '../../content/useCatalog';
 import type { Theme } from '../../content';
+import { useT } from '../../i18n';
 import { today } from '../../study/clock';
 import { themeStats } from '../../study/rules';
 import { dueCardIds } from '../../study/srs';
@@ -14,6 +15,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 
 export default function HomeScreen() {
+  const catalog = useCatalog();
   return (
     <Screen>
       {catalog.map((theme) => (
@@ -25,6 +27,7 @@ export default function HomeScreen() {
 
 function ThemeCard({ theme }: { theme: Theme }) {
   const { colors } = useTheme();
+  const t = useT();
   const progress = useStudyStore((s) => s.progress);
   const stats = themeStats(theme, progress);
   const schedule = useStudyStore((s) => s.schedule);
@@ -32,7 +35,7 @@ function ThemeCard({ theme }: { theme: Theme }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${theme.title}, ${stats.known} de ${stats.total} cards que você sabe`}
+      accessibilityLabel={t.home.cardLabel(theme.title, stats.known, stats.total)}
       onPress={() => router.push(`/theme/${theme.id}`)}
       style={({ pressed }) => [
         styles.card,
@@ -51,7 +54,7 @@ function ThemeCard({ theme }: { theme: Theme }) {
         </View>
         <AppText font="mono" size={12} tone="muted">{`${stats.known}/${stats.total}`}</AppText>
       </View>
-      {due > 0 && <AppText font="medium" size={13} tone="warn">{`${due} para revisar hoje`}</AppText>}
+      {due > 0 && <AppText font="medium" size={13} tone="warn">{t.home.dueBadge(due)}</AppText>}
     </Pressable>
   );
 }

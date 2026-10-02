@@ -3,10 +3,11 @@
 // restaurado ao abrir; falhas de leitura/escrita ou dados inválidos nunca
 // quebram o app — no pior caso ele começa sem progresso.
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { z } from 'zod';
 import { create } from 'zustand';
-import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
+import { persist } from 'zustand/middleware';
+
+import { safeJSONStorage } from '../storage/safeStorage';
 
 import { today } from './clock';
 import { progressKey, type AnswerResult, type Progress } from './rules';
@@ -41,46 +42,6 @@ const savedSchema = z.object({
     .default({}),
 });
 
-/** AsyncStorage que engole falhas: leitura com erro vira "nada salvo"; escrita com erro é ignorada. */
-const safeStorage: StateStorage = {
-  getItem: async (name) => {
-    try {
-      return await AsyncStorage.getItem(name);
-    } catch {
-      return null;
-    }
-  },
-  setItem: async (name, value) => {
-    try {
-      await AsyncStorage.setItem(name, value);
-    } catch {
-      // sem disco: o progresso segue em memória nesta sessão
-    }
-  },
-  removeItem: async (name) => {
-    try {
-      await AsyncStorage.removeItem(name);
-    } catch {
-      // ignorado
-    }
-  },
-};
-
-/** createJSONStorage falha com JSON corrompido; aqui ele vira "nada salvo". */
-const jsonStorage = createJSONStorage<StudyData>(() => ({
-  ...safeStorage,
-  getItem: async (name) => {
-    const raw = await safeStorage.getItem(name);
-    if (raw == null) return null;
-    try {
-      JSON.parse(raw as string);
-      return raw;
-    } catch {
-      return null;
-    }
-  },
-}));
-
 /** Remove do registro as chaves do tema (`themeId:...`). */
 function withoutTheme<T>(record: Record<string, T>, themeId: string): Record<string, T> {
   return Object.fromEntries(Object.entries(record).filter(([key]) => !key.startsWith(`${themeId}:`)));
@@ -111,7 +72,7 @@ export const useStudyStore = create<StudyState>()(
     {
       name: STUDY_STORAGE_KEY,
       version: 2,
-      storage: jsonStorage,
+      storage: safeJSONStorage<StudyData>(),
       partialize: (s): StudyData => ({
         progress: s.progress,
         preferredVariant: s.preferredVariant,

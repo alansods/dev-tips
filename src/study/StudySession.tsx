@@ -11,9 +11,9 @@ import { CloseIcon } from '../components/icons';
 import { ProgressBar } from '../components/ProgressBar';
 import type { Card, Theme } from '../content';
 import { TermSheet } from '../glossary/TermSheet';
+import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
-import { ANSWER_LABEL, CARD_TYPE_LABEL } from './copy';
 import { flipDuration } from './motion';
 import { cardTitle, initialSession, sessionReducer, summary, type SessionState } from './rules';
 import { useStudyStore } from './store';
@@ -35,6 +35,7 @@ type SessionProps = {
 /** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
 export function StudySession({ theme, title, initialIds }: SessionProps) {
   const { colors } = useTheme();
+  const t = useT();
   const answerCard = useStudyStore((s) => s.answer);
   const setVariant = useStudyStore((s) => s.setVariant);
   const variantId = useStudyStore((s) => s.preferredVariant[theme.id]) ?? theme.variants?.[0]?.id ?? '';
@@ -95,7 +96,7 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <IconButton label="Sair da sessão" onPress={exit}>
+        <IconButton label={t.session.exit} onPress={exit}>
           <CloseIcon color={colors.ink} />
         </IconButton>
         <View style={{ flex: 1, gap: 6 }}>
@@ -125,13 +126,13 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
           ) : (
             <Pressable
               accessibilityRole="button"
-              accessibilityLabel="Virar card"
-              accessibilityHint="Mostra a resposta"
+              accessibilityLabel={t.session.flip}
+              accessibilityHint={t.session.flipHint}
               onPress={() => dispatch({ type: 'reveal' })}
             >
               <CardFace card={card} theme={theme} side="front" variantId={variantId} onSelectVariant={() => {}} />
               <AppText size={13} tone="accentText" font="medium" style={{ marginTop: spacing.lg }}>
-                Toque para ver a resposta
+                {t.session.tapToReveal}
               </AppText>
             </Pressable>
           )}
@@ -141,11 +142,11 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
       <View style={styles.actions}>
         {state.revealed ? (
           <>
-            <Button title={ANSWER_LABEL.unknown.button} variant="warn" onPress={() => respond('unknown')} />
-            <Button title={ANSWER_LABEL.known.button} onPress={() => respond('known')} />
+            <Button title={t.answer.unknown.button} variant="warn" onPress={() => respond('unknown')} />
+            <Button title={t.answer.known.button} onPress={() => respond('known')} />
           </>
         ) : (
-          <Button title="Mostrar resposta" onPress={() => dispatch({ type: 'reveal' })} />
+          <Button title={t.session.showAnswer} onPress={() => dispatch({ type: 'reveal' })} />
         )}
       </View>
       <TermSheet theme={theme} termId={openTerm} onChangeTerm={setOpenTerm} onClose={() => setOpenTerm(null)} />
@@ -163,54 +164,55 @@ type SummaryProps = {
 
 function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: SummaryProps) {
   const { colors } = useTheme();
+  const t = useT();
   const { known, unknown, missedIds } = summary(state);
   const total = known + unknown;
-  const title = unknown === 0 ? 'Mandou bem, acertou tudo.' : known >= unknown ? 'Bom ritmo.' : 'Vale mais uma rodada.';
+  const title = unknown === 0 ? t.summary.allRight : known >= unknown ? t.summary.goodPace : t.summary.oneMore;
 
   return (
     <ScrollView contentContainerStyle={styles.summary}>
       <AppText font="mono" size={11} tone="muted" style={styles.kicker}>
-        Sessão concluída
+        {t.summary.kicker}
       </AppText>
       <AppText font="bold" size={28} accessibilityRole="header" style={{ lineHeight: 34 }}>
         {title}
       </AppText>
-      <AppText tone="muted">{`Você marcou ${known} de ${total} cards como "${ANSWER_LABEL.known.short}" em ${sessionTitle}.`}</AppText>
+      <AppText tone="muted">{t.summary.marked(known, total, sessionTitle)}</AppText>
 
       <View style={styles.counts}>
         <View
           accessible
-          accessibilityLabel={`${known} ${ANSWER_LABEL.known.short}`}
+          accessibilityLabel={t.summary.count(known, t.answer.known.short)}
           style={[styles.count, { backgroundColor: colors.accentSoft }]}
         >
           <AppText font="monoMedium" size={30} tone="accentText">
             {String(known)}
           </AppText>
-          <AppText size={13}>{ANSWER_LABEL.known.short}</AppText>
+          <AppText size={13}>{t.answer.known.short}</AppText>
         </View>
         <View
           accessible
-          accessibilityLabel={`${unknown} ${ANSWER_LABEL.unknown.short}`}
+          accessibilityLabel={t.summary.count(unknown, t.answer.unknown.short)}
           style={[styles.count, { backgroundColor: colors.warnSoft }]}
         >
           <AppText font="monoMedium" size={30} tone="warn">
             {String(unknown)}
           </AppText>
-          <AppText size={13}>{ANSWER_LABEL.unknown.short}</AppText>
+          <AppText size={13}>{t.answer.unknown.short}</AppText>
         </View>
       </View>
 
       {missedIds.length > 0 && (
         <View style={{ gap: spacing.sm }}>
           <AppText size={13} tone="muted">
-            Para revisar
+            {t.summary.toReview}
           </AppText>
           {missedIds.map((id) => {
             const card = cardsById.get(id)!;
             return (
               <View key={id} style={[styles.missed, { backgroundColor: colors.surface, borderColor: colors.line }]}>
                 <AppText font="mono" size={11} tone="muted">
-                  {card.type === 'step' ? `Passo ${card.number}` : CARD_TYPE_LABEL[card.type]}
+                  {card.type === 'step' ? t.card.stepNumber(card.number) : t.card.types[card.type]}
                 </AppText>
                 <AppText size={14} style={{ flex: 1 }}>
                   {cardTitle(card)}
@@ -224,11 +226,11 @@ function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: Su
       <View style={{ gap: spacing.md, marginTop: spacing.md }}>
         {missedIds.length > 0 && (
           <View style={{ flexDirection: 'row' }}>
-            <Button title="Revisar os que errei" onPress={() => onReview(missedIds)} />
+            <Button title={t.summary.reviewMissed} onPress={() => onReview(missedIds)} />
           </View>
         )}
         <View style={{ flexDirection: 'row' }}>
-          <Button title="Voltar ao tema" variant="secondary" onPress={onBack} />
+          <Button title={t.summary.backToTheme} variant="secondary" onPress={onBack} />
         </View>
       </View>
     </ScrollView>

@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '../components/AppText';
 import { getGlossary, type ConceptCard, type Theme } from '../content';
+import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { spacing } from '../theme/tokens';
 
@@ -22,6 +23,7 @@ type Props = { theme: Theme; termIds: string[]; onOpen: (termId: string) => void
 /** Um chip-botão por termo relacionado; não renderiza nada sem termos. */
 export function TermChips({ theme, termIds, onOpen, title }: Props) {
   const { colors } = useTheme();
+  const t = useT();
   const concepts = conceptsOf(theme);
   const terms = termIds.map((id) => concepts.get(id)).filter((c): c is ConceptCard => c !== undefined);
   if (terms.length === 0) return null;
@@ -38,7 +40,7 @@ export function TermChips({ theme, termIds, onOpen, title }: Props) {
             key={c.id}
             accessibilityRole="button"
             accessibilityLabel={c.term}
-            accessibilityHint="Abre a definição"
+            accessibilityHint={t.glossary.openHint}
             onPress={() => onOpen(c.id)}
             hitSlop={{ top: 4, bottom: 4 }}
             style={({ pressed }) => [styles.chip, { borderColor: colors.accentText, opacity: pressed ? 0.7 : 1 }]}

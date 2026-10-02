@@ -16,7 +16,9 @@ context: |
   textos exibidos em PT-BR.
 
   Decisões de produto (2026-10-01):
-  - Idioma: somente PT-BR (sem i18n no MVP).
+  - Idioma: somente PT-BR (sem i18n no MVP). Revisto em 2026-10-02
+    (change add-language-selection): PT-BR e inglês, escolhidos em Ajustes;
+    conteúdo traduzido via content/themes/<id>/translations/en.json.
   - Mecânica principal do MVP: flashcard ("sei / não sei") + progresso.
     Quiz e repetição espaçada vêm depois, cada um via change própria.
   - Sem backend no MVP: conteúdo empacotado no app, progresso local.

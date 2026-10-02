@@ -56,7 +56,7 @@ describe('Requirement: Conteúdo do repositório validado na suíte de testes', 
 
   it('Catálogo vazio', () => {
     fs.writeFileSync(path.join(root, '.gitkeep'), '');
-    expect(scanThemesDirectory(root)).toEqual({ ok: true, themes: [], errors: [] });
+    expect(scanThemesDirectory(root)).toEqual({ ok: true, themes: [], translations: {}, errors: [] });
   });
 
   it('pasta inexistente conta como catálogo vazio', () => {
@@ -84,5 +84,40 @@ describe('Requirement: Conteúdo do repositório validado na suíte de testes', 
     const result = scanThemesDirectory(root);
     expect(result.ok).toBe(false);
     expect(result.errors[0].file).toBe(path.join('vazio', 'theme.json'));
+  });
+});
+
+function writeTranslation(folder: string, file: string, content: Json | string) {
+  fs.mkdirSync(path.join(root, folder, 'translations'), { recursive: true });
+  const body = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+  fs.writeFileSync(path.join(root, folder, 'translations', file), body);
+}
+
+describe('Requirement: Tradução de um tema', () => {
+  it('Traduções do repositório validadas na suíte', () => {
+    writeTheme('crud-teste', fullTheme());
+    writeTranslation('crud-teste', 'en.json', { cards: { 'nao-existe': { title: 'x' } } });
+    const result = scanThemesDirectory(root);
+    expect(result.ok).toBe(false);
+    const report = formatScanErrors(result.errors);
+    expect(report).toContain(path.join('crud-teste', 'translations', 'en.json'));
+    expect(report).toContain('cards.nao-existe');
+  });
+
+  it('tradução válida passa e é devolvida', () => {
+    writeTheme('crud-teste', fullTheme());
+    writeTranslation('crud-teste', 'en.json', { title: 'Test CRUD' });
+    const result = scanThemesDirectory(root);
+    expect(result.ok).toBe(true);
+    expect(result.translations).toEqual({ 'crud-teste': { en: { title: 'Test CRUD' } } });
+  });
+
+  it('idioma não suportado ou JSON inválido', () => {
+    writeTheme('crud-teste', fullTheme());
+    writeTranslation('crud-teste', 'fr.json', { title: 'x' });
+    writeTranslation('crud-teste', 'en.json', '{oops');
+    const report = formatScanErrors(scanThemesDirectory(root).errors);
+    expect(report).toContain(path.join('crud-teste', 'translations', 'fr.json'));
+    expect(report).toContain('JSON inválido');
   });
 });
