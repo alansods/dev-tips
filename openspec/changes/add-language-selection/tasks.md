@@ -17,9 +17,9 @@
 
 ## 4. Tela Ajustes (app-shell, Idiomas disponíveis, Trocar o idioma)
 
-- [ ] 4.1 Testes falhando: o botão "Ajustes" abre a tela sem abas e com o idioma atual marcado; as opções mostram os próprios nomes; escolher "English" troca os títulos imediatamente; voltar retorna à aba
-- [ ] 4.2 Criar `src/app/settings.tsx` e o botão de engrenagem no `src/app/(tabs)/_layout.tsx` (com ícone em `src/components/icons.tsx`)
-- [ ] 4.3 Testes passando
+- [x] 4.1 Testes falhando: o botão "Ajustes" abre a tela sem abas e com o idioma atual marcado; as opções mostram os próprios nomes; escolher "English" troca os títulos imediatamente; voltar retorna à aba
+- [x] 4.2 Criar `src/app/settings.tsx` e o botão de engrenagem no `src/app/(tabs)/_layout.tsx` (com ícone em `src/components/icons.tsx`)
+- [x] 4.3 Testes passando
 
 ## 5. Migrar a interface para o dicionário (Interface traduzida)
 
