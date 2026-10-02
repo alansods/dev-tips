@@ -3,9 +3,7 @@
 ## Purpose
 
 Define o conteúdo do tema "O mesmo CRUD em quatro frameworks, passo a passo": o que ele contém, como os complementos se distinguem do material original e como a fidelidade a esse material é garantida.
-
 ## Requirements
-
 ### Requirement: Material de origem preservado
 O repositório SHALL conter o material de origem do tema em `content/sources/crud-4-frameworks.md`, com o texto e o código exatamente como foram fornecidos. Esse arquivo é a referência para conferir a fidelidade do tema.
 
@@ -123,3 +121,19 @@ Todo card `step`, `endpoint` e `question` SHALL ter pelo menos um termo em `rela
 #### Scenario: Passo de testes ligado ao termo Mock
 - **WHEN** o Passo 16 (Testar automaticamente) é lido
 - **THEN** seus `relatedTerms` incluem o concept de Mock
+
+### Requirement: Tradução completa para inglês
+O tema SHALL ter o arquivo `content/themes/crud-4-frameworks/translations/en.json`, registrado no app. Todo texto exibido do tema SHALL ter tradução para inglês: título e descrição do tema, título e descrição de cada deck, e os campos de texto de cada card (`description`, `title`, `whatIs`, `whyItMatters`, `concept`, `explanation`, `term`, `definition`, `frontendAnalogy`, `body`, `question`, `answer` e `note` dos snippets) e os rótulos das colunas de comparação. Ficam fora da cobertura: código, nomes de arquivo, `tags` (não exibidas), `aliases` e `values` de comparação que são identificadores ou código (ex.: `@RestController`, `main.ts`); `values` em prosa (ex.: "As URLs que o fetch chama") SHALL ser traduzidos. Nomes próprios e termos técnicos consagrados (ex.: Express, Spring Boot, NestJS, FastAPI, CORS, DTO, endpoint) MUST ficar no original. O conteúdo em PT-BR MUST NOT mudar.
+
+#### Scenario: Cobertura completa
+- **WHEN** a suíte de testes compara o tema com a tradução em inglês
+- **THEN** nenhum texto exibido obrigatório está sem tradução
+
+#### Scenario: Card exibido em inglês
+- **WHEN** o app está em inglês e o usuário abre o card concept "CORS" e o passo `step-01`
+- **THEN** o card aparece em inglês
+
+#### Scenario: PT-BR intacto
+- **WHEN** o app está em PT-BR
+- **THEN** o tema aparece com o título "O mesmo CRUD em quatro frameworks" e os textos originais
+

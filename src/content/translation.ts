@@ -149,3 +149,48 @@ function localizeCard(card: Card, raw: Record<string, unknown> | undefined): Car
   if (out.type === 'compare' && values) out.values = { ...out.values, ...values };
   return out;
 }
+
+/** Campos de texto exibidos de cada tipo de card que a tradução precisa cobrir. */
+const COVERED_FIELDS: { [K in Card['type']]: string[] } = {
+  endpoint: ['description'],
+  step: ['title', 'whatIs', 'whyItMatters'],
+  compare: ['concept', 'explanation'],
+  concept: ['term', 'definition', 'frontendAnalogy'],
+  code: ['title', 'body'],
+  question: ['question', 'answer'],
+};
+
+/**
+ * Caminhos de texto exibido que existem no original e não têm tradução.
+ * Ficam de fora `tags`, `aliases` e `values` (tradução editorial) e o código.
+ */
+export function missingTranslations(theme: Theme, translation: ThemeTranslation): string[] {
+  const missing: string[] = [];
+  if (!translation.title) missing.push('title');
+  if (!translation.description) missing.push('description');
+  for (const col of theme.compareColumns ?? []) {
+    if (!translation.compareColumns?.[col.id]) missing.push(`compareColumns.${col.id}`);
+  }
+  for (const deck of theme.decks) {
+    const d = translation.decks?.[deck.id];
+    if (!d?.title) missing.push(`decks.${deck.id}.title`);
+    if (deck.description && !d?.description) missing.push(`decks.${deck.id}.description`);
+    for (const card of deck.cards) {
+      const tr = (translation.cards?.[card.id] ?? {}) as Record<string, unknown>;
+      const original = card as unknown as Record<string, unknown>;
+      for (const field of COVERED_FIELDS[card.type]) {
+        if (original[field] !== undefined && !tr[field]) missing.push(`cards.${card.id}.${field}`);
+      }
+      if (card.type === 'step') {
+        const notes = tr.snippets as Record<string, { note?: string }> | undefined;
+        for (const [variant, snippet] of Object.entries(card.snippets)) {
+          if (snippet.note && !notes?.[variant]?.note) missing.push(`cards.${card.id}.snippets.${variant}.note`);
+        }
+      }
+      if ((card.type === 'code' || card.type === 'question') && card.snippet?.note) {
+        if (!(tr.snippet as { note?: string } | undefined)?.note) missing.push(`cards.${card.id}.snippet.note`);
+      }
+    }
+  }
+  return missing;
+}

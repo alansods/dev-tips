@@ -1,0 +1,628 @@
+{
+  "title": "The same CRUD in four frameworks",
+  "description": "We'll build a complete products CRUD (create, list, fetch, update and delete) and see, step by step, how each framework solves the same thing.",
+  "compareColumns": {
+    "frontend": "Frontend",
+    "spring": "Spring Boot",
+    "express": "Express",
+    "nest": "NestJS",
+    "fastapi": "FastAPI"
+  },
+  "decks": {
+    "o-que-vamos-criar": {
+      "title": "What we'll build",
+      "description": "The five CRUD endpoints: method, path, operation and status."
+    },
+    "passo-a-passo": {
+      "title": "Step by step",
+      "description": "The 16 CRUD steps, with the code for all four frameworks side by side."
+    },
+    "mapa-mental": {
+      "title": "Mind map",
+      "description": "The same concept in the frontend, Spring Boot, Express, NestJS and FastAPI."
+    },
+    "glossario": {
+      "title": "Glossary",
+      "description": "The technical terms used in this topic."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "API and database questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "endpoint-create": {
+      "description": "Creates a product"
+    },
+    "endpoint-list": {
+      "description": "Lists the products, in pages"
+    },
+    "endpoint-get": {
+      "description": "Fetches a product by id"
+    },
+    "endpoint-update": {
+      "description": "Updates a product"
+    },
+    "endpoint-delete": {
+      "description": "Deletes a product"
+    },
+    "step-01": {
+      "title": "Create the project",
+      "whatIs": "Create the project folder with the initial structure.",
+      "whyItMatters": "Some frameworks have a generator that sets everything up (like the npm create vite you use in the frontend). Others you build by hand.",
+      "snippets": {
+        "express": {
+          "note": "No generator. You start with an empty folder and a package.json and build the rest."
+        },
+        "spring": {
+          "note": "Generator on a website. You tick what you want and download a ready project."
+        },
+        "nest": {
+          "note": "Command-line generator. nest g resource already creates the products controller, service, module and DTOs."
+        },
+        "fastapi": {
+          "note": "No generator. You create a venv (Python), which isolates the project's libraries."
+        }
+      }
+    },
+    "step-02": {
+      "title": "Install the libraries",
+      "whatIs": "Download the libraries the project uses: the framework, the PostgreSQL driver and the validation tool.",
+      "whyItMatters": "It shows how much each framework already ships with. Express ships with little; Spring ships with almost everything.",
+      "snippets": {
+        "express": {
+          "note": "You pick each piece: pg talks to the database, zod validates, cors lets the frontend in."
+        },
+        "spring": {
+          "note": "No need to install anything by hand: Maven downloads everything when you run the project."
+        },
+        "nest": {
+          "note": "typeorm is the ORM; class-validator handles validation."
+        },
+        "fastapi": {
+          "note": "pip is Python's \"npm\" and requirements.txt is the dependency list."
+        }
+      }
+    },
+    "step-03": {
+      "title": "Start the database and connect",
+      "whatIs": "Start PostgreSQL with Docker (the same docker-compose.yml works for all four) and tell the API where the database is.",
+      "whyItMatters": "The database address and password stay out of the code, in an environment variable or a config file.",
+      "snippets": {
+        "express": {
+          "note": "You create the connection pool by hand."
+        },
+        "spring": {
+          "note": "Configuration only, no code. ddl-auto=update makes Spring create the table on its own."
+        },
+        "nest": {
+          "note": "Configured inside a module, using decorators."
+        },
+        "fastapi": {
+          "note": "get_db opens a database session for each request and closes it at the end."
+        }
+      }
+    },
+    "docker-compose": {
+      "title": "docker-compose.yml",
+      "body": "Step 3 says the same docker-compose.yml works for all four frameworks, but doesn't show the file. It starts the PostgreSQL used by every version.",
+      "snippet": {
+        "note": "Start it with docker compose up -d. The products-db container is the same one used in Step 15 to open psql."
+      }
+    },
+    "step-04": {
+      "title": "Define the products table",
+      "whatIs": "Describe the table's columns: id, name, description, price, stock and creation date.",
+      "whyItMatters": "With an ORM you write a class (entity) and it creates the table. Without an ORM, as in the guide's Express version, you write the table's SQL.",
+      "snippets": {
+        "express": {
+          "note": "Plain SQL. Plus a separate Product interface in TypeScript."
+        },
+        "spring": {
+          "note": "A class with annotations. @Entity says \"this is a table\"."
+        },
+        "nest": {
+          "note": "Very similar to Spring. The transformer turns the price, which the database returns as text, into a number."
+        },
+        "fastapi": {
+          "note": "A Python class. The types (Mapped[int]) give each column's type."
+        }
+      }
+    },
+    "step-05": {
+      "title": "Define and validate the input data",
+      "whatIs": "Say what the JSON the frontend sends (the DTO) should look like and which rules it must follow.",
+      "whyItMatters": "If someone sends a negative price, the API rejects it with status 400 before it reaches the database. It's the same idea as validating a form with Zod in the frontend.",
+      "snippets": {
+        "express": {
+          "note": "Zod, just like the frontend. The TypeScript type comes from the schema itself."
+        },
+        "spring": {
+          "note": "Annotations on each field. A record is a data-only class."
+        },
+        "nest": {
+          "note": "A class with decorators, in the same style as Spring."
+        },
+        "fastapi": {
+          "note": "Pydantic. Validation happens on its own just by using this class in the route."
+        }
+      }
+    },
+    "step-06": {
+      "title": "Build the layered structure",
+      "whatIs": "Create the three files every CRUD operation will use and wire them together: Repository (talks to the database), Service (rules) and Controller (receives the request and responds).",
+      "whyItMatters": "In the next 5 steps each CRUD operation will go through these three layers, always in this order: controller → service → repository → database.",
+      "snippets": {
+        "express": {
+          "note": "Wired by import. Each layer is a file with functions; there's no dependency injection."
+        },
+        "spring": {
+          "note": "Wired through the constructor. Spring creates each class and hands it to the other ready to use (dependency injection)."
+        },
+        "nest": {
+          "note": "Wired through the constructor + module. The module tells Nest which pieces exist. The repository comes ready from TypeORM."
+        },
+        "fastapi": {
+          "note": "Wired by import + Depends(). FastAPI hands the database session to each route."
+        }
+      }
+    },
+    "step-07": {
+      "title": "C: Create a product",
+      "whatIs": "POST /products with the product in the body. Responds 201 Created with the saved product (now with an id).",
+      "whyItMatters": "The controller validates the body, the service asks to save it, the repository inserts it into the database and returns the created row.",
+      "snippets": {
+        "express": {
+          "note": "toProduct converts the database row (snake_case, price as text) into the JS format."
+        },
+        "spring": {
+          "note": "repository.save() already exists. @Valid validates the body before it enters the method."
+        },
+        "nest": {
+          "note": "The global ValidationPipe validates the DTO automatically."
+        },
+        "fastapi": {
+          "note": "model_dump() turns the Pydantic model into a dictionary; the fields are spread (like JS spread)."
+        }
+      }
+    },
+    "express-to-product": {
+      "title": "ProductRow and toProduct",
+      "body": "Step 7 uses ProductRow and toProduct, and Step 4 mentions the Product interface, but none of the three appear in the material. The row comes from the database in snake_case with the price as text; toProduct converts it into the JS format.",
+      "snippet": {
+        "note": "pg returns NUMERIC as text to avoid losing precision; hence the Number(row.price)."
+      }
+    },
+    "step-08": {
+      "title": "R: List products",
+      "whatIs": "GET /products?page=0&size=10. Responds 200 with a page of products.",
+      "whyItMatters": "With thousands of products you don't want to return everything at once. The response has the same shape in all four: { content, page, size, totalElements, totalPages }.",
+      "snippets": {
+        "express": {
+          "note": "You write the LIMIT/OFFSET and the COUNT by hand."
+        },
+        "spring": {
+          "note": "Pagination built in. Spring reads page and size from the URL and builds the response."
+        },
+        "nest": {
+          "note": "findAndCount fetches the page and the total in a single call."
+        },
+        "fastapi": {
+          "note": "Query(0, ge=0) sets the default value and the rule (greater than or equal to 0)."
+        }
+      }
+    },
+    "express-query-schemas": {
+      "title": "pageQuerySchema and idParamSchema",
+      "body": "Step 8 uses pageQuerySchema, and Steps 9 to 11 use idParamSchema, but neither schema appears in the material. They sit next to the productSchema from Step 5.",
+      "snippet": {
+        "note": "The limits (size between 1 and 100) are the same as FastAPI's Query(10, ge=1, le=100) in Step 8."
+      }
+    },
+    "step-09": {
+      "title": "R: Fetch a product",
+      "whatIs": "GET /products/1. Responds 200 with the product, or 404 if it doesn't exist.",
+      "whyItMatters": "The repository only says \"not found\". The service is what turns that into an error. This get method is reused by update and delete.",
+      "snippets": {
+        "express": {
+          "note": "The id comes from the URL as text; Zod (z.coerce.number()) converts it."
+        },
+        "spring": {
+          "note": "findById returns an Optional (a \"box\" that may be empty)."
+        },
+        "nest": {
+          "note": "ParseIntPipe converts the id and responds 400 if it isn't a number."
+        },
+        "fastapi": {
+          "note": "Just by declaring product_id: int, FastAPI converts and validates it."
+        }
+      }
+    },
+    "step-10": {
+      "title": "U: Update a product",
+      "whatIs": "PUT /products/1 with the full product in the body. Responds 200 with the updated product, or 404.",
+      "whyItMatters": "It validates the id and the body, checks that the product exists, replaces the fields and saves.",
+      "snippets": {
+        "express": {
+          "note": "If no row was updated, the product didn't exist: it becomes a 404."
+        },
+        "spring": {
+          "note": "The same save() does an INSERT or an UPDATE, depending on whether the object already has an id."
+        },
+        "nest": {
+          "note": "Reuses findOne from the previous step."
+        },
+        "fastapi": {
+          "note": "setattr replaces each field; commit writes it to the database."
+        }
+      }
+    },
+    "step-11": {
+      "title": "D: Delete a product",
+      "whatIs": "DELETE /products/1. Responds 204 No Content (success, no body), or 404.",
+      "whyItMatters": "It validates the id, deletes and checks whether any row was actually deleted.",
+      "snippets": {
+        "express": {
+          "note": "The function is called remove because delete is a reserved word in JS."
+        },
+        "spring": {
+          "note": "@ResponseStatus sets the 204."
+        },
+        "nest": {
+          "note": "affected says how many rows were deleted."
+        },
+        "fastapi": {
+          "note": "status_code=204 right on the route."
+        }
+      }
+    },
+    "step-12": {
+      "title": "Handle errors in one place",
+      "whatIs": "A central point that turns errors into responses: \"not found\" becomes 404, invalid data becomes 400.",
+      "whyItMatters": "Without it, every route would need a try/catch. It's similar to an error boundary in React.",
+      "snippets": {
+        "express": {
+          "note": "A special Middleware with 4 parameters. Without the 4th, Express doesn't recognize it."
+        },
+        "spring": {
+          "note": "A class with one method per error type."
+        },
+        "nest": {
+          "note": "The most ready-made of the four."
+        },
+        "fastapi": {
+          "note": "Heads up: validation in FastAPI returns 422 by default."
+        }
+      }
+    },
+    "step-13": {
+      "title": "Allow the frontend (CORS)",
+      "whatIs": "Authorize your frontend's address (e.g. localhost:5173) to call the API.",
+      "whyItMatters": "Without it you get that CORS error in the browser console, even with the API working.",
+      "snippets": {
+        "express": {
+          "note": "One extra package, one line."
+        },
+        "spring": {
+          "note": "A configuration class."
+        },
+        "nest": {
+          "note": "One line, built into Nest."
+        },
+        "fastapi": {
+          "note": "A middleware that ships with FastAPI."
+        }
+      }
+    },
+    "step-14": {
+      "title": "Run the API",
+      "whatIs": "The command to start the API in development mode, which restarts on its own when you save a file.",
+      "whyItMatters": "It's the equivalent of the frontend's npm run dev.",
+      "snippets": {
+        "express": {
+          "note": "API at http://localhost:8080"
+        },
+        "spring": {
+          "note": "The first run takes a while because Maven downloads the dependencies."
+        },
+        "nest": {
+          "note": "Already configured by the generator."
+        },
+        "fastapi": {
+          "note": "Bonus: open http://localhost:8000/docs to see and test the API on a ready-made page."
+        }
+      }
+    },
+    "express-server": {
+      "title": "server.ts",
+      "body": "Step 14 runs tsx watch --env-file=.env src/server.ts, but server.ts doesn't appear in the material. It just imports the app and starts the API on port 8080.",
+      "snippet": {
+        "note": "For that, the app.ts from Step 6 exports the app (export const app = express();). Splitting app and server is what lets the Step 16 test use request(app) without opening the port."
+      }
+    },
+    "step-15": {
+      "title": "Test the CRUD by hand",
+      "whatIs": "Call each CRUD operation from the terminal with curl, in order: create, list, fetch, update and delete.",
+      "whyItMatters": "The commands are the same for all four; only the port changes. It's also worth testing an error (a negative price should give 400, or 422 in FastAPI).",
+      "snippets": {
+        "express": {
+          "note": "See the data in the database: docker exec -it products-db psql -U products productsdb -c \"SELECT * FROM products;\""
+        },
+        "spring": {
+          "note": "Same commands. The list format comes from Spring's Page (with a few extra fields)."
+        },
+        "nest": {
+          "note": "Same commands, since main.ts uses app.listen(8080)."
+        },
+        "fastapi": {
+          "note": "Or open http://localhost:8000/docs and test each operation by clicking."
+        }
+      }
+    },
+    "step-16": {
+      "title": "Test automatically",
+      "whatIs": "A test that calls the API and checks the response. Example: asking for a product that doesn't exist should give 404.",
+      "whyItMatters": "In the examples the service is a Mock, so the test runs without a database, like when you mock an API call in Vitest.",
+      "snippets": {
+        "express": {
+          "note": "Vitest + Supertest. Very familiar if you come from the frontend."
+        },
+        "spring": {
+          "note": "JUnit + Mockito + MockMvc."
+        },
+        "nest": {
+          "note": "Jest + Supertest, already configured by the generator."
+        },
+        "fastapi": {
+          "note": "pytest + TestClient. Here it would need a database or overriding get_db."
+        }
+      }
+    },
+    "cmp-ponto-de-entrada": {
+      "concept": "Entry point",
+      "explanation": "The file that wires everything up when the program starts."
+    },
+    "cmp-rotas-endpoints": {
+      "concept": "Routes / endpoints",
+      "explanation": "The addresses the frontend calls.",
+      "values": {
+        "frontend": "The URLs fetch calls",
+        "express": "Router + controller functions"
+      }
+    },
+    "cmp-regras-de-negocio": {
+      "concept": "Business rules",
+      "explanation": "Where the decisions live (\"if it doesn't exist, it's an error\").",
+      "values": {
+        "express": "functions in product.service.ts",
+        "fastapi": "functions in service.py"
+      }
+    },
+    "cmp-acesso-ao-banco": {
+      "concept": "Database access",
+      "explanation": "The part that fetches and saves data.",
+      "values": {
+        "frontend": "API calls file (api/products.ts)",
+        "spring": "Repository (JpaRepository, generated)",
+        "express": "product.repository.ts (SQL you write, via pg)",
+        "fastapi": "SQLAlchemy Session (no repository file)"
+      }
+    },
+    "cmp-tabela-modelo-de-dados": {
+      "concept": "Table / data model",
+      "explanation": "How the database table shows up in the code.",
+      "values": {
+        "express": "no ORM: table in init.sql + TS interface"
+      }
+    },
+    "cmp-dto": {
+      "concept": "DTO",
+      "explanation": "The shape of the data going in and out of the API.",
+      "values": {
+        "frontend": "Request/response types",
+        "express": "Zod schema + inferred type",
+        "nest": "class with decorators",
+        "fastapi": "Pydantic model"
+      }
+    },
+    "cmp-validacao": {
+      "concept": "Validation",
+      "explanation": "Checking whether the received data is valid.",
+      "values": {
+        "frontend": "Zod / Yup in the form",
+        "fastapi": "Pydantic (automatic via type hints)"
+      }
+    },
+    "cmp-injecao-de-dependencia": {
+      "concept": "Dependency injection",
+      "explanation": "The framework hands the class what it needs, ready to use.",
+      "values": {
+        "spring": "Constructor (Spring injects)",
+        "express": "Doesn't exist (direct imports)",
+        "nest": "Constructor + Modules"
+      }
+    },
+    "cmp-erros-globais": {
+      "concept": "Global errors",
+      "explanation": "A single place that turns errors into responses.",
+      "values": {
+        "express": "Error middleware (4 parameters)",
+        "nest": "Built-in NotFoundException + filters"
+      }
+    },
+    "cmp-cors": {
+      "concept": "CORS",
+      "explanation": "Allowing the frontend to call the API.",
+      "values": {
+        "frontend": "Error that shows up in the browser",
+        "express": "cors package"
+      }
+    },
+    "cmp-configuracao": {
+      "concept": "Configuration",
+      "explanation": "Where the database address, passwords and ports live.",
+      "values": {
+        "fastapi": "DATABASE_URL variable (os.getenv)"
+      }
+    },
+    "cmp-dependencias": {
+      "concept": "Dependencies",
+      "explanation": "The project's library list and who installs it."
+    },
+    "cmp-gerador-de-projeto": {
+      "concept": "Project generator",
+      "explanation": "A tool that creates the initial structure.",
+      "values": {
+        "express": "none (manual npm init)",
+        "fastapi": "none (venv + pip install)"
+      }
+    },
+    "cmp-rodar-em-dev": {
+      "concept": "Run in dev",
+      "explanation": "The command to start it while you code."
+    },
+    "cmp-testes": {
+      "concept": "Tests",
+      "explanation": "Tools for automated testing."
+    },
+    "cmp-documentacao-da-api": {
+      "concept": "API documentation",
+      "explanation": "A page that lists the endpoints and lets you try them.",
+      "values": {
+        "frontend": "Swagger/OpenAPI (consumed)",
+        "spring": "springdoc (extra)",
+        "express": "not included",
+        "nest": "@nestjs/swagger (extra)",
+        "fastapi": "automatic at /docs"
+      }
+    },
+    "api": {
+      "term": "API",
+      "definition": "A program running on a server, waiting for requests. The frontend asks (\"give me product 1\") and the API responds with data, usually in JSON."
+    },
+    "crud": {
+      "term": "CRUD",
+      "definition": "An acronym for the four basic operations: Create, Read, Update and Delete."
+    },
+    "endpoint": {
+      "term": "Endpoint (route)",
+      "definition": "An API address, made of method + path. E.g. GET /products/1. It's the URL your fetch calls."
+    },
+    "framework": {
+      "term": "Framework",
+      "definition": "A set of ready-made tools that gives the project its structure. Express, Spring Boot, NestJS and FastAPI are frameworks for building APIs."
+    },
+    "requisicao-e-resposta": {
+      "term": "Request and response",
+      "definition": "The request is what reaches the API (method, URL, body). The response is what the API returns (status and data)."
+    },
+    "status-http": {
+      "term": "HTTP status",
+      "definition": "A number that says how the response went. 200 success, 201 created, 204 success with no content, 400 bad data, 404 not found, 500 server error."
+    },
+    "json": {
+      "term": "JSON",
+      "definition": "The text format used to send data between the frontend and the API. It's the same object format you already use in JavaScript."
+    },
+    "sql": {
+      "term": "SQL",
+      "definition": "The language used to talk to the database. E.g. SELECT * FROM products WHERE id = 1."
+    },
+    "orm": {
+      "term": "ORM",
+      "definition": "A library that writes the SQL for you. You work with classes and objects and it translates them into database commands. Examples: JPA/Hibernate (Java), TypeORM (Nest), SQLAlchemy (Python)."
+    },
+    "entidade": {
+      "term": "Entity (model)",
+      "definition": "The representation of a database table in code. The Product class with id, name, price becomes the products table."
+    },
+    "dto": {
+      "term": "DTO (Data Transfer Object)",
+      "definition": "The shape of the data going into or out of the API. E.g. to create a product, the frontend sends only name, description, price and stock; the id and the date are generated by the database. That input \"mold\" is the DTO. It's like the request and response types you create in the frontend."
+    },
+    "validacao": {
+      "term": "Validation",
+      "definition": "Checking whether the received data makes sense before saving it. E.g. the price must be greater than zero. If it fails, the API responds 400."
+    },
+    "controller": {
+      "term": "Controller",
+      "definition": "The part of the code that receives the request, calls whoever does the work and returns the response. It's the \"front door\" of each route."
+    },
+    "service": {
+      "term": "Service",
+      "definition": "The part with the business rules. E.g. \"if the product doesn't exist, that's an error\". It knows nothing about HTTP or SQL."
+    },
+    "repository": {
+      "term": "Repository",
+      "definition": "The only part that talks to the database. It fetches, saves, updates and deletes."
+    },
+    "injecao-de-dependencia": {
+      "term": "Dependency injection",
+      "definition": "Instead of a class creating what it needs (new ProductService()), the framework creates it and hands it over ready in the constructor. Similar to receiving something via props or Context in React."
+    },
+    "decorator-anotacao": {
+      "term": "Decorator / annotation",
+      "definition": "Those @ markers on top of classes and methods, like @Controller or @GetMapping. They tell the framework what that class or method is."
+    },
+    "middleware": {
+      "term": "Middleware",
+      "definition": "A function that runs in the middle of the way, before the request reaches the route (or after an error). E.g. turning the body text into an object."
+    },
+    "cors": {
+      "term": "CORS",
+      "definition": "A browser security rule. If the frontend is on localhost:5173 and the API on localhost:8080, the API has to say explicitly that it accepts requests from that origin."
+    },
+    "variavel-de-ambiente": {
+      "term": "Environment variable",
+      "definition": "Configuration that lives outside the code, in a .env file or on the server. E.g. the database address. That way you don't write passwords in the code."
+    },
+    "pool-de-conexoes": {
+      "term": "Connection pool",
+      "definition": "A group of database connections kept open and reused. Opening a new connection for every request would be slow."
+    },
+    "docker": {
+      "term": "Docker",
+      "definition": "A tool that runs programs (like PostgreSQL) in isolated \"boxes\", without installing them directly on your computer."
+    },
+    "mock": {
+      "term": "Mock",
+      "definition": "A fake version of a part of the code used in tests. E.g. pretending the service answered \"not found\" without needing a database."
+    },
+    "venv": {
+      "term": "venv (Python)",
+      "definition": "An isolated folder with the Python project's libraries. It plays the role node_modules plays in Node."
+    },
+    "put-vs-patch": {
+      "question": "What's the difference between PUT and PATCH?",
+      "answer": "PUT replaces the whole resource: the body carries the full product, as in Step 10, and whatever isn't sent is lost or goes back to the default. PATCH makes a partial change: the body carries only the fields that change. PUT is idempotent by definition; PATCH may or may not be, depending on how the API implements it."
+    },
+    "idempotencia": {
+      "question": "What is an idempotent endpoint? Which CRUD operations are idempotent?",
+      "answer": "Idempotent means it leaves the server in the same state whether it's called once or many times. GET, PUT and DELETE are idempotent: fetching again changes nothing, saving the same full product again gives the same result and deleting something already deleted keeps it deleted (the second call returns 404, but the state is the same). POST isn't: each call creates a new product. This matters for safely retrying a request when the network fails."
+    },
+    "paginacao-offset-cursor": {
+      "question": "Offset or cursor pagination: what's the difference?",
+      "answer": "Offset (LIMIT/OFFSET, used in Step 8) skips N rows. It's simple and lets you jump straight to page 5, but it gets slow on large tables, because the database reads and discards the skipped rows, and it can repeat or skip items if someone inserts or deletes in between. Cursor uses the last item seen (\"products with id greater than 120\"): it's fast with an index and stable with inserts, but doesn't let you jump to a specific page."
+    },
+    "problema-n-mais-1": {
+      "question": "What is the N+1 problem?",
+      "answer": "It happens when the code runs 1 query to fetch a list and then 1 more query for each item, to bring related data: 100 products and their categories become 101 queries. It's common with ORMs, which load relationships on demand without you noticing. The fix is to fetch everything at once, with a JOIN or the ORM's eager loading: JOIN FETCH in JPA, relations in TypeORM, selectinload or joinedload in SQLAlchemy."
+    },
+    "transacoes": {
+      "question": "What is a transaction and when should you use one?",
+      "answer": "It's a group of database operations that happens entirely or not at all: if one fails, all of them are undone (rollback). Use it when several writes must stay consistent together, like decreasing stock and recording the order. In this topic's frameworks: @Transactional in Spring, dataSource.transaction in TypeORM, commit and rollback on the SQLAlchemy Session (Step 7 already uses db.commit()) and BEGIN/COMMIT with pg in Express."
+    },
+    "autenticacao-jwt": {
+      "question": "How does JWT authentication work? What's the difference between 401 and 403?",
+      "answer": "After login, the API returns a signed token (JWT) with data such as the user id and the expiry. The frontend sends this token on every request, in the Authorization header. The API checks the signature and the expiry without querying the database. The token's content is only encoded, not encrypted: it can't hold secrets and must expire. Without a valid token, the response is 401 (unauthenticated); with a token but without permission for that action, it's 403 (forbidden)."
+    },
+    "migrations": {
+      "question": "Why use migrations instead of synchronize or ddl-auto?",
+      "answer": "synchronize: true (NestJS) and ddl-auto=update (Spring), from Step 3, change the table on their own when the API starts. They're great in development and dangerous in production: they can drop columns or data and leave no history. Migrations are versioned files with each database change (create table, add column), applied in order and reviewed like code. Tools: Flyway or Liquibase in Spring, TypeORM migrations in NestJS, Alembic in FastAPI and node-pg-migrate or Knex in Express."
+    },
+    "sql-injection": {
+      "question": "Why use $1 instead of building the SQL by concatenating text?",
+      "answer": "Concatenating user input into SQL opens the door to SQL injection: someone sends text that becomes a command, for example to drop the table. With parameters ($1, $2 in pg, as in Step 9), the value travels separately from the command and the database never runs it as SQL. ORMs (JPA, TypeORM, SQLAlchemy) already do this automatically."
+    }
+  }
+}
