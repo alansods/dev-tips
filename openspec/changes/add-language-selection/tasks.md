@@ -30,10 +30,10 @@
 
 ## 6. Tradução de conteúdo: schema e validação (content-model)
 
-- [ ] 6.1 Testes falhando com fixtures em `src/content/__fixtures__/`: tradução válida, card inexistente, campo `code`, campo de outro tipo, texto vazio
-- [ ] 6.2 Implementar o schema do overlay por tipo de card e a checagem de ids em `src/content/`
-- [ ] 6.3 Incluir a validação de todo `translations/en.json` do repositório no teste de conteúdo
-- [ ] 6.4 Testes passando
+- [x] 6.1 Testes falhando com fixtures em `src/content/__fixtures__/`: tradução válida, card inexistente, campo `code`, campo de outro tipo, texto vazio
+- [x] 6.2 Implementar o schema do overlay por tipo de card e a checagem de ids em `src/content/`
+- [x] 6.3 Incluir a validação de todo `translations/en.json` do repositório no teste de conteúdo
+- [x] 6.4 Testes passando
 
 ## 7. Conteúdo no idioma escolhido (localization)
 
