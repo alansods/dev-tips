@@ -17,6 +17,9 @@ const ALL_ENTRIES: GlossaryEntry[] = catalog.flatMap((theme) =>
   getGlossary(theme).map((concept) => ({ themeId: theme.id, concept })),
 );
 
+const MANY_THEMES = catalog.length > 1;
+const themeTitle = (id: string) => catalog.find((t) => t.id === id)?.title ?? '';
+
 const preview = (text: string) => (text.length > 92 ? `${text.slice(0, 90).trimEnd()}…` : text);
 
 export default function GlossaryScreen() {
@@ -80,6 +83,11 @@ export default function GlossaryScreen() {
                   <AppText size={13} tone="muted">
                     {preview(entry.concept.definition)}
                   </AppText>
+                  {MANY_THEMES && (
+                    <AppText font="mono" size={11} tone="muted">
+                      {themeTitle(entry.themeId)}
+                    </AppText>
+                  )}
                 </Pressable>
               );
             })}

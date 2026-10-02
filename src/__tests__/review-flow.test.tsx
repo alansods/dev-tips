@@ -1,4 +1,4 @@
-import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -113,8 +113,9 @@ describe('Requirement: Zerar progresso de um tema (agendamento)', () => {
   it('Zerar apaga o agendamento do tema', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open('/progress');
-    press('Zerar progresso');
-    press('Zerar');
+    const crud = within(screen.getByTestId(`theme-progress-${THEME}`));
+    fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
+    fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
     fireEvent.press(screen.getByRole('button', { name: /^Temas, tab/ }));
     press(/^O mesmo CRUD em quatro frameworks/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();

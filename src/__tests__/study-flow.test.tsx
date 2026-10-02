@@ -217,3 +217,22 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
     expect(screen.getByText(`4/${TOTAL_CARDS}`)).toBeOnTheScreen();
   });
 });
+
+describe('Requirement: Identidade do tema (Fundamentos web)', () => {
+  it('Tema na Home', async () => {
+    await open('/');
+    const titles = screen
+      .getAllByRole('button')
+      .map((b) => String(b.props.accessibilityLabel ?? ''))
+      .filter((l) => /^(O mesmo CRUD em quatro frameworks|Fundamentos web),/.test(l))
+      .map((l) => l.split(',')[0]);
+    expect(titles).toEqual(['O mesmo CRUD em quatro frameworks', 'Fundamentos web']);
+  });
+
+  it('Sem frameworks', async () => {
+    await open('/theme/fundamentos-web');
+    expect(screen.getByText('Fundamentos web')).toBeOnTheScreen();
+    expect(screen.queryByText('Spring Boot')).toBeNull();
+    expect(screen.queryByText('FastAPI')).toBeNull();
+  });
+});

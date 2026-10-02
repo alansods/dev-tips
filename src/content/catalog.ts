@@ -7,9 +7,10 @@
 // nunca falha com o conteúdo do repositório.
 
 import crud4Frameworks from '../../content/themes/crud-4-frameworks/theme.json';
+import fundamentosWeb from '../../content/themes/fundamentos-web/theme.json';
 import { themeSchema, type Theme } from './schema';
 
-const registry: unknown[] = [crud4Frameworks];
+const registry: unknown[] = [crud4Frameworks, fundamentosWeb];
 
 export const catalog: readonly Theme[] = registry.map((raw) => themeSchema.parse(raw));
 

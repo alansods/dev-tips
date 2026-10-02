@@ -55,10 +55,20 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
 describe('Requirement: Aba Glossário', () => {
   it('Lista completa', async () => {
     await open('/glossary');
-    expect(listed()).toHaveLength(24);
+    expect(listed()).toHaveLength(45);
     expect(listed()[0]).toBe('API');
-    expect(screen.getByText('24 termos')).toBeOnTheScreen();
+    expect(listed()[23]).toBe('venv (Python)');
+    expect(listed()[24]).toBe('HTTP');
+    expect(screen.getByText('45 termos')).toBeOnTheScreen();
     expect(screen.queryByText(/em construção/i)).toBeNull();
+  });
+
+  it('Tema de cada termo', async () => {
+    await open('/glossary');
+    expect(
+      within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
+    ).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: 'Cookie' })).getByText('Fundamentos web')).toBeOnTheScreen();
   });
 
   it('Selo de status', async () => {
@@ -83,8 +93,8 @@ describe('Requirement: Busca no glossário (na tela)', () => {
   it('Buscar pelo nome', async () => {
     await open('/glossary');
     search('cors');
-    expect(listed()).toEqual(['CORS']);
-    expect(screen.getByText('1 termo')).toBeOnTheScreen();
+    expect(listed()).toEqual(['CORS', 'Política de mesma origem']);
+    expect(screen.getByText('2 termos')).toBeOnTheScreen();
   });
 
   it('Buscar sem acento', async () => {

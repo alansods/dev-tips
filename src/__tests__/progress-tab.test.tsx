@@ -1,4 +1,4 @@
-import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -27,6 +27,9 @@ const deckIds = (id: string) => crudTheme.decks.find((d) => d.id === id)!.cards.
 const seed = (ids: string[], result: 'known' | 'unknown') =>
   ids.forEach((id) => useStudyStore.getState().answer(THEME, id, result));
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
+/** Seção da aba Progresso do tema CRUD (há mais de um tema no catálogo). */
+const crud = () => within(screen.getByTestId(`theme-progress-${THEME}`));
+const pressInCrud = (name: string) => fireEvent.press(crud().getByRole('button', { name }));
 
 async function openProgress() {
   renderRouter(APP, { initialUrl: '/progress' });
@@ -38,11 +41,11 @@ beforeEach(() => resetStudyStore());
 describe('Requirement: Aba Progresso', () => {
   it('Sem progresso', async () => {
     await openProgress();
-    expect(screen.getByText(crudTheme.title)).toBeOnTheScreen();
-    expect(screen.getByLabelText('0% do tema dominado')).toBeOnTheScreen();
-    expect(screen.getByLabelText('0 sei')).toBeOnTheScreen();
-    expect(screen.getByLabelText('0 para revisar')).toBeOnTheScreen();
-    expect(screen.getByLabelText(`${TOTAL} não vistos`)).toBeOnTheScreen();
+    expect(crud().getByText(crudTheme.title)).toBeOnTheScreen();
+    expect(crud().getByLabelText('0% do tema dominado')).toBeOnTheScreen();
+    expect(crud().getByLabelText('0 sei')).toBeOnTheScreen();
+    expect(crud().getByLabelText('0 para revisar')).toBeOnTheScreen();
+    expect(crud().getByLabelText(`${TOTAL} não vistos`)).toBeOnTheScreen();
     expect(screen.queryByText(/em construção/i)).toBeNull();
   });
 
@@ -50,18 +53,18 @@ describe('Requirement: Aba Progresso', () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     seed(deckIds('mapa-mental').slice(0, 2), 'unknown');
     await openProgress();
-    expect(screen.getByLabelText('5% do tema dominado')).toBeOnTheScreen(); // 4 de 73
-    expect(screen.getByLabelText('4 sei')).toBeOnTheScreen();
-    expect(screen.getByLabelText('2 para revisar')).toBeOnTheScreen();
-    expect(screen.getByLabelText(`${TOTAL - 6} não vistos`)).toBeOnTheScreen();
+    expect(crud().getByLabelText('5% do tema dominado')).toBeOnTheScreen(); // 4 de 73
+    expect(crud().getByLabelText('4 sei')).toBeOnTheScreen();
+    expect(crud().getByLabelText('2 para revisar')).toBeOnTheScreen();
+    expect(crud().getByLabelText(`${TOTAL - 6} não vistos`)).toBeOnTheScreen();
   });
 
   it('Progresso por deck', async () => {
     seed(deckIds('o-que-vamos-criar').slice(0, 2), 'known');
     await openProgress();
-    expect(screen.getByText('O que vamos criar')).toBeOnTheScreen();
-    expect(screen.getByText('2/5')).toBeOnTheScreen();
-    expect(screen.getByText('0/20')).toBeOnTheScreen();
+    expect(crud().getByText('O que vamos criar')).toBeOnTheScreen();
+    expect(crud().getByText('2/5')).toBeOnTheScreen();
+    expect(crud().getByText('0/20')).toBeOnTheScreen();
   });
 });
 
@@ -69,10 +72,10 @@ describe('Requirement: Zerar progresso de um tema', () => {
   it('Zerar com confirmação', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     await openProgress();
-    press('Zerar progresso');
-    expect(screen.getByText('Zerar o progresso deste tema?')).toBeOnTheScreen();
-    press('Zerar');
-    expect(screen.getByLabelText('0% do tema dominado')).toBeOnTheScreen();
+    pressInCrud('Zerar progresso');
+    expect(crud().getByText('Zerar o progresso deste tema?')).toBeOnTheScreen();
+    pressInCrud('Zerar');
+    expect(crud().getByLabelText('0% do tema dominado')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress).toEqual({});
 
     fireEvent.press(screen.getByRole('button', { name: /^Temas, tab/ }));
@@ -85,10 +88,10 @@ describe('Requirement: Zerar progresso de um tema', () => {
   it('Cancelar', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     await openProgress();
-    press('Zerar progresso');
-    press('Cancelar');
-    expect(screen.queryByText('Zerar o progresso deste tema?')).toBeNull();
-    expect(screen.getByLabelText('4 sei')).toBeOnTheScreen();
+    pressInCrud('Zerar progresso');
+    pressInCrud('Cancelar');
+    expect(crud().queryByText('Zerar o progresso deste tema?')).toBeNull();
+    expect(crud().getByLabelText('4 sei')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(THEME, 'api')]).toBe('known');
   });
 });

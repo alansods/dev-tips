@@ -34,7 +34,7 @@ function ThemeProgress({ theme }: { theme: Theme }) {
   const unseen = stats.total - stats.answered;
 
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View testID={`theme-progress-${theme.id}`} style={{ gap: spacing.lg }}>
       <View style={[styles.hero, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <ProgressRing percent={percent} label={`${percent}% do tema dominado`} />
         <View style={{ flex: 1, gap: 4 }}>
