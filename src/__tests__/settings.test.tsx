@@ -7,6 +7,8 @@ import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
 import SettingsScreen from '../app/settings';
 import { useSettingsStore } from '../i18n';
+import { resetStudyStore, useStudyStore } from '../study/store';
+import { crudTheme } from '../test-utils';
 
 const APP = {
   _layout: RootLayout,
@@ -69,5 +71,20 @@ describe('Requirement: Trocar o idioma', () => {
     expect(useSettingsStore.getState().language).toBe('en');
     press('Back');
     expect(tabLabels()).toEqual(['Topics', 'Glossary', 'Progress']);
+  });
+});
+
+describe('Requirement: Trocar o idioma (progresso)', () => {
+  it('Progresso preservado', async () => {
+    resetStudyStore();
+    const ids = crudTheme.decks.flatMap((d) => d.cards).slice(0, 4).map((c) => c.id);
+    ids.forEach((id) => useStudyStore.getState().answer(crudTheme.id, id, 'known'));
+    await open('/progress');
+    expect(screen.getByTestId(`theme-progress-${crudTheme.id}`)).toBeOnTheScreen();
+    expect(screen.getAllByLabelText('4 já sabia').length).toBeGreaterThan(0);
+    press('Ajustes');
+    fireEvent.press(radio('English'));
+    press('Back');
+    expect(screen.getAllByLabelText('4 I knew it').length).toBeGreaterThan(0);
   });
 });

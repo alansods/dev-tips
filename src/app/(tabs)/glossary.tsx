@@ -3,8 +3,8 @@ import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Screen } from '../../components/Screen';
-import { catalog } from '../../content/catalog';
-import { getGlossary } from '../../content';
+import { getGlossary, type Theme } from '../../content';
+import { useCatalog } from '../../content/useCatalog';
 import { searchTerms, type GlossaryEntry } from '../../glossary/search';
 import { TermSheet } from '../../glossary/TermSheet';
 import { useT } from '../../i18n';
@@ -14,12 +14,8 @@ import { useFontsReady } from '../../theme/fonts';
 import { useTheme } from '../../theme/ThemeProvider';
 import { fontFamilies, radius, spacing } from '../../theme/tokens';
 
-const ALL_ENTRIES: GlossaryEntry[] = catalog.flatMap((theme) =>
-  getGlossary(theme).map((concept) => ({ themeId: theme.id, concept })),
-);
-
-const MANY_THEMES = catalog.length > 1;
-const themeTitle = (id: string) => catalog.find((t) => t.id === id)?.title ?? '';
+const allEntries = (catalog: readonly Theme[]): GlossaryEntry[] =>
+  catalog.flatMap((theme) => getGlossary(theme).map((concept) => ({ themeId: theme.id, concept })));
 
 const preview = (text: string) => (text.length > 92 ? `${text.slice(0, 90).trimEnd()}…` : text);
 
@@ -30,8 +26,12 @@ export default function GlossaryScreen() {
   const progress = useStudyStore((s) => s.progress);
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState<GlossaryEntry | null>(null);
+  const catalog = useCatalog();
+  const manyThemes = catalog.length > 1;
+  const themeTitle = (id: string) => catalog.find((theme) => theme.id === id)?.title ?? '';
 
-  const entries = useMemo(() => searchTerms(ALL_ENTRIES, query), [query]);
+  const all = useMemo(() => allEntries(catalog), [catalog]);
+  const entries = useMemo(() => searchTerms(all, query), [all, query]);
   const openTheme = open ? catalog.find((t) => t.id === open.themeId) : undefined;
 
   return (
@@ -85,7 +85,7 @@ export default function GlossaryScreen() {
                   <AppText size={13} tone="muted">
                     {preview(entry.concept.definition)}
                   </AppText>
-                  {MANY_THEMES && (
+                  {manyThemes && (
                     <AppText font="mono" size={11} tone="muted">
                       {themeTitle(entry.themeId)}
                     </AppText>

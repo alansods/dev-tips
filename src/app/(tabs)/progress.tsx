@@ -6,7 +6,7 @@ import { Button } from '../../components/Button';
 import { ProgressBar } from '../../components/ProgressBar';
 import { ProgressRing } from '../../components/ProgressRing';
 import { Screen } from '../../components/Screen';
-import { catalog } from '../../content/catalog';
+import { useCatalog } from '../../content/useCatalog';
 import type { Theme } from '../../content';
 import { useT } from '../../i18n';
 import { deckStats, themeStats } from '../../study/rules';
@@ -15,6 +15,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 
 export default function ProgressScreen() {
+  const catalog = useCatalog();
   return (
     <Screen>
       {catalog.map((theme) => (

@@ -7,7 +7,7 @@ import { Button } from '../../components/Button';
 import { IconButton } from '../../components/IconButton';
 import { BackIcon } from '../../components/icons';
 import { ProgressBar } from '../../components/ProgressBar';
-import { getTheme } from '../../content/catalog';
+import { useCatalogTheme } from '../../content/useCatalog';
 import type { Deck, Theme } from '../../content';
 import { useT } from '../../i18n';
 import { today } from '../../study/clock';
@@ -27,7 +27,7 @@ export default function ThemeScreen() {
   const { themeId } = useLocalSearchParams<{ themeId: string }>();
   const { colors } = useTheme();
   const t = useT();
-  const theme = getTheme(String(themeId));
+  const theme = useCatalogTheme(String(themeId));
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>

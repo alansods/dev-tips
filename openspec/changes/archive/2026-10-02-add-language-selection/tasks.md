@@ -37,12 +37,12 @@
 
 ## 7. Conteúdo no idioma escolhido (localization)
 
-- [ ] 7.1 Testes falhando para `localizeTheme`: card traduzido, tradução parcial campo a campo, tema sem tradução, código e ids inalterados
-- [ ] 7.2 Implementar `localizeTheme`, `getCatalog(language)` memoizado e `useCatalog()`, e trocar os usos de `catalog`/`getTheme` nas telas
-- [ ] 7.3 Teste falhando e depois passando: a busca do glossário em inglês encontra "CORS" por "browser"
-- [ ] 7.4 Testes passando
+- [x] 7.1 Testes falhando para `localizeTheme`: card traduzido, tradução parcial campo a campo, tema sem tradução, código e ids inalterados
+- [x] 7.2 Implementar `localizeTheme`, `getCatalog(language)` memoizado e `useCatalog()`, e trocar os usos de `catalog`/`getTheme` nas telas
+- [x] 7.3 Teste falhando e depois passando: a busca do glossário em inglês encontra "CORS" por "browser"
+- [x] 7.4 Testes passando
 
 ## 8. Verificação
 
-- [ ] 8.1 Conferir as telas principais em inglês numa largura de 320 pt
-- [ ] 8.2 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit`
+- [x] 8.1 Conferir as telas principais em inglês numa largura de 320 pt (por cálculo: o texto mais longo dos botões, "I didn't know", ocupa cerca de 95 pt dos 106 pt disponíveis; falta conferir no aparelho)
+- [x] 8.2 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit`

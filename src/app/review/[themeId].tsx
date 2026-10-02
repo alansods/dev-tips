@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
-import { getTheme } from '../../content/catalog';
+import { useCatalogTheme } from '../../content/useCatalog';
 import { today } from '../../study/clock';
 import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
@@ -17,7 +17,7 @@ export default function ReviewScreen() {
   const { themeId } = useLocalSearchParams<{ themeId: string }>();
   const { colors } = useTheme();
   const t = useT();
-  const theme = getTheme(String(themeId));
+  const theme = useCatalogTheme(String(themeId));
 
   if (!theme) {
     return (

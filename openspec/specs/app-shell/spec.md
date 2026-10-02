@@ -3,9 +3,7 @@
 ## Purpose
 
 Define a estrutura comum do app (navegação por abas, tema visual claro/escuro, fontes e acesso ao catálogo de temas) sobre a qual as telas de estudo são construídas.
-
 ## Requirements
-
 ### Requirement: Navegação por abas
 O app SHALL ter 3 abas inferiores, nesta ordem: **Temas**, **Glossário** e **Progresso**. Cada aba SHALL ter um rótulo de texto e um ícone. Ao abrir, o app SHALL mostrar a aba Temas. A aba ativa MUST ser indicada visualmente e para leitores de tela.
 
@@ -83,3 +81,15 @@ A aba Temas SHALL listar cada tema do catálogo, na ordem do catálogo. Cada tem
 #### Scenario: Tocar no tema
 - **WHEN** o usuário toca no card do tema
 - **THEN** a tela do tema abre
+
+### Requirement: Tela Ajustes
+O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um botão de engrenagem com rótulo acessível "Ajustes" ("Settings" em inglês). Tocar nele SHALL abrir a tela "Ajustes" em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL ter a seção "Idioma", com as opções de idioma e a atual marcada.
+
+#### Scenario: Abrir Ajustes
+- **WHEN** o usuário está na aba Temas e toca no botão "Ajustes"
+- **THEN** a tela "Ajustes" abre sem a barra de abas e mostra a seção "Idioma" com o idioma atual marcado
+
+#### Scenario: Voltar
+- **WHEN** o usuário está em Ajustes e toca em voltar
+- **THEN** volta para a aba de onde saiu
+

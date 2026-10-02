@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AppText } from '../../components/AppText';
 import { ProgressBar } from '../../components/ProgressBar';
 import { Screen } from '../../components/Screen';
-import { catalog } from '../../content/catalog';
+import { useCatalog } from '../../content/useCatalog';
 import type { Theme } from '../../content';
 import { useT } from '../../i18n';
 import { today } from '../../study/clock';
@@ -15,6 +15,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 
 export default function HomeScreen() {
+  const catalog = useCatalog();
   return (
     <Screen>
       {catalog.map((theme) => (
