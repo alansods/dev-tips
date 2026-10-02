@@ -1,0 +1,126 @@
+{
+  "title": "Web fundamentals",
+  "description": "The web concepts behind every API: HTTP, REST, browser rules and security.",
+  "decks": {
+    "http": { "title": "HTTP", "description": "How the browser and the API talk to each other." },
+    "rest": { "title": "REST", "description": "How to organize an API's resources and URLs." },
+    "navegador-e-seguranca": {
+      "title": "Browser and security",
+      "description": "Browser rules, where to store data and the most common attacks."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Web questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "http": {
+      "term": "HTTP",
+      "definition": "The protocol the browser and the API use to talk. Each exchange is a request (method, URL, headers and body) followed by a response (status code, headers and body)."
+    },
+    "metodo-http": {
+      "term": "HTTP method",
+      "definition": "The request's verb, which says what you want to do with the resource: GET fetches, POST creates, PUT replaces, PATCH partially updates and DELETE removes. A GET should never change data."
+    },
+    "codigo-de-status": {
+      "term": "Status code",
+      "definition": "A three-digit number that sums up the result of the request: 2xx succeeded (200, 201, 204), 3xx is a redirect or cache (301, 302, 304), 4xx is a client error (400, 401, 403, 404, 409, 422) and 5xx is a server error (500, 503)."
+    },
+    "cabecalho": {
+      "term": "Header",
+      "definition": "A name: value pair sent with the request or the response, carrying information about it. Examples: Content-Type (body format), Authorization (credential), Cache-Control (caching rules) and Set-Cookie (stores a cookie in the browser)."
+    },
+    "corpo": {
+      "term": "Body",
+      "definition": "The content sent in the request or the response, such as a product's JSON. The Content-Type header says which format it is in. A GET usually has no body: the parameters go in the URL."
+    },
+    "https": {
+      "term": "HTTPS",
+      "definition": "HTTP inside an encrypted connection (TLS). It stops anyone in the middle from reading or changing the data and proves, through the certificate, that the site is who it claims to be. Cookies with the Secure attribute only travel over HTTPS."
+    },
+    "cache-http": {
+      "term": "HTTP cache",
+      "definition": "Keeping a response to reuse later without asking the server again. The server controls this with headers: Cache-Control says how long the copy is valid, and the ETag is a \"fingerprint\" of the version, used to ask whether something changed and get 304 Not Modified when it didn't."
+    },
+    "rest": {
+      "term": "REST",
+      "definition": "A style of building APIs where each thing is a resource with a URL (/products/1) and actions use the HTTP methods. Responses carry a representation of the resource, usually JSON, and the server doesn't keep the conversation's state between one request and the next."
+    },
+    "recurso": {
+      "term": "Resource",
+      "definition": "The \"thing\" the API exposes, identified by a URL: a collection (/products) or an item (/products/1). By convention you use a plural noun and let the method say the action, instead of URLs like /createProduct."
+    },
+    "stateless": {
+      "term": "Stateless",
+      "definition": "Each request carries everything the server needs to handle it, such as the access token; the server doesn't remember previous requests. This makes it easy to run several copies of the API behind a load balancer."
+    },
+    "path-param": {
+      "term": "Path param",
+      "definition": "A variable part of the URL path that identifies a resource: in /products/42, 42 is the product id. Use it to say which resource you want."
+    },
+    "query-string": {
+      "term": "Query string",
+      "definition": "The parameters after the ? in the URL, in key=value format and separated by &, like ?page=0&size=10. Use it to filter, sort and paginate a collection, not to identify a resource."
+    },
+    "versionamento": {
+      "term": "API versioning",
+      "definition": "A way to change the API without breaking existing clients: the version goes in the URL (/v1/products), in a header or in the media type. Changes that break the contract, such as removing a field or changing a format, go into a new version."
+    },
+    "mesma-origem": {
+      "term": "Same-origin policy",
+      "definition": "A browser rule that stops a site from reading responses that come from another origin. An origin is the combination of protocol, domain and port: http://localhost:5173 and http://localhost:8080 are different origins. CORS is how the server allows exceptions to this rule."
+    },
+    "preflight": {
+      "term": "Preflight",
+      "definition": "An OPTIONS request the browser sends before the real request when it goes to another origin and isn't \"simple\", for example a PUT, a DELETE or a body with Content-Type: application/json. The server answers with Access-Control-Allow-* headers saying what it allows."
+    },
+    "cookie": {
+      "term": "Cookie",
+      "definition": "A small piece of data the server stores in the browser with the Set-Cookie header and that the browser sends back automatically on every request to that site. Key attributes: HttpOnly (JavaScript can't read it), Secure (HTTPS only) and SameSite (limits sending it from other sites)."
+    },
+    "local-storage": {
+      "term": "localStorage",
+      "definition": "The browser's key-value storage, accessible from the page's JavaScript and never expiring on its own. It isn't sent to the server automatically. Since any script on the page can read it, it is exposed to XSS. sessionStorage works the same way, but is cleared when the tab closes."
+    },
+    "sessao": {
+      "term": "Session",
+      "definition": "A way to remember who the user is: the server keeps the login data and gives the browser only a session id, usually in a cookie. Unlike an access token, the information stays on the server, which can end the session whenever it wants."
+    },
+    "xss": {
+      "term": "XSS (Cross-Site Scripting)",
+      "definition": "An attack where someone gets your site to run their script, for example by saving a <script> in a comment that is later displayed without escaping. The script runs with the page's powers and can read localStorage. Defenses: escape user input when displaying it (React does this by default) and use Content-Security-Policy."
+    },
+    "csrf": {
+      "term": "CSRF (Cross-Site Request Forgery)",
+      "definition": "An attack where another site makes the victim's browser send a request to yours, taking advantage of cookies being sent along automatically. Defenses: SameSite cookies, an anti-CSRF token in forms and never changing data with GET."
+    },
+    "token-de-acesso": {
+      "term": "Access token",
+      "definition": "A credential the client sends on every request, usually in the Authorization: Bearer <token> header. It can be a JWT, which carries signed data, or an opaque value the server looks up. It should expire quickly."
+    },
+    "url-no-navegador": {
+      "question": "What happens when you type a URL and press Enter?",
+      "answer": "The browser finds the domain's IP through DNS (using the cache when it can), opens a TCP connection to the server and, if it's HTTPS, negotiates encryption (TLS). Then it sends the HTTP request (a GET) and receives the response with the HTML. Next it builds the page: it reads the HTML, downloads the CSS, JavaScript and images it references (more requests), builds the page tree, computes the layout and paints it on screen."
+    },
+    "cookie-ou-localstorage": {
+      "question": "Where should you store the login token: cookie or localStorage?",
+      "answer": "An HttpOnly, Secure, SameSite cookie is usually safer: JavaScript can't read it, so an XSS attack can't steal the token. In exchange, since the cookie goes along automatically, you need to protect against CSRF (SameSite and an anti-CSRF token). localStorage is simple and isn't vulnerable to CSRF, but any script on the page can read the token, so an XSS leaks it."
+    },
+    "preflight-options": {
+      "question": "Why does the browser send an OPTIONS request before my PUT?",
+      "answer": "It's the CORS preflight. For requests to another origin that aren't \"simple\", such as PUT, DELETE or JSON in the body, the browser first asks the server whether it accepts that origin, method and headers. If the response doesn't include the right Access-Control-Allow-* headers, the browser blocks the real request and shows the CORS error in the console. That's why the error shows up even when the API is working: it's the browser that blocks it."
+    },
+    "xss-vs-csrf": {
+      "question": "What's the difference between XSS and CSRF?",
+      "answer": "In XSS, the attacker gets your site to run their script, which runs with the page's powers and can read data and act as the user. In CSRF, the attacker doesn't run anything on your site: they make the victim's browser send a request to your API from another site, taking advantage of the cookies that go along. Against XSS: escape output and use Content-Security-Policy. Against CSRF: SameSite cookies and an anti-CSRF token."
+    },
+    "cache-304": {
+      "question": "How does 304 Not Modified work?",
+      "answer": "In the first response, the server sends an ETag (a version identifier) or a Last-Modified. When the browser needs the resource again, it sends If-None-Match with that ETag. If nothing changed, the server answers 304 with no body and the browser uses the cached copy, saving bandwidth. If it changed, it answers 200 with the new content and a new ETag."
+    },
+    "rest-vs-graphql": {
+      "question": "When should you use REST and when should you use GraphQL?",
+      "answer": "In REST, each resource has its own URL and the server decides the response format: it's simple, takes advantage of HTTP caching and fits CRUD well. In GraphQL there is a single endpoint and the client describes exactly the fields it wants, even from several resources in one query: it avoids over-fetching or making several requests, but complicates caching, controlling query cost and error handling. REST is usually enough for CRUD APIs; GraphQL helps when many clients need different data."
+    }
+  }
+}

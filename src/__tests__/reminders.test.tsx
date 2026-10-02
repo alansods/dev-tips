@@ -4,7 +4,9 @@ import { Linking, Platform } from 'react-native';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
+import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import ProgressScreen from '../app/(tabs)/progress';
 import SettingsScreen from '../app/settings';
 import ThemeScreen from '../app/theme/[themeId]';
 import { resetRemindersStore, useRemindersStore } from '../reminders/store';
@@ -16,6 +18,8 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/glossary': GlossaryScreen,
+  '(tabs)/progress': ProgressScreen,
   'theme/[themeId]': ThemeScreen,
   settings: SettingsScreen,
 };

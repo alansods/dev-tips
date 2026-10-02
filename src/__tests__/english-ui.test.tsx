@@ -64,7 +64,7 @@ describe('Requirement: Interface traduzida', () => {
     await open(`/theme/${THEME}`);
     expect(screen.getByText("Today's review")).toBeOnTheScreen();
     expect(screen.getByText('1 card to review today')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Study O que vamos criar' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: "Study What we'll build" })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: /^Continue / })).toBeOnTheScreen();
     press('Review now');
     expect(screen.getAllByText("Today's review").length).toBeGreaterThan(0);
