@@ -5,7 +5,7 @@
 Define o fluxo de estudo do app: abrir um tema, escolher um deck, estudar os cards como flashcards (frente e verso, "Já sabia"/"Não sabia"), ver o resumo da sessão e acompanhar o progresso.
 ## Requirements
 ### Requirement: Tela do tema
-Tocar num tema na aba Temas SHALL abrir a tela do tema em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL mostrar o título e a descrição do tema, os frameworks (variantes) quando o tema tiver, a quantidade de cards que o usuário marcou como "sei", o total de cards do tema e a lista de decks na ordem do conteúdo.
+Tocar num tema na aba Temas SHALL abrir a tela do tema em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL mostrar o título e a descrição do tema, os frameworks (variantes) quando o tema tiver, a quantidade de cards que o usuário marcou como "já sabia", o total de cards do tema e a lista de decks na ordem do conteúdo.
 
 #### Scenario: Abrir o tema
 - **WHEN** o usuário toca em "O mesmo CRUD em quatro frameworks" na aba Temas
