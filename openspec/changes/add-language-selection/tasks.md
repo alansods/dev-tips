@@ -1,0 +1,48 @@
+## 1. Preparação
+
+- [ ] 1.1 Conferir a doc do `expo-localization` no SDK 57 (`getLocales`, `useLocales`) e instalar com `npx expo install expo-localization`
+- [ ] 1.2 Atualizar o `context` de `openspec/config.yaml`: o app passa de somente PT-BR para PT-BR e inglês
+
+## 2. Idioma: resolução e persistência (Idioma inicial pelo aparelho, Trocar o idioma)
+
+- [ ] 2.1 Testes falhando para `resolveLanguage(saved, deviceLocales)`: `en-GB` → en, `es-ES` → pt-BR, `pt-PT` → pt-BR, sem locale → pt-BR, escolha salva prevalece
+- [ ] 2.2 Implementar `src/i18n/language.ts` e o store `src/i18n/store.ts` (Zod + `safeStorage`, valor inválido → `null`)
+- [ ] 2.3 Testes passando
+
+## 3. Dicionários e `useT` (Interface traduzida)
+
+- [ ] 3.1 Teste falhando: os dicionários PT-BR e inglês têm as mesmas chaves e nenhum texto vazio; e os textos em inglês listados na spec
+- [ ] 3.2 Criar `src/i18n/pt-BR.ts`, `src/i18n/en.ts` e `useT()`/`useLanguage()`; adicionar `language` em `renderWithProviders`
+- [ ] 3.3 Testes passando
+
+## 4. Tela Ajustes (app-shell, Idiomas disponíveis, Trocar o idioma)
+
+- [ ] 4.1 Testes falhando: o botão "Ajustes" abre a tela sem abas e com o idioma atual marcado; as opções mostram os próprios nomes; escolher "English" troca os títulos imediatamente; voltar retorna à aba
+- [ ] 4.2 Criar `src/app/settings.tsx` e o botão de engrenagem no `src/app/(tabs)/_layout.tsx` (com ícone em `src/components/icons.tsx`)
+- [ ] 4.3 Testes passando
+
+## 5. Migrar a interface para o dicionário (Interface traduzida)
+
+- [ ] 5.1 Testes falhando em inglês para sessão, resumo, revisão, tela do tema, aba Progresso e Glossário (cenários "Sessão em inglês" e "Rótulo acessível traduzido")
+- [ ] 5.2 Migrar os literais de `src/study/copy.ts`, `StudySession.tsx`, `src/app/**`, `src/glossary/**` e `src/components/**` para `useT()`
+- [ ] 5.3 Teste de varredura que falha com literais de UI fora de `src/i18n/` (com lista de exceções)
+- [ ] 5.4 Testes passando, incluindo os existentes em PT-BR
+
+## 6. Tradução de conteúdo: schema e validação (content-model)
+
+- [ ] 6.1 Testes falhando com fixtures em `src/content/__fixtures__/`: tradução válida, card inexistente, campo `code`, campo de outro tipo, texto vazio
+- [ ] 6.2 Implementar o schema do overlay por tipo de card e a checagem de ids em `src/content/`
+- [ ] 6.3 Incluir a validação de todo `translations/en.json` do repositório no teste de conteúdo
+- [ ] 6.4 Testes passando
+
+## 7. Conteúdo no idioma escolhido (localization)
+
+- [ ] 7.1 Testes falhando para `localizeTheme`: card traduzido, tradução parcial campo a campo, tema sem tradução, código e ids inalterados
+- [ ] 7.2 Implementar `localizeTheme`, `getCatalog(language)` memoizado e `useCatalog()`, e trocar os usos de `catalog`/`getTheme` nas telas
+- [ ] 7.3 Teste falhando e depois passando: a busca do glossário em inglês encontra "CORS" por "browser"
+- [ ] 7.4 Testes passando
+
+## 8. Verificação
+
+- [ ] 8.1 Conferir as telas principais em inglês numa largura de 320 pt
+- [ ] 8.2 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit`
