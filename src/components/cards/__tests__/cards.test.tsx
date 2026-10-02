@@ -3,10 +3,10 @@ import { useState } from 'react';
 
 import type { Card, StepCard } from '../../../content';
 import { ptBR } from '../../../i18n/pt-BR';
-
-const FRONT_PROMPT = ptBR.card.frontPrompt;
 import { cardById, crudTheme, renderWithTheme } from '../../../test-utils';
 import { CardFace } from '../CardFace';
+
+const FRONT_PROMPT = ptBR.card.frontPrompt;
 
 /** CardFace com a aba de framework controlada, como a sessão faz. */
 function Harness({ card, side }: { card: Card; side: 'front' | 'back' }) {

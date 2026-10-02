@@ -9,8 +9,7 @@ import ReviewScreen from '../app/review/[themeId]';
 import StudyScreen from '../app/study/[themeId]/[deckId]';
 import ThemeScreen from '../app/theme/[themeId]';
 import { useSettingsStore } from '../i18n';
-import { useStudyStore } from '../study/store';
-import { resetStudyStore } from '../study/store';
+import { resetStudyStore, useStudyStore } from '../study/store';
 import { crudTheme } from '../test-utils';
 
 const APP = {
