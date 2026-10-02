@@ -8,13 +8,17 @@ import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 
+import { today } from './clock';
 import { progressKey, type AnswerResult, type Progress } from './rules';
+import { nextSchedule, type Schedule } from './srs';
 
 export const STUDY_STORAGE_KEY = 'dev-tips:study';
 
 type StudyData = {
   progress: Progress;
   preferredVariant: Record<string, string>;
+  /** Repetição espaçada: caixa e data de revisão por `themeId:cardId`. */
+  schedule: Schedule;
 };
 
 type StudyState = StudyData & {
@@ -26,6 +30,15 @@ type StudyState = StudyData & {
 const savedSchema = z.object({
   progress: z.record(z.string(), z.enum(['known', 'unknown'])),
   preferredVariant: z.record(z.string(), z.string()),
+  schedule: z
+    .record(
+      z.string(),
+      z.object({
+        box: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
+        due: z.string(),
+      }),
+    )
+    .default({}),
 });
 
 /** AsyncStorage que engole falhas: leitura com erro vira "nada salvo"; escrita com erro é ignorada. */
@@ -68,26 +81,45 @@ const jsonStorage = createJSONStorage<StudyData>(() => ({
   },
 }));
 
-const initialData = (): StudyData => ({ progress: {}, preferredVariant: {} });
+/** Remove do registro as chaves do tema (`themeId:...`). */
+function withoutTheme<T>(record: Record<string, T>, themeId: string): Record<string, T> {
+  return Object.fromEntries(Object.entries(record).filter(([key]) => !key.startsWith(`${themeId}:`)));
+}
+
+const initialData = (): StudyData => ({ progress: {}, preferredVariant: {}, schedule: {} });
 
 export const useStudyStore = create<StudyState>()(
   persist(
     (set) => ({
       ...initialData(),
       answer: (themeId, cardId, result) =>
-        set((s) => ({ progress: { ...s.progress, [progressKey(themeId, cardId)]: result } })),
+        set((s) => {
+          const key = progressKey(themeId, cardId);
+          return {
+            progress: { ...s.progress, [key]: result },
+            schedule: { ...s.schedule, [key]: nextSchedule(s.schedule[key], result, today()) },
+          };
+        }),
       setVariant: (themeId, variantId) =>
         set((s) => ({ preferredVariant: { ...s.preferredVariant, [themeId]: variantId } })),
       resetTheme: (themeId) =>
         set((s) => ({
-          progress: Object.fromEntries(Object.entries(s.progress).filter(([key]) => !key.startsWith(`${themeId}:`))),
+          progress: withoutTheme(s.progress, themeId),
+          schedule: withoutTheme(s.schedule, themeId),
         })),
     }),
     {
       name: STUDY_STORAGE_KEY,
-      version: 1,
+      version: 2,
       storage: jsonStorage,
-      partialize: (s): StudyData => ({ progress: s.progress, preferredVariant: s.preferredVariant }),
+      partialize: (s): StudyData => ({
+        progress: s.progress,
+        preferredVariant: s.preferredVariant,
+        schedule: s.schedule,
+      }),
+      // v1 não tinha agendamento: mantém o progresso e começa o agendamento vazio.
+      migrate: (saved, version) =>
+        (version < 2 && saved && typeof saved === 'object' ? { ...saved, schedule: {} } : saved) as StudyData,
       // Só aceita o que foi salvo se tiver o formato esperado.
       merge: (saved, current) => {
         const parsed = savedSchema.safeParse(saved);

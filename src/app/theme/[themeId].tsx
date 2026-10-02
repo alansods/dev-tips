@@ -10,7 +10,9 @@ import { ProgressBar } from '../../components/ProgressBar';
 import { getTheme } from '../../content/catalog';
 import type { Deck, Theme } from '../../content';
 import { DECK_ACTION_LABEL } from '../../study/copy';
+import { today } from '../../study/clock';
 import { deckAction, deckStats, themeStats } from '../../study/rules';
+import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
 import { ThemeToggle } from '../../theme/ThemeToggle';
@@ -82,6 +84,8 @@ function ThemeContent({ theme }: { theme: Theme }) {
         </AppText>
       </View>
 
+      <ReviewToday theme={theme} />
+
       <AppText font="bold" size={17} style={{ marginTop: spacing.xs }}>
         Decks
       </AppText>
@@ -89,6 +93,36 @@ function ThemeContent({ theme }: { theme: Theme }) {
         <DeckItem key={deck.id} theme={theme} deck={deck} index={i} />
       ))}
     </ScrollView>
+  );
+}
+
+function ReviewToday({ theme }: { theme: Theme }) {
+  const { colors } = useTheme();
+  const schedule = useStudyStore((s) => s.schedule);
+  const due = dueCardIds(theme, schedule, today()).length;
+  return (
+    <View
+      style={[
+        styles.review,
+        { backgroundColor: due ? colors.warnSoft : colors.surface, borderColor: due ? colors.warn : colors.line },
+      ]}
+    >
+      <AppText font="mono" size={11} tone={due ? 'warn' : 'muted'} style={styles.caps}>
+        Revisão de hoje
+      </AppText>
+      {due ? (
+        <>
+          <AppText font="semibold" size={16}>{`${due} ${due === 1 ? 'card' : 'cards'} para revisar hoje`}</AppText>
+          <View style={{ flexDirection: 'row' }}>
+            <Button title="Revisar agora" onPress={() => router.push(`/review/${theme.id}`)} />
+          </View>
+        </>
+      ) : (
+        <AppText size={14} tone="muted">
+          Nada para revisar hoje.
+        </AppText>
+      )}
+    </View>
   );
 }
 
@@ -144,6 +178,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   kicker: { flex: 1, textTransform: 'uppercase', letterSpacing: 0.8 },
+  caps: { textTransform: 'uppercase', letterSpacing: 0.8 },
   missing: { padding: spacing.lg },
   content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xl * 2 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -157,6 +192,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   stats: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: 2 },
+  review: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.sm },
   deck: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.md },
   deckHead: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   deckNum: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: radius.sm },

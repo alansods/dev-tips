@@ -6,7 +6,9 @@ import { ProgressBar } from '../../components/ProgressBar';
 import { Screen } from '../../components/Screen';
 import { catalog } from '../../content/catalog';
 import type { Theme } from '../../content';
+import { today } from '../../study/clock';
 import { themeStats } from '../../study/rules';
+import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
@@ -25,6 +27,8 @@ function ThemeCard({ theme }: { theme: Theme }) {
   const { colors } = useTheme();
   const progress = useStudyStore((s) => s.progress);
   const stats = themeStats(theme, progress);
+  const schedule = useStudyStore((s) => s.schedule);
+  const due = dueCardIds(theme, schedule, today()).length;
   return (
     <Pressable
       accessibilityRole="button"
@@ -47,6 +51,7 @@ function ThemeCard({ theme }: { theme: Theme }) {
         </View>
         <AppText font="mono" size={12} tone="muted">{`${stats.known}/${stats.total}`}</AppText>
       </View>
+      {due > 0 && <AppText font="medium" size={13} tone="warn">{`${due} para revisar hoje`}</AppText>}
     </Pressable>
   );
 }

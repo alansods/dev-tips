@@ -13,7 +13,7 @@ const flush = () => new Promise((r) => setTimeout(r, 0));
 async function reopen() {
   // limpar a memória faz o persist gravar o estado vazio; guardamos o disco antes e o restauramos
   const saved = await AsyncStorage.getItem(STUDY_STORAGE_KEY);
-  useStudyStore.setState({ progress: {}, preferredVariant: {} });
+  useStudyStore.setState({ progress: {}, preferredVariant: {}, schedule: {} });
   await flush();
   if (saved == null) await AsyncStorage.removeItem(STUDY_STORAGE_KEY);
   else await AsyncStorage.setItem(STUDY_STORAGE_KEY, saved);
@@ -78,8 +78,8 @@ describe('Requirement: Progresso salvo no aparelho', () => {
     store().answer(THEME, 'api', 'unknown');
     await flush();
     const saved = JSON.parse((await AsyncStorage.getItem(STUDY_STORAGE_KEY))!);
-    expect(Object.keys(saved.state).sort()).toEqual(['preferredVariant', 'progress']);
-    expect(saved.version).toBe(1);
+    expect(Object.keys(saved.state).sort()).toEqual(['preferredVariant', 'progress', 'schedule']);
+    expect(saved.version).toBe(2);
   });
 });
 

@@ -41,7 +41,7 @@ A aba Progresso SHALL mostrar, para cada tema do catálogo:
 - **THEN** a linha desse deck mostra "2/5"
 
 ### Requirement: Zerar progresso de um tema
-Cada tema na aba Progresso SHALL ter o botão "Zerar progresso". Tocar nele SHALL pedir confirmação na própria tela, com as opções "Zerar" e "Cancelar". Confirmar SHALL apagar todas as respostas daquele tema (e só dele) e salvar a mudança no aparelho. A aba de framework preferida MUST ser mantida. Cancelar SHALL manter tudo como estava.
+Cada tema na aba Progresso SHALL ter o botão "Zerar progresso". Tocar nele SHALL pedir confirmação na própria tela, com as opções "Zerar" e "Cancelar". Confirmar SHALL apagar todas as respostas e todo o agendamento de revisão daquele tema (e só dele) e salvar a mudança no aparelho. A aba de framework preferida MUST ser mantida. Cancelar SHALL manter tudo como estava.
 
 #### Scenario: Zerar com confirmação
 - **WHEN** o tema tem 4 cards como "sei" e o usuário toca em "Zerar progresso" e depois em "Zerar"
@@ -54,3 +54,7 @@ Cada tema na aba Progresso SHALL ter o botão "Zerar progresso". Tocar nele SHAL
 #### Scenario: Zerar mantém outros temas e o framework preferido
 - **WHEN** existem respostas de outro tema e o framework preferido é FastAPI, e o usuário zera o tema CRUD
 - **THEN** as respostas do outro tema e a preferência por FastAPI continuam salvas
+
+#### Scenario: Zerar apaga o agendamento do tema
+- **WHEN** o tema tem cards para revisar hoje e o usuário zera o tema
+- **THEN** a tela do tema mostra "Nada para revisar hoje."
