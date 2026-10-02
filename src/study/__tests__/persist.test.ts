@@ -78,7 +78,7 @@ describe('Requirement: Progresso salvo no aparelho', () => {
     store().answer(THEME, 'api', 'unknown');
     await flush();
     const saved = JSON.parse((await AsyncStorage.getItem(STUDY_STORAGE_KEY))!);
-    expect(Object.keys(saved.state).sort()).toEqual(['preferredVariant', 'progress', 'schedule']);
+    expect(Object.keys(saved.state).sort()).toEqual(['lastStudyDay', 'preferredVariant', 'progress', 'schedule']);
     expect(saved.version).toBe(2);
   });
 });

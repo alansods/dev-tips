@@ -20,6 +20,8 @@ type StudyData = {
   preferredVariant: Record<string, string>;
   /** Repetição espaçada: caixa e data de revisão por `themeId:cardId`. */
   schedule: Schedule;
+  /** Último dia (YYYY-MM-DD) em que algum card foi respondido; usado pelos lembretes. */
+  lastStudyDay: string | null;
 };
 
 type StudyState = StudyData & {
@@ -40,6 +42,7 @@ const savedSchema = z.object({
       }),
     )
     .default({}),
+  lastStudyDay: z.string().nullable().default(null),
 });
 
 /** Remove do registro as chaves do tema (`themeId:...`). */
@@ -47,7 +50,7 @@ function withoutTheme<T>(record: Record<string, T>, themeId: string): Record<str
   return Object.fromEntries(Object.entries(record).filter(([key]) => !key.startsWith(`${themeId}:`)));
 }
 
-const initialData = (): StudyData => ({ progress: {}, preferredVariant: {}, schedule: {} });
+const initialData = (): StudyData => ({ progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: null });
 
 export const useStudyStore = create<StudyState>()(
   persist(
@@ -56,9 +59,11 @@ export const useStudyStore = create<StudyState>()(
       answer: (themeId, cardId, result) =>
         set((s) => {
           const key = progressKey(themeId, cardId);
+          const day = today();
           return {
             progress: { ...s.progress, [key]: result },
-            schedule: { ...s.schedule, [key]: nextSchedule(s.schedule[key], result, today()) },
+            schedule: { ...s.schedule, [key]: nextSchedule(s.schedule[key], result, day) },
+            lastStudyDay: day,
           };
         }),
       setVariant: (themeId, variantId) =>
@@ -77,6 +82,7 @@ export const useStudyStore = create<StudyState>()(
         progress: s.progress,
         preferredVariant: s.preferredVariant,
         schedule: s.schedule,
+        lastStudyDay: s.lastStudyDay,
       }),
       // v1 não tinha agendamento: mantém o progresso e começa o agendamento vazio.
       migrate: (saved, version) =>

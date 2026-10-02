@@ -101,4 +101,15 @@ export const en: Messages = {
     confirmBody: 'All answers for this topic will be deleted. This cannot be undone.',
     confirm: 'Reset',
   },
+  reminders: {
+    section: 'Reminders',
+    toggle: 'Daily reminder',
+    times: { '08:00': 'Morning 08:00', '12:30': 'Lunch 12:30', '20:00': 'Evening 20:00' },
+    denied: 'Turn on notifications in your device settings.',
+    openSettings: 'Open settings',
+    title: 'Dev Tips',
+    review: (n) => `Today's review: ${n} ${plural(n, 'card', 'cards')} waiting for you`,
+    practice: '5 minutes of study? Pick up where you left off.',
+    channel: 'Study reminders',
+  },
 };

@@ -100,6 +100,17 @@ export const ptBR = {
     confirmBody: 'Todas as respostas deste tema serão apagadas. Isso não pode ser desfeito.',
     confirm: 'Zerar',
   },
+  reminders: {
+    section: 'Lembretes',
+    toggle: 'Lembrete diário',
+    times: { '08:00': 'Manhã 08:00', '12:30': 'Almoço 12:30', '20:00': 'Noite 20:00' },
+    denied: 'Ative as notificações nas configurações do aparelho.',
+    openSettings: 'Abrir ajustes',
+    title: 'Dev Tips',
+    review: (n: number) => `Revisão do dia: ${n} ${plural(n, 'card', 'cards')} esperando por você`,
+    practice: '5 minutos de estudo? Continue de onde parou.',
+    channel: 'Lembretes de estudo',
+  },
 };
 
 export type Messages = typeof ptBR;

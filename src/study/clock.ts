@@ -15,3 +15,8 @@ export function addDays(day: string, days: number): string {
   const date = new Date(Date.UTC(y, m - 1, d + days));
   return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())}`;
 }
+
+/** Instante atual (separado para os testes poderem fixar a hora). */
+export function now(): Date {
+  return new Date();
+}

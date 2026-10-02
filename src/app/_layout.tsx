@@ -10,6 +10,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { useReminderSync } from '../reminders/useReminderSync';
+import { useReminderTapNavigation } from '../reminders/useReminderTap';
 import { FontsReadyContext } from '../theme/fonts';
 import { ThemeProvider, useTheme } from '../theme/ThemeProvider';
 
@@ -43,6 +45,8 @@ export default function RootLayout() {
 
 function RootStack() {
   const { scheme, colors } = useTheme();
+  useReminderSync();
+  useReminderTapNavigation();
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />

@@ -6,6 +6,7 @@ import { AppText } from '../components/AppText';
 import { IconButton } from '../components/IconButton';
 import { BackIcon } from '../components/icons';
 import { LANGUAGE_NAMES, LANGUAGES, useLanguage, useSettingsStore, useT } from '../i18n';
+import { RemindersSection } from '../reminders/RemindersSection';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
@@ -60,6 +61,7 @@ export default function SettingsScreen() {
             );
           })}
         </View>
+        <RemindersSection />
       </ScrollView>
     </SafeAreaView>
   );
