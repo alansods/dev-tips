@@ -1,5 +1,5 @@
-// Repetição espaçada por caixas (Leitner): "não sei" volta para a caixa 1 e
-// revisa no mesmo dia; "sei" sobe uma caixa e revisa depois do intervalo dela.
+// Repetição espaçada por caixas (Leitner): "não sabia" volta para a caixa 1 e
+// revisa no mesmo dia; "já sabia" sobe uma caixa e revisa depois do intervalo dela.
 
 import type { Theme } from '../content';
 import { addDays } from './clock';

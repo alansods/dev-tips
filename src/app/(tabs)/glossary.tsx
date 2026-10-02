@@ -7,6 +7,7 @@ import { catalog } from '../../content/catalog';
 import { getGlossary } from '../../content';
 import { searchTerms, type GlossaryEntry } from '../../glossary/search';
 import { TermSheet } from '../../glossary/TermSheet';
+import { ANSWER_LABEL } from '../../study/copy';
 import { progressKey } from '../../study/rules';
 import { useStudyStore } from '../../study/store';
 import { useFontsReady } from '../../theme/fonts';
@@ -76,7 +77,7 @@ export default function GlossaryScreen() {
                     </AppText>
                     {status ? (
                       <AppText font="mono" size={11} tone={status === 'known' ? 'accentText' : 'warn'}>
-                        {status === 'known' ? 'sei' : 'revisar'}
+                        {status === 'known' ? ANSWER_LABEL.known.short : 'revisar'}
                       </AppText>
                     ) : null}
                   </View>

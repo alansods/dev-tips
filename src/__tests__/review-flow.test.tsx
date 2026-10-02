@@ -32,7 +32,7 @@ async function open(url: string) {
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const seed = (ids: string[], result: 'known' | 'unknown') =>
   ids.forEach((id) => useStudyStore.getState().answer(THEME, id, result));
-function answer(result: 'Sei' | 'Não sei') {
+function answer(result: 'Já sabia' | 'Não sabia') {
   press('Mostrar resposta');
   press(result);
 }
@@ -93,8 +93,8 @@ describe('Requirement: Sessão de revisão', () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open(`/theme/${THEME}`);
     press('Revisar agora');
-    answer('Sei');
-    answer('Sei');
+    answer('Já sabia');
+    answer('Já sabia');
     press('Voltar ao tema');
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });
@@ -103,7 +103,7 @@ describe('Requirement: Sessão de revisão', () => {
     seed(glossaryIds.slice(0, 1), 'unknown');
     await open(`/theme/${THEME}`);
     press('Revisar agora');
-    answer('Não sei');
+    answer('Não sabia');
     press('Voltar ao tema');
     expect(screen.getByText('1 card para revisar hoje')).toBeOnTheScreen();
   });

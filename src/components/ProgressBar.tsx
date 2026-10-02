@@ -3,9 +3,9 @@ import { StyleSheet, View } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 
 type Props = {
-  /** Fração "sei", de 0 a 1. */
+  /** Fração "já sabia", de 0 a 1. */
   value: number;
-  /** Fração "não sei", desenhada logo depois (opcional). */
+  /** Fração "não sabia", desenhada logo depois (opcional). */
   unknownValue?: number;
   height?: number;
 };

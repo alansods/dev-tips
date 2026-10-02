@@ -39,7 +39,7 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
     // avança até o Passo 13 (os complementos ficam entre os passos)
     while (!screen.queryByText('Passo 13')) {
       press('Mostrar resposta');
-      press('Sei');
+      press('Já sabia');
     }
     press('Mostrar resposta');
     fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
@@ -47,8 +47,8 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
     fireEvent.press(sheet().getByRole('button', { name: 'Fechar' }));
     expect(screen.queryByTestId('term-sheet')).toBeNull();
     expect(screen.getByText('Liberar o frontend (CORS)')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Não sei' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Sei' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Não sabia' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
   });
 });
 
@@ -76,9 +76,9 @@ describe('Requirement: Aba Glossário', () => {
     useStudyStore.getState().answer(THEME, 'dto', 'unknown');
     await open('/glossary');
     const item = (term: string) => within(screen.getByRole('button', { name: term }));
-    expect(item('CORS').getByText('sei')).toBeOnTheScreen();
+    expect(item('CORS').getByText('já sabia')).toBeOnTheScreen();
     expect(item('DTO (Data Transfer Object)').getByText('revisar')).toBeOnTheScreen();
-    expect(item('API').queryByText(/^(sei|revisar)$/)).toBeNull();
+    expect(item('API').queryByText(/^(já sabia|revisar)$/)).toBeNull();
   });
 
   it('Abrir termo pela lista', async () => {

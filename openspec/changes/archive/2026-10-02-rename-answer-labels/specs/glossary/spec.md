@@ -1,23 +1,4 @@
-# glossary Specification
-
-## Purpose
-
-Liga os cards aos termos do glossário e torna o glossário consultável: chips de termos relacionados, gaveta com a definição, aba Glossário com busca.
-## Requirements
-### Requirement: Termos relacionados no verso
-O verso de todo card que tenha `relatedTerms` SHALL mostrar a seção "Termos relacionados", com um chip por termo, na ordem do conteúdo. Cada chip mostra o nome do termo e é um botão. Cards sem `relatedTerms` MUST NOT mostrar a seção. A frente dos cards MUST NOT mostrar os termos relacionados.
-
-#### Scenario: Chips no verso do passo
-- **WHEN** o verso do Passo 13 (Liberar o frontend) é exibido
-- **THEN** aparecem os chips "CORS" e "Middleware", nessa ordem
-
-#### Scenario: Frente sem chips
-- **WHEN** a frente do Passo 13 é exibida
-- **THEN** nenhum chip de termo relacionado aparece
-
-#### Scenario: Card sem termos relacionados
-- **WHEN** o verso de um card de comparação (sem `relatedTerms`) é exibido
-- **THEN** a seção "Termos relacionados" não aparece
+## MODIFIED Requirements
 
 ### Requirement: Gaveta de definição
 Tocar num chip de termo SHALL abrir uma gaveta sobre a tela com o nome do termo, a definição e, quando o termo tiver `relatedTerms`, os chips desses termos. Tocar num chip dentro da gaveta SHALL trocar o conteúdo para o novo termo. A gaveta SHALL fechar pelo botão "Fechar" ou tocando na área escurecida fora dela. Abrir e fechar a gaveta MUST NOT alterar a sessão de estudo: o mesmo card continua visível, no mesmo lado.
@@ -52,23 +33,3 @@ A aba Glossário SHALL listar todos os termos (cards `concept`) dos temas do cat
 #### Scenario: Abrir termo pela lista
 - **WHEN** o usuário toca em "Docker" na lista
 - **THEN** a gaveta abre com a definição de Docker
-
-### Requirement: Busca no glossário
-A aba Glossário SHALL ter um campo de busca, com rótulo acessível "Buscar termo", que filtra a lista por nome do termo, definição ou outros nomes (`aliases`), sem diferenciar maiúsculas, minúsculas e acentos. Com a busca vazia, todos os termos aparecem. Sem resultados, SHALL aparecer "Nenhum termo encontrado." A contagem SHALL refletir os termos exibidos.
-
-#### Scenario: Buscar pelo nome
-- **WHEN** o usuário digita "cors"
-- **THEN** a lista mostra CORS e "Política de mesma origem" (cuja definição cita CORS), e a contagem "2 termos"
-
-#### Scenario: Buscar sem acento
-- **WHEN** o usuário digita "injecao"
-- **THEN** a lista mostra "Injeção de dependência"
-
-#### Scenario: Buscar pela definição
-- **WHEN** o usuário digita "caixinhas"
-- **THEN** a lista mostra "Docker", cuja definição contém essa palavra
-
-#### Scenario: Sem resultados
-- **WHEN** o usuário digita "kubernetes"
-- **THEN** aparece "Nenhum termo encontrado." e a contagem "0 termos"
-

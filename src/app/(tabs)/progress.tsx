@@ -8,6 +8,7 @@ import { ProgressRing } from '../../components/ProgressRing';
 import { Screen } from '../../components/Screen';
 import { catalog } from '../../content/catalog';
 import type { Theme } from '../../content';
+import { ANSWER_LABEL } from '../../study/copy';
 import { deckStats, themeStats } from '../../study/rules';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -46,7 +47,7 @@ function ThemeProgress({ theme }: { theme: Theme }) {
       </View>
 
       <View style={styles.counts}>
-        <Count value={stats.known} label="sei" bg={colors.accentSoft} tone="accentText" />
+        <Count value={stats.known} label={ANSWER_LABEL.known.short} bg={colors.accentSoft} tone="accentText" />
         <Count value={stats.unknown} label="para revisar" bg={colors.warnSoft} tone="warn" />
         <Count value={unseen} label="não vistos" bg={colors.surface2} tone="ink" />
       </View>
@@ -70,7 +71,7 @@ function ThemeProgress({ theme }: { theme: Theme }) {
       })}
 
       <View style={styles.legend}>
-        <Legend color={colors.accent} label="sei" />
+        <Legend color={colors.accent} label={ANSWER_LABEL.known.short} />
         <Legend color={colors.warn} label="para revisar" />
       </View>
 

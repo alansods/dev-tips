@@ -1,9 +1,5 @@
-# progress Specification
+## MODIFIED Requirements
 
-## Purpose
-
-Garante que o progresso de estudo fique salvo no aparelho e possa ser acompanhado e zerado pela aba Progresso.
-## Requirements
 ### Requirement: Progresso salvo no aparelho
 As respostas registradas para cada card e a aba de framework preferida de cada tema SHALL ser salvas no aparelho a cada mudança e restauradas quando o app abre. Se a leitura falhar ou os dados salvos forem inválidos, o app SHALL abrir normalmente, sem progresso e sem exibir erro. Uma falha ao salvar MUST NOT impedir o uso do app.
 
@@ -56,4 +52,3 @@ Cada tema na aba Progresso SHALL ter o botão "Zerar progresso". Tocar nele SHAL
 #### Scenario: Zerar apaga o agendamento do tema
 - **WHEN** o tema tem cards para revisar hoje e o usuário zera o tema
 - **THEN** a tela do tema mostra "Nada para revisar hoje."
-

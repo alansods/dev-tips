@@ -34,7 +34,7 @@ const seed = (cardIds: string[], result: 'known' | 'unknown') =>
   cardIds.forEach((id) => useStudyStore.getState().answer(THEME, id, result));
 
 /** Vira o card atual e responde. */
-function answer(result: 'Sei' | 'Não sei') {
+function answer(result: 'Já sabia' | 'Não sabia') {
   press('Mostrar resposta');
   press(result);
 }
@@ -124,9 +124,9 @@ describe('Requirement: Sessão de estudo', () => {
   it('Sair no meio', async () => {
     await open(`/theme/${THEME}`);
     press('Estudar O que vamos criar');
-    answer('Sei');
-    answer('Sei');
-    answer('Não sei');
+    answer('Já sabia');
+    answer('Já sabia');
+    answer('Não sabia');
     press('Sair da sessão');
     expect(screen).toHavePathname(`/theme/${THEME}`);
     expect(Object.keys(useStudyStore.getState().progress)).toHaveLength(3);
@@ -142,10 +142,10 @@ describe('Requirement: Sessão de estudo', () => {
 describe('Requirement: Virar e responder (na tela)', () => {
   it('Não responder sem ver o verso', async () => {
     await open(`/study/${THEME}/o-que-vamos-criar`);
-    expect(screen.queryByRole('button', { name: 'Sei' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Não sei' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Já sabia' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Não sabia' })).toBeNull();
     press('Mostrar resposta');
-    expect(screen.getByRole('button', { name: 'Sei' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
   });
 
   it('tocar no card também vira', async () => {
@@ -156,7 +156,7 @@ describe('Requirement: Virar e responder (na tela)', () => {
 
   it('Responder e avançar', async () => {
     await open(`/study/${THEME}/o-que-vamos-criar`);
-    answer('Sei');
+    answer('Já sabia');
     expect(screen.getByText('2 / 5')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(THEME, 'endpoint-create')]).toBe('known');
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
@@ -168,7 +168,7 @@ describe('Requirement: Abas de framework (na sessão)', () => {
     await open(`/study/${THEME}/passo-a-passo`);
     press('Mostrar resposta');
     fireEvent.press(screen.getByRole('tab', { name: 'FastAPI' }));
-    press('Sei');
+    press('Já sabia');
     press('Mostrar resposta');
     expect(screen.getByText('Passo 2')).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'FastAPI' })).toBeSelected();
@@ -179,10 +179,11 @@ describe('Requirement: Abas de framework (na sessão)', () => {
 describe('Requirement: Resumo da sessão', () => {
   it('Resumo com erros', async () => {
     await open(`/study/${THEME}/o-que-vamos-criar`);
-    (['Sei', 'Não sei', 'Sei', 'Não sei', 'Sei'] as const).forEach(answer);
+    (['Já sabia', 'Não sabia', 'Já sabia', 'Não sabia', 'Já sabia'] as const).forEach(answer);
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
-    expect(screen.getByLabelText('3 sei')).toBeOnTheScreen();
-    expect(screen.getByLabelText('2 não sei')).toBeOnTheScreen();
+    expect(screen.getByLabelText('3 já sabia')).toBeOnTheScreen();
+    expect(screen.getByLabelText('2 não sabia')).toBeOnTheScreen();
+    expect(screen.getByText(/3 de 5 cards como "já sabia"/)).toBeOnTheScreen();
     expect(screen.getByText('GET /products')).toBeOnTheScreen();
     expect(screen.getByText('PUT /products/{id}')).toBeOnTheScreen();
     press('Revisar os que errei');
@@ -191,7 +192,7 @@ describe('Requirement: Resumo da sessão', () => {
 
   it('Resumo sem erros', async () => {
     await open(`/study/${THEME}/o-que-vamos-criar`);
-    for (let i = 0; i < 5; i++) answer('Sei');
+    for (let i = 0; i < 5; i++) answer('Já sabia');
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Revisar os que errei' })).toBeNull();
     expect(screen.queryByText('Para revisar')).toBeNull();
@@ -204,8 +205,8 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
     await open(`/theme/${THEME}`);
     expect(screen.getByLabelText(`0 de ${TOTAL_CARDS} cards que você sabe`)).toBeOnTheScreen();
     press('Estudar Glossário');
-    answer('Sei');
-    answer('Sei');
+    answer('Já sabia');
+    answer('Já sabia');
     press('Sair da sessão');
     expect(screen.getByText('2/24')).toBeOnTheScreen();
     expect(screen.getByLabelText(`2 de ${TOTAL_CARDS} cards que você sabe`)).toBeOnTheScreen();
@@ -242,7 +243,7 @@ describe('Requirement: Animação de virar o card (na sessão)', () => {
     await open(`/study/${THEME}/o-que-vamos-criar`);
     press('Mostrar resposta');
     // sem avançar timers: a animação ainda está em curso, mas os botões já existem
-    expect(screen.getByRole('button', { name: 'Não sei' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Sei' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Não sabia' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
   });
 });

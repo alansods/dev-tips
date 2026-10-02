@@ -3,11 +3,9 @@
 ## Purpose
 
 Define o acabamento do app: a animação de virar o card, a identidade visual (ícone e splash), os alvos de toque mínimos e a configuração para gerar builds instaláveis.
-
 ## Requirements
-
 ### Requirement: Animação de virar o card
-Ao mostrar o verso de um card, a sessão SHALL animar a troca, com a frente girando até sumir e o verso aparecendo, em até 300 ms. Quando o sistema estiver com "reduzir movimento" ativado, a troca SHALL ser imediata, sem animação. A animação MUST NOT atrasar nem bloquear os botões "Não sei" e "Sei", que aparecem assim que o verso é pedido.
+Ao mostrar o verso de um card, a sessão SHALL animar a troca, com a frente girando até sumir e o verso aparecendo, em até 300 ms. Quando o sistema estiver com "reduzir movimento" ativado, a troca SHALL ser imediata, sem animação. A animação MUST NOT atrasar nem bloquear os botões "Não sabia" e "Já sabia", que aparecem assim que o verso é pedido.
 
 #### Scenario: Duração da animação
 - **WHEN** o usuário pede o verso com "reduzir movimento" desativado
@@ -19,7 +17,7 @@ Ao mostrar o verso de um card, a sessão SHALL animar a troca, com a frente gira
 
 #### Scenario: Botões disponíveis durante a animação
 - **WHEN** o usuário toca em "Mostrar resposta"
-- **THEN** os botões "Não sei" e "Sei" ficam disponíveis imediatamente
+- **THEN** os botões "Não sabia" e "Já sabia" ficam disponíveis imediatamente
 
 ### Requirement: Identidade visual
 O app SHALL usar ícone e splash próprios, gerados a partir do mesmo desenho (cards empilhados com o acento do design), com estes requisitos:
@@ -59,3 +57,4 @@ O repositório SHALL ter um `eas.json` com os perfis `development` (development 
 #### Scenario: Identificadores do app
 - **WHEN** o `app.json` é lido
 - **THEN** `ios.bundleIdentifier` e `android.package` estão definidos com o mesmo identificador
+

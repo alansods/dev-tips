@@ -24,3 +24,9 @@ export const DECK_ACTION_LABEL = {
   continue: 'Continuar',
   restart: 'Estudar de novo',
 } as const;
+
+/** Rótulos das respostas: botões da sessão e formas minúsculas para contagens e selos. */
+export const ANSWER_LABEL = {
+  known: { button: 'Já sabia', short: 'já sabia' },
+  unknown: { button: 'Não sabia', short: 'não sabia' },
+} as const;
