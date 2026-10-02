@@ -1,0 +1,15 @@
+node_modules/
+.expo/
+dist/
+coverage/
+package-lock.json
+assets/
+# conteúdo: o markdown de origem precisa ficar idêntico ao material,
+# e o theme.json é protegido pelos testes de fidelidade
+content/
+# specs e changes do OpenSpec são editadas pelo fluxo SDD
+openspec/
+AGENTS.md
+CLAUDE.md
+# arquivos gerados pelo OpenSpec para o Claude Code
+.claude/

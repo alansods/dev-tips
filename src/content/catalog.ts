@@ -1,0 +1,26 @@
+// Catálogo dos temas empacotados no app. Para adicionar um tema, importe o
+// theme.json dele aqui; o teste do catálogo falha se uma pasta de
+// content/themes/ ficar sem registro.
+//
+// Cada tema passa pelo schema ao carregar para receber os valores padrão
+// (origin, tags, relatedTerms). O gate do `npm test` garante que o parse
+// nunca falha com o conteúdo do repositório.
+
+import crud4Frameworks from '../../content/themes/crud-4-frameworks/theme.json';
+import { themeSchema, type Theme } from './schema';
+
+const registry: unknown[] = [crud4Frameworks];
+
+export const catalog: readonly Theme[] = registry.map((raw) => themeSchema.parse(raw));
+
+export function getTheme(id: string): Theme | undefined {
+  return catalog.find((theme) => theme.id === id);
+}
+
+/** Compara as pastas de content/themes com os ids registrados, nos dois sentidos. */
+export function compareRegistry(folders: string[], registeredIds: string[]): { unregistered: string[]; missing: string[] } {
+  return {
+    unregistered: folders.filter((f) => !registeredIds.includes(f)).sort(),
+    missing: registeredIds.filter((id) => !folders.includes(id)).sort(),
+  };
+}
