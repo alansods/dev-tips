@@ -49,5 +49,5 @@
 
 ## 9. Verificação
 
-- [ ] 9.1 Testar no aparelho com Expo Go: ligar, conceder permissão, agendar para daqui a 1 minuto (só em desenvolvimento) e tocar na notificação
+- [ ] 9.1 Testar no aparelho com Expo Go: ligar, conceder permissão, agendar para daqui a 1 minuto (só em desenvolvimento) e tocar na notificação — pendente: teste manual do usuário depois do merge
 - [x] 9.2 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit`
