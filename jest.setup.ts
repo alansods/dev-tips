@@ -26,3 +26,17 @@ beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('./src/i18n/store').useSettingsStore.setState({ language: null });
 });
+
+// Notificações: módulo nativo simulado. Os testes de lembrete inspecionam estes mocks.
+jest.mock('expo-notifications', () => ({
+  SchedulableTriggerInputTypes: { DATE: 'date' },
+  AndroidImportance: { DEFAULT: 3 },
+  setNotificationHandler: jest.fn(),
+  setNotificationChannelAsync: jest.fn(() => Promise.resolve(null)),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({ granted: false, status: 'undetermined', canAskAgain: true })),
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({ granted: false, status: 'denied', canAskAgain: false })),
+  scheduleNotificationAsync: jest.fn(() => Promise.resolve('id')),
+  cancelAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve()),
+  getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),
+  useLastNotificationResponse: jest.fn(() => undefined),
+}));

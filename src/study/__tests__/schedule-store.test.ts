@@ -66,3 +66,27 @@ describe('Requirement: Zerar progresso de um tema', () => {
     expect(store().schedule).toEqual({ [progressKey('outro', 'api')]: { box: 1, due: '2026-10-02' } });
   });
 });
+
+describe('Requirement: Configuração salva no aparelho (último dia de estudo)', () => {
+  it('answer grava o último dia de estudo, que é salvo e restaurado', async () => {
+    expect(store().lastStudyDay).toBeNull();
+    store().answer(THEME, 'api', 'known');
+    expect(store().lastStudyDay).toBe('2026-10-02');
+    await flush();
+    await reopen();
+    expect(store().lastStudyDay).toBe('2026-10-02');
+  });
+
+  it('Progresso da versão anterior', async () => {
+    await AsyncStorage.setItem(
+      STUDY_STORAGE_KEY,
+      JSON.stringify({
+        state: { progress: { [progressKey(THEME, 'api')]: 'known' }, preferredVariant: {}, schedule: {} },
+        version: 2,
+      }),
+    );
+    await useStudyStore.persist.rehydrate();
+    expect(store().progress[progressKey(THEME, 'api')]).toBe('known');
+    expect(store().lastStudyDay).toBeNull();
+  });
+});

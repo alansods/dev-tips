@@ -15,7 +15,7 @@ export const MESSAGES: Record<Language, Messages> = { 'pt-BR': ptBR, en };
 
 function deviceLocales() {
   try {
-    return getLocales();
+    return getLocales() ?? [];
   } catch {
     return [];
   }
