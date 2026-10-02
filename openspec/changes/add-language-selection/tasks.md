@@ -1,19 +1,19 @@
 ## 1. Preparação
 
-- [ ] 1.1 Conferir a doc do `expo-localization` no SDK 57 (`getLocales`, `useLocales`) e instalar com `npx expo install expo-localization`
-- [ ] 1.2 Atualizar o `context` de `openspec/config.yaml`: o app passa de somente PT-BR para PT-BR e inglês
+- [x] 1.1 Conferir a doc do `expo-localization` no SDK 57 (`getLocales`, `useLocales`) e instalar com `npx expo install expo-localization`
+- [x] 1.2 Atualizar o `context` de `openspec/config.yaml`: o app passa de somente PT-BR para PT-BR e inglês
 
 ## 2. Idioma: resolução e persistência (Idioma inicial pelo aparelho, Trocar o idioma)
 
-- [ ] 2.1 Testes falhando para `resolveLanguage(saved, deviceLocales)`: `en-GB` → en, `es-ES` → pt-BR, `pt-PT` → pt-BR, sem locale → pt-BR, escolha salva prevalece
-- [ ] 2.2 Implementar `src/i18n/language.ts` e o store `src/i18n/store.ts` (Zod + `safeStorage`, valor inválido → `null`)
-- [ ] 2.3 Testes passando
+- [x] 2.1 Testes falhando para `resolveLanguage(saved, deviceLocales)`: `en-GB` → en, `es-ES` → pt-BR, `pt-PT` → pt-BR, sem locale → pt-BR, escolha salva prevalece
+- [x] 2.2 Implementar `src/i18n/language.ts` e o store `src/i18n/store.ts` (Zod + `safeStorage`, valor inválido → `null`)
+- [x] 2.3 Testes passando
 
 ## 3. Dicionários e `useT` (Interface traduzida)
 
-- [ ] 3.1 Teste falhando: os dicionários PT-BR e inglês têm as mesmas chaves e nenhum texto vazio; e os textos em inglês listados na spec
-- [ ] 3.2 Criar `src/i18n/pt-BR.ts`, `src/i18n/en.ts` e `useT()`/`useLanguage()`; adicionar `language` em `renderWithProviders`
-- [ ] 3.3 Testes passando
+- [x] 3.1 Teste falhando: os dicionários PT-BR e inglês têm as mesmas chaves e nenhum texto vazio; e os textos em inglês listados na spec
+- [x] 3.2 Criar `src/i18n/pt-BR.ts`, `src/i18n/en.ts` e `useT()`/`useLanguage()`; adicionar `language` em `renderWithProviders`
+- [x] 3.3 Testes passando
 
 ## 4. Tela Ajustes (app-shell, Idiomas disponíveis, Trocar o idioma)
 
