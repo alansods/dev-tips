@@ -123,3 +123,18 @@ describe('Requirement: Exibição de código', () => {
     expect(screen.getByRole('tab', { name: 'Express' })).toBeSelected();
   });
 });
+
+describe('Requirement: Frente e verso por tipo de card (pergunta)', () => {
+  it('Pergunta de entrevista', () => {
+    show('put-vs-patch', 'front');
+    expect(screen.getByText('Qual a diferença entre PUT e PATCH?')).toBeOnTheScreen();
+    expect(screen.getByText(FRONT_PROMPT.question)).toBeOnTheScreen();
+    expect(screen.getByText('Complemento')).toBeOnTheScreen();
+    expect(screen.getByText('Entrevista')).toBeOnTheScreen();
+    screen.unmount();
+
+    show('put-vs-patch', 'back');
+    expect(screen.getByText(/PUT substitui o recurso inteiro/)).toBeOnTheScreen();
+    expect(screen.getByText(/curl -X PUT[\s\S]*curl -X PATCH/)).toBeOnTheScreen();
+  });
+});

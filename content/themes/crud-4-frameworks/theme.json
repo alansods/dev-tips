@@ -1289,6 +1289,132 @@
           ]
         }
       ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas que costumam cair em entrevista sobre APIs e banco, com resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "put-vs-patch",
+          "origin": "supplement",
+          "question": "Qual a diferença entre PUT e PATCH?",
+          "answer": "PUT substitui o recurso inteiro: o corpo traz o produto completo, como no Passo 10, e o que não vier é perdido ou volta ao padrão. PATCH faz uma alteração parcial: o corpo traz só os campos que mudam. PUT é idempotente por definição; PATCH pode ou não ser, dependendo de como a API o implementa.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "# PUT: manda o produto inteiro\ncurl -X PUT $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"name\":\"Teclado RGB\",\"price\":349.90,\"stock\":10}'\n\n# PATCH: manda só o que muda\ncurl -X PATCH $B/1 -H \"Content-Type: application/json\" \\\n  -d '{\"stock\":8}'"
+          },
+          "relatedTerms": [
+            "endpoint",
+            "dto"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "idempotencia",
+          "origin": "supplement",
+          "question": "O que é um endpoint idempotente? Quais operações do CRUD são?",
+          "answer": "Idempotente é o que deixa o servidor no mesmo estado, seja chamado uma ou várias vezes. GET, PUT e DELETE são idempotentes: buscar de novo não muda nada, gravar o mesmo produto completo de novo dá o mesmo resultado e apagar o que já foi apagado continua apagado (a segunda chamada responde 404, mas o estado é o mesmo). POST não é: cada chamada cria um produto novo. Isso importa para repetir um pedido com segurança quando a rede falha.",
+          "relatedTerms": [
+            "endpoint",
+            "crud",
+            "status-http"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "paginacao-offset-cursor",
+          "origin": "supplement",
+          "question": "Paginação por offset ou por cursor: qual a diferença?",
+          "answer": "Offset (LIMIT/OFFSET, usado no Passo 8) pula N linhas. É simples e permite ir direto para a página 5, mas fica lento em tabelas grandes, porque o banco lê e descarta as linhas puladas, e pode repetir ou pular itens se alguém inserir ou apagar no meio. Cursor usa o último item visto (\"os produtos com id maior que 120\"): é rápido com índice e estável com inserções, mas não permite pular para uma página específica.",
+          "snippet": {
+            "file": "query.sql",
+            "language": "sql",
+            "code": "-- offset: página 3, com 10 itens por página\nSELECT * FROM products ORDER BY id LIMIT 10 OFFSET 20;\n\n-- cursor: os 10 seguintes depois do id 120\nSELECT * FROM products WHERE id > 120 ORDER BY id LIMIT 10;"
+          },
+          "relatedTerms": [
+            "sql",
+            "endpoint"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "problema-n-mais-1",
+          "origin": "supplement",
+          "question": "O que é o problema N+1?",
+          "answer": "Acontece quando o código faz 1 consulta para buscar uma lista e depois mais 1 consulta para cada item, para trazer dados relacionados: 100 produtos e suas categorias viram 101 consultas. É comum com ORM, que carrega relacionamentos sob demanda sem você perceber. A solução é buscar tudo de uma vez, com JOIN ou com o carregamento antecipado do ORM: JOIN FETCH no JPA, relations no TypeORM, selectinload ou joinedload no SQLAlchemy.",
+          "relatedTerms": [
+            "orm",
+            "sql",
+            "repository"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "transacoes",
+          "origin": "supplement",
+          "question": "O que é uma transação e quando usar?",
+          "answer": "É um grupo de operações no banco que acontece por inteiro ou não acontece: se uma falhar, todas são desfeitas (rollback). Use quando várias gravações precisam ficar consistentes juntas, como baixar o estoque e registrar o pedido. Nos frameworks do tema: @Transactional no Spring, dataSource.transaction no TypeORM, commit e rollback na Session do SQLAlchemy (o Passo 7 já usa db.commit()) e BEGIN/COMMIT com o pg no Express.",
+          "snippet": {
+            "file": "query.sql",
+            "language": "sql",
+            "code": "BEGIN;\nUPDATE products SET stock = stock - 1 WHERE id = 1;\nINSERT INTO orders (product_id, quantity) VALUES (1, 1);\nCOMMIT; -- se algo falhar antes daqui: ROLLBACK"
+          },
+          "relatedTerms": [
+            "sql",
+            "service",
+            "repository"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "autenticacao-jwt",
+          "origin": "supplement",
+          "question": "Como funciona a autenticação com JWT? Qual a diferença entre 401 e 403?",
+          "answer": "Depois do login, a API devolve um token assinado (JWT) com dados como o id do usuário e a validade. O frontend manda esse token em cada pedido, no cabeçalho Authorization. A API confere a assinatura e a validade sem consultar o banco. O conteúdo do token só é codificado, não criptografado: ele não pode guardar segredos e precisa expirar. Sem token válido, a resposta é 401 (não autenticado); com token, mas sem permissão para aquela ação, é 403 (proibido).",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "curl $B/1 -H \"Authorization: Bearer <token>\""
+          },
+          "relatedTerms": [
+            "middleware",
+            "status-http",
+            "requisicao-e-resposta"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "migrations",
+          "origin": "supplement",
+          "question": "Por que usar migrations em vez de synchronize ou ddl-auto?",
+          "answer": "O synchronize: true (NestJS) e o ddl-auto=update (Spring), do Passo 3, alteram a tabela sozinhos ao subir a API. São ótimos em desenvolvimento e perigosos em produção: podem apagar colunas ou dados e não deixam histórico. Migrations são arquivos versionados com cada mudança no banco (criar tabela, adicionar coluna), aplicados em ordem e revisados como código. Ferramentas: Flyway ou Liquibase no Spring, migrations do TypeORM no NestJS, Alembic no FastAPI e node-pg-migrate ou Knex no Express.",
+          "relatedTerms": [
+            "orm",
+            "sql",
+            "entidade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "sql-injection",
+          "origin": "supplement",
+          "question": "Por que usar $1 em vez de montar o SQL concatenando texto?",
+          "answer": "Concatenar no SQL o que veio do usuário abre espaço para SQL injection: alguém envia um texto que vira comando, por exemplo para apagar a tabela. Com parâmetros ($1, $2 no pg, como no Passo 9), o valor vai separado do comando e o banco nunca o executa como SQL. Os ORMs (JPA, TypeORM, SQLAlchemy) já fazem isso automaticamente.",
+          "snippet": {
+            "file": "product.repository.ts",
+            "language": "ts",
+            "code": "// perigoso: o texto do usuário vira parte do SQL\npool.query(`SELECT * FROM products WHERE name = '${name}'`);\n\n// seguro: o valor vai como parâmetro\npool.query('SELECT * FROM products WHERE name = $1', [name]);"
+          },
+          "relatedTerms": [
+            "sql",
+            "orm",
+            "repository"
+          ]
+        }
+      ]
     }
   ]
 }

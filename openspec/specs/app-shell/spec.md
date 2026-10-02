@@ -59,7 +59,7 @@ O app SHALL acessar os temas empacotados por um catálogo único. Todo tema em `
 
 #### Scenario: Tema registrado
 - **WHEN** o catálogo é carregado
-- **THEN** ele contém o tema `crud-4-frameworks`, com os 4 decks
+- **THEN** ele contém o tema `crud-4-frameworks`, com todos os decks do seu `theme.json`
 
 #### Scenario: Pasta sem registro
 - **WHEN** existe uma pasta em `content/themes/` que não está registrada no catálogo

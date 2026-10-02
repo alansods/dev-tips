@@ -65,7 +65,7 @@ describe('Requirement: Tela do tema', () => {
     press(/^O mesmo CRUD em quatro frameworks/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
       expect(screen.getByText(name)).toBeOnTheScreen();
-    const titles = ['O que vamos criar', 'Passo a passo', 'Mapa mental', 'Glossário'];
+    const titles = ['O que vamos criar', 'Passo a passo', 'Mapa mental', 'Glossário', 'Perguntas de entrevista'];
     const found = screen.getAllByRole('header').map((h) => h.props.children);
     expect(found.filter((t: unknown) => titles.includes(String(t)))).toEqual(titles);
     expect(screen.queryByRole('button', { name: /^Temas, tab/ })).toBeNull(); // tela cheia, sem abas

@@ -72,12 +72,21 @@ export const codeCardSchema = z.object({
   variant: z.string().optional(),
 });
 
+export const questionCardSchema = z.object({
+  ...cardBase,
+  type: z.literal('question'),
+  question: text(),
+  answer: text(),
+  snippet: snippetSchema.optional(),
+});
+
 export const cardSchema = z.discriminatedUnion('type', [
   endpointCardSchema,
   stepCardSchema,
   compareCardSchema,
   conceptCardSchema,
   codeCardSchema,
+  questionCardSchema,
 ]);
 
 export const variantSchema = z.object({ id: id(), name: text(), language: text() });
@@ -107,6 +116,7 @@ export type EndpointCard = z.output<typeof endpointCardSchema>;
 export type StepCard = z.output<typeof stepCardSchema>;
 export type CompareCard = z.output<typeof compareCardSchema>;
 export type CodeCard = z.output<typeof codeCardSchema>;
+export type QuestionCard = z.output<typeof questionCardSchema>;
 export type Snippet = z.output<typeof snippetSchema>;
 export type SnippetLanguage = (typeof SNIPPET_LANGUAGES)[number];
 export type Variant = z.output<typeof variantSchema>;

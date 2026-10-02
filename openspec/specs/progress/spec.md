@@ -34,7 +34,7 @@ A aba Progresso SHALL mostrar, para cada tema do catálogo:
 
 #### Scenario: Com progresso
 - **WHEN** no tema CRUD, 4 cards estão como "sei" e 2 como "não sei"
-- **THEN** a aba mostra 6% (4 de 65), 4 sei, 2 para revisar e 59 não vistos
+- **THEN** a aba mostra 5% (4 de 73), 4 sei, 2 para revisar e 67 não vistos
 
 #### Scenario: Progresso por deck
 - **WHEN** 2 cards do deck O que vamos criar estão como "sei"

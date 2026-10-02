@@ -87,13 +87,20 @@ describe('Requirement: Identidade, variantes e colunas do tema', () => {
 describe('Requirement: Decks e contagens', () => {
   it('Contagem por deck', () => {
     const theme = loadTheme();
-    expect(theme.decks.map((d) => d.id)).toEqual(['o-que-vamos-criar', 'passo-a-passo', 'mapa-mental', 'glossario']);
+    expect(theme.decks.map((d) => d.id)).toEqual([
+      'o-que-vamos-criar',
+      'passo-a-passo',
+      'mapa-mental',
+      'glossario',
+      'perguntas-de-entrevista',
+    ]);
     const countBy = (id: string) =>
       deck(id).cards.reduce<Record<string, number>>((acc, c) => ({ ...acc, [c.type]: (acc[c.type] ?? 0) + 1 }), {});
     expect(countBy('o-que-vamos-criar')).toEqual({ endpoint: 5 });
     expect(countBy('passo-a-passo')).toEqual({ step: 16, code: 4 });
     expect(countBy('mapa-mental')).toEqual({ compare: 16 });
     expect(countBy('glossario')).toEqual({ concept: 24 });
+    expect(countBy('perguntas-de-entrevista')).toEqual({ question: 8 });
   });
 
   it('Passos contíguos', () => {
@@ -108,6 +115,19 @@ describe('Requirement: Decks e contagens', () => {
     expect(terms[23]).toBe('venv (Python)');
     const sourceTerms = [...readSource().matchAll(/^\*\*(.+?)\*\*: /gm)].map((m) => m[1]);
     expect(terms).toEqual(sourceTerms);
+  });
+
+  it('Perguntas de entrevista na ordem', () => {
+    expect(deck('perguntas-de-entrevista').cards.map((c) => c.id)).toEqual([
+      'put-vs-patch',
+      'idempotencia',
+      'paginacao-offset-cursor',
+      'problema-n-mais-1',
+      'transacoes',
+      'autenticacao-jwt',
+      'migrations',
+      'sql-injection',
+    ]);
   });
 
   it('mapa mental na ordem da tabela', () => {
@@ -168,6 +188,8 @@ function textsOf(card: Card): [string, string][] {
       return [['term', card.term], ['definition', card.definition]];
     case 'code':
       return [['title', card.title], ['body', card.body], ['snippet.file', card.snippet.file], ...(card.snippet.note ? [['snippet.note', card.snippet.note] as [string, string]] : [])];
+    case 'question':
+      return [['question', card.question], ['answer', card.answer]];
   }
 }
 
@@ -209,11 +231,19 @@ describe('Requirement: Complementos marcados', () => {
 
   it('Somente os complementos são supplement', () => {
     const supplements = allCards().filter((c) => c.origin === 'supplement');
-    expect(supplements.map((c) => c.id)).toEqual(SUPPLEMENTS);
-    expect(supplements.every((c) => c.type === 'code')).toBe(true);
-    expect(allCards().filter((c) => c.origin === 'original')).toHaveLength(allCards().length - 4);
-    const variants = Object.fromEntries((supplements as CodeCard[]).map((c) => [c.id, c.variant ?? null]));
-    expect(variants).toEqual({ 'docker-compose': null, 'express-to-product': 'express', 'express-query-schemas': 'express', 'express-server': 'express' });
+    const questions = deck('perguntas-de-entrevista').cards.map((c) => c.id);
+    expect(supplements.map((c) => c.id)).toEqual([...SUPPLEMENTS, ...questions]);
+    expect(supplements.filter((c) => c.type === 'code').map((c) => c.id)).toEqual(SUPPLEMENTS);
+    expect(supplements.filter((c) => c.type === 'question')).toHaveLength(8);
+    expect(allCards().filter((c) => c.origin === 'original')).toHaveLength(allCards().length - 12);
+    const codes = supplements.filter((c): c is CodeCard => c.type === 'code');
+    const variants = Object.fromEntries(codes.map((c) => [c.id, c.variant ?? null]));
+    expect(variants).toEqual({
+      'docker-compose': null,
+      'express-to-product': 'express',
+      'express-query-schemas': 'express',
+      'express-server': 'express',
+    });
   });
 
   it('Posição dos complementos', () => {
@@ -256,7 +286,7 @@ describe('Requirement: Complementos marcados', () => {
 describe('Requirement: Ligação com o glossário', () => {
   it('Todo passo tem termos relacionados', () => {
     const empty = allCards()
-      .filter((c) => c.type === 'step' || c.type === 'endpoint')
+      .filter((c) => c.type === 'step' || c.type === 'endpoint' || c.type === 'question')
       .filter((c) => c.relatedTerms.length === 0)
       .map((c) => c.id);
     expect(empty).toEqual([]);

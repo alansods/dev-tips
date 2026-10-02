@@ -50,7 +50,7 @@ describe('Requirement: Aba Progresso', () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     seed(deckIds('mapa-mental').slice(0, 2), 'unknown');
     await openProgress();
-    expect(screen.getByLabelText('6% do tema dominado')).toBeOnTheScreen();
+    expect(screen.getByLabelText('5% do tema dominado')).toBeOnTheScreen(); // 4 de 73
     expect(screen.getByLabelText('4 sei')).toBeOnTheScreen();
     expect(screen.getByLabelText('2 para revisar')).toBeOnTheScreen();
     expect(screen.getByLabelText(`${TOTAL - 6} não vistos`)).toBeOnTheScreen();

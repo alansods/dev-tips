@@ -17,7 +17,8 @@ describe('Requirement: Catálogo de temas no app', () => {
   it('Tema registrado', () => {
     const theme = getTheme('crud-4-frameworks');
     expect(theme).toBeDefined();
-    expect(theme?.decks).toHaveLength(4);
+    const raw = JSON.parse(fs.readFileSync(path.join(THEMES_DIR, 'crud-4-frameworks/theme.json'), 'utf8'));
+    expect(theme?.decks.map((d) => d.id)).toEqual(raw.decks.map((d: { id: string }) => d.id));
     expect(catalog.map((t) => t.id)).toContain('crud-4-frameworks');
   });
 

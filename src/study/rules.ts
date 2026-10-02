@@ -100,5 +100,7 @@ export function cardTitle(card: Card): string {
       return card.term;
     case 'code':
       return card.title;
+    case 'question':
+      return card.question;
   }
 }

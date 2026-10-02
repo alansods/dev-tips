@@ -11,7 +11,7 @@ Tocar num tema na aba Temas SHALL abrir a tela do tema em tela cheia, sem a barr
 
 #### Scenario: Abrir o tema
 - **WHEN** o usuário toca em "O mesmo CRUD em quatro frameworks" na aba Temas
-- **THEN** a tela do tema abre com o título, os 4 frameworks e os 4 decks na ordem O que vamos criar, Passo a passo, Mapa mental, Glossário
+- **THEN** a tela do tema abre com o título, os 4 frameworks e os 5 decks na ordem O que vamos criar, Passo a passo, Mapa mental, Glossário, Perguntas de entrevista
 
 #### Scenario: Voltar para os temas
 - **WHEN** o usuário está na tela do tema e toca em voltar
@@ -71,6 +71,7 @@ Cada tipo de card SHALL ter frente e verso próprios:
 | compare | conceito, explicação e a pergunta "Como cada stack resolve isso?" | uma linha por coluna do tema, com rótulo e valor |
 | concept | termo e o convite "O que significa?" | definição |
 | code | título e explicação (`body`) | snippet |
+| question | a pergunta e o convite "Responda em voz alta antes de virar." | a pergunta, a resposta modelo e o snippet, quando houver |
 
 Todo card com `origin: "supplement"` SHALL exibir o selo "Complemento" na frente e no verso.
 
@@ -93,6 +94,10 @@ Todo card com `origin: "supplement"` SHALL exibir o selo "Complemento" na frente
 #### Scenario: Complemento
 - **WHEN** a sessão mostra o card `docker-compose`
 - **THEN** o selo "Complemento" aparece, e o verso mostra o snippet do `docker-compose.yml`
+
+#### Scenario: Pergunta de entrevista
+- **WHEN** a sessão mostra o card `put-vs-patch` e o usuário vira
+- **THEN** a frente mostra "Qual a diferença entre PUT e PATCH?" e o selo "Complemento", e o verso mostra a resposta modelo e o snippet com os dois comandos `curl`
 
 ### Requirement: Abas de framework
 No verso de um card `step`, as abas SHALL listar as variantes do tema na ordem do tema, e uma delas SHALL estar selecionada (indicada para leitores de tela). Tocar numa aba SHALL trocar o snippet exibido (arquivo, código e nota). A aba escolhida SHALL continuar selecionada nos próximos cards `step`. Na primeira vez, a aba selecionada SHALL ser a primeira variante do tema.

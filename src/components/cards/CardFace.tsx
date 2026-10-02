@@ -2,7 +2,16 @@
 // schema quebra o typecheck até ganhar sua apresentação aqui.
 import { StyleSheet, View } from 'react-native';
 
-import type { Card, CodeCard, CompareCard, ConceptCard, EndpointCard, StepCard, Theme } from '../../content';
+import type {
+  Card,
+  CodeCard,
+  CompareCard,
+  ConceptCard,
+  EndpointCard,
+  QuestionCard,
+  StepCard,
+  Theme,
+} from '../../content';
 import { CARD_TYPE_LABEL, FRONT_PROMPT, OPERATION_NAME } from '../../study/copy';
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
@@ -52,6 +61,8 @@ function Body(props: Props) {
       return <Concept card={card} side={props.side} />;
     case 'code':
       return <Code card={card} side={props.side} />;
+    case 'question':
+      return <Question card={card} side={props.side} />;
     default: {
       const exhaustive: never = card;
       return exhaustive;
@@ -228,6 +239,28 @@ function Code({ card, side }: { card: CodeCard; side: Side }) {
         {card.title}
       </AppText>
       <CodeBlock snippet={card.snippet} />
+    </View>
+  );
+}
+
+function Question({ card, side }: { card: QuestionCard; side: Side }) {
+  if (side === 'front') {
+    return (
+      <View style={styles.gap}>
+        <Title>{card.question}</Title>
+        <Prompt>{FRONT_PROMPT.question}</Prompt>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.gap}>
+      <AppText font="semibold" size={15} tone="muted">
+        {card.question}
+      </AppText>
+      <AppText size={16} style={{ lineHeight: 24 }}>
+        {card.answer}
+      </AppText>
+      {card.snippet && <CodeBlock snippet={card.snippet} />}
     </View>
   );
 }

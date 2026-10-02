@@ -25,15 +25,16 @@ O tema SHALL estar em `content/themes/crud-4-frameworks/theme.json`, com id `cru
 - **THEN** as variantes são express, spring, nest, fastapi e as colunas são frontend, spring, express, nest, fastapi, nessa ordem
 
 ### Requirement: Decks e contagens
-O tema SHALL ter exatamente 4 decks, nesta ordem: `o-que-vamos-criar`, `passo-a-passo`, `mapa-mental` e `glossario`. As contagens MUST ser:
+O tema SHALL ter exatamente 5 decks, nesta ordem: `o-que-vamos-criar`, `passo-a-passo`, `mapa-mental`, `glossario` e `perguntas-de-entrevista`. As contagens MUST ser:
 - `o-que-vamos-criar`: 5 cards `endpoint`;
 - `passo-a-passo`: 16 cards `step` numerados de 1 a 16, sem lacunas e em ordem crescente, mais 4 cards `code` de complemento;
 - `mapa-mental`: 16 cards `compare`, na ordem da tabela comparativa;
-- `glossario`: 24 cards `concept`, na ordem do glossário.
+- `glossario`: 24 cards `concept`, na ordem do glossário;
+- `perguntas-de-entrevista`: 8 cards `question`, nesta ordem: PUT vs PATCH, idempotência, paginação por offset vs cursor, problema N+1, transações, autenticação com JWT, migrations, SQL injection.
 
 #### Scenario: Contagem por deck
 - **WHEN** o tema é carregado
-- **THEN** os decks têm 5 endpoints, 16 steps + 4 codes, 16 compares e 24 concepts, respectivamente
+- **THEN** os decks têm 5 endpoints, 16 steps + 4 codes, 16 compares, 24 concepts e 8 questions, respectivamente
 
 #### Scenario: Passos contíguos
 - **WHEN** os cards `step` do deck `passo-a-passo` são lidos em ordem
@@ -42,6 +43,10 @@ O tema SHALL ter exatamente 4 decks, nesta ordem: `o-que-vamos-criar`, `passo-a-
 #### Scenario: Glossário completo
 - **WHEN** o glossário do tema é derivado
 - **THEN** ele contém os 24 termos do material, de "API" a "venv (Python)"
+
+#### Scenario: Perguntas de entrevista na ordem
+- **WHEN** o deck `perguntas-de-entrevista` é lido
+- **THEN** os ids são `put-vs-patch`, `idempotencia`, `paginacao-offset-cursor`, `problema-n-mais-1`, `transacoes`, `autenticacao-jwt`, `migrations`, `sql-injection`
 
 ### Requirement: Endpoints do CRUD
 Os 5 cards `endpoint` MUST representar, nesta ordem:
@@ -81,7 +86,7 @@ Todo card com `origin: "original"` SHALL ter seu conteúdo tirado literalmente d
 - **THEN** sua `language` é `text`, e o código continua idêntico ao material
 
 ### Requirement: Complementos marcados
-O tema SHALL ter exatamente 4 cards com `origin: "supplement"`, todos do tipo `code`, cada um posicionado logo após o passo que depende dele:
+O tema SHALL ter exatamente 12 cards com `origin: "supplement"`: os 4 cards `code` do deck `passo-a-passo`, cada um posicionado logo após o passo que depende dele, e os 8 cards `question` do deck `perguntas-de-entrevista`.
 
 | Id | Conteúdo | Variante | Depois do passo |
 |---|---|---|---|
@@ -90,11 +95,11 @@ O tema SHALL ter exatamente 4 cards com `origin: "supplement"`, todos do tipo `c
 | `express-query-schemas` | `pageQuerySchema` + `idParamSchema` | express | 8 |
 | `express-server` | `server.ts` | express | 14 |
 
-O `body` de cada complemento MUST dizer qual passo usa aquele código sem mostrá-lo. Os complementos MUST ser coerentes com o material: mesmos nomes de banco, usuário, senha, container e porta (`productsdb`, `products`, `products-db`, 5432, API na 8080).
+O `body` de cada complemento `code` MUST dizer qual passo usa aquele código sem mostrá-lo. Os complementos MUST ser coerentes com o material: mesmos nomes de banco, usuário, senha, container e porta (`productsdb`, `products`, `products-db`, 5432, API na 8080).
 
 #### Scenario: Somente os complementos são supplement
 - **WHEN** todos os cards do tema são lidos
-- **THEN** exatamente os 4 cards da tabela têm `origin: "supplement"` e todos os outros têm `origin: "original"`
+- **THEN** exatamente os 4 cards da tabela e os 8 cards de perguntas têm `origin: "supplement"`, e todos os outros têm `origin: "original"`
 
 #### Scenario: Posição dos complementos
 - **WHEN** o deck `passo-a-passo` é lido em ordem
@@ -105,10 +110,10 @@ O `body` de cada complemento MUST dizer qual passo usa aquele código sem mostr�
 - **THEN** ele define o container `products-db`, usuário e senha `products`, banco `productsdb` e porta 5432
 
 ### Requirement: Ligação com o glossário
-Todo card `step` e todo card `endpoint` SHALL ter pelo menos um termo em `relatedTerms`, apontando para conceitos que o próprio passo ou endpoint menciona.
+Todo card `step`, `endpoint` e `question` SHALL ter pelo menos um termo em `relatedTerms`, apontando para conceitos que o próprio card menciona.
 
 #### Scenario: Todo passo tem termos relacionados
-- **WHEN** os cards `step` e `endpoint` são lidos
+- **WHEN** os cards `step`, `endpoint` e `question` são lidos
 - **THEN** cada um tem `relatedTerms` não vazio
 
 #### Scenario: Passo de CORS ligado ao termo CORS

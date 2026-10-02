@@ -5,6 +5,7 @@ export const FRONT_PROMPT = {
   step: 'Como cada framework faz isso?',
   compare: 'Como cada stack resolve isso?',
   concept: 'O que significa?',
+  question: 'Responda em voz alta antes de virar.',
 } as const;
 
 export const OPERATION_NAME = { C: 'Create', R: 'Read', U: 'Update', D: 'Delete' } as const;
@@ -15,6 +16,7 @@ export const CARD_TYPE_LABEL = {
   compare: 'Mapa mental',
   concept: 'Glossário',
   code: 'Código',
+  question: 'Entrevista',
 } as const;
 
 export const DECK_ACTION_LABEL = {

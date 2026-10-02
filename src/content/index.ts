@@ -10,6 +10,7 @@ export type {
   ConceptCard,
   Deck,
   EndpointCard,
+  QuestionCard,
   Snippet,
   SnippetLanguage,
   StepCard,
