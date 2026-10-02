@@ -68,12 +68,6 @@ describe('Requirement: Telas provisórias', () => {
     expect(screen.getAllByRole('heading', { name: 'Glossário' }).length).toBeGreaterThan(0);
     expect(screen.getByText(/em construção/i)).toBeOnTheScreen();
   });
-
-  it('Progresso provisório', async () => {
-    await renderApp();
-    fireEvent.press(tab('Progresso'));
-    expect(screen.getByText(/em construção/i)).toBeOnTheScreen();
-  });
 });
 
 describe('Requirement: Home mínima', () => {

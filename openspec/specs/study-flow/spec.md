@@ -127,8 +127,8 @@ Ao responder o último card, a sessão SHALL mostrar o resumo:
 - **WHEN** o usuário marcou todos os cards como "sei"
 - **THEN** o resumo não mostra o botão "Revisar os que errei" nem a lista para revisar
 
-### Requirement: Progresso enquanto o app está aberto
-O progresso de cada card SHALL ser a última resposta registrada ("sei" ou "não sei"), ou nenhuma. Ele SHALL valer para todo o app enquanto estiver aberto: a tela do tema e a aba Temas refletem cada resposta assim que é registrada. Responder um card de novo SHALL substituir a resposta anterior. Fechar o app MAY perder o progresso. A persistência é responsabilidade de uma capability futura.
+### Requirement: Progresso de cada card
+O progresso de cada card SHALL ser a última resposta registrada ("sei" ou "não sei"), ou nenhuma. Ele SHALL valer para todo o app: a tela do tema e a aba Temas refletem cada resposta assim que é registrada. Responder um card de novo SHALL substituir a resposta anterior. A persistência entre aberturas do app é definida pela capability `progress`.
 
 #### Scenario: Progresso refletido na tela do tema
 - **WHEN** o usuário marca 2 cards do Glossário como "sei" e volta para a tela do tema

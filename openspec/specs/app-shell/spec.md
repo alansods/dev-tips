@@ -22,7 +22,7 @@ O app SHALL ter 3 abas inferiores, nesta ordem: **Temas**, **Glossário** e **Pr
 - **THEN** as abas aparecem na ordem Temas, Glossário, Progresso, cada uma com rótulo visível
 
 ### Requirement: Telas provisórias
-Enquanto as changes de glossário e progresso não forem implementadas, as abas Glossário e Progresso SHALL exibir o título da tela e uma mensagem informando que o conteúdo ainda vai chegar.
+Enquanto a change de glossário não for implementada, a aba Glossário SHALL exibir o título da tela e uma mensagem informando que o conteúdo ainda vai chegar.
 
 #### Scenario: Glossário provisório
 - **WHEN** o usuário abre a aba Glossário
