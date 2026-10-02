@@ -13,7 +13,7 @@ import type { Card, Theme } from '../content';
 import { TermSheet } from '../glossary/TermSheet';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
-import { CARD_TYPE_LABEL } from './copy';
+import { ANSWER_LABEL, CARD_TYPE_LABEL } from './copy';
 import { flipDuration } from './motion';
 import { cardTitle, initialSession, sessionReducer, summary, type SessionState } from './rules';
 import { useStudyStore } from './store';
@@ -32,7 +32,7 @@ type SessionProps = {
   initialIds: () => string[];
 };
 
-/** Sessão de flashcards: frente → verso → "Sei"/"Não sei", e o resumo no fim. */
+/** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
 export function StudySession({ theme, title, initialIds }: SessionProps) {
   const { colors } = useTheme();
   const answerCard = useStudyStore((s) => s.answer);
@@ -141,8 +141,8 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
       <View style={styles.actions}>
         {state.revealed ? (
           <>
-            <Button title="Não sei" variant="warn" onPress={() => respond('unknown')} />
-            <Button title="Sei" onPress={() => respond('known')} />
+            <Button title={ANSWER_LABEL.unknown.button} variant="warn" onPress={() => respond('unknown')} />
+            <Button title={ANSWER_LABEL.known.button} onPress={() => respond('known')} />
           </>
         ) : (
           <Button title="Mostrar resposta" onPress={() => dispatch({ type: 'reveal' })} />
@@ -175,28 +175,28 @@ function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: Su
       <AppText font="bold" size={28} accessibilityRole="header" style={{ lineHeight: 34 }}>
         {title}
       </AppText>
-      <AppText tone="muted">{`Você marcou ${known} de ${total} cards como "sei" em ${sessionTitle}.`}</AppText>
+      <AppText tone="muted">{`Você marcou ${known} de ${total} cards como "${ANSWER_LABEL.known.short}" em ${sessionTitle}.`}</AppText>
 
       <View style={styles.counts}>
         <View
           accessible
-          accessibilityLabel={`${known} sei`}
+          accessibilityLabel={`${known} ${ANSWER_LABEL.known.short}`}
           style={[styles.count, { backgroundColor: colors.accentSoft }]}
         >
           <AppText font="monoMedium" size={30} tone="accentText">
             {String(known)}
           </AppText>
-          <AppText size={13}>sei</AppText>
+          <AppText size={13}>{ANSWER_LABEL.known.short}</AppText>
         </View>
         <View
           accessible
-          accessibilityLabel={`${unknown} não sei`}
+          accessibilityLabel={`${unknown} ${ANSWER_LABEL.unknown.short}`}
           style={[styles.count, { backgroundColor: colors.warnSoft }]}
         >
           <AppText font="monoMedium" size={30} tone="warn">
             {String(unknown)}
           </AppText>
-          <AppText size={13}>não sei</AppText>
+          <AppText size={13}>{ANSWER_LABEL.unknown.short}</AppText>
         </View>
       </View>
 

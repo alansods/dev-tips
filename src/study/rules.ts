@@ -40,7 +40,7 @@ export function deckAction(stats: Stats): DeckAction {
   return 'continue';
 }
 
-/** Cards da sessão aberta pelo botão do deck: todos, ou só os que ainda não estão como "sei". */
+/** Cards da sessão aberta pelo botão do deck: todos, ou só os que ainda não estão como "já sabia". */
 export function sessionCardIds(themeId: string, deck: Deck, progress: Progress): string[] {
   const action = deckAction(deckStats(themeId, deck, progress));
   const cards =

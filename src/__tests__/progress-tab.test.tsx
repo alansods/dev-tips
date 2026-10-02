@@ -43,7 +43,7 @@ describe('Requirement: Aba Progresso', () => {
     await openProgress();
     expect(crud().getByText(crudTheme.title)).toBeOnTheScreen();
     expect(crud().getByLabelText('0% do tema dominado')).toBeOnTheScreen();
-    expect(crud().getByLabelText('0 sei')).toBeOnTheScreen();
+    expect(crud().getByLabelText('0 já sabia')).toBeOnTheScreen();
     expect(crud().getByLabelText('0 para revisar')).toBeOnTheScreen();
     expect(crud().getByLabelText(`${TOTAL} não vistos`)).toBeOnTheScreen();
     expect(screen.queryByText(/em construção/i)).toBeNull();
@@ -54,9 +54,11 @@ describe('Requirement: Aba Progresso', () => {
     seed(deckIds('mapa-mental').slice(0, 2), 'unknown');
     await openProgress();
     expect(crud().getByLabelText('5% do tema dominado')).toBeOnTheScreen(); // 4 de 73
-    expect(crud().getByLabelText('4 sei')).toBeOnTheScreen();
+    expect(crud().getByLabelText('4 já sabia')).toBeOnTheScreen();
     expect(crud().getByLabelText('2 para revisar')).toBeOnTheScreen();
     expect(crud().getByLabelText(`${TOTAL - 6} não vistos`)).toBeOnTheScreen();
+    // legenda das cores com o mesmo rótulo da contagem
+    expect(crud().getAllByText('já sabia').length).toBeGreaterThanOrEqual(2);
   });
 
   it('Progresso por deck', async () => {
@@ -91,7 +93,7 @@ describe('Requirement: Zerar progresso de um tema', () => {
     pressInCrud('Zerar progresso');
     pressInCrud('Cancelar');
     expect(crud().queryByText('Zerar o progresso deste tema?')).toBeNull();
-    expect(crud().getByLabelText('4 sei')).toBeOnTheScreen();
+    expect(crud().getByLabelText('4 já sabia')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(THEME, 'api')]).toBe('known');
   });
 });

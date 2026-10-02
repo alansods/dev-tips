@@ -3,9 +3,7 @@
 ## Purpose
 
 Liga os cards aos termos do glossário e torna o glossário consultável: chips de termos relacionados, gaveta com a definição, aba Glossário com busca.
-
 ## Requirements
-
 ### Requirement: Termos relacionados no verso
 O verso de todo card que tenha `relatedTerms` SHALL mostrar a seção "Termos relacionados", com um chip por termo, na ordem do conteúdo. Cada chip mostra o nome do termo e é um botão. Cards sem `relatedTerms` MUST NOT mostrar a seção. A frente dos cards MUST NOT mostrar os termos relacionados.
 
@@ -34,10 +32,10 @@ Tocar num chip de termo SHALL abrir uma gaveta sobre a tela com o nome do termo,
 
 #### Scenario: Fechar sem perder a sessão
 - **WHEN** a gaveta está aberta sobre o verso do Passo 13 e o usuário toca em "Fechar"
-- **THEN** a gaveta some e o verso do Passo 13 continua visível, com os botões "Não sei" e "Sei"
+- **THEN** a gaveta some e o verso do Passo 13 continua visível, com os botões "Não sabia" e "Já sabia"
 
 ### Requirement: Aba Glossário
-A aba Glossário SHALL listar todos os termos (cards `concept`) dos temas do catálogo, na ordem dos temas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de um tema, cada item SHALL mostrar também o título do tema a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "sei" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquele tema.
+A aba Glossário SHALL listar todos os termos (cards `concept`) dos temas do catálogo, na ordem dos temas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de um tema, cada item SHALL mostrar também o título do tema a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquele tema.
 
 #### Scenario: Lista completa
 - **WHEN** o usuário abre a aba Glossário sem busca
@@ -48,8 +46,8 @@ A aba Glossário SHALL listar todos os termos (cards `concept`) dos temas do cat
 - **THEN** o item "CORS" mostra "O mesmo CRUD em quatro frameworks" e o item "Cookie" mostra "Fundamentos web"
 
 #### Scenario: Selo de status
-- **WHEN** o card "CORS" foi marcado como "sei" e o card "DTO (Data Transfer Object)" como "não sei"
-- **THEN** na lista, CORS mostra o selo "sei" e DTO mostra o selo "revisar"
+- **WHEN** o card "CORS" foi marcado como "já sabia" e o card "DTO (Data Transfer Object)" como "não sabia"
+- **THEN** na lista, CORS mostra o selo "já sabia" e DTO mostra o selo "revisar"
 
 #### Scenario: Abrir termo pela lista
 - **WHEN** o usuário toca em "Docker" na lista
@@ -73,3 +71,4 @@ A aba Glossário SHALL ter um campo de busca, com rótulo acessível "Buscar ter
 #### Scenario: Sem resultados
 - **WHEN** o usuário digita "kubernetes"
 - **THEN** aparece "Nenhum termo encontrado." e a contagem "0 termos"
+
