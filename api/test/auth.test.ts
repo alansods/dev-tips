@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { createApp } from '../src/index';
 import { fakeGoogle } from './helpers/google';
+import { clearDatabase } from './helpers/session';
 
 type Session = {
   accessToken: string;
@@ -18,7 +19,7 @@ beforeAll(async () => {
   google = await fakeGoogle();
 });
 beforeEach(async () => {
-  await env.DB.batch([env.DB.prepare('DELETE FROM refresh_tokens'), env.DB.prepare('DELETE FROM users')]);
+  await clearDatabase();
 });
 
 /** App com o Google falso; `now` permite emitir tokens "no passado". */

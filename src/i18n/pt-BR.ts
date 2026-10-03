@@ -66,6 +66,18 @@ export const ptBR = {
     deleteOffline: 'Sem conexão. Tente de novo quando estiver online.',
     deleteError: 'Não foi possível apagar a conta agora. Tente de novo.',
   },
+  sync: {
+    section: 'Sincronização',
+    detail: 'Progresso, revisões e preferências',
+    synced: 'Sincronizado agora há pouco',
+    syncedMinutes: (n: number) => `Sincronizado há ${n} ${plural(n, 'minuto', 'minutos')}`,
+    syncing: 'Sincronizando…',
+    waiting: 'Aguardando conexão',
+    error: 'Não foi possível sincronizar',
+    offlineTitle: 'Offline.',
+    offlineBody: 'Seu progresso será enviado depois.',
+    firstSync: 'Seu progresso foi salvo na conta.',
+  },
   answer: {
     known: { button: 'Já sabia', short: 'já sabia' },
     unknown: { button: 'Não sabia', short: 'não sabia' },

@@ -9,6 +9,7 @@ import { errorBody, handleError } from './errors';
 import { authRoutes } from './routes/auth';
 import { healthRoutes } from './routes/health';
 import { meRoutes } from './routes/me';
+import { syncRoutes } from './routes/sync';
 
 /** Origens web liberadas no CORS; outras não recebem Access-Control-Allow-Origin. */
 const allowedOrigins = (env: Env) =>
@@ -29,6 +30,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
   app.route('/health', healthRoutes);
   app.route('/auth', authRoutes(deps));
   app.route('/me', meRoutes);
+  app.route('/sync', syncRoutes(deps));
 
   app.notFound((c) => c.json(errorBody('not_found', 'Rota não encontrada.'), 404));
   app.onError(handleError);

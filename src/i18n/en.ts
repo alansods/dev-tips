@@ -67,6 +67,18 @@ export const en: Messages = {
     deleteOffline: 'No connection. Try again when you’re online.',
     deleteError: 'Couldn’t delete the account right now. Try again.',
   },
+  sync: {
+    section: 'Sync',
+    detail: 'Progress, reviews and preferences',
+    synced: 'Synced just now',
+    syncedMinutes: (n) => `Synced ${n} ${plural(n, 'minute', 'minutes')} ago`,
+    syncing: 'Syncing…',
+    waiting: 'Waiting for connection',
+    error: 'Couldn’t sync',
+    offlineTitle: 'Offline.',
+    offlineBody: 'Your progress will be sent later.',
+    firstSync: 'Your progress was saved to your account.',
+  },
   answer: {
     known: { button: 'I knew it', short: 'I knew it' },
     unknown: { button: "I didn't know", short: "I didn't know" },
