@@ -10,12 +10,12 @@
 - [x] 2.1 Testes falhando: os cenários de "Login com Google na API", "Rotas protegidas", "Renovação da sessão" e "Dados e exclusão da conta na API" (chaves do Google simuladas com um JWKS de teste)
 - [x] 2.2 Implementar a validação de ID token com `jose`, `auth/service.ts`, `routes/auth.ts`, `routes/me.ts` e o middleware `requireAuth`
 - [x] 2.3 Testes passando
-- [ ] 2.4 Configurar os segredos (`JWT_SECRET`, `GOOGLE_CLIENT_IDS`) e publicar (publicado com `JWT_SECRET` real; falta o `GOOGLE_CLIENT_IDS` real, que depende da tarefa 3.1)
+- [x] 2.4 Configurar os segredos (`JWT_SECRET`, `GOOGLE_CLIENT_IDS`) e publicar
 
 ## 3. Configuração externa (com o usuário)
 
-- [ ] 3.1 Google Cloud: tela de consentimento (com o link da política de privacidade) e client IDs web, iOS e Android (SHA-1 de debug e de produção)
-- [ ] 3.2 `npx expo install @react-native-google-signin/google-signin expo-secure-store` (feito), `iosUrlScheme` do plugin no `app.json` e as variáveis `EXPO_PUBLIC_GOOGLE_*` (dependem da 3.1)
+- [x] 3.1 Google Cloud: tela de consentimento (com o link da política de privacidade) e client IDs web, iOS e Android (SHA-1 de debug e de produção)
+- [x] 3.2 `npx expo install @react-native-google-signin/google-signin expo-secure-store`, `iosUrlScheme` via `app.config.ts` e `.env` (`EXPO_PUBLIC_GOOGLE_*`)
 
 ## 4. Sessão no app
 
@@ -33,5 +33,5 @@
 
 ## 6. Verificação
 
-- [ ] 6.1 Development build local (`npx expo run:ios` e `npx expo run:android`): login com Google no iPhone e no tablet Android, sair, apagar conta
-- [ ] 6.2 Rodar `npm test` e `npm run typecheck` em `api/`, e `npm test`, `npm run lint` e `npx tsc --noEmit` no app
+- [x] 6.1 Development build local: login com Google testado no simulador do iPhone e no iPhone real (build Release). **Pendente:** teste no tablet Android, adiado pelo usuário
+- [x] 6.2 Rodar `npm test` e `npm run typecheck` em `api/`, e `npm test`, `npm run lint` e `npx tsc --noEmit` no app

@@ -83,7 +83,7 @@ A aba Temas SHALL listar cada tema do catálogo, na ordem do catálogo. Cada tem
 - **THEN** a tela do tema abre
 
 ### Requirement: Tela Ajustes
-O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um botão de engrenagem com rótulo acessível "Ajustes" ("Settings" em inglês). Tocar nele SHALL abrir a tela "Ajustes" em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL ter, nesta ordem, a seção "Idioma", com as opções de idioma e a atual marcada, a seção "Lembretes" (quando disponível na plataforma) e a seção "Sobre".
+O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um botão de engrenagem com rótulo acessível "Ajustes" ("Settings" em inglês). Tocar nele SHALL abrir a tela "Ajustes" em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL ter, nesta ordem, a seção "Conta" (quando disponível na plataforma), a seção "Idioma", com as opções de idioma e a atual marcada, a seção "Lembretes" (quando disponível na plataforma) e a seção "Sobre".
 
 #### Scenario: Abrir Ajustes
 - **WHEN** o usuário está na aba Temas e toca no botão "Ajustes"
@@ -95,7 +95,11 @@ O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um bot�
 
 #### Scenario: Ordem das seções
 - **WHEN** o usuário abre Ajustes no celular
-- **THEN** as seções aparecem na ordem "Idioma", "Lembretes" e "Sobre"
+- **THEN** as seções aparecem na ordem "Conta", "Idioma", "Lembretes" e "Sobre"
+
+#### Scenario: Web sem conta
+- **WHEN** o app roda na web
+- **THEN** a tela Ajustes não mostra a seção "Conta"
 
 ### Requirement: Seção Sobre
 A seção "Sobre" de Ajustes SHALL mostrar o link "Política de privacidade", o link "Termos de uso" e a versão do app. Tocar num link SHALL abrir o endereço configurado no navegador do aparelho. A versão SHALL ser a versão configurada do app (ex.: "1.0.0").
