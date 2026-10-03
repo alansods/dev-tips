@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
 import { useT } from '../i18n';
+import { SectionTitle } from '../settings/SectionTitle';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { ensurePermission, openSystemSettings } from './notifications';
@@ -28,9 +29,7 @@ export function RemindersSection() {
 
   return (
     <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
-      <AppText font="mono" size={11} tone="muted" style={styles.kicker}>
-        {t.reminders.section}
-      </AppText>
+      <SectionTitle>{t.reminders.section}</SectionTitle>
       <View style={[styles.group, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <View style={styles.row}>
           <AppText size={15} style={{ flex: 1 }}>
@@ -43,27 +42,36 @@ export function RemindersSection() {
             trackColor={{ true: colors.accent, false: colors.track }}
           />
         </View>
-        {enabled &&
-          REMINDER_TIMES.map((option) => {
-            const selected = option === time;
-            return (
-              <Pressable
-                key={option}
-                accessibilityRole="radio"
-                accessibilityLabel={t.reminders.times[option]}
-                accessibilityState={{ checked: selected }}
-                onPress={() => setTime(option)}
-                style={({ pressed }) => [styles.row, { borderTopWidth: 1, borderColor: colors.line, opacity: pressed ? 0.7 : 1 }]}
-              >
-                <AppText size={15} style={{ flex: 1 }}>
-                  {t.reminders.times[option]}
-                </AppText>
-                <View style={[styles.dot, { borderColor: selected ? colors.accent : colors.line }]}>
-                  {selected ? <View style={[styles.dotInner, { backgroundColor: colors.accent }]} /> : null}
-                </View>
-              </Pressable>
-            );
-          })}
+        {enabled && (
+          <View accessibilityRole="radiogroup" style={styles.times}>
+            {REMINDER_TIMES.map((option) => {
+              const selected = option === time;
+              return (
+                <Pressable
+                  key={option}
+                  accessibilityRole="radio"
+                  accessibilityLabel={t.reminders.times[option]}
+                  accessibilityState={{ checked: selected }}
+                  onPress={() => setTime(option)}
+                  style={({ pressed }) => [
+                    styles.time,
+                    selected
+                      ? { borderColor: colors.accent, borderWidth: 1.5, backgroundColor: colors.accentSoft }
+                      : { borderColor: colors.line, backgroundColor: colors.surface },
+                    { opacity: pressed ? 0.7 : 1 },
+                  ]}
+                >
+                  <AppText size={13} font={selected ? 'semibold' : 'regular'} tone={selected ? 'accentText' : 'ink'}>
+                    {t.reminders.timeNames[option]}
+                  </AppText>
+                  <AppText font="mono" size={12} tone={selected ? 'accentText' : 'muted'}>
+                    {option}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </View>
+        )}
       </View>
       {permissionDenied && !enabled ? (
         <View style={[styles.denied, { backgroundColor: colors.warnSoft, borderColor: colors.warn }]}>
@@ -78,10 +86,17 @@ export function RemindersSection() {
 }
 
 const styles = StyleSheet.create({
-  kicker: { textTransform: 'uppercase', letterSpacing: 0.8 },
   group: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden' },
   row: { flexDirection: 'row', alignItems: 'center', minHeight: 52, paddingHorizontal: spacing.lg, gap: spacing.md },
-  dot: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
-  dotInner: { width: 10, height: 10, borderRadius: 5 },
+  times: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg, paddingBottom: spacing.lg },
+  time: {
+    flex: 1,
+    minHeight: 52,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
   denied: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.sm },
 });
