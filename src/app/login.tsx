@@ -10,6 +10,7 @@ import { signIn } from '../auth/actions';
 import { GoogleButton } from '../auth/GoogleButton';
 import { LoginIllustration } from '../auth/LoginIllustration';
 import { AppText } from '../components/AppText';
+import { AppMark } from '../components/icons';
 import { useSettingsStore, useT } from '../i18n';
 import { legalUrls } from '../settings/legal';
 import { useTheme } from '../theme/ThemeProvider';
@@ -47,13 +48,8 @@ export default function LoginScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.brand}>
-          <View
-            accessibilityElementsHidden
-            importantForAccessibility="no-hide-descendants"
-            style={[styles.mark, { backgroundColor: colors.accent }]}
-          >
-            <View style={[styles.markBack, { borderColor: colors.accentSoft }]} />
-            <View style={[styles.markFront, { backgroundColor: colors.onAccent }]} />
+          <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            <AppMark />
           </View>
           <AppText font="bold" size={20}>
             {t.auth.appName}
@@ -122,26 +118,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   content: { flexGrow: 1, padding: spacing.xl, paddingTop: spacing.lg, gap: spacing.xl },
   brand: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44 },
-  mark: { width: 36, height: 36, borderRadius: 10 },
-  markBack: {
-    position: 'absolute',
-    left: 9,
-    top: 7,
-    width: 17,
-    height: 21,
-    borderRadius: 4,
-    borderWidth: 1.5,
-    transform: [{ rotate: '-10deg' }],
-  },
-  markFront: {
-    position: 'absolute',
-    left: 10,
-    top: 8,
-    width: 17,
-    height: 21,
-    borderRadius: 4,
-    transform: [{ rotate: '6deg' }],
-  },
   hero: { flex: 1, justifyContent: 'center', gap: 32 },
   actions: { gap: spacing.md },
   alert: { padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
