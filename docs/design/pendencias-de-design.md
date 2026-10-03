@@ -13,16 +13,16 @@ Tudo o que falta desenhar para o login (Google e Apple), a conta e os estados ge
 ## Prioridade
 
 1. Telas 3 a 10 (login e conta): bloqueiam a change `add-auth`.
-2. Telas 1 e 2 (Ajustes completo).
+2. Telas 1, 2, 15 e 16 (Ajustes completo e política de privacidade).
 3. Telas 11 a 14 (estados gerais).
-4. Opcionais (15 a 17).
+4. Opcionais (17 a 19).
 
 ## 1. Telas já implementadas, sem design
 
-| #   | Tela                | O que tem hoje                                                                                                                   | Recomendação                                                                                                    |
-| --- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| 1   | **Ajustes**         | Cabeçalho com "Voltar", seção Idioma (2 opções de rádio) e seção Lembretes                                                       | Desenhar a tela inteira com as seções que vão entrar: **Conta** (no topo), Idioma e Lembretes                   |
-| 2   | **Seção Lembretes** | Interruptor "Lembrete diário", 3 horários (só aparecem com ele ligado) e o aviso de permissão negada com o botão "Abrir ajustes" | 3 estados: desligado, ligado com o horário escolhido e permissão negada (o aviso pode usar o laranja de alerta) |
+| #   | Tela                | O que tem hoje                                                                                                                   | Recomendação                                                                                                        |
+| --- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Ajustes**         | Cabeçalho com "Voltar", seção Idioma (2 opções de rádio) e seção Lembretes                                                       | Desenhar a tela inteira com as seções que vão entrar: **Conta** (no topo), Idioma, Lembretes e **Sobre** (no final) |
+| 2   | **Seção Lembretes** | Interruptor "Lembrete diário", 3 horários (só aparecem com ele ligado) e o aviso de permissão negada com o botão "Abrir ajustes" | 3 estados: desligado, ligado com o horário escolhido e permissão negada (o aviso pode usar o laranja de alerta)     |
 
 ## 2. Conta e login (Google e Apple)
 
@@ -46,17 +46,22 @@ Tudo o que falta desenhar para o login (Google e Apple), a conta e os estados ge
 | 13  | **Aviso de sem conexão**        | Aviso discreto no topo ou no rodapé ("Offline: seu progresso será enviado depois"), que some ao reconectar. Não bloquear o uso: o app funciona offline |
 | 14  | **Primeira sincronização**      | Depois do primeiro login, uma mensagem curta ("Seu progresso foi salvo na conta")                                                                      |
 
-## 4. Requisito sem tela: política de privacidade
+## 4. Sobre e legal
 
-Não precisa de design nem de seção no app, mas é **obrigatória**: o Google pede o link dela para liberar o login, e a App Store e o Google Play exigem o link para publicar. Basta uma página web simples, com quais dados são guardados (e-mail, nome, progresso de estudo), para quê e como apagar a conta. O link fica no rodapé da tela de login (3) e é cadastrado no Google Cloud e nas lojas.
+A política de privacidade é **obrigatória**: o Google pede o link dela para liberar o login, e a App Store e o Google Play exigem o link para publicar, inclusive acessível dentro do app.
+
+| #   | Tela                         | Recomendação                                                                                                                                                                                                                                                  |
+| --- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 15  | **Seção Sobre (em Ajustes)** | No final de Ajustes: versão do app, link para a **Política de privacidade** e, opcionalmente, **Termos de uso** e "Enviar feedback"                                                                                                                           |
+| 16  | **Política de privacidade**  | Página web simples, não uma tela do app. Dizer quais dados são guardados (e-mail, nome, progresso de estudo), para quê e como apagar a conta. O link aparece na seção Sobre (15) e no rodapé da tela de login (3), e é cadastrado no Google Cloud e nas lojas |
 
 ## 5. Opcionais
 
 | #   | Tela                            | Recomendação                                                                                                                               |
 | --- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| 15  | **Splash screen**               | Já existe (ícone sobre o fundo `#0C1015`). Redesenhar só para mudar a identidade                                                           |
-| 16  | **Ícone do app**                | Já existe, gerado por `scripts/generate-icons.js`. Mesmo critério da splash                                                                |
-| 17  | **Boas-vindas no primeiro uso** | 2 ou 3 telas explicando o app (temas → cards → revisão), terminando na tela de login (3) com "Continuar sem conta". Pode ficar para depois |
+| 17  | **Splash screen**               | Já existe (ícone sobre o fundo `#0C1015`). Redesenhar só para mudar a identidade                                                           |
+| 18  | **Ícone do app**                | Já existe, gerado por `scripts/generate-icons.js`. Mesmo critério da splash                                                                |
+| 19  | **Boas-vindas no primeiro uso** | 2 ou 3 telas explicando o app (temas → cards → revisão), terminando na tela de login (3) com "Continuar sem conta". Pode ficar para depois |
 
 ## Fora da lista, de propósito
 
