@@ -8,7 +8,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dev.devtips.app"
+      "bundleIdentifier": "dev.devtips.app",
+      "appleTeamId": "XJGZS86KK9"
     },
     "android": {
       "adaptiveIcon": {
