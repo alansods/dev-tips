@@ -21,10 +21,14 @@ jest.mock('expo-localization', () => ({
   getLocales: jest.fn(() => [{ languageTag: 'pt-BR', languageCode: 'pt', textDirection: 'ltr' }]),
 }));
 
-// Cada teste começa sem idioma escolhido (segue o aparelho).
+// Cada teste começa sem idioma escolhido (segue o aparelho), com a tela de
+// boas-vindas já vista (os testes do primeiro uso desligam isso) e sem conta.
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('./src/i18n/store').useSettingsStore.setState({ language: null });
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  require('./src/i18n/store').useSettingsStore.setState({ language: null, onboardingSeen: true });
+  require('./src/auth/store').useAccountStore.setState({ user: null });
+  require('./src/auth/tokens').__resetSecureStoreForTests();
+  /* eslint-enable @typescript-eslint/no-require-imports */
 });
 
 // Notificações: módulo nativo simulado. Os testes de lembrete inspecionam estes mocks.
@@ -49,3 +53,18 @@ jest.mock('expo-constants', () => {
   const constants = { ...actual.default, expoConfig };
   return { __esModule: true, ...actual, default: constants };
 });
+
+// SecureStore: um armazenamento em memória no lugar do Keychain/Keystore.
+jest.mock('expo-secure-store', () => {
+  const data = new Map();
+  return {
+    getItemAsync: jest.fn(async (key) => data.get(key) ?? null),
+    setItemAsync: jest.fn(async (key, value) => void data.set(key, value)),
+    deleteItemAsync: jest.fn(async (key) => void data.delete(key)),
+    __clear: () => data.clear(),
+  };
+});
+
+// Google Sign-In: módulo nativo, nunca carregado nos testes (o adaptador
+// src/auth/providers.ts é mockado em cada teste que precisa dele).
+jest.mock('@react-native-google-signin/google-signin', () => ({}));

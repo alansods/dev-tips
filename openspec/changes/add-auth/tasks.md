@@ -15,21 +15,21 @@
 ## 3. Configuração externa (com o usuário)
 
 - [ ] 3.1 Google Cloud: tela de consentimento (com o link da política de privacidade) e client IDs web, iOS e Android (SHA-1 de debug e de produção)
-- [ ] 3.2 `npx expo install @react-native-google-signin/google-signin expo-secure-store`, plugins no `app.json` e `EXPO_PUBLIC_API_URL` por perfil no `eas.json`
+- [ ] 3.2 `npx expo install @react-native-google-signin/google-signin expo-secure-store` (feito), `iosUrlScheme` do plugin no `app.json` e as variáveis `EXPO_PUBLIC_GOOGLE_*` (dependem da 3.1)
 
 ## 4. Sessão no app
 
-- [ ] 4.1 Testes falhando: "Sessão mantida ao reabrir", "Renovação automática" e "Sessão encerrada no servidor" (API e SecureStore mockados)
-- [ ] 4.2 Implementar `src/auth/api.ts`, `src/auth/session.ts` e `src/auth/providers.ts`
-- [ ] 4.3 Testes passando
+- [x] 4.1 Testes falhando: "Sessão mantida ao reabrir", "Renovação automática" e "Sessão encerrada no servidor" (API e SecureStore mockados)
+- [x] 4.2 Implementar `src/auth/api.ts`, `src/auth/session.ts` e `src/auth/providers.ts`
+- [x] 4.3 Testes passando
 
 ## 5. Telas
 
-- [ ] 5.1 Testes falhando: "Tela de login" (primeiro uso, continuar sem conta) e "Entrar pelo app" (sucesso, carregando, cancelado, sem conexão, erro da API)
-- [ ] 5.2 Implementar `src/app/login.tsx` com o design da opção C e os textos nos dicionários
-- [ ] 5.3 Testes falhando: "Conta no app" (convite, sair, apagar, cancelar) e "Ordem das seções" e "Web sem conta" de Ajustes
-- [ ] 5.4 Implementar a seção Conta em `src/app/settings.tsx` e `src/app/account.tsx`
-- [ ] 5.5 Testes passando
+- [x] 5.1 Testes falhando: "Tela de login" (primeiro uso, continuar sem conta) e "Entrar pelo app" (sucesso, carregando, cancelado, sem conexão, erro da API)
+- [x] 5.2 Implementar `src/app/login.tsx` com o design da opção C e os textos nos dicionários
+- [x] 5.3 Testes falhando: "Conta no app" (convite, sair, apagar, cancelar) e "Ordem das seções" e "Web sem conta" de Ajustes
+- [x] 5.4 Implementar a seção Conta em `src/app/settings.tsx` e `src/app/account.tsx`
+- [x] 5.5 Testes passando
 
 ## 6. Verificação
 

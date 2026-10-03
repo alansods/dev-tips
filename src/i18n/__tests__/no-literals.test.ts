@@ -11,7 +11,8 @@ const SRC = path.resolve(__dirname, '../..');
 const SKIP = [/__tests__/, /__fixtures__/, /^i18n\//, /^test-utils\.tsx$/];
 
 /** Literais permitidos: não são texto de interface traduzível. */
-const ALLOWED = new Set<string>([]);
+// Conteúdo técnico da ilustração de login (código e termo), igual em qualquer idioma.
+const ALLOWED = new Set<string>(['DELETE', 'CORS']);
 
 const TEXT_PROP = /\b(title|label|accessibilityLabel|accessibilityHint|placeholder)="([^"]*\p{L}[^"]*)"/gu;
 const INLINE_TEXT = />([^<>{}]*\p{L}{2}[^<>{}]*)<\//gu;
