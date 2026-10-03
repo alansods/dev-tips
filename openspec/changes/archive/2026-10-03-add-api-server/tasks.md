@@ -19,5 +19,5 @@
 ## 4. Publicação e decisão
 
 - [x] 4.1 Atualizar a decisão de backend no `openspec/config.yaml`
-- [ ] 4.2 Com o login do usuário no Wrangler: `wrangler d1 create dev-tips`, preencher o `database_id`, `npm run deploy` e conferir `GET /health` em produção
-- [ ] 4.3 Rodar `npm test` e `npm run typecheck` em `api/`, e `npm test`, `npm run lint` e `npx tsc --noEmit` no app
+- [x] 4.2 Com o login do usuário no Wrangler: `wrangler d1 create dev-tips`, preencher o `database_id`, `npm run deploy` e conferir `GET /health` em produção
+- [x] 4.3 Rodar `npm test` e `npm run typecheck` em `api/`, e `npm test`, `npm run lint` e `npx tsc --noEmit` no app
