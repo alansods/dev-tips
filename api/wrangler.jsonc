@@ -1,0 +1,21 @@
+// Configuração do Worker da API (Cloudflare Workers + D1).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dev-tips-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "d1_databases": [
+    {
+      // Aparece no código como c.env.DB.
+      "binding": "DB",
+      "database_name": "dev-tips",
+      // Gerado por `wrangler d1 create dev-tips`; não é segredo.
+      "database_id": "097d3d97-7a2c-44a4-9346-3e7e548cccbc",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "vars": {
+    // Origens web que podem chamar a API (separadas por vírgula). O app nativo não envia Origin.
+    "ALLOWED_ORIGINS": "http://localhost:8081"
+  }
+}

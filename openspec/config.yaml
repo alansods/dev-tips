@@ -22,7 +22,11 @@ context: |
   - Mecânica principal do MVP: flashcard ("sei / não sei") + progresso.
     Quiz e repetição espaçada vêm depois, cada um via change própria.
   - Sem backend no MVP: conteúdo empacotado no app, progresso local.
-    Backend (login/sync) só via change de spec futura.
+    Revisto em 2026-10-03 (change add-api-server): API própria em api/
+    (Hono no Cloudflare Workers, banco Cloudflare D1), base para login com
+    Google/Apple (add-auth) e sincronização (add-cloud-sync). O app continua
+    offline-first e funciona sem conta. Alternativa documentada em
+    docs/backend/alternativa-nestjs-render-monorepo.md.
   - Lacunas do material de origem são completadas com cards marcados
     como "complemento" (origin: "supplement"), distintos do original.
   - Próximos temas previstos: Fundamentos web, Banco de dados,
