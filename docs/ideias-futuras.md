@@ -55,6 +55,8 @@ A pessoa escreve só a ideia, em poucas palavras, e a IA completa o resto no for
 
 ## 2. Outras ideias já levantadas
 
+- **Login com Apple:** a App Store exige "Sign in with Apple" em apps com login social. Precisa da conta paga de desenvolvedor Apple; entra numa change própria antes de publicar no iOS. A tabela `users` já tem a coluna `provider` pensando nisso.
+
 - **Novo nome para o app:** opções discutidas: DevDeck, DevCards, Recall, Commit, Stack Cards e Revisa.dev. Antes de decidir, conferir a disponibilidade nas lojas, no domínio e no registro de marca. A troca mexe no `app.json`, no ícone, nos textos e nas specs.
 - **Perfil, ranking e compartilhamento de progresso:** só fazem sentido com recursos sociais, que podem nascer junto com a área "Da comunidade" acima.
 - **Estatísticas pessoais:** sequência de dias estudados e total de cards revisados.

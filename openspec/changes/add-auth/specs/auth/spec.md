@@ -1,6 +1,6 @@
 ## Purpose
 
-Permite entrar no Dev Tips com Google ou Apple, de forma opcional, manter a sessão no aparelho e sair ou apagar a conta, tanto na API quanto no app.
+Permite entrar no Dev Tips com Google, de forma opcional, manter a sessão no aparelho e sair ou apagar a conta, tanto na API quanto no app.
 
 ## ADDED Requirements
 
@@ -22,17 +22,6 @@ Permite entrar no Dev Tips com Google ou Apple, de forma opcional, manter a sess
 #### Scenario: Token expirado
 - **WHEN** o ID token está expirado
 - **THEN** a resposta é `401` com `error.code` igual a `invalid_token`
-
-### Requirement: Login com Apple na API
-`POST /auth/apple` com `{ "idToken", "name"? }` SHALL validar o ID token da Apple (chaves públicas da Apple, emissor da Apple, público igual ao identificador do app, não expirado) e seguir as mesmas regras do login com Google. Como a Apple só envia o nome no primeiro login, o `name` recebido SHALL ser gravado só quando o usuário ainda não tiver nome.
-
-#### Scenario: Primeiro login com Apple
-- **WHEN** um ID token válido da Apple é enviado com `name` "Ana"
-- **THEN** a resposta é `200` e o usuário tem o nome "Ana"
-
-#### Scenario: Login seguinte sem nome
-- **WHEN** o mesmo usuário entra de novo sem `name`
-- **THEN** o nome continua "Ana"
 
 ### Requirement: Rotas protegidas
 Rotas que exigem conta SHALL aceitar só requisições com `Authorization: Bearer <accessToken>` válido. O token de acesso SHALL expirar em 15 minutos. Sem token, com token inválido ou expirado, a resposta SHALL ser `401` com o código `unauthorized`.
@@ -76,7 +65,7 @@ Rotas que exigem conta SHALL aceitar só requisições com `Authorization: Beare
 - **THEN** a exclusão responde `204`, e o novo login cria um usuário novo, sem dados anteriores
 
 ### Requirement: Tela de login
-A tela de login SHALL mostrar o nome do app "Dev Tips", a ilustração de cards, o título "Aprenda, reforce e relembre", o texto "Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.", os botões "Continuar com o Google", "Continuar com a Apple" (só no iOS) e "Continuar sem conta", e os links "Termos de uso" e "Política de privacidade". No primeiro uso do app, a tela SHALL aparecer uma única vez antes da aba Temas; depois, só pelo botão "Entrar" de Ajustes. "Continuar sem conta" SHALL fechar a tela sem criar conta, e o app SHALL funcionar normalmente sem conta.
+A tela de login SHALL mostrar o nome do app "Dev Tips", a ilustração de cards, o título "Aprenda, reforce e relembre", o texto "Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.", os botões "Continuar com o Google" e "Continuar sem conta", e os links "Termos de uso" e "Política de privacidade". No primeiro uso do app, a tela SHALL aparecer uma única vez antes da aba Temas; depois, só pelo botão "Entrar" de Ajustes. "Continuar sem conta" SHALL fechar a tela sem criar conta, e o app SHALL funcionar normalmente sem conta.
 
 #### Scenario: Primeiro uso
 - **WHEN** o app abre pela primeira vez
@@ -86,12 +75,8 @@ A tela de login SHALL mostrar o nome do app "Dev Tips", a ilustração de cards,
 - **WHEN** o usuário toca em "Continuar sem conta" e depois fecha e abre o app
 - **THEN** a aba Temas abre, e a tela de login não aparece de novo
 
-#### Scenario: Apple só no iOS
-- **WHEN** o app roda no Android
-- **THEN** a tela de login não mostra "Continuar com a Apple"
-
 ### Requirement: Entrar pelo app
-Tocar em "Continuar com o Google" ou "Continuar com a Apple" SHALL abrir o login do provedor e, com sucesso, enviar o ID token à API, guardar a sessão e voltar para a tela de onde o login foi aberto (a aba Temas no primeiro uso). Durante o envio, o botão tocado SHALL mostrar "Entrando…" com um indicador, e os outros botões SHALL ficar desabilitados. Se o usuário cancelar o login do provedor, a tela SHALL voltar ao estado normal sem mensagem. Sem conexão, SHALL mostrar "Sem conexão. Tente de novo quando estiver online."; com erro da API, "Não foi possível entrar agora. Tente de novo."
+Tocar em "Continuar com o Google" SHALL abrir o login do Google e, com sucesso, enviar o ID token à API, guardar a sessão e voltar para a tela de onde o login foi aberto (a aba Temas no primeiro uso). Durante o envio, o botão SHALL mostrar "Entrando…" com um indicador, e "Continuar sem conta" SHALL ficar desabilitado. Se o usuário cancelar o login do Google, a tela SHALL voltar ao estado normal sem mensagem. Sem conexão, SHALL mostrar "Sem conexão. Tente de novo quando estiver online."; com erro da API, "Não foi possível entrar agora. Tente de novo."
 
 #### Scenario: Login com sucesso
 - **WHEN** o usuário entra com o Google a partir de Ajustes
@@ -99,7 +84,7 @@ Tocar em "Continuar com o Google" ou "Continuar com a Apple" SHALL abrir o login
 
 #### Scenario: Carregando
 - **WHEN** o ID token foi obtido e a API ainda não respondeu
-- **THEN** o botão mostra "Entrando…" e os outros botões estão desabilitados
+- **THEN** o botão mostra "Entrando…" e "Continuar sem conta" está desabilitado
 
 #### Scenario: Cancelado
 - **WHEN** o usuário cancela o login do Google
@@ -114,7 +99,7 @@ Tocar em "Continuar com o Google" ou "Continuar com a Apple" SHALL abrir o login
 - **THEN** aparece "Não foi possível entrar agora. Tente de novo."
 
 ### Requirement: Conta no app
-A seção "Conta" de Ajustes SHALL mostrar, sem sessão, o convite "Salve seu progresso na nuvem" com o botão "Entrar" (que abre a tela de login) e, com sessão, uma linha com foto, nome e e-mail que abre a tela "Conta". A tela "Conta" SHALL mostrar foto, nome, e-mail e o provedor ("Conectado com Google" ou "Conectado com Apple"), o botão "Sair" e, separado no final, "Apagar conta". "Sair" SHALL pedir confirmação ("Sair da conta?", com "Cancelar" e "Sair") e, confirmado, encerrar a sessão na API e no aparelho. "Apagar conta" SHALL pedir confirmação explicando que os dados na nuvem serão apagados para sempre e que o progresso no aparelho continua, com "Cancelar" e "Apagar minha conta". Nos dois casos, o progresso no aparelho MUST NOT ser apagado. Sem conexão, sair SHALL encerrar a sessão no aparelho mesmo assim; apagar a conta SHALL mostrar o erro de conexão e manter a conta.
+A seção "Conta" de Ajustes SHALL mostrar, sem sessão, o convite "Salve seu progresso na nuvem" com o botão "Entrar" (que abre a tela de login) e, com sessão, uma linha com foto, nome e e-mail que abre a tela "Conta". A tela "Conta" SHALL mostrar foto, nome, e-mail e "Conectado com Google", o botão "Sair" e, separado no final, "Apagar conta". "Sair" SHALL pedir confirmação ("Sair da conta?", com "Cancelar" e "Sair") e, confirmado, encerrar a sessão na API e no aparelho. "Apagar conta" SHALL pedir confirmação explicando que os dados na nuvem serão apagados para sempre e que o progresso no aparelho continua, com "Cancelar" e "Apagar minha conta". Nos dois casos, o progresso no aparelho MUST NOT ser apagado. Sem conexão, sair SHALL encerrar a sessão no aparelho mesmo assim; apagar a conta SHALL mostrar o erro de conexão e manter a conta.
 
 #### Scenario: Convite para entrar
 - **WHEN** não há sessão e o usuário abre Ajustes
