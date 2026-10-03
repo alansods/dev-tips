@@ -40,3 +40,12 @@ jest.mock('expo-notifications', () => ({
   getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),
   useLastNotificationResponse: jest.fn(() => undefined),
 }));
+
+// expo-constants: nos testes, a configuração do app vem do app.json real
+// (no app, o Expo injeta isso em tempo de execução).
+jest.mock('expo-constants', () => {
+  const actual = jest.requireActual('expo-constants');
+  const expoConfig = jest.requireActual('./app.json').expo;
+  const constants = { ...actual.default, expoConfig };
+  return { __esModule: true, ...actual, default: constants };
+});

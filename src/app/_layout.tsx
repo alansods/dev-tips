@@ -5,17 +5,40 @@ import { IBMPlexSans_700Bold } from '@expo-google-fonts/ibm-plex-sans/700Bold';
 import { JetBrainsMono_400Regular } from '@expo-google-fonts/jetbrains-mono/400Regular';
 import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono/500Medium';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { ErrorScreen } from '../components/ErrorScreen';
 import { useReminderSync } from '../reminders/useReminderSync';
 import { useReminderTapNavigation } from '../reminders/useReminderTap';
 import { FontsReadyContext } from '../theme/fonts';
 import { ThemeProvider, useTheme } from '../theme/ThemeProvider';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+/**
+ * Qualquer tela que falhar ao ser exibida cai aqui (o expo-router embrulha a
+ * rota num Error Boundary). Fica fora do ThemeProvider do layout, por isso
+ * traz o seu. O erro vai só para o console, nunca para a tela.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+  return (
+    <ThemeProvider>
+      <ErrorScreen
+        onRetry={() => void retry()}
+        onHome={() => {
+          router.replace('/');
+          void retry();
+        }}
+      />
+    </ThemeProvider>
+  );
+}
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({

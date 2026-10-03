@@ -85,3 +85,20 @@ export function SettingsIcon({ color, size = 20 }: IconProps) {
     </Svg>
   );
 }
+
+export function ExternalLinkIcon({ color, size = 16 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" {...stroke(color)} />
+    </Svg>
+  );
+}
+
+export function ErrorIcon({ color, size = 44 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x="3" y="4" width="18" height="16" rx="2" {...stroke(color)} />
+      <Path d="M3 9h18M8 14l3 3M11 14l-3 3M14 16h3" {...stroke(color)} />
+    </Svg>
+  );
+}

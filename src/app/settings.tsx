@@ -7,6 +7,8 @@ import { IconButton } from '../components/IconButton';
 import { BackIcon } from '../components/icons';
 import { LANGUAGE_NAMES, LANGUAGES, useLanguage, useSettingsStore, useT } from '../i18n';
 import { RemindersSection } from '../reminders/RemindersSection';
+import { AboutSection } from '../settings/AboutSection';
+import { SectionTitle } from '../settings/SectionTitle';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
@@ -32,10 +34,11 @@ export default function SettingsScreen() {
         </AppText>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
-        <AppText font="mono" size={11} tone="muted" style={styles.kicker}>
-          {t.settings.language}
-        </AppText>
-        <View accessibilityRole="radiogroup" style={[styles.group, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <SectionTitle>{t.settings.language}</SectionTitle>
+        <View
+          accessibilityRole="radiogroup"
+          style={[styles.group, { backgroundColor: colors.surface, borderColor: colors.line }]}
+        >
           {LANGUAGES.map((lang, i) => {
             const selected = lang === language;
             return (
@@ -62,6 +65,7 @@ export default function SettingsScreen() {
           })}
         </View>
         <RemindersSection />
+        <AboutSection />
       </ScrollView>
     </SafeAreaView>
   );
@@ -76,7 +80,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   content: { padding: spacing.lg, gap: spacing.sm },
-  kicker: { textTransform: 'uppercase', letterSpacing: 0.8 },
   group: { borderWidth: 1, borderRadius: radius.lg, overflow: 'hidden' },
   option: { flexDirection: 'row', alignItems: 'center', minHeight: 52, paddingHorizontal: spacing.lg, gap: spacing.md },
   dot: { width: 20, height: 20, borderRadius: 10, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },

@@ -39,6 +39,12 @@
       "expo-localization",
       "expo-notifications"
     ],
-    "scheme": "devtips"
+    "scheme": "devtips",
+    "extra": {
+      "legal": {
+        "privacyUrl": "https://alansods.github.io/dev-tips/privacidade",
+        "termsUrl": "https://alansods.github.io/dev-tips/termos"
+      }
+    }
   }
 }
