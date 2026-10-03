@@ -26,5 +26,5 @@
 
 ## 5. Verificação
 
-- [ ] 5.1 Dois aparelhos com a mesma conta: progresso indo e voltando, conflito no mesmo card, uso offline e reconexão
+- [x] 5.1 ~~Dois aparelhos com a mesma conta: progresso indo e voltando, conflito no mesmo card, uso offline e reconexão~~ (dispensada: por enquanto só iPhone, um aparelho; os cenários estão cobertos pelos testes automatizados)
 - [x] 5.2 Rodar `npm test` e `npm run typecheck` em `api/`, e `npm test`, `npm run lint` e `npx tsc --noEmit` no app
