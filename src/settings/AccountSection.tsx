@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { useAccountStore } from '../auth/store';
+import { SyncStatusLine } from '../sync/SyncStatusLine';
 import { AppText } from '../components/AppText';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -44,6 +45,7 @@ export function AccountSection() {
                 {user.email}
               </AppText>
             ) : null}
+            <SyncStatusLine />
           </View>
           <ChevronRightIcon color={colors.muted} />
         </Pressable>

@@ -68,3 +68,38 @@ jest.mock('expo-secure-store', () => {
 // Google Sign-In: módulo nativo, nunca carregado nos testes (o adaptador
 // src/auth/providers.ts é mockado em cada teste que precisa dele).
 jest.mock('@react-native-google-signin/google-signin', () => ({}));
+
+// Rede (expo-network): estado controlável pelos testes com __setNetworkState.
+// Componentes que usam useNetworkState redesenham quando o estado muda.
+jest.mock('expo-network', () => {
+  const { useSyncExternalStore } = jest.requireActual('react');
+  type MockNetworkState = { isConnected: boolean; isInternetReachable: boolean; type: string };
+  type MockListener = (mockState: MockNetworkState) => void;
+  let mockState: MockNetworkState = { isConnected: true, isInternetReachable: true, type: 'WIFI' };
+  const mockListeners = new Set<MockListener>();
+  return {
+    NetworkStateType: { WIFI: 'WIFI', NONE: 'NONE', UNKNOWN: 'UNKNOWN' },
+    getNetworkStateAsync: jest.fn(async () => mockState),
+    addNetworkStateListener: jest.fn((mockFn: MockListener) => {
+      mockListeners.add(mockFn);
+      return { remove: () => mockListeners.delete(mockFn) };
+    }),
+    useNetworkState: () =>
+      useSyncExternalStore(
+        (mockFn: MockListener) => {
+          mockListeners.add(mockFn);
+          return () => mockListeners.delete(mockFn);
+        },
+        () => mockState,
+      ),
+    __setNetworkState: (mockOnline: boolean) => {
+      mockState = { isConnected: mockOnline, isInternetReachable: mockOnline, type: mockOnline ? 'WIFI' : 'NONE' };
+      mockListeners.forEach((mockFn) => mockFn(mockState));
+    },
+  };
+});
+
+beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('expo-network').__setNetworkState(true);
+});

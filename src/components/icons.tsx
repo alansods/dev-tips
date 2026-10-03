@@ -139,3 +139,11 @@ export function ChevronRightIcon({ color, size = 18 }: IconProps) {
     </Svg>
   );
 }
+
+export function OfflineIcon({ color, size = 16 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M2 8.8a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16.4a5 5 0 0 1 7 0M12 20h.01M3 3l18 18" {...stroke(color)} />
+    </Svg>
+  );
+}

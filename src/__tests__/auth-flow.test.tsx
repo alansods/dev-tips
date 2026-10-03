@@ -17,6 +17,9 @@ import { useSettingsStore } from '../i18n';
 import { progressKey } from '../study/rules';
 import { resetStudyStore, useStudyStore } from '../study/store';
 
+// A sincronização tem testes próprios; aqui ela fica desligada.
+jest.mock('../sync/useSync', () => ({ useSync: () => {} }));
+
 jest.mock('../auth/providers', () => ({
   signInWithGoogle: jest.fn(),
   signOutFromGoogle: jest.fn(async () => {}),

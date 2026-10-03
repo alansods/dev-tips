@@ -8,6 +8,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { deleteAccount, signOut } from '../auth/actions';
 import { useAccountStore } from '../auth/store';
+import { SyncStatusLine } from '../sync/SyncStatusLine';
+import { SectionTitle } from '../settings/SectionTitle';
 import { AppText } from '../components/AppText';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
@@ -76,6 +78,16 @@ export default function AccountScreen() {
             <GoogleLogo size={12} />
             <AppText font="mono" size={11} tone="muted">
               {t.account.connectedGoogle}
+            </AppText>
+          </View>
+        </View>
+
+        <View style={{ gap: spacing.sm }}>
+          <SectionTitle>{t.sync.section}</SectionTitle>
+          <View style={[styles.syncCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+            <SyncStatusLine size={15} />
+            <AppText size={13} tone="muted">
+              {t.sync.detail}
             </AppText>
           </View>
         </View>
@@ -167,4 +179,5 @@ const styles = StyleSheet.create({
   confirm: { gap: spacing.sm, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1.5 },
   danger: { gap: spacing.sm, paddingTop: spacing.lg, borderTopWidth: 1, marginTop: spacing.lg },
   alert: { padding: spacing.md, borderRadius: radius.md },
+  syncCard: { gap: 4, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1 },
 });
