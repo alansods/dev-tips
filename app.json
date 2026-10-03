@@ -39,7 +39,15 @@
       "expo-localization",
       "expo-notifications",
       "@react-native-google-signin/google-signin",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
     ],
     "scheme": "devtips",
     "extra": {
