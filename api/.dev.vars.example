@@ -1,0 +1,7 @@
+# Copie para .dev.vars (fora do Git) para rodar `npm run dev` localmente.
+# Em produção, os mesmos nomes são definidos com `npx wrangler secret put <NOME>`.
+
+# Segredo que assina os access tokens (HS256). Use um valor aleatório longo.
+JWT_SECRET=troque-por-um-valor-aleatorio-longo
+# Client IDs do Google aceitos como público (aud) do ID token, separados por vírgula.
+GOOGLE_CLIENT_IDS=000000000000-xxxxxxxx.apps.googleusercontent.com

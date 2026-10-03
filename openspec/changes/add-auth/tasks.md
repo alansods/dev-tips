@@ -1,16 +1,16 @@
 ## 1. Banco e tokens (API)
 
-- [ ] 1.1 Migration `0001_users.sql` (`users`, `refresh_tokens`) aplicada nos testes
-- [ ] 1.2 Testes falhando para emissão e validação do access JWT e do refresh (hash, uso único, família, vencimento)
-- [ ] 1.3 Implementar `auth/tokens.ts`, `db/users.ts` e `db/tokens.ts`
-- [ ] 1.4 Testes passando
+- [x] 1.1 Migration `0001_users.sql` (`users`, `refresh_tokens`) aplicada nos testes
+- [x] 1.2 Testes falhando para emissão e validação do access JWT e do refresh (hash, uso único, família, vencimento)
+- [x] 1.3 Implementar `auth/tokens.ts`, `db/users.ts` e `db/tokens.ts`
+- [x] 1.4 Testes passando
 
 ## 2. Login e sessão (API)
 
-- [ ] 2.1 Testes falhando: os cenários de "Login com Google na API", "Rotas protegidas", "Renovação da sessão" e "Dados e exclusão da conta na API" (chaves do Google simuladas com um JWKS de teste)
-- [ ] 2.2 Implementar a validação de ID token com `jose`, `auth/service.ts`, `routes/auth.ts`, `routes/me.ts` e o middleware `requireAuth`
-- [ ] 2.3 Testes passando
-- [ ] 2.4 Configurar os segredos (`JWT_SECRET`, `GOOGLE_CLIENT_IDS`) e publicar
+- [x] 2.1 Testes falhando: os cenários de "Login com Google na API", "Rotas protegidas", "Renovação da sessão" e "Dados e exclusão da conta na API" (chaves do Google simuladas com um JWKS de teste)
+- [x] 2.2 Implementar a validação de ID token com `jose`, `auth/service.ts`, `routes/auth.ts`, `routes/me.ts` e o middleware `requireAuth`
+- [x] 2.3 Testes passando
+- [ ] 2.4 Configurar os segredos (`JWT_SECRET`, `GOOGLE_CLIENT_IDS`) e publicar (publicado com `JWT_SECRET` real; falta o `GOOGLE_CLIENT_IDS` real, que depende da tarefa 3.1)
 
 ## 3. Configuração externa (com o usuário)
 
