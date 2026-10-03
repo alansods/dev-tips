@@ -21,10 +21,14 @@ jest.mock('expo-localization', () => ({
   getLocales: jest.fn(() => [{ languageTag: 'pt-BR', languageCode: 'pt', textDirection: 'ltr' }]),
 }));
 
-// Cada teste começa sem idioma escolhido (segue o aparelho).
+// Cada teste começa sem idioma escolhido (segue o aparelho), com a tela de
+// boas-vindas já vista (os testes do primeiro uso desligam isso) e sem conta.
 beforeEach(() => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require('./src/i18n/store').useSettingsStore.setState({ language: null });
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  require('./src/i18n/store').useSettingsStore.setState({ language: null, onboardingSeen: true });
+  require('./src/auth/store').useAccountStore.setState({ user: null });
+  require('./src/auth/tokens').__resetSecureStoreForTests();
+  /* eslint-enable @typescript-eslint/no-require-imports */
 });
 
 // Notificações: módulo nativo simulado. Os testes de lembrete inspecionam estes mocks.
@@ -48,4 +52,54 @@ jest.mock('expo-constants', () => {
   const expoConfig = jest.requireActual('./app.json').expo;
   const constants = { ...actual.default, expoConfig };
   return { __esModule: true, ...actual, default: constants };
+});
+
+// SecureStore: um armazenamento em memória no lugar do Keychain/Keystore.
+jest.mock('expo-secure-store', () => {
+  const data = new Map();
+  return {
+    getItemAsync: jest.fn(async (key) => data.get(key) ?? null),
+    setItemAsync: jest.fn(async (key, value) => void data.set(key, value)),
+    deleteItemAsync: jest.fn(async (key) => void data.delete(key)),
+    __clear: () => data.clear(),
+  };
+});
+
+// Google Sign-In: módulo nativo, nunca carregado nos testes (o adaptador
+// src/auth/providers.ts é mockado em cada teste que precisa dele).
+jest.mock('@react-native-google-signin/google-signin', () => ({}));
+
+// Rede (expo-network): estado controlável pelos testes com __setNetworkState.
+// Componentes que usam useNetworkState redesenham quando o estado muda.
+jest.mock('expo-network', () => {
+  const { useSyncExternalStore } = jest.requireActual('react');
+  type MockNetworkState = { isConnected: boolean; isInternetReachable: boolean; type: string };
+  type MockListener = (mockState: MockNetworkState) => void;
+  let mockState: MockNetworkState = { isConnected: true, isInternetReachable: true, type: 'WIFI' };
+  const mockListeners = new Set<MockListener>();
+  return {
+    NetworkStateType: { WIFI: 'WIFI', NONE: 'NONE', UNKNOWN: 'UNKNOWN' },
+    getNetworkStateAsync: jest.fn(async () => mockState),
+    addNetworkStateListener: jest.fn((mockFn: MockListener) => {
+      mockListeners.add(mockFn);
+      return { remove: () => mockListeners.delete(mockFn) };
+    }),
+    useNetworkState: () =>
+      useSyncExternalStore(
+        (mockFn: MockListener) => {
+          mockListeners.add(mockFn);
+          return () => mockListeners.delete(mockFn);
+        },
+        () => mockState,
+      ),
+    __setNetworkState: (mockOnline: boolean) => {
+      mockState = { isConnected: mockOnline, isInternetReachable: mockOnline, type: mockOnline ? 'WIFI' : 'NONE' };
+      mockListeners.forEach((mockFn) => mockFn(mockState));
+    },
+  };
+});
+
+beforeEach(() => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  require('expo-network').__setNetworkState(true);
 });

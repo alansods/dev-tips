@@ -8,7 +8,8 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "dev.devtips.app"
+      "bundleIdentifier": "dev.devtips.app",
+      "appleTeamId": "XJGZS86KK9"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +26,7 @@
       "bundler": "metro"
     },
     "plugins": [
+      "./plugins/withoutPushEntitlement",
       "expo-router",
       "expo-font",
       [
@@ -37,7 +39,17 @@
       ],
       "expo-asset",
       "expo-localization",
-      "expo-notifications"
+      "expo-notifications",
+      "@react-native-google-signin/google-signin",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
     ],
     "scheme": "devtips",
     "extra": {

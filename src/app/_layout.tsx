@@ -12,6 +12,8 @@ import { useEffect } from 'react';
 
 import { ErrorScreen } from '../components/ErrorScreen';
 import { useReminderSync } from '../reminders/useReminderSync';
+import { FirstSyncToast } from '../sync/FirstSyncToast';
+import { useSync } from '../sync/useSync';
 import { useReminderTapNavigation } from '../reminders/useReminderTap';
 import { FontsReadyContext } from '../theme/fonts';
 import { ThemeProvider, useTheme } from '../theme/ThemeProvider';
@@ -70,12 +72,14 @@ function RootStack() {
   const { scheme, colors } = useTheme();
   useReminderSync();
   useReminderTapNavigation();
+  useSync();
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
       </Stack>
+      <FirstSyncToast />
     </>
   );
 }

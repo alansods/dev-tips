@@ -98,7 +98,7 @@ describe('Requirement: Tela Ajustes (seções)', () => {
   it('Ordem das seções', async () => {
     await open('/settings');
     const headers = screen.getAllByRole('header').map((el) => String(el.props.children));
-    expect(headers).toEqual(['Ajustes', 'Idioma', 'Lembretes', 'Sobre']);
+    expect(headers).toEqual(['Ajustes', 'Conta', 'Idioma', 'Lembretes', 'Sobre']);
   });
 });
 

@@ -1,9 +1,10 @@
-import { router, Tabs } from 'expo-router';
+import { Redirect, router, Tabs } from 'expo-router';
 import { View } from 'react-native';
 
 import { IconButton } from '../../components/IconButton';
 import { GlossaryIcon, ProgressIcon, SettingsIcon, ThemesIcon } from '../../components/icons';
-import { useT } from '../../i18n';
+import { useSettingsStore, useT } from '../../i18n';
+import { useHydrated } from '../../storage/useHydrated';
 import { useFontsReady } from '../../theme/fonts';
 import { useTheme } from '../../theme/ThemeProvider';
 import { ThemeToggle } from '../../theme/ThemeToggle';
@@ -12,8 +13,14 @@ import { fontFamilies, spacing } from '../../theme/tokens';
 export default function TabsLayout() {
   const { colors } = useTheme();
   const t = useT();
+  const onboardingSeen = useSettingsStore((s) => s.onboardingSeen);
+  const settingsLoaded = useHydrated(useSettingsStore);
   const fontsReady = useFontsReady();
   const family = (role: keyof typeof fontFamilies) => (fontsReady ? fontFamilies[role] : undefined);
+
+  // Primeiro uso: a tela de login aparece uma vez antes da aba Temas.
+  if (!settingsLoaded) return null;
+  if (!onboardingSeen) return <Redirect href="/login" />;
 
   return (
     <Tabs

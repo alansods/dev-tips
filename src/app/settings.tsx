@@ -8,6 +8,7 @@ import { BackIcon } from '../components/icons';
 import { LANGUAGE_NAMES, LANGUAGES, useLanguage, useSettingsStore, useT } from '../i18n';
 import { RemindersSection } from '../reminders/RemindersSection';
 import { AboutSection } from '../settings/AboutSection';
+import { AccountSection } from '../settings/AccountSection';
 import { SectionTitle } from '../settings/SectionTitle';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
@@ -34,6 +35,8 @@ export default function SettingsScreen() {
         </AppText>
       </View>
       <ScrollView contentContainerStyle={styles.content}>
+        <AccountSection />
+        <View style={{ height: spacing.md }} />
         <SectionTitle>{t.settings.language}</SectionTitle>
         <View
           accessibilityRole="radiogroup"

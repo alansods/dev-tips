@@ -1,5 +1,5 @@
 // Seção "Sobre" de Ajustes: links legais (abrem no navegador) e a versão do app.
-// Os endereços ficam em app.json → extra.legal.
+// Os endereços ficam em app.json → extra.legal (ver legal.ts).
 
 import Constants from 'expo-constants';
 import { Linking, Pressable, StyleSheet, View } from 'react-native';
@@ -9,14 +9,13 @@ import { ExternalLinkIcon } from '../components/icons';
 import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
+import { legalUrls } from './legal';
 import { SectionTitle } from './SectionTitle';
-
-type Legal = { privacyUrl: string; termsUrl: string };
 
 export function AboutSection() {
   const { colors } = useTheme();
   const t = useT();
-  const legal = Constants.expoConfig?.extra?.legal as Legal | undefined;
+  const legal = legalUrls();
   const version = Constants.expoConfig?.version ?? '';
 
   const links = legal
