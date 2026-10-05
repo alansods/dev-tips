@@ -50,11 +50,19 @@ A tela da trilha SHALL mostrar um bloco "Revisão de hoje". Com cards para revis
 - **THEN** a tela da trilha mostra "Nada para revisar hoje." sem o botão "Revisar agora"
 
 ### Requirement: Revisão na Home
-O card da trilha na aba Trilhas SHALL mostrar "N para revisar hoje" quando houver cards para revisar hoje, e MUST NOT mostrar esse texto quando não houver.
+O card de cada área na aba Trilhas SHALL mostrar "N para revisar hoje", somando os cards para revisar hoje das trilhas da área, quando houver, e MUST NOT mostrar esse texto quando não houver. O card de cada trilha nas telas de área, linguagem e framework SHALL mostrar o mesmo aviso com os cards daquela trilha.
 
 #### Scenario: Aviso na Home
-- **WHEN** 2 cards da trilha estão para revisar hoje
-- **THEN** o card da trilha na Home mostra "2 para revisar hoje"
+- **WHEN** 2 cards da trilha CRUD estão para revisar hoje
+- **THEN** o card da área Backend na Home mostra "2 para revisar hoje"
+
+#### Scenario: Aviso no card da trilha
+- **WHEN** 2 cards da trilha CRUD estão para revisar hoje e o usuário abre a área Backend
+- **THEN** o card da trilha mostra "2 para revisar hoje"
+
+#### Scenario: Sem revisão
+- **WHEN** nenhum card está para revisar hoje
+- **THEN** a Home não mostra "para revisar hoje"
 
 ### Requirement: Sessão de revisão
 Tocar em "Revisar agora" SHALL abrir uma sessão em tela cheia com o título "Revisão de hoje", contendo exatamente os cards para revisar hoje daquela trilha, com a mesma mecânica da sessão de estudo (virar, "Já sabia"/"Não sabia", abas de framework, resumo e "Revisar os que errei"). Cada resposta SHALL atualizar o progresso e o agendamento.

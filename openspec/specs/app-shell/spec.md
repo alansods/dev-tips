@@ -67,21 +67,6 @@ O app SHALL acessar as trilhas empacotadas por um catálogo único. Toda trilha 
 - **WHEN** um card do catálogo omitia `tags` no `track.json`
 - **THEN** o card exposto pelo catálogo tem `tags` igual a lista vazia
 
-### Requirement: Home mínima
-A aba Trilhas SHALL listar cada trilha do catálogo, na ordem do catálogo. Cada trilha SHALL aparecer como um card tocável com o título, a descrição, uma barra de progresso e o texto "sei/total", calculados com a mesma regra de progresso da capability `study-flow`. Tocar no card SHALL abrir a tela da trilha.
-
-#### Scenario: Lista de trilhas
-- **WHEN** a aba Trilhas é exibida
-- **THEN** o título "O mesmo CRUD em quatro frameworks" aparece na lista
-
-#### Scenario: Progresso da trilha na Home
-- **WHEN** nenhum card da trilha tem resposta registrada
-- **THEN** o card da trilha mostra "0/" seguido do total de cards da trilha, e a barra está vazia
-
-#### Scenario: Tocar na trilha
-- **WHEN** o usuário toca no card da trilha
-- **THEN** a tela da trilha abre
-
 ### Requirement: Tela Ajustes
 O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um botão de engrenagem com rótulo acessível "Ajustes" ("Settings" em inglês). Tocar nele SHALL abrir a tela "Ajustes" em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL ter, nesta ordem, a seção "Conta" (quando disponível na plataforma), a seção "Idioma", com as opções de idioma e a atual marcada, a seção "Lembretes" (quando disponível na plataforma) e a seção "Sobre".
 
