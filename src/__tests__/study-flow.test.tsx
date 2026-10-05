@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
+import AreaScreen from '../app/area/[areaId]/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import { resetStudyStore, useStudyStore } from '../study/store';
@@ -17,6 +18,7 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
+  'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
 };
@@ -41,27 +43,9 @@ function answer(result: 'Já sabia' | 'Não sabia') {
 
 beforeEach(() => resetStudyStore());
 
-describe('Requirement: Home mínima', () => {
-  it('Lista de trilhas', async () => {
-    await open('/');
-    expect(screen.getByText('O mesmo CRUD em quatro frameworks')).toBeOnTheScreen();
-  });
-
-  it('Progresso da trilha na Home', async () => {
-    await open('/');
-    expect(screen.getByText(`0/${TOTAL_CARDS}`)).toBeOnTheScreen();
-  });
-
-  it('Tocar na trilha', async () => {
-    await open('/');
-    press(/^O mesmo CRUD em quatro frameworks/);
-    expect(screen).toHavePathname(`/track/${TRACK}`);
-  });
-});
-
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
-    await open('/');
+    await open('/area/backend');
     press(/^O mesmo CRUD em quatro frameworks/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
       expect(screen.getByText(name)).toBeOnTheScreen();
@@ -73,9 +57,10 @@ describe('Requirement: Tela da trilha', () => {
 
   it('Voltar para as trilhas', async () => {
     await open('/');
+    press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks/);
     press('Voltar');
-    expect(screen).toHavePathname('/');
+    expect(screen).toHavePathname('/area/backend');
   });
 
   it('trilha inexistente mostra aviso', async () => {
@@ -119,6 +104,12 @@ describe('Requirement: Sessão de estudo', () => {
     expect(screen.getByText('1 / 20')).toBeOnTheScreen();
     expect(screen.getByText('Passo 1')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: /^Trilhas, tab/ })).toBeNull();
+  });
+
+  it('mostra o nível do card na sessão', async () => {
+    await open(`/track/${TRACK}`);
+    press('Estudar Passo a passo');
+    expect(screen.getByText('Júnior')).toBeOnTheScreen(); // step-01
   });
 
   it('Sair no meio', async () => {
@@ -220,14 +211,9 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
 });
 
 describe('Requirement: Identidade da trilha (Fundamentos web)', () => {
-  it('Trilha na Home', async () => {
-    await open('/');
-    const titles = screen
-      .getAllByRole('button')
-      .map((b) => String(b.props.accessibilityLabel ?? ''))
-      .filter((l) => /^(O mesmo CRUD em quatro frameworks|Fundamentos web),/.test(l))
-      .map((l) => l.split(',')[0]);
-    expect(titles).toEqual(['O mesmo CRUD em quatro frameworks', 'Fundamentos web']);
+  it('Trilha na área Fundamentos', async () => {
+    await open('/area/fundamentos');
+    expect(screen.getByRole('button', { name: /^Fundamentos web,/ })).toBeOnTheScreen();
   });
 
   it('Sem frameworks', async () => {

@@ -28,6 +28,18 @@ export function SupplementBadge({ label }: { label: string }) {
   );
 }
 
+/** Senioridade do card (só informativo). */
+export function LevelChip({ label }: { label: string }) {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.chip, styles.outlined, { borderColor: colors.line }]}>
+      <AppText font="mono" size={11} tone="muted" style={styles.caps}>
+        {label}
+      </AppText>
+    </View>
+  );
+}
+
 /** Código em fonte mono, sem quebra de linha, com rolagem horizontal; arquivo em cima e nota embaixo. */
 export function CodeBlock({ snippet }: { snippet: Snippet }) {
   const { colors } = useTheme();

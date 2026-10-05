@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import { catalog, getTrack } from '../catalog';
-import { getGlossary, type Track } from '../index';
+import { getGlossary, placementOf, type Track } from '../index';
 
 const web = (): Track => {
   const track = getTrack('fundamentos-web');
@@ -17,6 +17,8 @@ describe('Requirement: Identidade da trilha', () => {
     expect(web().title).toBe('Fundamentos web');
     expect(web().variants).toBeUndefined();
     expect(web().compareColumns).toBeUndefined();
+    expect(web().areas).toEqual(['fundamentos']);
+    expect(placementOf(web())).toEqual({ kind: 'direct' });
   });
 });
 

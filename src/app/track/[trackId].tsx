@@ -4,8 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
-import { IconButton } from '../../components/IconButton';
-import { BackIcon } from '../../components/icons';
+import { FullScreenHeader } from '../../components/FullScreen';
 import { ProgressBar } from '../../components/ProgressBar';
 import { useCatalogTrack } from '../../content/useCatalog';
 import type { Deck, Track } from '../../content';
@@ -15,13 +14,7 @@ import { deckAction, deckStats, trackStats } from '../../study/rules';
 import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
-import { ThemeToggle } from '../../theme/ThemeToggle';
 import { radius, spacing } from '../../theme/tokens';
-
-function goBack() {
-  if (router.canGoBack()) router.back();
-  else router.replace('/');
-}
 
 export default function TrackScreen() {
   const { trackId } = useLocalSearchParams<{ trackId: string }>();
@@ -31,15 +24,7 @@ export default function TrackScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
-      <View style={styles.header}>
-        <IconButton label={t.common.back} onPress={goBack}>
-          <BackIcon color={colors.ink} />
-        </IconButton>
-        <AppText font="mono" size={11} tone="muted" style={styles.kicker}>
-          {t.track.kicker}
-        </AppText>
-        <ThemeToggle />
-      </View>
+      <FullScreenHeader kicker={t.track.kicker} />
       {track ? <TrackContent track={track} /> : <AppText style={styles.missing}>{t.common.trackNotFound}</AppText>}
     </SafeAreaView>
   );
@@ -174,14 +159,6 @@ function DeckItem({ track, deck, index }: { track: Track; deck: Deck; index: num
 }
 
 const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  kicker: { flex: 1, textTransform: 'uppercase', letterSpacing: 0.8 },
   caps: { textTransform: 'uppercase', letterSpacing: 0.8 },
   missing: { padding: spacing.lg },
   content: { padding: spacing.lg, gap: spacing.md, paddingBottom: spacing.xl * 2 },

@@ -1,15 +1,15 @@
-import { validateTrack, type ContentError, type Track } from '../index';
+import { validateTrack, type ContentError, type Taxonomy, type Track } from '../index';
 
 /** Valida e devolve os erros; falha o teste se a trilha for aceita. */
-export function errorsOf(input: unknown): ContentError[] {
-  const result = validateTrack(input);
+export function errorsOf(input: unknown, taxonomy?: Taxonomy): ContentError[] {
+  const result = validateTrack(input, taxonomy);
   if (result.ok) throw new Error('esperava que a validação rejeitasse a trilha, mas ela aceitou');
   return result.errors;
 }
 
 /** Valida e devolve a trilha; falha o teste mostrando os erros se for rejeitada. */
-export function trackOf(input: unknown): Track {
-  const result = validateTrack(input);
+export function trackOf(input: unknown, taxonomy?: Taxonomy): Track {
+  const result = validateTrack(input, taxonomy);
   if (!result.ok) {
     throw new Error('esperava trilha válida, mas houve erros:\n' + result.errors.map((e) => `${e.path}: ${e.message}`).join('\n'));
   }
@@ -17,8 +17,8 @@ export function trackOf(input: unknown): Track {
 }
 
 /** Afirma que existe um erro exatamente no `path` (e, opcionalmente, com um trecho da mensagem). */
-export function expectErrorAt(input: unknown, path: string, messagePart?: string): void {
-  const errors = errorsOf(input);
+export function expectErrorAt(input: unknown, path: string, messagePart?: string, taxonomy?: Taxonomy): void {
+  const errors = errorsOf(input, taxonomy);
   const match = errors.find((e) => e.path === path && (!messagePart || e.message.includes(messagePart)));
   if (!match) {
     throw new Error(

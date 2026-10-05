@@ -24,6 +24,7 @@ export function checkIntegrity(input: unknown): ContentError[] {
   if (!isObj(input)) return errors;
   const push: Push = (path, message) => errors.push({ path: formatPath(path), message });
 
+  checkPosition(input, push);
   checkUniqueIds(input.variants, 'variants', 'variante', push);
   checkUniqueIds(input.compareColumns, 'compareColumns', 'coluna', push);
 
@@ -56,6 +57,24 @@ export function checkIntegrity(input: unknown): ContentError[] {
   });
 
   return errors;
+}
+
+/** Áreas sem repetição e combinações de posição que não dependem do cadastro. */
+function checkPosition(input: Obj, push: Push) {
+  const areas = new Set<string>();
+  list(input.areas).forEach((area) => {
+    if (typeof area !== 'string') return;
+    if (areas.has(area)) push(['areas'], `área repetida: ${area}`);
+    areas.add(area);
+  });
+
+  const hasLanguage = input.language !== undefined;
+  const hasFramework = input.framework !== undefined;
+  if (input.variants !== undefined && (hasLanguage || hasFramework)) {
+    push([hasLanguage ? 'language' : 'framework'], 'trilhas comparativas (com variants) não têm linguagem nem framework');
+  } else if (hasFramework && !hasLanguage) {
+    push(['language'], 'uma trilha com framework precisa declarar a linguagem');
+  }
 }
 
 function checkUniqueIds(value: unknown, key: string, label: string, push: Push) {

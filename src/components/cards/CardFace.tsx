@@ -17,7 +17,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
 import { TermChips } from '../../glossary/TermChips';
-import { CodeBlock, SupplementBadge, TypeChip, VariantTabs } from './parts';
+import { CodeBlock, LevelChip, SupplementBadge, TypeChip, VariantTabs } from './parts';
 
 export type Side = 'front' | 'back';
 
@@ -39,6 +39,7 @@ export function CardFace({ card, track, side, variantId, onSelectVariant, onOpen
     <View style={styles.face}>
       <View style={styles.chips}>
         <TypeChip label={label} />
+        <LevelChip label={t.card.levels[card.level]} />
         {card.origin === 'supplement' && <SupplementBadge label={t.card.supplement} />}
       </View>
       <Body card={card} track={track} side={side} variantId={variantId} onSelectVariant={onSelectVariant} />

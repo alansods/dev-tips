@@ -14,6 +14,12 @@ context: |
   Conteúdo: separado do código em content/tracks/<track-id>/track.json,
   validado pelo schema Zod da capability content-model. Chaves em inglês,
   textos exibidos em PT-BR.
+  Organização (2026-10-05, changes rename-theme-to-track e
+  add-content-taxonomy): o conjunto de decks se chama "trilha" (track).
+  Trilhas ficam em áreas (Fundamentos, Frontend, Backend) e, opcionalmente,
+  numa linguagem e num framework do cadastro content/taxonomy.json; trilhas
+  com variants são "Comparativos". Todo card tem nível (junior, pleno,
+  senior), exibido como chip informativo.
 
   Decisões de produto (2026-10-01):
   - Idioma: somente PT-BR (sem i18n no MVP). Revisto em 2026-10-02

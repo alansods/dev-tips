@@ -2,6 +2,9 @@
   "id": "crud-4-frameworks",
   "title": "O mesmo CRUD em quatro frameworks",
   "description": "Vamos construir um CRUD completo de produtos (criar, listar, buscar, atualizar e apagar) e ver, etapa por etapa, como cada framework resolve a mesma coisa.",
+  "areas": [
+    "backend"
+  ],
   "variants": [
     {
       "id": "express",
@@ -55,6 +58,7 @@
         {
           "type": "endpoint",
           "id": "endpoint-create",
+          "level": "junior",
           "method": "POST",
           "path": "/products",
           "operation": "C",
@@ -74,6 +78,7 @@
         {
           "type": "endpoint",
           "id": "endpoint-list",
+          "level": "junior",
           "method": "GET",
           "path": "/products",
           "operation": "R",
@@ -92,6 +97,7 @@
         {
           "type": "endpoint",
           "id": "endpoint-get",
+          "level": "junior",
           "method": "GET",
           "path": "/products/{id}",
           "operation": "R",
@@ -109,6 +115,7 @@
         {
           "type": "endpoint",
           "id": "endpoint-update",
+          "level": "junior",
           "method": "PUT",
           "path": "/products/{id}",
           "operation": "U",
@@ -128,6 +135,7 @@
         {
           "type": "endpoint",
           "id": "endpoint-delete",
+          "level": "junior",
           "method": "DELETE",
           "path": "/products/{id}",
           "operation": "D",
@@ -152,6 +160,7 @@
         {
           "type": "step",
           "id": "step-01",
+          "level": "junior",
           "number": 1,
           "title": "Criar o projeto",
           "whatIs": "Criar a pasta do projeto com a estrutura inicial.",
@@ -190,6 +199,7 @@
         {
           "type": "step",
           "id": "step-02",
+          "level": "junior",
           "number": 2,
           "title": "Instalar as bibliotecas",
           "whatIs": "Baixar as bibliotecas que o projeto usa: o framework, o driver do PostgreSQL e a ferramenta de validação.",
@@ -229,6 +239,7 @@
         {
           "type": "step",
           "id": "step-03",
+          "level": "junior",
           "number": 3,
           "title": "Subir o banco e conectar",
           "whatIs": "Ligar o PostgreSQL com Docker (o mesmo docker-compose.yml serve para os quatro) e dizer à API onde o banco está.",
@@ -268,6 +279,7 @@
         {
           "type": "code",
           "id": "docker-compose",
+          "level": "junior",
           "origin": "supplement",
           "title": "docker-compose.yml",
           "body": "O Passo 3 diz que o mesmo docker-compose.yml serve para os quatro frameworks, mas não mostra o arquivo. Ele sobe o PostgreSQL usado por todas as versões.",
@@ -285,6 +297,7 @@
         {
           "type": "step",
           "id": "step-04",
+          "level": "junior",
           "number": 4,
           "title": "Definir a tabela de produtos",
           "whatIs": "Descrever as colunas da tabela: id, nome, descrição, preço, estoque e data de criação.",
@@ -324,6 +337,7 @@
         {
           "type": "step",
           "id": "step-05",
+          "level": "pleno",
           "number": 5,
           "title": "Definir e validar os dados de entrada",
           "whatIs": "Dizer como deve ser o JSON que o frontend envia (o DTO) e quais regras ele precisa cumprir.",
@@ -363,6 +377,7 @@
         {
           "type": "step",
           "id": "step-06",
+          "level": "pleno",
           "number": 6,
           "title": "Montar a estrutura em camadas",
           "whatIs": "Criar os três arquivos que todo CRUD vai usar e ligá-los entre si: Repository (fala com o banco), Service (regras) e Controller (recebe o pedido e responde).",
@@ -404,6 +419,7 @@
         {
           "type": "step",
           "id": "step-07",
+          "level": "junior",
           "number": 7,
           "title": "C: Criar produto",
           "whatIs": "POST /products com o produto no corpo. Responde 201 Created com o produto salvo (já com id).",
@@ -444,6 +460,7 @@
         {
           "type": "code",
           "id": "express-to-product",
+          "level": "pleno",
           "origin": "supplement",
           "variant": "express",
           "title": "ProductRow e toProduct",
@@ -462,6 +479,7 @@
         {
           "type": "step",
           "id": "step-08",
+          "level": "junior",
           "number": 8,
           "title": "R: Listar produtos",
           "whatIs": "GET /products?page=0&size=10. Responde 200 com uma página de produtos.",
@@ -500,6 +518,7 @@
         {
           "type": "code",
           "id": "express-query-schemas",
+          "level": "pleno",
           "origin": "supplement",
           "variant": "express",
           "title": "pageQuerySchema e idParamSchema",
@@ -518,6 +537,7 @@
         {
           "type": "step",
           "id": "step-09",
+          "level": "junior",
           "number": 9,
           "title": "R: Buscar um produto",
           "whatIs": "GET /products/1. Responde 200 com o produto, ou 404 se ele não existir.",
@@ -557,6 +577,7 @@
         {
           "type": "step",
           "id": "step-10",
+          "level": "junior",
           "number": 10,
           "title": "U: Atualizar produto",
           "whatIs": "PUT /products/1 com o produto completo no corpo. Responde 200 com o produto atualizado, ou 404.",
@@ -595,6 +616,7 @@
         {
           "type": "step",
           "id": "step-11",
+          "level": "junior",
           "number": 11,
           "title": "D: Apagar produto",
           "whatIs": "DELETE /products/1. Responde 204 No Content (deu certo, sem corpo), ou 404.",
@@ -633,6 +655,7 @@
         {
           "type": "step",
           "id": "step-12",
+          "level": "pleno",
           "number": 12,
           "title": "Tratar erros em um lugar só",
           "whatIs": "Um ponto central que transforma erros em respostas: \"não encontrado\" vira 404, dados inválidos viram 400.",
@@ -672,6 +695,7 @@
         {
           "type": "step",
           "id": "step-13",
+          "level": "pleno",
           "number": 13,
           "title": "Liberar o frontend (CORS)",
           "whatIs": "Autorizar o endereço do seu frontend (ex.: localhost:5173) a chamar a API.",
@@ -710,6 +734,7 @@
         {
           "type": "step",
           "id": "step-14",
+          "level": "junior",
           "number": 14,
           "title": "Rodar a API",
           "whatIs": "O comando para ligar a API em modo de desenvolvimento, que reinicia sozinha quando você salva um arquivo.",
@@ -748,6 +773,7 @@
         {
           "type": "code",
           "id": "express-server",
+          "level": "junior",
           "origin": "supplement",
           "variant": "express",
           "title": "server.ts",
@@ -766,6 +792,7 @@
         {
           "type": "step",
           "id": "step-15",
+          "level": "junior",
           "number": 15,
           "title": "Testar o CRUD na mão",
           "whatIs": "Chamar cada operação do CRUD pelo terminal com curl, na ordem: criar, listar, buscar, atualizar e apagar.",
@@ -806,6 +833,7 @@
         {
           "type": "step",
           "id": "step-16",
+          "level": "pleno",
           "number": 16,
           "title": "Testar automaticamente",
           "whatIs": "Um teste que chama a API e confere a resposta. Exemplo: pedir um produto que não existe deve dar 404.",
@@ -852,6 +880,7 @@
         {
           "type": "compare",
           "id": "cmp-ponto-de-entrada",
+          "level": "junior",
           "concept": "Ponto de entrada",
           "explanation": "O arquivo que liga tudo quando o programa começa.",
           "values": {
@@ -865,6 +894,7 @@
         {
           "type": "compare",
           "id": "cmp-rotas-endpoints",
+          "level": "junior",
           "concept": "Rotas / endpoints",
           "explanation": "Os endereços que o frontend chama.",
           "values": {
@@ -878,6 +908,7 @@
         {
           "type": "compare",
           "id": "cmp-regras-de-negocio",
+          "level": "pleno",
           "concept": "Regras de negócio",
           "explanation": "Onde ficam as decisões (\"se não existe, é erro\").",
           "values": {
@@ -891,6 +922,7 @@
         {
           "type": "compare",
           "id": "cmp-acesso-ao-banco",
+          "level": "pleno",
           "concept": "Acesso ao banco",
           "explanation": "A parte que busca e salva dados.",
           "values": {
@@ -904,6 +936,7 @@
         {
           "type": "compare",
           "id": "cmp-tabela-modelo-de-dados",
+          "level": "junior",
           "concept": "Tabela / modelo de dados",
           "explanation": "Como a tabela do banco aparece no código.",
           "values": {
@@ -917,6 +950,7 @@
         {
           "type": "compare",
           "id": "cmp-dto",
+          "level": "pleno",
           "concept": "DTO",
           "explanation": "O formato dos dados que entram e saem da API.",
           "values": {
@@ -930,6 +964,7 @@
         {
           "type": "compare",
           "id": "cmp-validacao",
+          "level": "pleno",
           "concept": "Validação",
           "explanation": "Checar se os dados recebidos são válidos.",
           "values": {
@@ -943,6 +978,7 @@
         {
           "type": "compare",
           "id": "cmp-injecao-de-dependencia",
+          "level": "pleno",
           "concept": "Injeção de dependência",
           "explanation": "O framework entrega pronto aquilo que a classe precisa.",
           "values": {
@@ -956,6 +992,7 @@
         {
           "type": "compare",
           "id": "cmp-erros-globais",
+          "level": "pleno",
           "concept": "Erros globais",
           "explanation": "Um lugar só que transforma erros em respostas.",
           "values": {
@@ -969,6 +1006,7 @@
         {
           "type": "compare",
           "id": "cmp-cors",
+          "level": "pleno",
           "concept": "CORS",
           "explanation": "Permitir que o frontend chame a API.",
           "values": {
@@ -982,6 +1020,7 @@
         {
           "type": "compare",
           "id": "cmp-configuracao",
+          "level": "junior",
           "concept": "Configuração",
           "explanation": "Onde ficam endereço do banco, senhas e portas.",
           "values": {
@@ -995,6 +1034,7 @@
         {
           "type": "compare",
           "id": "cmp-dependencias",
+          "level": "junior",
           "concept": "Dependências",
           "explanation": "A lista de bibliotecas do projeto e quem instala.",
           "values": {
@@ -1008,6 +1048,7 @@
         {
           "type": "compare",
           "id": "cmp-gerador-de-projeto",
+          "level": "junior",
           "concept": "Gerador de projeto",
           "explanation": "Ferramenta que cria a estrutura inicial.",
           "values": {
@@ -1021,6 +1062,7 @@
         {
           "type": "compare",
           "id": "cmp-rodar-em-dev",
+          "level": "junior",
           "concept": "Rodar em dev",
           "explanation": "Comando para ligar enquanto programa.",
           "values": {
@@ -1034,6 +1076,7 @@
         {
           "type": "compare",
           "id": "cmp-testes",
+          "level": "pleno",
           "concept": "Testes",
           "explanation": "Ferramentas para testar automaticamente.",
           "values": {
@@ -1047,6 +1090,7 @@
         {
           "type": "compare",
           "id": "cmp-documentacao-da-api",
+          "level": "pleno",
           "concept": "Documentação da API",
           "explanation": "Página que lista e deixa testar os endpoints.",
           "values": {
@@ -1067,6 +1111,7 @@
         {
           "type": "concept",
           "id": "api",
+          "level": "junior",
           "term": "API",
           "definition": "Um programa que fica rodando num servidor esperando pedidos. O frontend pede (\"me dá o produto 1\") e a API responde com dados, geralmente em JSON.",
           "relatedTerms": [
@@ -1077,6 +1122,7 @@
         {
           "type": "concept",
           "id": "crud",
+          "level": "junior",
           "term": "CRUD",
           "definition": "Sigla para as quatro operações básicas: Create (criar), Read (ler), Update (atualizar) e Delete (apagar).",
           "relatedTerms": [
@@ -1086,6 +1132,7 @@
         {
           "type": "concept",
           "id": "endpoint",
+          "level": "junior",
           "term": "Endpoint (rota)",
           "definition": "Um endereço da API, formado por método + caminho. Ex.: GET /products/1. É a URL que o seu fetch chama.",
           "relatedTerms": [
@@ -1096,12 +1143,14 @@
         {
           "type": "concept",
           "id": "framework",
+          "level": "junior",
           "term": "Framework",
           "definition": "Um conjunto de ferramentas prontas que dá a estrutura do projeto. Express, Spring Boot, NestJS e FastAPI são frameworks para criar APIs."
         },
         {
           "type": "concept",
           "id": "requisicao-e-resposta",
+          "level": "junior",
           "term": "Requisição e resposta",
           "definition": "Requisição é o pedido que chega na API (método, URL, corpo). Resposta é o que a API devolve (status e dados).",
           "relatedTerms": [
@@ -1112,6 +1161,7 @@
         {
           "type": "concept",
           "id": "status-http",
+          "level": "junior",
           "term": "Status HTTP",
           "definition": "Número que diz como foi a resposta. 200 deu certo, 201 criado, 204 deu certo sem conteúdo, 400 dados errados, 404 não encontrado, 500 erro no servidor.",
           "relatedTerms": [
@@ -1121,6 +1171,7 @@
         {
           "type": "concept",
           "id": "json",
+          "level": "junior",
           "term": "JSON",
           "definition": "O formato de texto usado para enviar dados entre frontend e API. É o mesmo formato de objeto que você já usa em JavaScript.",
           "relatedTerms": [
@@ -1130,6 +1181,7 @@
         {
           "type": "concept",
           "id": "sql",
+          "level": "junior",
           "term": "SQL",
           "definition": "A linguagem usada para falar com o banco de dados. Ex.: SELECT * FROM products WHERE id = 1.",
           "relatedTerms": [
@@ -1139,6 +1191,7 @@
         {
           "type": "concept",
           "id": "orm",
+          "level": "junior",
           "term": "ORM",
           "definition": "Uma biblioteca que escreve o SQL por você. Você mexe com classes e objetos e ela traduz para comandos do banco. Exemplos: JPA/Hibernate (Java), TypeORM (Nest), SQLAlchemy (Python).",
           "relatedTerms": [
@@ -1149,6 +1202,7 @@
         {
           "type": "concept",
           "id": "entidade",
+          "level": "junior",
           "term": "Entidade (model)",
           "definition": "A representação de uma tabela do banco no código. A classe Product com id, name, price vira a tabela products.",
           "relatedTerms": [
@@ -1159,6 +1213,7 @@
         {
           "type": "concept",
           "id": "dto",
+          "level": "pleno",
           "term": "DTO (Data Transfer Object)",
           "definition": "O formato dos dados que entram ou saem da API. Ex.: para criar um produto, o frontend manda só name, description, price e stock; o id e a data quem gera é o banco. Esse \"molde\" de entrada é o DTO. É como os types de request e response que você cria no frontend.",
           "relatedTerms": [
@@ -1169,6 +1224,7 @@
         {
           "type": "concept",
           "id": "validacao",
+          "level": "junior",
           "term": "Validação",
           "definition": "Checar se os dados recebidos fazem sentido antes de salvar. Ex.: preço precisa ser maior que zero. Se não passar, a API responde 400.",
           "relatedTerms": [
@@ -1179,6 +1235,7 @@
         {
           "type": "concept",
           "id": "controller",
+          "level": "junior",
           "term": "Controller",
           "definition": "A parte do código que recebe a requisição, chama quem faz o trabalho e devolve a resposta. É a \"porta de entrada\" de cada rota.",
           "relatedTerms": [
@@ -1189,6 +1246,7 @@
         {
           "type": "concept",
           "id": "service",
+          "level": "pleno",
           "term": "Service",
           "definition": "A parte com as regras de negócio. Ex.: \"se o produto não existe, isso é um erro\". Não sabe nada de HTTP nem de SQL.",
           "relatedTerms": [
@@ -1199,6 +1257,7 @@
         {
           "type": "concept",
           "id": "repository",
+          "level": "pleno",
           "term": "Repository",
           "definition": "A única parte que conversa com o banco de dados. Busca, salva, atualiza e apaga.",
           "relatedTerms": [
@@ -1209,6 +1268,7 @@
         {
           "type": "concept",
           "id": "injecao-de-dependencia",
+          "level": "pleno",
           "term": "Injeção de dependência",
           "definition": "Em vez de uma classe criar o que precisa (new ProductService()), o framework cria e entrega pronto no construtor. Parecido com receber algo por props ou Context no React.",
           "relatedTerms": [
@@ -1219,6 +1279,7 @@
         {
           "type": "concept",
           "id": "decorator-anotacao",
+          "level": "pleno",
           "term": "Decorator / anotação",
           "definition": "Aquelas marcações com @ em cima de classes e métodos, como @Controller ou @GetMapping. Elas dizem ao framework o que aquela classe ou método é.",
           "relatedTerms": [
@@ -1228,6 +1289,7 @@
         {
           "type": "concept",
           "id": "middleware",
+          "level": "pleno",
           "term": "Middleware",
           "definition": "Uma função que roda no meio do caminho, antes de a requisição chegar na rota (ou depois de dar erro). Ex.: transformar o texto do corpo em objeto.",
           "relatedTerms": [
@@ -1237,6 +1299,7 @@
         {
           "type": "concept",
           "id": "cors",
+          "level": "pleno",
           "term": "CORS",
           "definition": "Regra de segurança do navegador. Se o frontend está em localhost:5173 e a API em localhost:8080, a API precisa dizer explicitamente que aceita pedidos dessa origem.",
           "relatedTerms": [
@@ -1246,6 +1309,7 @@
         {
           "type": "concept",
           "id": "variavel-de-ambiente",
+          "level": "junior",
           "term": "Variável de ambiente",
           "definition": "Configuração que fica fora do código, num arquivo .env ou no servidor. Ex.: o endereço do banco. Assim você não escreve senha no código.",
           "relatedTerms": [
@@ -1255,6 +1319,7 @@
         {
           "type": "concept",
           "id": "pool-de-conexoes",
+          "level": "senior",
           "term": "Pool de conexões",
           "definition": "Um grupo de conexões com o banco abertas e reaproveitadas. Abrir uma conexão nova a cada pedido seria lento.",
           "relatedTerms": [
@@ -1264,6 +1329,7 @@
         {
           "type": "concept",
           "id": "docker",
+          "level": "junior",
           "term": "Docker",
           "definition": "Ferramenta que roda programas (como o PostgreSQL) em \"caixinhas\" isoladas, sem precisar instalar direto no seu computador.",
           "relatedTerms": [
@@ -1273,6 +1339,7 @@
         {
           "type": "concept",
           "id": "mock",
+          "level": "pleno",
           "term": "Mock",
           "definition": "Uma versão falsa de uma parte do código usada em testes. Ex.: fingir que o service respondeu \"não encontrado\" sem precisar de banco.",
           "relatedTerms": [
@@ -1282,6 +1349,7 @@
         {
           "type": "concept",
           "id": "venv",
+          "level": "junior",
           "term": "venv (Python)",
           "definition": "Uma pasta isolada com as bibliotecas do projeto Python. Faz o papel que a node_modules faz no Node.",
           "relatedTerms": [
@@ -1298,6 +1366,7 @@
         {
           "type": "question",
           "id": "put-vs-patch",
+          "level": "junior",
           "origin": "supplement",
           "question": "Qual a diferença entre PUT e PATCH?",
           "answer": "PUT substitui o recurso inteiro: o corpo traz o produto completo, como no Passo 10, e o que não vier é perdido ou volta ao padrão. PATCH faz uma alteração parcial: o corpo traz só os campos que mudam. PUT é idempotente por definição; PATCH pode ou não ser, dependendo de como a API o implementa.",
@@ -1314,6 +1383,7 @@
         {
           "type": "question",
           "id": "idempotencia",
+          "level": "pleno",
           "origin": "supplement",
           "question": "O que é um endpoint idempotente? Quais operações do CRUD são?",
           "answer": "Idempotente é o que deixa o servidor no mesmo estado, seja chamado uma ou várias vezes. GET, PUT e DELETE são idempotentes: buscar de novo não muda nada, gravar o mesmo produto completo de novo dá o mesmo resultado e apagar o que já foi apagado continua apagado (a segunda chamada responde 404, mas o estado é o mesmo). POST não é: cada chamada cria um produto novo. Isso importa para repetir um pedido com segurança quando a rede falha.",
@@ -1326,6 +1396,7 @@
         {
           "type": "question",
           "id": "paginacao-offset-cursor",
+          "level": "senior",
           "origin": "supplement",
           "question": "Paginação por offset ou por cursor: qual a diferença?",
           "answer": "Offset (LIMIT/OFFSET, usado no Passo 8) pula N linhas. É simples e permite ir direto para a página 5, mas fica lento em tabelas grandes, porque o banco lê e descarta as linhas puladas, e pode repetir ou pular itens se alguém inserir ou apagar no meio. Cursor usa o último item visto (\"os produtos com id maior que 120\"): é rápido com índice e estável com inserções, mas não permite pular para uma página específica.",
@@ -1342,6 +1413,7 @@
         {
           "type": "question",
           "id": "problema-n-mais-1",
+          "level": "pleno",
           "origin": "supplement",
           "question": "O que é o problema N+1?",
           "answer": "Acontece quando o código faz 1 consulta para buscar uma lista e depois mais 1 consulta para cada item, para trazer dados relacionados: 100 produtos e suas categorias viram 101 consultas. É comum com ORM, que carrega relacionamentos sob demanda sem você perceber. A solução é buscar tudo de uma vez, com JOIN ou com o carregamento antecipado do ORM: JOIN FETCH no JPA, relations no TypeORM, selectinload ou joinedload no SQLAlchemy.",
@@ -1354,6 +1426,7 @@
         {
           "type": "question",
           "id": "transacoes",
+          "level": "senior",
           "origin": "supplement",
           "question": "O que é uma transação e quando usar?",
           "answer": "É um grupo de operações no banco que acontece por inteiro ou não acontece: se uma falhar, todas são desfeitas (rollback). Use quando várias gravações precisam ficar consistentes juntas, como baixar o estoque e registrar o pedido. Nos frameworks do tema: @Transactional no Spring, dataSource.transaction no TypeORM, commit e rollback na Session do SQLAlchemy (o Passo 7 já usa db.commit()) e BEGIN/COMMIT com o pg no Express.",
@@ -1371,6 +1444,7 @@
         {
           "type": "question",
           "id": "autenticacao-jwt",
+          "level": "pleno",
           "origin": "supplement",
           "question": "Como funciona a autenticação com JWT? Qual a diferença entre 401 e 403?",
           "answer": "Depois do login, a API devolve um token assinado (JWT) com dados como o id do usuário e a validade. O frontend manda esse token em cada pedido, no cabeçalho Authorization. A API confere a assinatura e a validade sem consultar o banco. O conteúdo do token só é codificado, não criptografado: ele não pode guardar segredos e precisa expirar. Sem token válido, a resposta é 401 (não autenticado); com token, mas sem permissão para aquela ação, é 403 (proibido).",
@@ -1388,6 +1462,7 @@
         {
           "type": "question",
           "id": "migrations",
+          "level": "pleno",
           "origin": "supplement",
           "question": "Por que usar migrations em vez de synchronize ou ddl-auto?",
           "answer": "O synchronize: true (NestJS) e o ddl-auto=update (Spring), do Passo 3, alteram a tabela sozinhos ao subir a API. São ótimos em desenvolvimento e perigosos em produção: podem apagar colunas ou dados e não deixam histórico. Migrations são arquivos versionados com cada mudança no banco (criar tabela, adicionar coluna), aplicados em ordem e revisados como código. Ferramentas: Flyway ou Liquibase no Spring, migrations do TypeORM no NestJS, Alembic no FastAPI e node-pg-migrate ou Knex no Express.",
@@ -1400,6 +1475,7 @@
         {
           "type": "question",
           "id": "sql-injection",
+          "level": "junior",
           "origin": "supplement",
           "question": "Por que usar $1 em vez de montar o SQL concatenando texto?",
           "answer": "Concatenar no SQL o que veio do usuário abre espaço para SQL injection: alguém envia um texto que vira comando, por exemplo para apagar a tabela. Com parâmetros ($1, $2 no pg, como no Passo 9), o valor vai separado do comando e o banco nunca o executa como SQL. Os ORMs (JPA, TypeORM, SQLAlchemy) já fazem isso automaticamente.",

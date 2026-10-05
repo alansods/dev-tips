@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
+import AreaScreen from '../app/area/[areaId]/index';
 import AccountScreen from '../app/account';
 import SettingsScreen from '../app/settings';
 import TrackScreen from '../app/track/[trackId]';
@@ -24,6 +25,7 @@ const APP = {
   '(tabs)/progress': ProgressScreen,
   settings: SettingsScreen,
   account: AccountScreen,
+  'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
 };
 const ana = { id: 'u1', name: 'Ana Souza', email: 'ana@example.com', photoUrl: null };
@@ -61,9 +63,9 @@ describe('Requirement: Aviso de offline', () => {
     await act(async () => network.__setNetworkState(false));
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
     // os cards continuam abrindo normalmente
-    fireEvent.press(screen.getByRole('button', { name: /^O mesmo CRUD/ }));
+    fireEvent.press(screen.getByRole('button', { name: /^Backend,/ }));
     await flush();
-    expect(screen).toHavePathname('/track/crud-4-frameworks');
+    expect(screen).toHavePathname('/area/backend');
   });
 
   it('Reconectar', async () => {

@@ -8,6 +8,7 @@ import { useSettingsStore, type Language } from './i18n';
 import { ThemeProvider } from './theme/ThemeProvider';
 
 export const crudTrack: Track = getTrack('crud-4-frameworks')!;
+export const webTrack: Track = getTrack('fundamentos-web')!;
 
 export function cardById(id: string, track: Track = crudTrack): Card {
   const card = track.decks.flatMap((d) => d.cards).find((c) => c.id === id);
