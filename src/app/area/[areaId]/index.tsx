@@ -20,7 +20,11 @@ export default function AreaScreen() {
     sections.direct.length + sections.grouped.length + sections.languages.length + sections.comparisons.length > 0;
 
   return (
-    <FullScreen kicker={t.nav.areaKicker} title={found && area ? t.nav.areas[area] : undefined} missing={t.nav.areaNotFound}>
+    <FullScreen
+      kicker={t.nav.areaKicker}
+      title={found && area ? t.nav.areas[area] : undefined}
+      missing={t.nav.areaNotFound}
+    >
       {sections ? (
         <>
           <Section title={t.nav.sections.tracks}>

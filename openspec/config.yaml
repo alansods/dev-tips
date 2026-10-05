@@ -36,9 +36,9 @@ context: |
     docs/backend/alternativa-nestjs-render-monorepo.md.
   - Lacunas do material de origem são completadas com cards marcados
     como "complemento" (origin: "supplement"), distintos do original.
-  - Próximos trilhas previstos: Fundamentos web, Banco de dados,
-    Frontend/React, System design. O schema deve ser genérico: nem todo
-    trilha compara frameworks (frameworks/colunas definidos por trilha).
+  - Próxima trilha prevista: System design. O schema deve ser genérico:
+    nem toda trilha compara frameworks (frameworks/colunas definidos por
+    trilha).
   - Projeto Expo criado já na change add-content-model; a change de
     scaffold depois só adiciona rotas, tema claro/escuro e Prettier.
 

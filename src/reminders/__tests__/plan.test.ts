@@ -7,7 +7,11 @@ import type { Schedule } from '../../study/srs';
 import { planReminders, reminderTarget } from '../plan';
 
 const [crud, web] = catalog as Track[];
-const ids = (track: Track, n: number) => track.decks.flatMap((d) => d.cards).slice(0, n).map((c) => c.id);
+const ids = (track: Track, n: number) =>
+  track.decks
+    .flatMap((d) => d.cards)
+    .slice(0, n)
+    .map((c) => c.id);
 
 /** Agenda `n` cards da trilha para `due`. */
 function due(track: Track, n: number, day: string, schedule: Schedule = {}): Schedule {

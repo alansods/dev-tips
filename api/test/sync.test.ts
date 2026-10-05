@@ -33,17 +33,15 @@ let clock = BASE;
 const sync = await testApp({ now: () => clock });
 
 const put = (token: string, body: unknown) =>
-  sync
-    .app()
-    .request(
-      '/sync',
-      {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(body),
-      },
-      env,
-    );
+  sync.app().request(
+    '/sync',
+    {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(body),
+    },
+    env,
+  );
 const get = async (token: string, since?: number) => {
   const res = await sync
     .app()

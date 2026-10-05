@@ -44,7 +44,9 @@ function TrackProgress({ track }: { track: Track }) {
           <AppText font="semibold" size={16} accessibilityRole="header">
             {track.title}
           </AppText>
-          <AppText size={13} tone="muted">{t.progress.mastered(stats.known, stats.total)}</AppText>
+          <AppText size={13} tone="muted">
+            {t.progress.mastered(stats.known, stats.total)}
+          </AppText>
         </View>
       </View>
 

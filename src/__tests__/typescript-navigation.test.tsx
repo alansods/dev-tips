@@ -57,7 +57,12 @@ describe('Requirement: Trilhas de TypeScript no catálogo', () => {
 
   it('TypeScript no Backend', async () => {
     await open('/area/backend/javascript');
-    expect(buttons([...JS_CORE, ...TS_CORE])).toEqual(['JavaScript essencial', 'JavaScript assíncrono', 'Node.js', ...TS_CORE]);
+    expect(buttons([...JS_CORE, ...TS_CORE])).toEqual([
+      'JavaScript essencial',
+      'JavaScript assíncrono',
+      'Node.js',
+      ...TS_CORE,
+    ]);
     expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
   });
 

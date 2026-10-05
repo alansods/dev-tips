@@ -1,12 +1,73 @@
-:root { color-scheme: light dark; --bg: #f3f4f7; --surface: #ffffff; --ink: #121722; --muted: #596172; --line: #dcdfe6; --accent: #2440c8; }
-@media (prefers-color-scheme: dark) { :root { --bg: #0c1015; --surface: #151b23; --ink: #e7ecf2; --muted: #9ba6b4; --line: #273140; --accent: #a9b6ff; } }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
-main { max-width: 720px; margin: 0 auto; padding: 40px 16px 64px; }
-.marca { margin: 0; font: 600 13px/1 ui-monospace, "JetBrains Mono", monospace; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-h1 { margin: 8px 0 4px; font-size: 32px; line-height: 1.2; }
-h2 { margin: 32px 0 8px; font-size: 20px; }
-.data { margin: 0 0 24px; color: var(--muted); font-size: 14px; }
-a { color: var(--accent); }
-ul { padding-left: 20px; }
-li { margin: 4px 0; }
-.rodape { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px; }
+:root {
+  color-scheme: light dark;
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --ink: #121722;
+  --muted: #596172;
+  --line: #dcdfe6;
+  --accent: #2440c8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c1015;
+    --surface: #151b23;
+    --ink: #e7ecf2;
+    --muted: #9ba6b4;
+    --line: #273140;
+    --accent: #a9b6ff;
+  }
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font:
+    16px/1.6 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+}
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 40px 16px 64px;
+}
+.marca {
+  margin: 0;
+  font:
+    600 13px/1 ui-monospace,
+    'JetBrains Mono',
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1 {
+  margin: 8px 0 4px;
+  font-size: 32px;
+  line-height: 1.2;
+}
+h2 {
+  margin: 32px 0 8px;
+  font-size: 20px;
+}
+.data {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 14px;
+}
+a {
+  color: var(--accent);
+}
+ul {
+  padding-left: 20px;
+}
+li {
+  margin: 4px 0;
+}
+.rodape {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
