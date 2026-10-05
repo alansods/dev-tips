@@ -20,6 +20,9 @@ import typescriptEssencial from '../../content/tracks/typescript-essencial/track
 import typescriptAvancado from '../../content/tracks/typescript-avancado/track.json';
 import angular from '../../content/tracks/angular/track.json';
 import nestjs from '../../content/tracks/nestjs/track.json';
+import javaEssencial from '../../content/tracks/java-essencial/track.json';
+import javaColecoesEConcorrencia from '../../content/tracks/java-colecoes-e-concorrencia/track.json';
+import springBoot from '../../content/tracks/spring-boot/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -40,6 +43,9 @@ const registry: unknown[] = [
   typescriptAvancado,
   angular,
   nestjs,
+  javaEssencial,
+  javaColecoesEConcorrencia,
+  springBoot,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

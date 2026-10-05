@@ -1,0 +1,120 @@
+{
+  "title": "Java essentials",
+  "description": "The Java basics: the JVM, types, object orientation, exceptions and equality.",
+  "decks": {
+    "jvm-e-tipos": {
+      "title": "JVM and types",
+      "description": "How Java runs and how it stores values."
+    },
+    "orientacao-a-objetos": {
+      "title": "Object orientation",
+      "description": "Classes, interfaces, inheritance and records."
+    },
+    "excecoes-e-igualdade": {
+      "title": "Exceptions and equality",
+      "description": "Error handling, equals, hashCode and immutability."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Java questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "jvm": {
+      "term": "JVM",
+      "definition": "Java Virtual Machine: runs the bytecode (.class) produced by the javac compiler. It is what makes \"write once, run anywhere\" possible. It includes the JIT compiler, which turns the most executed paths into native code, and the garbage collector."
+    },
+    "primitivos-e-wrappers": {
+      "term": "Primitives and wrappers",
+      "definition": "Java has 8 primitive types (int, long, double, boolean, char, byte, short, float), stored directly as values, and their matching wrapper classes (Integer, Long...), which are objects and can be null. Collections only accept objects, so autoboxing converts between the two."
+    },
+    "heap-e-stack": {
+      "term": "Heap and stack",
+      "definition": "Each thread has its own stack, with local variables and method calls; objects live on the shared heap. An object variable on the stack only holds the reference. StackOverflowError comes from recursion that is too deep; OutOfMemoryError, from a full heap."
+    },
+    "garbage-collector": {
+      "term": "Garbage collector",
+      "definition": "Automatically frees objects that are no longer reachable. It splits the heap into generations, because most objects die young. The current default is G1; ZGC and Shenandoah have millisecond pauses for large heaps. A leak in Java is a forgotten reference, such as a static cache that only grows."
+    },
+    "autoboxing-armadilha": {
+      "title": "Autoboxing pitfalls",
+      "body": "Wrappers compared with == compare references: it works between -128 and 127 because of the cache, and fails outside that range. Unboxing null throws a NullPointerException."
+    },
+    "var-e-text-blocks": {
+      "title": "var, text blocks and modern switch",
+      "body": "var infers the type of local variables (Java 10), text blocks write multi-line strings (Java 15) and the switch expression returns a value without break (Java 14)."
+    },
+    "encapsulamento": {
+      "term": "Encapsulation",
+      "definition": "Hiding an object's internal state (private fields) and exposing only operations that keep the object valid. Instead of setBalance, a withdraw method that checks the limit. The modifiers are private, (package), protected and public."
+    },
+    "interface-java": {
+      "term": "Interface",
+      "definition": "A contract that says what a class does without saying how. A class can implement several interfaces. Since Java 8, interfaces can have default methods (with an implementation) and static methods. It is the basis of polymorphism and dependency injection."
+    },
+    "heranca": {
+      "term": "Inheritance and abstract class",
+      "definition": "A class extends another (only one) with extends, inheriting fields and methods. An abstract class cannot be instantiated and can have abstract methods, implemented by subclasses. Inheritance creates strong coupling: prefer composition when the relationship is not clearly \"is a\"."
+    },
+    "polimorfismo": {
+      "term": "Polymorphism",
+      "definition": "Using objects of different classes through the same interface, each responding in its own way. A List<Shape> calls area() on circles and squares without knowing which is which. The method that runs is chosen at runtime (dynamic dispatch)."
+    },
+    "record": {
+      "title": "Record",
+      "body": "An immutable data class in one line (Java 16): it generates the constructor, getters, equals, hashCode and toString. The compact constructor validates the data."
+    },
+    "sealed-pattern": {
+      "title": "Sealed interfaces and pattern matching",
+      "body": "sealed limits who can implement the interface; with that, a switch with pattern matching (Java 21) knows it covered every case and needs no default."
+    },
+    "checked-unchecked": {
+      "term": "Checked and unchecked exceptions",
+      "definition": "Checked exceptions (subclasses of Exception, such as IOException) must be handled or declared with throws; the compiler enforces it. Unchecked ones (subclasses of RuntimeException, such as NullPointerException and IllegalArgumentException) do not. Error signals a JVM problem (OutOfMemoryError) and should not be handled."
+    },
+    "try-with-resources": {
+      "term": "try-with-resources",
+      "definition": "A way to open resources (files, connections) that closes everything automatically when leaving the block, even on exception. It works with any class that implements AutoCloseable and replaces the manual finally."
+    },
+    "equals-hashcode": {
+      "term": "equals and hashCode",
+      "definition": "== compares references; equals compares content. Whoever overrides equals must override hashCode: equal objects must have the same hash, or HashMap and HashSet will not find them. Records and IDEs generate both correctly."
+    },
+    "imutabilidade": {
+      "term": "Immutability and String",
+      "definition": "An immutable object does not change after creation: final fields, no setters, defensive copies of collections. String is immutable, which is why concatenating in a loop creates many objects (use StringBuilder). Immutable objects are thread-safe and make good map keys."
+    },
+    "try-resources-exemplo": {
+      "title": "Reading a file safely",
+      "body": "The reader is closed when leaving the try, with or without an error. IOException is checked, so the catch (or a throws in the signature) is required."
+    },
+    "equals-quebrado": {
+      "title": "equals without hashCode",
+      "body": "The class overrode only equals: two equal objects land in different HashSet positions, and contains fails."
+    },
+    "jdk-jre-jvm": {
+      "question": "What is the difference between the JDK, JRE and JVM?",
+      "answer": "The JVM runs the bytecode. The JRE is the JVM plus the standard libraries, what you need to run programs. The JDK is the JRE plus the development tools: compiler (javac), debugger, jar. Today you install the JDK directly, and the separate JRE has practically disappeared."
+    },
+    "equals-vs-igual": {
+      "question": "What is the difference between == and equals?",
+      "answer": "With primitives, == compares values. With objects, == checks whether they are the same reference in memory, and equals compares content as the class defined it. That is why Strings and wrappers must be compared with equals. If I override equals, I override hashCode too."
+    },
+    "interface-vs-abstrata": {
+      "question": "When should you use an interface and when an abstract class?",
+      "answer": "An interface to define a contract that unrelated classes can fulfill; a class implements many. An abstract class when there is state or implementation shared by a family of classes, knowing each class can extend only one. When in doubt, an interface with default methods, and composition over inheritance."
+    },
+    "checked-vs-unchecked-pergunta": {
+      "question": "Checked or unchecked: which should your exceptions be?",
+      "answer": "In most applications, unchecked: business rule and programming errors leave the caller nothing to do midway, and checked ones clutter signatures and lambdas. I use checked when the caller really can and should recover. When rethrowing, I always keep the original cause."
+    },
+    "string-imutavel": {
+      "question": "Why is String immutable in Java?",
+      "answer": "Security (text passed to other code cannot change underneath), safe use across threads, a cached hashCode (good for HashMap keys) and the String pool, which reuses equal literals. The cost is that concatenation in a loop creates many objects; that is what StringBuilder is for."
+    },
+    "memoria-java": {
+      "question": "How would you investigate a memory leak in a Java application?",
+      "answer": "First I confirm with the heap graph after each GC: if the baseline keeps rising, there is a leak. I take a heap dump (jcmd or -XX:+HeapDumpOnOutOfMemoryError) and open it in Eclipse MAT or VisualVM to see which objects dominate memory and who references them. Common causes: unbounded static caches and collections, listeners never removed and ThreadLocal without remove."
+    }
+  }
+}

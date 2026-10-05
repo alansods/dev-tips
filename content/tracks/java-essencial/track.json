@@ -1,0 +1,320 @@
+{
+  "id": "java-essencial",
+  "title": "Java essencial",
+  "description": "A base do Java: JVM, tipos, orientação a objetos, exceções e igualdade.",
+  "areas": [
+    "backend"
+  ],
+  "language": "java",
+  "decks": [
+    {
+      "id": "jvm-e-tipos",
+      "title": "JVM e tipos",
+      "description": "Como o Java roda e como guarda os valores.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "jvm",
+          "level": "junior",
+          "term": "JVM",
+          "definition": "Java Virtual Machine: executa o bytecode (.class) gerado pelo compilador javac. É o que permite \"escrever uma vez e rodar em qualquer lugar\". Inclui o compilador JIT, que transforma em código nativo os trechos mais executados, e o garbage collector.",
+          "relatedTerms": [
+            "heap-e-stack",
+            "garbage-collector"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "primitivos-e-wrappers",
+          "level": "junior",
+          "term": "Primitivos e wrappers",
+          "definition": "Java tem 8 tipos primitivos (int, long, double, boolean, char, byte, short, float), guardados direto como valor, e as classes wrapper correspondentes (Integer, Long...), que são objetos e podem ser null. Coleções só aceitam objetos, por isso o autoboxing converte entre os dois.",
+          "relatedTerms": [
+            "heap-e-stack"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "heap-e-stack",
+          "level": "pleno",
+          "term": "Heap e stack",
+          "definition": "Cada thread tem sua stack, com as variáveis locais e as chamadas de método; objetos ficam no heap, compartilhado. Uma variável de objeto na stack guarda só a referência. StackOverflowError vem de recursão funda demais; OutOfMemoryError, de heap cheio.",
+          "relatedTerms": [
+            "jvm",
+            "garbage-collector"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "garbage-collector",
+          "level": "senior",
+          "term": "Garbage collector",
+          "definition": "Libera automaticamente objetos que não são mais alcançáveis. Divide o heap em gerações, porque a maioria dos objetos morre cedo. O padrão atual é o G1; ZGC e Shenandoah têm pausas de milissegundos para heaps grandes. Vazamento em Java é referência esquecida, como um cache estático que só cresce.",
+          "relatedTerms": [
+            "heap-e-stack",
+            "jvm"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "autoboxing-armadilha",
+          "level": "pleno",
+          "title": "Armadilhas do autoboxing",
+          "body": "Wrappers comparados com == comparam referências: funciona entre -128 e 127 por causa do cache, e falha fora disso. Desembrulhar null lança NullPointerException.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "Integer a = 127, b = 127;\nSystem.out.println(a == b);      // true (cache)\n\nInteger c = 1000, d = 1000;\nSystem.out.println(c == d);      // false: objetos diferentes\nSystem.out.println(c.equals(d)); // true\n\nInteger total = null;\nint x = total;                   // NullPointerException"
+          },
+          "relatedTerms": [
+            "primitivos-e-wrappers"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "var-e-text-blocks",
+          "level": "junior",
+          "title": "var, text blocks e switch moderno",
+          "body": "var infere o tipo de variáveis locais (Java 10), text blocks escrevem textos de várias linhas (Java 15) e o switch expression devolve valor sem break (Java 14).",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "var names = new ArrayList<String>();\n\nString json = \"\"\"\n    { \"name\": \"Ana\", \"age\": 30 }\n    \"\"\";\n\nString label = switch (status) {\n    case PENDING -> \"Aguardando\";\n    case PAID -> \"Pago\";\n    default -> \"Outro\";\n};"
+          },
+          "relatedTerms": [
+            "jvm"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orientacao-a-objetos",
+      "title": "Orientação a objetos",
+      "description": "Classes, interfaces, herança e records.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "encapsulamento",
+          "level": "junior",
+          "term": "Encapsulamento",
+          "definition": "Esconder o estado interno de um objeto (campos private) e expor só operações que mantêm o objeto válido. Em vez de setSaldo, um método sacar que checa o limite. Os modificadores são private, (pacote), protected e public.",
+          "relatedTerms": [
+            "interface-java",
+            "heranca"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "interface-java",
+          "level": "junior",
+          "term": "Interface",
+          "definition": "Contrato que diz o que uma classe faz, sem dizer como. Uma classe pode implementar várias interfaces. Desde o Java 8, interfaces podem ter métodos default (com implementação) e static. É a base do polimorfismo e da injeção de dependência.",
+          "relatedTerms": [
+            "polimorfismo",
+            "heranca"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "heranca",
+          "level": "pleno",
+          "term": "Herança e classe abstrata",
+          "definition": "Uma classe estende outra (só uma) com extends, herdando campos e métodos. Classe abstrata não pode ser instanciada e pode ter métodos abstratos, implementados pelas filhas. Herança cria acoplamento forte: prefira composição quando a relação não é claramente \"é um\".",
+          "relatedTerms": [
+            "interface-java",
+            "polimorfismo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "polimorfismo",
+          "level": "pleno",
+          "term": "Polimorfismo",
+          "definition": "Usar objetos de classes diferentes pela mesma interface, com cada um respondendo do seu jeito. Uma List<Forma> chama area() em círculos e quadrados sem saber qual é qual. O método executado é escolhido em tempo de execução (dynamic dispatch).",
+          "relatedTerms": [
+            "interface-java"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "record",
+          "level": "junior",
+          "title": "Record",
+          "body": "Classe imutável de dados numa linha (Java 16): gera construtor, getters, equals, hashCode e toString. O construtor compacto valida os dados.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "public record Money(BigDecimal amount, String currency) {\n    public Money {\n        if (amount.signum() < 0) throw new IllegalArgumentException(\"valor negativo\");\n    }\n}\n\nvar price = new Money(new BigDecimal(\"29.90\"), \"BRL\");\nprice.amount();                         // 29.90\nprice.equals(new Money(new BigDecimal(\"29.90\"), \"BRL\")); // true"
+          },
+          "relatedTerms": [
+            "encapsulamento"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "sealed-pattern",
+          "level": "senior",
+          "title": "Sealed interfaces e pattern matching",
+          "body": "sealed limita quem pode implementar a interface; com isso, o switch com pattern matching (Java 21) sabe que cobriu todos os casos e dispensa o default.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "sealed interface Shape permits Circle, Square {}\nrecord Circle(double radius) implements Shape {}\nrecord Square(double side) implements Shape {}\n\ndouble area(Shape shape) {\n    return switch (shape) {\n        case Circle c -> Math.PI * c.radius() * c.radius();\n        case Square s -> s.side() * s.side();\n    };\n}"
+          },
+          "relatedTerms": [
+            "polimorfismo",
+            "interface-java"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "excecoes-e-igualdade",
+      "title": "Exceções e igualdade",
+      "description": "Tratamento de erros, equals, hashCode e imutabilidade.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "checked-unchecked",
+          "level": "pleno",
+          "term": "Checked e unchecked exceptions",
+          "definition": "Checked (subclasses de Exception, como IOException) precisam ser tratadas ou declaradas com throws; o compilador obriga. Unchecked (subclasses de RuntimeException, como NullPointerException e IllegalArgumentException) não. Error indica problema da JVM (OutOfMemoryError) e não deve ser tratado.",
+          "relatedTerms": [
+            "try-with-resources"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "try-with-resources",
+          "level": "junior",
+          "term": "try-with-resources",
+          "definition": "Forma de abrir recursos (arquivos, conexões) que fecha tudo automaticamente ao sair do bloco, mesmo com exceção. Funciona com qualquer classe que implemente AutoCloseable e substitui o finally manual.",
+          "relatedTerms": [
+            "checked-unchecked"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "equals-hashcode",
+          "level": "pleno",
+          "term": "equals e hashCode",
+          "definition": "== compara referências; equals compara conteúdo. Quem sobrescreve equals deve sobrescrever hashCode: objetos iguais precisam ter o mesmo hash, senão HashMap e HashSet não os encontram. Records e IDEs geram os dois corretamente.",
+          "relatedTerms": [
+            "imutabilidade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "imutabilidade",
+          "level": "pleno",
+          "term": "Imutabilidade e String",
+          "definition": "Objeto imutável não muda depois de criado: campos final, sem setters, cópias defensivas de coleções. String é imutável, por isso concatenar em laço cria muitos objetos (use StringBuilder). Imutáveis são seguros entre threads e bons como chaves de mapa.",
+          "relatedTerms": [
+            "equals-hashcode"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "try-resources-exemplo",
+          "level": "junior",
+          "title": "Lendo um arquivo com segurança",
+          "body": "O reader é fechado ao sair do try, com ou sem erro. IOException é checked, por isso o catch (ou um throws na assinatura) é obrigatório.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "try (var reader = Files.newBufferedReader(Path.of(\"dados.csv\"))) {\n    String line;\n    while ((line = reader.readLine()) != null) {\n        System.out.println(line);\n    }\n} catch (IOException e) {\n    throw new UncheckedIOException(\"falha ao ler dados.csv\", e);\n}"
+          },
+          "relatedTerms": [
+            "try-with-resources",
+            "checked-unchecked"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "equals-quebrado",
+          "level": "pleno",
+          "title": "equals sem hashCode",
+          "body": "A classe sobrescreveu só equals: dois objetos iguais caem em posições diferentes do HashSet, e o contains falha.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "class Cpf {\n    final String value;\n    Cpf(String value) { this.value = value; }\n\n    @Override public boolean equals(Object o) {\n        return o instanceof Cpf other && value.equals(other.value);\n    }\n    // faltou: @Override public int hashCode() { return value.hashCode(); }\n}\n\nvar set = new HashSet<Cpf>();\nset.add(new Cpf(\"123\"));\nset.contains(new Cpf(\"123\")); // false!"
+          },
+          "relatedTerms": [
+            "equals-hashcode"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Java que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "jdk-jre-jvm",
+          "level": "junior",
+          "question": "Qual a diferença entre JDK, JRE e JVM?",
+          "answer": "A JVM executa o bytecode. O JRE é a JVM mais as bibliotecas padrão, o necessário para rodar programas. O JDK é o JRE mais as ferramentas de desenvolvimento: compilador (javac), depurador, jar. Hoje se instala o JDK direto, e o JRE separado praticamente sumiu.",
+          "relatedTerms": [
+            "jvm"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "equals-vs-igual",
+          "level": "junior",
+          "question": "Qual a diferença entre == e equals?",
+          "answer": "Com primitivos, == compara valores. Com objetos, == compara se são a mesma referência na memória, e equals compara o conteúdo conforme a classe definiu. Por isso Strings e wrappers devem ser comparados com equals. Se sobrescrevo equals, sobrescrevo hashCode junto.",
+          "relatedTerms": [
+            "equals-hashcode",
+            "primitivos-e-wrappers"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "interface-vs-abstrata",
+          "level": "pleno",
+          "question": "Quando usar interface e quando usar classe abstrata?",
+          "answer": "Interface para definir um contrato que classes sem relação entre si podem cumprir; uma classe implementa várias. Classe abstrata quando há estado ou implementação comum a uma família de classes, sabendo que cada classe só estende uma. Na dúvida, interface com métodos default, e composição em vez de herança.",
+          "relatedTerms": [
+            "interface-java",
+            "heranca"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "checked-vs-unchecked-pergunta",
+          "level": "pleno",
+          "question": "Checked ou unchecked: qual usar nas suas exceções?",
+          "answer": "Na maioria das aplicações, unchecked: erros de regra de negócio e de programação não têm o que o chamador fazer no meio do caminho, e checked polui assinaturas e lambdas. Uso checked quando quem chama realmente pode e deve se recuperar. Ao relançar, sempre mantenho a causa original.",
+          "relatedTerms": [
+            "checked-unchecked"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "string-imutavel",
+          "level": "pleno",
+          "question": "Por que String é imutável em Java?",
+          "answer": "Segurança (um texto passado para outro código não muda por baixo), uso seguro entre threads, cache do hashCode (bom para chaves de HashMap) e o pool de Strings, que reaproveita literais iguais. O custo é que concatenações em laço criam muitos objetos; para isso existe StringBuilder.",
+          "relatedTerms": [
+            "imutabilidade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "memoria-java",
+          "level": "senior",
+          "question": "Como você investigaria um vazamento de memória numa aplicação Java?",
+          "answer": "Primeiro confirmo pelo gráfico de heap depois de cada GC: se a base só sobe, há vazamento. Gero um heap dump (jcmd ou -XX:+HeapDumpOnOutOfMemoryError) e abro no Eclipse MAT ou VisualVM para ver quais objetos dominam a memória e quem os referencia. Causas comuns: caches e coleções estáticas sem limite, listeners não removidos e ThreadLocal sem remove.",
+          "relatedTerms": [
+            "garbage-collector",
+            "heap-e-stack"
+          ]
+        }
+      ]
+    }
+  ]
+}
