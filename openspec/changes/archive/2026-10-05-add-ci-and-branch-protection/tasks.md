@@ -8,11 +8,11 @@
 
 ## 2. Proteção e segurança
 
-- [ ] 2.1 Ruleset da `main` (PR, checks `app` e `api`, sem push forçado nem exclusão, bypass de admin por PR)
-- [ ] 2.2 Ruleset da `dev` (checks `app` e `api`, sem push forçado nem exclusão)
-- [ ] 2.3 Ligar alertas de vulnerabilidade e correções automáticas do Dependabot
-- [ ] 2.4 Conferir as configurações pela API do GitHub
+- [x] 2.1 Ruleset da `main` (PR, checks `app` e `api`, sem push forçado nem exclusão, bypass de admin por PR)
+- [x] 2.2 Ruleset da `dev` (checks `app` e `api`, sem push forçado nem exclusão)
+- [x] 2.3 Ligar alertas de vulnerabilidade e correções automáticas do Dependabot
+- [x] 2.4 Conferir as configurações pela API do GitHub
 
 ## 3. Fechamento
 
-- [ ] 3.1 Rodar `openspec validate --strict`, `npm test`, `npm run lint` e `npx tsc --noEmit`
+- [x] 3.1 Rodar `openspec validate --strict`, `npm test`, `npm run lint` e `npx tsc --noEmit`
