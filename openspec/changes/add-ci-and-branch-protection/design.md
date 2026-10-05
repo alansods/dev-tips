@@ -38,6 +38,11 @@ A CI usa a versão LTS atual, independente da versão de quem desenvolve. O cach
 Alertas de vulnerabilidade e correções automáticas ligados nas configurações do repositório, sem `dependabot.yml`. Os PRs de segurança vão para a `main` (o GitHub não permite mudar o destino deles). Para dependências do app, a compatibilidade com o Expo é conferida com `npx expo install --check`.
 *Alternativa descartada:* PR semanal com todas as atualizações; ruído sem ganho de segurança.
 
+## Achados da primeira execução
+
+- `api/tsconfig.json` tinha `"extends": "expo/tsconfig.base"`, entrado por engano no commit `9c3a1a8`. Localmente o TypeScript achava o `expo` no `node_modules` do app; na CI, o job `api` só instala as dependências da `api/`. A linha foi removida, e a API volta a não depender do app.
+- O teste "Ícones reproduzíveis" também comparava os PNGs gerados com os de `assets/` byte a byte. Os pixels são idênticos, mas o zlib do Node 23 (1.2.12) e o do Node 24 (1.3.2.1) comprimem com bytes diferentes. A comparação com `assets/` passa a usar o cabeçalho e os pixels descomprimidos; a exigência da spec (duas execuções idênticas byte a byte) não muda.
+
 ## Risks / Trade-offs
 
 - [A CI do GitHub pode ficar fora do ar e travar um merge] → Bypass explícito do admin na tela do PR.

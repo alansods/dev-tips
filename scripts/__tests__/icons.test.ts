@@ -4,6 +4,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import zlib from 'node:zlib';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { generateIcons } = require('../generate-icons');
@@ -15,6 +16,17 @@ function pngInfo(file: string) {
   const buf = fs.readFileSync(file);
   expect(buf.subarray(0, 8)).toEqual(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]));
   return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20), colorType: buf[25] };
+}
+/** Pixels descomprimidos (junta os chunks IDAT e descomprime). */
+function pngPixels(file: string) {
+  const buf = fs.readFileSync(file);
+  const idat: Buffer[] = [];
+  for (let i = 8; i < buf.length;) {
+    const length = buf.readUInt32BE(i);
+    if (buf.toString('ascii', i + 4, i + 8) === 'IDAT') idat.push(buf.subarray(i + 8, i + 8 + length));
+    i += 12 + length;
+  }
+  return zlib.inflateSync(Buffer.concat(idat));
 }
 const RGB = 2;
 const RGBA = 6;
@@ -54,9 +66,12 @@ describe('Requirement: Identidade visual', () => {
       expect(files).toEqual(fs.readdirSync(b).sort());
       for (const f of files)
         expect(fs.readFileSync(path.join(a, f)).equals(fs.readFileSync(path.join(b, f)))).toBe(true);
-      // e são os mesmos que estão versionados em assets/
-      for (const f of files)
-        expect(fs.readFileSync(path.join(a, f)).equals(fs.readFileSync(path.join(ASSETS, f)))).toBe(true);
+      // e têm o mesmo desenho dos versionados em assets/. Compara os pixels, e não
+      // os bytes: a compressão do zlib muda entre versões do Node.
+      for (const f of files) {
+        expect(pngInfo(path.join(a, f))).toEqual(pngInfo(path.join(ASSETS, f)));
+        expect(pngPixels(path.join(a, f)).equals(pngPixels(path.join(ASSETS, f)))).toBe(true);
+      }
     } finally {
       fs.rmSync(a, { recursive: true, force: true });
       fs.rmSync(b, { recursive: true, force: true });
