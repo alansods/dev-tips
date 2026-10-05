@@ -128,9 +128,20 @@ The specs in [`openspec/specs/`](openspec/specs/) are the source of truth. No be
 
 Bugs follow the same path: first a spec scenario that reproduces the bug, then the fix.
 
-Current capabilities: `api-server`, `app-polish`, `app-shell`, `auth`, `catalog-navigation`, `content-model`, `crud-theme-content`, `glossary`, `localization`, `progress`, `reminders`, `spaced-repetition`, `study-flow`, `sync` and `web-fundamentals-content`.
+Current capabilities: `api-server`, `app-polish`, `app-shell`, `auth`, `catalog-navigation`, `content-model`, `crud-theme-content`, `database-content`, `devops-content`, `glossary`, `java-content`, `javascript-content`, `localization`, `mobile-content`, `progress`, `python-content`, `reminders`, `spaced-repetition`, `study-flow`, `sync`, `typescript-content` and `web-fundamentals-content`.
 
 > Specs, changes and project docs are written in Brazilian Portuguese.
+
+## CI and branch protection
+
+Every pull request and every push to `main` or `dev` runs [`.github/workflows/ci.yml`](.github/workflows/ci.yml) on a clean machine, in two parallel jobs:
+
+- `app`: `npm ci`, lint, typecheck, `prettier --check`, Jest and `openspec validate --strict --all`.
+- `api`: `npm ci`, typecheck and Vitest in `api/`.
+
+Run the same commands locally before pushing; CI is the second check. Repository rulesets require `app` and `api` to pass before anything lands on `main` or `dev`, `main` only changes through pull requests, and force pushes and branch deletion are blocked on both. Dependabot only opens pull requests for known security vulnerabilities.
+
+Branch flow: `feat/*`, `fix/*` and `chore/*` start from `dev` and are merged into `dev`; `dev` is merged into `main` for a release.
 
 ## Builds
 
