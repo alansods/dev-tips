@@ -1,18 +1,18 @@
 /**
  * @jest-environment node
  */
-import { catalog, getTheme } from '../catalog';
-import { getGlossary, type Theme } from '../index';
+import { catalog, getTrack } from '../catalog';
+import { getGlossary, type Track } from '../index';
 
-const web = (): Theme => {
-  const theme = getTheme('fundamentos-web');
-  if (!theme) throw new Error('tema fundamentos-web não registrado');
-  return theme;
+const web = (): Track => {
+  const track = getTrack('fundamentos-web');
+  if (!track) throw new Error('trilha fundamentos-web não registrada');
+  return track;
 };
 const cards = () => web().decks.flatMap((d) => d.cards);
 
-describe('Requirement: Identidade do tema', () => {
-  it('Tema no catálogo', () => {
+describe('Requirement: Identidade da trilha', () => {
+  it('Trilha no catálogo', () => {
     expect(catalog.map((t) => t.id)).toEqual(['crud-4-frameworks', 'fundamentos-web']);
     expect(web().title).toBe('Fundamentos web');
     expect(web().variants).toBeUndefined();
@@ -22,9 +22,9 @@ describe('Requirement: Identidade do tema', () => {
 
 describe('Requirement: Decks e contagens', () => {
   it('Contagem por deck', () => {
-    const theme = web();
-    expect(theme.decks.map((d) => d.id)).toEqual(['http', 'rest', 'navegador-e-seguranca', 'perguntas-de-entrevista']);
-    const types = theme.decks.map((d) => ({ n: d.cards.length, types: [...new Set(d.cards.map((c) => c.type))] }));
+    const track = web();
+    expect(track.decks.map((d) => d.id)).toEqual(['http', 'rest', 'navegador-e-seguranca', 'perguntas-de-entrevista']);
+    const types = track.decks.map((d) => ({ n: d.cards.length, types: [...new Set(d.cards.map((c) => c.type))] }));
     expect(types).toEqual([
       { n: 7, types: ['concept'] },
       { n: 6, types: ['concept'] },
@@ -34,8 +34,8 @@ describe('Requirement: Decks e contagens', () => {
     expect(cards()).toHaveLength(27);
   });
 
-  it('Sem termos repetidos entre temas', () => {
-    const crud = new Set(getGlossary(getTheme('crud-4-frameworks')!).map((c) => c.term.toLowerCase()));
+  it('Sem termos repetidos entre trilhas', () => {
+    const crud = new Set(getGlossary(getTrack('crud-4-frameworks')!).map((c) => c.term.toLowerCase()));
     const repeated = getGlossary(web()).filter((c) => crud.has(c.term.toLowerCase()));
     expect(repeated.map((c) => c.term)).toEqual([]);
   });

@@ -6,12 +6,12 @@ import type { Messages } from './pt-BR';
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const en: Messages = {
-  tabs: { themes: 'Topics', glossary: 'Glossary', progress: 'Progress' },
+  tabs: { tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress' },
   common: {
     back: 'Back',
     close: 'Close',
     cancel: 'Cancel',
-    themeNotFound: 'Topic not found.',
+    trackNotFound: 'Track not found.',
     deckNotFound: 'Deck not found.',
   },
   themeToggle: { toLight: 'Use light theme', toDark: 'Use dark theme' },
@@ -33,7 +33,7 @@ export const en: Messages = {
   notFound: {
     title: "We couldn't find this page",
     body: 'The content may have moved or no longer exists.',
-    home: 'Go to Topics',
+    home: 'Go to Tracks',
   },
   auth: {
     appName: 'Dev Tips',
@@ -87,8 +87,8 @@ export const en: Messages = {
     cardLabel: (title, known, total) => `${title}, ${known} of ${total} cards you know`,
     dueBadge: (n) => `${n} to review today`,
   },
-  theme: {
-    kicker: 'Topic',
+  track: {
+    kicker: 'Track',
     knownLabel: (known, total) => `${known} of ${total} cards you know`,
     knownCaption: 'cards you know',
     decks: 'Decks',
@@ -117,7 +117,7 @@ export const en: Messages = {
     count: (n, label) => `${n} ${label}`,
     toReview: 'To review',
     reviewMissed: 'Review the ones I missed',
-    backToTheme: 'Back to topic',
+    backToTrack: 'Back to track',
   },
   card: {
     types: {
@@ -153,15 +153,15 @@ export const en: Messages = {
     reviewBadge: 'review',
   },
   progress: {
-    ring: (percent) => `${percent}% of the topic mastered`,
+    ring: (percent) => `${percent}% of the track mastered`,
     mastered: (known, total) => `${known} of ${total} cards mastered.`,
     count: (n, label) => `${n} ${label}`,
     toReview: 'to review',
     unseen: 'not seen',
     byDeck: 'By deck',
     reset: 'Reset progress',
-    confirmTitle: "Reset this topic's progress?",
-    confirmBody: 'All answers for this topic will be deleted. This cannot be undone.',
+    confirmTitle: "Reset this track's progress?",
+    confirmBody: 'All answers for this track will be deleted. This cannot be undone.',
     confirm: 'Reset',
   },
   reminders: {

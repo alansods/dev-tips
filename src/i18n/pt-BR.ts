@@ -4,12 +4,12 @@
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const ptBR = {
-  tabs: { themes: 'Temas', glossary: 'Glossário', progress: 'Progresso' },
+  tabs: { tracks: 'Trilhas', glossary: 'Glossário', progress: 'Progresso' },
   common: {
     back: 'Voltar',
     close: 'Fechar',
     cancel: 'Cancelar',
-    themeNotFound: 'Tema não encontrado.',
+    trackNotFound: 'Trilha não encontrada.',
     deckNotFound: 'Deck não encontrado.',
   },
   themeToggle: { toLight: 'Usar tema claro', toDark: 'Usar tema escuro' },
@@ -31,7 +31,7 @@ export const ptBR = {
   notFound: {
     title: 'Não encontramos esta página',
     body: 'O conteúdo pode ter mudado de lugar ou não existir mais.',
-    home: 'Ir para Temas',
+    home: 'Ir para Trilhas',
   },
   auth: {
     appName: 'Dev Tips',
@@ -86,8 +86,8 @@ export const ptBR = {
     cardLabel: (title: string, known: number, total: number) => `${title}, ${known} de ${total} cards que você sabe`,
     dueBadge: (n: number) => `${n} para revisar hoje`,
   },
-  theme: {
-    kicker: 'Tema',
+  track: {
+    kicker: 'Trilha',
     knownLabel: (known: number, total: number) => `${known} de ${total} cards que você sabe`,
     knownCaption: 'cards que você sabe',
     decks: 'Decks',
@@ -117,7 +117,7 @@ export const ptBR = {
     count: (n: number, label: string) => `${n} ${label}`,
     toReview: 'Para revisar',
     reviewMissed: 'Revisar os que errei',
-    backToTheme: 'Voltar ao tema',
+    backToTrack: 'Voltar à trilha',
   },
   card: {
     types: {
@@ -153,15 +153,15 @@ export const ptBR = {
     reviewBadge: 'revisar',
   },
   progress: {
-    ring: (percent: number) => `${percent}% do tema dominado`,
+    ring: (percent: number) => `${percent}% da trilha dominada`,
     mastered: (known: number, total: number) => `${known} de ${total} cards dominados.`,
     count: (n: number, label: string) => `${n} ${label}`,
     toReview: 'para revisar',
     unseen: 'não vistos',
     byDeck: 'Por deck',
     reset: 'Zerar progresso',
-    confirmTitle: 'Zerar o progresso deste tema?',
-    confirmBody: 'Todas as respostas deste tema serão apagadas. Isso não pode ser desfeito.',
+    confirmTitle: 'Zerar o progresso desta trilha?',
+    confirmBody: 'Todas as respostas desta trilha serão apagadas. Isso não pode ser desfeito.',
     confirm: 'Zerar',
   },
   reminders: {

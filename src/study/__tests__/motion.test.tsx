@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react-native';
 import { AccessibilityInfo, StyleSheet, Text } from 'react-native';
 
 import { TermChips } from '../../glossary/TermChips';
-import { crudTheme, renderWithTheme } from '../../test-utils';
+import { crudTrack, renderWithTheme } from '../../test-utils';
 import { flipDuration } from '../motion';
 import { useReducedMotion } from '../useReducedMotion';
 
@@ -34,7 +34,7 @@ describe('Requirement: Animação de virar o card', () => {
 
 describe('Requirement: Alvos de toque mínimos', () => {
   it('Chips de termos relacionados', () => {
-    renderWithTheme(<TermChips theme={crudTheme} termIds={['cors']} onOpen={() => {}} />);
+    renderWithTheme(<TermChips track={crudTrack} termIds={['cors']} onOpen={() => {}} />);
     const chip = screen.getByRole('button', { name: 'CORS' });
     const style = StyleSheet.flatten(
       typeof chip.props.style === 'function' ? chip.props.style({ pressed: false }) : chip.props.style,

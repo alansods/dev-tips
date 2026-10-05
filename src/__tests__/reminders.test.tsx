@@ -8,9 +8,9 @@ import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
 import SettingsScreen from '../app/settings';
-import ThemeScreen from '../app/theme/[themeId]';
+import TrackScreen from '../app/track/[trackId]';
 import { resetRemindersStore, useRemindersStore } from '../reminders/store';
-import { getTheme } from '../content/catalog';
+import { getTrack } from '../content/catalog';
 import { resetStudyStore, useStudyStore } from '../study/store';
 
 const N = Notifications as jest.Mocked<typeof Notifications>;
@@ -20,7 +20,7 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
-  'theme/[themeId]': ThemeScreen,
+  'track/[trackId]': TrackScreen,
   settings: SettingsScreen,
 };
 
@@ -149,9 +149,9 @@ describe('Requirement: Reagendamento', () => {
 describe('Requirement: Abrir pela notificação', () => {
   const tap = (id: string, kind = 'reminder') =>
     ({ notification: { date: 1, request: { identifier: id, content: { data: { kind } } } } }) as never;
-  const seedDue = (themeId: string, n: number) => {
-    const cards = getTheme(themeId)!.decks.flatMap((d) => d.cards).slice(0, n);
-    cards.forEach((c) => useStudyStore.getState().answer(themeId, c.id, 'unknown'));
+  const seedDue = (trackId: string, n: number) => {
+    const cards = getTrack(trackId)!.decks.flatMap((d) => d.cards).slice(0, n);
+    cards.forEach((c) => useStudyStore.getState().answer(trackId, c.id, 'unknown'));
   };
 
   it('Toque com revisão pendente', async () => {
@@ -159,7 +159,7 @@ describe('Requirement: Abrir pela notificação', () => {
     seedDue('fundamentos-web', 5);
     N.useLastNotificationResponse.mockReturnValue(tap('n1'));
     await open('/');
-    expect(screen).toHavePathname('/theme/fundamentos-web');
+    expect(screen).toHavePathname('/track/fundamentos-web');
   });
 
   it('Toque sem revisão', async () => {

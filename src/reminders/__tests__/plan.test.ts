@@ -1,4 +1,4 @@
-import type { Theme } from '../../content';
+import type { Track } from '../../content';
 import { catalog } from '../../content/catalog';
 import { en } from '../../i18n/en';
 import { ptBR } from '../../i18n/pt-BR';
@@ -6,12 +6,12 @@ import { progressKey } from '../../study/rules';
 import type { Schedule } from '../../study/srs';
 import { planReminders, reminderTarget } from '../plan';
 
-const [crud, web] = catalog as Theme[];
-const ids = (theme: Theme, n: number) => theme.decks.flatMap((d) => d.cards).slice(0, n).map((c) => c.id);
+const [crud, web] = catalog as Track[];
+const ids = (track: Track, n: number) => track.decks.flatMap((d) => d.cards).slice(0, n).map((c) => c.id);
 
-/** Agenda `n` cards do tema para `due`. */
-function due(theme: Theme, n: number, day: string, schedule: Schedule = {}): Schedule {
-  for (const id of ids(theme, n)) schedule[progressKey(theme.id, id)] = { box: 1, due: day };
+/** Agenda `n` cards da trilha para `due`. */
+function due(track: Track, n: number, day: string, schedule: Schedule = {}): Schedule {
+  for (const id of ids(track, n)) schedule[progressKey(track.id, id)] = { box: 1, due: day };
   return schedule;
 }
 
@@ -45,7 +45,7 @@ describe('Requirement: Uma notificação por dia com texto do dia', () => {
     expect(plans).toHaveLength(7);
   });
 
-  it('soma os temas e conta cards vencidos antes do dia', () => {
+  it('soma as trilhas e conta cards vencidos antes do dia', () => {
     const schedule = due(crud, 2, '2026-09-30', due(web, 1, '2026-10-02'));
     expect(plan({ schedule })[0].body).toBe('Revisão do dia: 3 cards esperando por você');
   });
@@ -104,12 +104,12 @@ describe('Requirement: Não insistir no dia estudado', () => {
 describe('Requirement: Abrir pela notificação', () => {
   it('Toque com revisão pendente', () => {
     const schedule = due(crud, 2, '2026-10-02', due(web, 5, '2026-10-02'));
-    expect(reminderTarget(catalog, schedule, '2026-10-02')).toBe(`/theme/${web.id}`);
+    expect(reminderTarget(catalog, schedule, '2026-10-02')).toBe(`/track/${web.id}`);
   });
 
   it('empate fica com o primeiro do catálogo', () => {
     const schedule = due(crud, 2, '2026-10-02', due(web, 2, '2026-10-02'));
-    expect(reminderTarget(catalog, schedule, '2026-10-02')).toBe(`/theme/${crud.id}`);
+    expect(reminderTarget(catalog, schedule, '2026-10-02')).toBe(`/track/${crud.id}`);
   });
 
   it('Toque sem revisão', () => {

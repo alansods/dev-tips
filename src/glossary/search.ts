@@ -1,6 +1,6 @@
 import type { ConceptCard } from '../content';
 
-export type GlossaryEntry = { themeId: string; concept: ConceptCard };
+export type GlossaryEntry = { trackId: string; concept: ConceptCard };
 
 // Acentos separados pelo NFD (U+0300 a U+036F, "Combining Diacritical Marks").
 const COMBINING_MARKS = new RegExp(`[${String.fromCharCode(0x300)}-${String.fromCharCode(0x36f)}]`, 'g');

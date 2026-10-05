@@ -10,7 +10,7 @@ import type {
   EndpointCard,
   QuestionCard,
   StepCard,
-  Theme,
+  Track,
 } from '../../content';
 import { useT } from '../../i18n';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -23,7 +23,7 @@ export type Side = 'front' | 'back';
 
 type Props = {
   card: Card;
-  theme: Theme;
+  track: Track;
   side: Side;
   /** Aba de framework selecionada (cards step). */
   variantId: string;
@@ -32,7 +32,7 @@ type Props = {
   onOpenTerm?: (termId: string) => void;
 };
 
-export function CardFace({ card, theme, side, variantId, onSelectVariant, onOpenTerm }: Props) {
+export function CardFace({ card, track, side, variantId, onSelectVariant, onOpenTerm }: Props) {
   const t = useT();
   const label = card.type === 'step' ? t.card.stepNumber(card.number) : t.card.types[card.type];
   return (
@@ -41,9 +41,9 @@ export function CardFace({ card, theme, side, variantId, onSelectVariant, onOpen
         <TypeChip label={label} />
         {card.origin === 'supplement' && <SupplementBadge label={t.card.supplement} />}
       </View>
-      <Body card={card} theme={theme} side={side} variantId={variantId} onSelectVariant={onSelectVariant} />
+      <Body card={card} track={track} side={side} variantId={variantId} onSelectVariant={onSelectVariant} />
       {side === 'back' && onOpenTerm ? (
-        <TermChips theme={theme} termIds={card.relatedTerms} onOpen={onOpenTerm} title={t.card.relatedTerms} />
+        <TermChips track={track} termIds={card.relatedTerms} onOpen={onOpenTerm} title={t.card.relatedTerms} />
       ) : null}
     </View>
   );
@@ -57,7 +57,7 @@ function Body(props: Props) {
     case 'step':
       return <Step {...props} card={card} />;
     case 'compare':
-      return <Compare card={card} theme={props.theme} side={props.side} />;
+      return <Compare card={card} track={props.track} side={props.side} />;
     case 'concept':
       return <Concept card={card} side={props.side} />;
     case 'code':
@@ -140,7 +140,7 @@ function StatusBox({
   );
 }
 
-function Step({ card, theme, side, variantId, onSelectVariant }: Props & { card: StepCard }) {
+function Step({ card, track, side, variantId, onSelectVariant }: Props & { card: StepCard }) {
   const t = useT();
   if (side === 'front') {
     return (
@@ -151,7 +151,7 @@ function Step({ card, theme, side, variantId, onSelectVariant }: Props & { card:
       </View>
     );
   }
-  const variants = theme.variants ?? [];
+  const variants = track.variants ?? [];
   const selected = variants.some((v) => v.id === variantId) ? variantId : (variants[0]?.id ?? '');
   const snippet = card.snippets[selected];
   return (
@@ -168,7 +168,7 @@ function Step({ card, theme, side, variantId, onSelectVariant }: Props & { card:
   );
 }
 
-function Compare({ card, theme, side }: { card: CompareCard; theme: Theme; side: Side }) {
+function Compare({ card, track, side }: { card: CompareCard; track: Track; side: Side }) {
   const { colors } = useTheme();
   const t = useT();
   if (side === 'front') {
@@ -186,7 +186,7 @@ function Compare({ card, theme, side }: { card: CompareCard; theme: Theme; side:
         {card.concept}
       </AppText>
       <View style={[styles.table, { borderColor: colors.line }]}>
-        {(theme.compareColumns ?? []).map((col, i) => (
+        {(track.compareColumns ?? []).map((col, i) => (
           <View
             key={col.id}
             style={[

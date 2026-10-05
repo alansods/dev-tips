@@ -7,9 +7,9 @@ import { ProgressBar } from '../../components/ProgressBar';
 import { ProgressRing } from '../../components/ProgressRing';
 import { Screen } from '../../components/Screen';
 import { useCatalog } from '../../content/useCatalog';
-import type { Theme } from '../../content';
+import type { Track } from '../../content';
 import { useT } from '../../i18n';
-import { deckStats, themeStats } from '../../study/rules';
+import { deckStats, trackStats } from '../../study/rules';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
@@ -18,31 +18,31 @@ export default function ProgressScreen() {
   const catalog = useCatalog();
   return (
     <Screen>
-      {catalog.map((theme) => (
-        <ThemeProgress key={theme.id} theme={theme} />
+      {catalog.map((track) => (
+        <TrackProgress key={track.id} track={track} />
       ))}
     </Screen>
   );
 }
 
-function ThemeProgress({ theme }: { theme: Theme }) {
+function TrackProgress({ track }: { track: Track }) {
   const { colors } = useTheme();
   const t = useT();
   const progress = useStudyStore((s) => s.progress);
-  const resetTheme = useStudyStore((s) => s.resetTheme);
+  const resetTrack = useStudyStore((s) => s.resetTrack);
   const [confirming, setConfirming] = useState(false);
 
-  const stats = themeStats(theme, progress);
+  const stats = trackStats(track, progress);
   const percent = Math.round((stats.known / stats.total) * 100);
   const unseen = stats.total - stats.answered;
 
   return (
-    <View testID={`theme-progress-${theme.id}`} style={{ gap: spacing.lg }}>
+    <View testID={`track-progress-${track.id}`} style={{ gap: spacing.lg }}>
       <View style={[styles.hero, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <ProgressRing percent={percent} label={t.progress.ring(percent)} />
         <View style={{ flex: 1, gap: 4 }}>
           <AppText font="semibold" size={16} accessibilityRole="header">
-            {theme.title}
+            {track.title}
           </AppText>
           <AppText size={13} tone="muted">{t.progress.mastered(stats.known, stats.total)}</AppText>
         </View>
@@ -57,8 +57,8 @@ function ThemeProgress({ theme }: { theme: Theme }) {
       <AppText font="bold" size={17}>
         {t.progress.byDeck}
       </AppText>
-      {theme.decks.map((deck) => {
-        const ds = deckStats(theme.id, deck, progress);
+      {track.decks.map((deck) => {
+        const ds = deckStats(track.id, deck, progress);
         return (
           <View key={deck.id} style={[styles.deck, { backgroundColor: colors.surface, borderColor: colors.line }]}>
             <View style={styles.deckHead}>
@@ -89,7 +89,7 @@ function ThemeProgress({ theme }: { theme: Theme }) {
               title={t.progress.confirm}
               variant="warn"
               onPress={() => {
-                resetTheme(theme.id);
+                resetTrack(track.id);
                 setConfirming(false);
               }}
             />

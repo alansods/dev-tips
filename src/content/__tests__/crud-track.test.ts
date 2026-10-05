@@ -4,11 +4,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { getGlossary, validateTheme, type Card, type CodeCard, type EndpointCard, type StepCard, type Theme } from '../index';
+import { getGlossary, validateTrack, type Card, type CodeCard, type EndpointCard, type StepCard, type Track } from '../index';
 
 const ROOT = path.resolve(__dirname, '../../..');
 const SOURCE_PATH = path.join(ROOT, 'content/sources/crud-4-frameworks.md');
-const THEME_PATH = path.join(ROOT, 'content/themes/crud-4-frameworks/theme.json');
+const TRACK_PATH = path.join(ROOT, 'content/tracks/crud-4-frameworks/track.json');
 
 const STEP_TITLES = [
   'Criar o projeto',
@@ -34,20 +34,20 @@ const readSource = () => fs.readFileSync(SOURCE_PATH, 'utf8');
 /** Remove `**` e crases, colapsa espaços e ignora caixa. */
 const normalize = (s: string) => s.replace(/\*\*/g, '').replace(/`/g, '').replace(/\s+/g, ' ').trim().toLowerCase();
 
-let cachedTheme: Theme | undefined;
-function loadTheme(): Theme {
-  if (cachedTheme) return cachedTheme;
-  const result = validateTheme(JSON.parse(fs.readFileSync(THEME_PATH, 'utf8')));
-  if (!result.ok) throw new Error('theme.json inválido:\n' + result.errors.map((e) => `${e.path}: ${e.message}`).join('\n'));
-  cachedTheme = result.theme;
-  return cachedTheme;
+let cachedTrack: Track | undefined;
+function loadTrack(): Track {
+  if (cachedTrack) return cachedTrack;
+  const result = validateTrack(JSON.parse(fs.readFileSync(TRACK_PATH, 'utf8')));
+  if (!result.ok) throw new Error('track.json inválido:\n' + result.errors.map((e) => `${e.path}: ${e.message}`).join('\n'));
+  cachedTrack = result.track;
+  return cachedTrack;
 }
 const deck = (id: string) => {
-  const found = loadTheme().decks.find((d) => d.id === id);
+  const found = loadTrack().decks.find((d) => d.id === id);
   if (!found) throw new Error(`deck ${id} não encontrado`);
   return found;
 };
-const allCards = (): Card[] => loadTheme().decks.flatMap((d) => d.cards);
+const allCards = (): Card[] => loadTrack().decks.flatMap((d) => d.cards);
 const steps = () => deck('passo-a-passo').cards.filter((c): c is StepCard => c.type === 'step');
 const step = (n: number) => {
   const found = steps().find((s) => s.number === n);
@@ -65,29 +65,29 @@ describe('Requirement: Material de origem preservado', () => {
   });
 });
 
-describe('Requirement: Identidade, variantes e colunas do tema', () => {
-  it('Tema válido no catálogo', () => {
-    const theme = loadTheme();
-    expect(theme.id).toBe('crud-4-frameworks');
-    expect(theme.title).toBe('O mesmo CRUD em quatro frameworks');
+describe('Requirement: Identidade, variantes e colunas da trilha', () => {
+  it('Trilha válida no catálogo', () => {
+    const track = loadTrack();
+    expect(track.id).toBe('crud-4-frameworks');
+    expect(track.title).toBe('O mesmo CRUD em quatro frameworks');
   });
 
   it('Ordem de variantes e colunas', () => {
-    const theme = loadTheme();
-    expect(theme.variants?.map((v) => [v.id, v.name])).toEqual([
+    const track = loadTrack();
+    expect(track.variants?.map((v) => [v.id, v.name])).toEqual([
       ['express', 'Express'],
       ['spring', 'Spring Boot'],
       ['nest', 'NestJS'],
       ['fastapi', 'FastAPI'],
     ]);
-    expect(theme.compareColumns?.map((c) => c.id)).toEqual(['frontend', 'spring', 'express', 'nest', 'fastapi']);
+    expect(track.compareColumns?.map((c) => c.id)).toEqual(['frontend', 'spring', 'express', 'nest', 'fastapi']);
   });
 });
 
 describe('Requirement: Decks e contagens', () => {
   it('Contagem por deck', () => {
-    const theme = loadTheme();
-    expect(theme.decks.map((d) => d.id)).toEqual([
+    const track = loadTrack();
+    expect(track.decks.map((d) => d.id)).toEqual([
       'o-que-vamos-criar',
       'passo-a-passo',
       'mapa-mental',
@@ -109,7 +109,7 @@ describe('Requirement: Decks e contagens', () => {
   });
 
   it('Glossário completo', () => {
-    const terms = getGlossary(loadTheme()).map((c) => c.term);
+    const terms = getGlossary(loadTrack()).map((c) => c.term);
     expect(terms).toHaveLength(24);
     expect(terms[0]).toBe('API');
     expect(terms[23]).toBe('venv (Python)');

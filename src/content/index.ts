@@ -1,6 +1,6 @@
-export { validateCatalog, validateTheme, type CatalogResult, type ThemeResult } from './validate';
+export { validateCatalog, validateTrack, type CatalogResult, type TrackResult } from './validate';
 export { getGlossary } from './glossary';
-export { SNIPPET_LANGUAGES, themeSchema } from './schema';
+export { SNIPPET_LANGUAGES, trackSchema } from './schema';
 export type { ContentError } from './errors';
 export type {
   Card,
@@ -14,6 +14,6 @@ export type {
   Snippet,
   SnippetLanguage,
   StepCard,
-  Theme,
+  Track,
   Variant,
 } from './schema';

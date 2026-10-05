@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import type { Card, StepCard } from '../../../content';
 import { ptBR } from '../../../i18n/pt-BR';
-import { cardById, crudTheme, renderWithTheme } from '../../../test-utils';
+import { cardById, crudTrack, renderWithTheme } from '../../../test-utils';
 import { CardFace } from '../CardFace';
 
 const FRONT_PROMPT = ptBR.card.frontPrompt;
@@ -11,7 +11,7 @@ const FRONT_PROMPT = ptBR.card.frontPrompt;
 /** CardFace com a aba de framework controlada, como a sessão faz. */
 function Harness({ card, side }: { card: Card; side: 'front' | 'back' }) {
   const [variant, setVariant] = useState('express');
-  return <CardFace card={card} theme={crudTheme} side={side} variantId={variant} onSelectVariant={setVariant} />;
+  return <CardFace card={card} track={crudTrack} side={side} variantId={variant} onSelectVariant={setVariant} />;
 }
 const show = (id: string, side: 'front' | 'back') => renderWithTheme(<Harness card={cardById(id)} side={side} />);
 
@@ -50,7 +50,7 @@ describe('Requirement: Frente e verso por tipo de card', () => {
 
   it('Comparação', () => {
     show('cmp-dto', 'back');
-    for (const col of crudTheme.compareColumns!) expect(screen.getByText(col.label)).toBeOnTheScreen();
+    for (const col of crudTrack.compareColumns!) expect(screen.getByText(col.label)).toBeOnTheScreen();
     expect(screen.getByText('modelo Pydantic')).toBeOnTheScreen();
     expect(screen.getByText('record')).toBeOnTheScreen();
   });
@@ -98,7 +98,7 @@ describe('Requirement: Exibição de código', () => {
       return (
         <CardFace
           card={cardById('step-03')}
-          theme={crudTheme}
+          track={crudTrack}
           side="back"
           variantId="fastapi"
           onSelectVariant={() => {}}
@@ -112,11 +112,11 @@ describe('Requirement: Exibição de código', () => {
     expect(screen.getByText(snippet.note!)).toBeOnTheScreen();
   });
 
-  it('variante desconhecida cai na primeira do tema', () => {
+  it('variante desconhecida cai na primeira da trilha', () => {
     renderWithTheme(
       <CardFace
         card={cardById('step-03')}
-        theme={crudTheme}
+        track={crudTrack}
         side="back"
         variantId="rails"
         onSelectVariant={() => {}}

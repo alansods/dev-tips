@@ -2,7 +2,7 @@
 // agendar nos próximos dias e com que texto, e para onde ir ao tocar numa.
 // O texto de cada dia sai do agendamento de revisão, que já é conhecido hoje.
 
-import type { Theme } from '../content';
+import type { Track } from '../content';
 import type { Messages } from '../i18n';
 import { addDays } from '../study/clock';
 import { dueCardIds, type Schedule } from '../study/srs';
@@ -16,7 +16,7 @@ export const REMINDER_DAYS = 7;
 export type ReminderPlan = { date: Date; title: string; body: string };
 
 type PlanInput = {
-  catalog: readonly Theme[];
+  catalog: readonly Track[];
   schedule: Schedule;
   lastStudyDay: string | null;
   time: ReminderTime;
@@ -34,8 +34,8 @@ function localDate(day: string, time: ReminderTime): Date {
   return new Date(y, m - 1, d, h, min);
 }
 
-const dueCount = (catalog: readonly Theme[], schedule: Schedule, day: string) =>
-  catalog.reduce((n, theme) => n + dueCardIds(theme, schedule, day).length, 0);
+const dueCount = (catalog: readonly Track[], schedule: Schedule, day: string) =>
+  catalog.reduce((n, track) => n + dueCardIds(track, schedule, day).length, 0);
 
 /**
  * Uma notificação por dia nos próximos `REMINDER_DAYS` dias, a partir do primeiro
@@ -58,12 +58,12 @@ export function planReminders({ catalog, schedule, lastStudyDay, time, now, mess
   return plans;
 }
 
-/** Rota ao tocar no lembrete: o tema com mais cards para revisar (empate: o primeiro), ou a aba Temas. */
-export function reminderTarget(catalog: readonly Theme[], schedule: Schedule, day: string): string {
+/** Rota ao tocar no lembrete: a trilha com mais cards para revisar (empate: o primeiro), ou a aba Trilhas. */
+export function reminderTarget(catalog: readonly Track[], schedule: Schedule, day: string): string {
   let best: { id: string; n: number } | null = null;
-  for (const theme of catalog) {
-    const n = dueCardIds(theme, schedule, day).length;
-    if (n > 0 && (!best || n > best.n)) best = { id: theme.id, n };
+  for (const track of catalog) {
+    const n = dueCardIds(track, schedule, day).length;
+    if (n > 0 && (!best || n > best.n)) best = { id: track.id, n };
   }
-  return best ? `/theme/${best.id}` : '/';
+  return best ? `/track/${best.id}` : '/';
 }

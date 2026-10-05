@@ -1,4 +1,4 @@
-// Tradução de um tema (content/themes/<id>/translations/<idioma>.json): só os
+// Tradução de uma trilha (content/tracks/<id>/translations/<idioma>.json): só os
 // textos exibidos, organizados por id. Tudo é opcional; o que faltar aparece
 // no idioma original. Código, ids, métodos, caminhos e status nunca se traduzem.
 
@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { pt } from 'zod/locales';
 
 import { formatPath, type ContentError, type PathSegment } from './errors';
-import type { Card, Theme } from './schema';
+import type { Card, Track } from './schema';
 
 const text = () => z.string().refine((s) => s.trim().length > 0, { error: 'não pode ficar vazio' });
 const optionalText = () => text().optional();
@@ -45,7 +45,7 @@ const cardTranslationSchemas = {
   }),
 } satisfies Record<Card['type'], z.ZodType>;
 
-export const themeTranslationSchema = z.strictObject({
+export const trackTranslationSchema = z.strictObject({
   title: optionalText(),
   description: optionalText(),
   compareColumns: z.record(z.string(), text()).optional(),
@@ -53,7 +53,7 @@ export const themeTranslationSchema = z.strictObject({
   cards: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
 });
 
-export type ThemeTranslation = z.output<typeof themeTranslationSchema>;
+export type TrackTranslation = z.output<typeof trackTranslationSchema>;
 type CardTranslation = { [K in Card['type']]: z.output<(typeof cardTranslationSchemas)[K]> };
 
 const ptErrors = pt().localeError;
@@ -72,17 +72,17 @@ function zodErrors(result: z.ZodSafeParseResult<unknown>, prefix: PathSegment[])
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
 
-/** Valida a tradução contra o tema: formato, campos por tipo de card e ids existentes. */
-export function validateTranslation(theme: Theme, input: unknown): ContentError[] {
-  const errors = zodErrors(themeTranslationSchema.safeParse(input, { error: ptErrors }), []);
+/** Valida a tradução contra a trilha: formato, campos por tipo de card e ids existentes. */
+export function validateTranslation(track: Track, input: unknown): ContentError[] {
+  const errors = zodErrors(trackTranslationSchema.safeParse(input, { error: ptErrors }), []);
   if (!isObj(input)) return errors;
 
   const missing = (path: PathSegment[], what: string) =>
-    errors.push({ path: formatPath(path), message: `${what} não existe no tema` });
+    errors.push({ path: formatPath(path), message: `${what} não existe na trilha` });
 
-  const deckIds = new Set(theme.decks.map((d) => d.id));
-  const columnIds = new Set((theme.compareColumns ?? []).map((c) => c.id));
-  const cards = new Map(theme.decks.flatMap((d) => d.cards).map((c) => [c.id, c]));
+  const deckIds = new Set(track.decks.map((d) => d.id));
+  const columnIds = new Set((track.compareColumns ?? []).map((c) => c.id));
+  const cards = new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c]));
 
   if (isObj(input.decks)) for (const id of Object.keys(input.decks)) if (!deckIds.has(id)) missing(['decks', id], 'deck');
   if (isObj(input.compareColumns))
@@ -108,16 +108,16 @@ export function validateTranslation(theme: Theme, input: unknown): ContentError[
   return errors;
 }
 
-/** O tema com os textos traduzidos por cima, campo a campo; sem tradução, devolve o próprio tema. */
-export function localizeTheme(theme: Theme, translation: ThemeTranslation | undefined): Theme {
-  if (!translation) return theme;
+/** A trilha com os textos traduzidos por cima, campo a campo; sem tradução, devolve a própria trilha. */
+export function localizeTrack(track: Track, translation: TrackTranslation | undefined): Track {
+  if (!translation) return track;
   const cards = translation.cards ?? {};
   return {
-    ...theme,
-    title: translation.title ?? theme.title,
-    description: translation.description ?? theme.description,
-    compareColumns: theme.compareColumns?.map((col) => ({ ...col, label: translation.compareColumns?.[col.id] ?? col.label })),
-    decks: theme.decks.map((deck) => {
+    ...track,
+    title: translation.title ?? track.title,
+    description: translation.description ?? track.description,
+    compareColumns: track.compareColumns?.map((col) => ({ ...col, label: translation.compareColumns?.[col.id] ?? col.label })),
+    decks: track.decks.map((deck) => {
       const d = translation.decks?.[deck.id];
       return {
         ...deck,
@@ -164,14 +164,14 @@ const COVERED_FIELDS: { [K in Card['type']]: string[] } = {
  * Caminhos de texto exibido que existem no original e não têm tradução.
  * Ficam de fora `tags`, `aliases` e `values` (tradução editorial) e o código.
  */
-export function missingTranslations(theme: Theme, translation: ThemeTranslation): string[] {
+export function missingTranslations(track: Track, translation: TrackTranslation): string[] {
   const missing: string[] = [];
   if (!translation.title) missing.push('title');
   if (!translation.description) missing.push('description');
-  for (const col of theme.compareColumns ?? []) {
+  for (const col of track.compareColumns ?? []) {
     if (!translation.compareColumns?.[col.id]) missing.push(`compareColumns.${col.id}`);
   }
-  for (const deck of theme.decks) {
+  for (const deck of track.decks) {
     const d = translation.decks?.[deck.id];
     if (!d?.title) missing.push(`decks.${deck.id}.title`);
     if (deck.description && !d?.description) missing.push(`decks.${deck.id}.description`);

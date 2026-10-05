@@ -1,5 +1,5 @@
 // Rota sem correspondência (convenção do expo-router): ex.: uma notificação
-// antiga que aponta para um tema removido.
+// antiga que aponta para uma trilha removida.
 
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';

@@ -1,5 +1,5 @@
-// Ao tocar num lembrete, abre o tema com mais cards para revisar ou a aba
-// Temas. O destino é calculado na hora do toque, com o progresso atual.
+// Ao tocar num lembrete, abre a trilha com mais cards para revisar ou a aba
+// Trilhas. O destino é calculado na hora do toque, com o progresso atual.
 
 import { router } from 'expo-router';
 import { useEffect } from 'react';

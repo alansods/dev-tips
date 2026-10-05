@@ -3,22 +3,22 @@ schema: spec-driven
 context: |
   Produto: Dev Tips — app mobile de estudo em cards (inspirado no Algo App) para
   reforçar conceitos de desenvolvimento fullstack que caem em entrevistas.
-  O usuário escolhe um tema; cada tema tem decks; cada deck tem cards.
-  Primeiro tema: "O mesmo CRUD em quatro frameworks, passo a passo"
+  O usuário escolhe uma trilha; cada trilha tem decks; cada deck tem cards.
+  Primeiro trilha: "O mesmo CRUD em quatro frameworks, passo a passo"
   (Express, Spring Boot, NestJS, FastAPI). Fonte editorial em content/sources/.
 
   Stack: Expo + React Native + TypeScript (strict) + expo-router, Zustand,
   AsyncStorage (progresso), Reanimated (flip/swipe), Zod (schema de conteúdo),
   Jest + React Native Testing Library. Offline-first, sem backend no MVP.
 
-  Conteúdo: separado do código em content/themes/<theme-id>/theme.json,
+  Conteúdo: separado do código em content/tracks/<track-id>/track.json,
   validado pelo schema Zod da capability content-model. Chaves em inglês,
   textos exibidos em PT-BR.
 
   Decisões de produto (2026-10-01):
   - Idioma: somente PT-BR (sem i18n no MVP). Revisto em 2026-10-02
     (change add-language-selection): PT-BR e inglês, escolhidos em Ajustes;
-    conteúdo traduzido via content/themes/<id>/translations/en.json.
+    conteúdo traduzido via content/tracks/<id>/translations/en.json.
   - Mecânica principal do MVP: flashcard ("sei / não sei") + progresso.
     Quiz e repetição espaçada vêm depois, cada um via change própria.
   - Sem backend no MVP: conteúdo empacotado no app, progresso local.
@@ -29,26 +29,26 @@ context: |
     docs/backend/alternativa-nestjs-render-monorepo.md.
   - Lacunas do material de origem são completadas com cards marcados
     como "complemento" (origin: "supplement"), distintos do original.
-  - Próximos temas previstos: Fundamentos web, Banco de dados,
+  - Próximos trilhas previstos: Fundamentos web, Banco de dados,
     Frontend/React, System design. O schema deve ser genérico: nem todo
-    tema compara frameworks (frameworks/colunas definidos por tema).
+    trilha compara frameworks (frameworks/colunas definidos por trilha).
   - Projeto Expo criado já na change add-content-model; a change de
     scaffold depois só adiciona rotas, tema claro/escuro e Prettier.
 
   Design aprovado (2026-10-01) — protótipo: https://claude.ai/artifact/4Qt8CnCTGpUGUooUjLMA1G
-  - Navegação: 3 abas inferiores (Temas, Glossário, Progresso); a sessão
+  - Navegação: 3 abas inferiores (Trilhas, Glossário, Progresso); a sessão
     de estudo e o resumo são telas cheias, sem abas.
-  - Fluxo: Temas → Tema (decks com %) → Sessão (frente → toque vira →
+  - Fluxo: Trilhas → Trilha (decks com %) → Sessão (frente → toque vira →
     "Sei"/"Não sei") → Resumo (acertos, lista "para revisar", botão
     "Revisar os que errei").
   - Card step: abas por variante trocando o snippet; código em bloco
     escuro com scroll horizontal; termos relacionados como chips que
     abrem a definição numa bottom sheet.
-  - Glossário com busca por termo e definição; Progresso com % do tema,
+  - Glossário com busca por termo e definição; Progresso com % da trilha,
     contagem sei / para revisar / não vistos, barra por deck e "Zerar".
   - Visual: fundo frio, acento azul (#2D4BE0 claro / #8296FF escuro),
     laranja para "revisar"; IBM Plex Sans + JetBrains Mono; claro/escuro.
-  - Temas futuros aparecem na Home como "Em breve" (bloqueados).
+  - Trilhas futuros aparecem na Home como "Em breve" (bloqueados).
 
   Processo (SDD): specs são a fonte da verdade. Toda implementação, correção
   ou alteração começa criando/ajustando a spec (change em openspec/changes/),

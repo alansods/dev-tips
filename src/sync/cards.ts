@@ -1,13 +1,13 @@
-// Conversão entre o estado de estudo (progress + schedule por `themeId:cardId`)
+// Conversão entre o estado de estudo (progress + schedule por `trackId:cardId`)
 // e as mudanças de card que a API sincroniza.
 
 import type { Progress } from '../study/rules';
 import type { Schedule } from '../study/srs';
 import type { CardChange } from './store';
 
-export function splitKey(key: string): { themeId: string; cardId: string } {
+export function splitKey(key: string): { trackId: string; cardId: string } {
   const i = key.indexOf(':');
-  return { themeId: key.slice(0, i), cardId: key.slice(i + 1) };
+  return { trackId: key.slice(0, i), cardId: key.slice(i + 1) };
 }
 
 /** A mudança que representa o estado atual do card (sem resposta = tudo nulo, o "zerado"). */

@@ -27,17 +27,17 @@ describe('Requirement: Interface traduzida', () => {
   });
 
   it('textos em inglês da spec', () => {
-    expect(en.tabs).toEqual({ themes: 'Topics', glossary: 'Glossary', progress: 'Progress' });
+    expect(en.tabs).toEqual({ tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress' });
     expect(en.settings.title).toBe('Settings');
     expect(en.answer.unknown.button).toBe("I didn't know");
     expect(en.answer.known.button).toBe('I knew it');
     expect(en.session.showAnswer).toBe('Show answer');
     expect(en.deckAction).toEqual({ start: 'Study', continue: 'Continue', restart: 'Study again' });
-    expect(en.theme.reviewKicker).toBe("Today's review");
-    expect(en.theme.reviewNow).toBe('Review now');
-    expect(en.theme.nothingToReview).toBe('Nothing to review today.');
+    expect(en.track.reviewKicker).toBe("Today's review");
+    expect(en.track.reviewNow).toBe('Review now');
+    expect(en.track.nothingToReview).toBe('Nothing to review today.');
     expect(en.summary.reviewMissed).toBe('Review the ones I missed');
-    expect(en.summary.backToTheme).toBe('Back to topic');
+    expect(en.summary.backToTrack).toBe('Back to track');
     expect(en.progress.reset).toBe('Reset progress');
     expect(en.progress.confirm).toBe('Reset');
     expect(en.common.cancel).toBe('Cancel');

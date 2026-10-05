@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { clearDatabase, testApp } from './helpers/session';
 
 type Card = {
-  themeId: string;
+  trackId: string;
   cardId: string;
   result: 'known' | 'unknown' | null;
   box: number | null;
@@ -18,7 +18,7 @@ type Pull = {
 };
 
 const card = (cardId: string, updatedAt: number, result: Card['result'] = 'known'): Card => ({
-  themeId: 'crud-4-frameworks',
+  trackId: 'crud-4-frameworks',
   cardId,
   result,
   box: result ? 2 : null,

@@ -16,7 +16,7 @@ import { legalUrls } from '../settings/legal';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
-/** Sai do login: volta para quem abriu (Ajustes) ou, no primeiro uso, vai para a aba Temas. */
+/** Sai do login: volta para quem abriu (Ajustes) ou, no primeiro uso, vai para a aba Trilhas. */
 function leave() {
   useSettingsStore.getState().setOnboardingSeen();
   if (router.canGoBack()) router.back();

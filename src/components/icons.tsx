@@ -12,7 +12,7 @@ const stroke = (color: ColorValue) => ({
   fill: 'none',
 });
 
-export function ThemesIcon({ color, size = 22 }: IconProps) {
+export function TracksIcon({ color, size = 22 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Rect x="3" y="4" width="13" height="16" rx="2" {...stroke(color)} />

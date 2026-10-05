@@ -5,10 +5,10 @@ import { AppText } from '../../components/AppText';
 import { ProgressBar } from '../../components/ProgressBar';
 import { Screen } from '../../components/Screen';
 import { useCatalog } from '../../content/useCatalog';
-import type { Theme } from '../../content';
+import type { Track } from '../../content';
 import { useT } from '../../i18n';
 import { today } from '../../study/clock';
-import { themeStats } from '../../study/rules';
+import { trackStats } from '../../study/rules';
 import { dueCardIds } from '../../study/srs';
 import { useStudyStore } from '../../study/store';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -18,35 +18,35 @@ export default function HomeScreen() {
   const catalog = useCatalog();
   return (
     <Screen>
-      {catalog.map((theme) => (
-        <ThemeCard key={theme.id} theme={theme} />
+      {catalog.map((track) => (
+        <TrackCard key={track.id} track={track} />
       ))}
     </Screen>
   );
 }
 
-function ThemeCard({ theme }: { theme: Theme }) {
+function TrackCard({ track }: { track: Track }) {
   const { colors } = useTheme();
   const t = useT();
   const progress = useStudyStore((s) => s.progress);
-  const stats = themeStats(theme, progress);
+  const stats = trackStats(track, progress);
   const schedule = useStudyStore((s) => s.schedule);
-  const due = dueCardIds(theme, schedule, today()).length;
+  const due = dueCardIds(track, schedule, today()).length;
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={t.home.cardLabel(theme.title, stats.known, stats.total)}
-      onPress={() => router.push(`/theme/${theme.id}`)}
+      accessibilityLabel={t.home.cardLabel(track.title, stats.known, stats.total)}
+      onPress={() => router.push(`/track/${track.id}`)}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: colors.surface, borderColor: colors.line, opacity: pressed ? 0.85 : 1 },
       ]}
     >
       <AppText font="semibold" size={16}>
-        {theme.title}
+        {track.title}
       </AppText>
       <AppText size={13} tone="muted">
-        {theme.description}
+        {track.description}
       </AppText>
       <View style={styles.progressRow}>
         <View style={{ flex: 1 }}>

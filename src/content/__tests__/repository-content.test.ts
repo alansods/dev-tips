@@ -3,17 +3,17 @@
  */
 import path from 'node:path';
 
-import { formatScanErrors, scanThemesDirectory } from '../node/scanThemes';
+import { formatScanErrors, scanTracksDirectory } from '../node/scanTracks';
 
-// Gate de conteúdo: todo content/themes/<theme-id>/theme.json do repositório
+// Gate de conteúdo: todo content/tracks/<track-id>/track.json do repositório
 // precisa passar na validação para a suíte ficar verde.
-const THEMES_DIR = path.resolve(__dirname, '../../../content/themes');
+const TRACKS_DIR = path.resolve(__dirname, '../../../content/tracks');
 
-describe('conteúdo do repositório (content/themes)', () => {
-  it('todos os temas são válidos', () => {
-    const result = scanThemesDirectory(THEMES_DIR);
+describe('conteúdo do repositório (content/tracks)', () => {
+  it('todas as trilhas são válidas', () => {
+    const result = scanTracksDirectory(TRACKS_DIR);
     if (!result.ok) {
-      throw new Error(`Conteúdo inválido em content/themes:\n${formatScanErrors(result.errors)}`);
+      throw new Error(`Conteúdo inválido em content/tracks:\n${formatScanErrors(result.errors)}`);
     }
   });
 });

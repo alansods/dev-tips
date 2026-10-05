@@ -2,7 +2,7 @@
 // (updated_at maior) que a guardada: "a mudança mais recente vence".
 
 export type CardChange = {
-  themeId: string;
+  trackId: string;
   cardId: string;
   result: 'known' | 'unknown' | null;
   box: number | null;
@@ -27,14 +27,14 @@ export async function upsertChanges(
   const statements = cards.map((c) =>
     db
       .prepare(
-        `INSERT INTO card_progress (user_id, theme_id, card_id, result, box, due, updated_at, server_updated_at)
+        `INSERT INTO card_progress (user_id, track_id, card_id, result, box, due, updated_at, server_updated_at)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT (user_id, theme_id, card_id) DO UPDATE SET
+         ON CONFLICT (user_id, track_id, card_id) DO UPDATE SET
            result = excluded.result, box = excluded.box, due = excluded.due,
            updated_at = excluded.updated_at, server_updated_at = excluded.server_updated_at
          WHERE excluded.updated_at > card_progress.updated_at`,
       )
-      .bind(userId, c.themeId, c.cardId, c.result, c.box, c.due, c.updatedAt, serverNow),
+      .bind(userId, c.trackId, c.cardId, c.result, c.box, c.due, c.updatedAt, serverNow),
   );
   if (settings) {
     statements.push(
@@ -54,7 +54,7 @@ export async function upsertChanges(
 }
 
 type CardRow = {
-  theme_id: string;
+  track_id: string;
   card_id: string;
   result: CardChange['result'];
   box: number | null;
@@ -73,8 +73,8 @@ export async function changesSince(
   const [cards, settings] = await db.batch([
     db
       .prepare(
-        `SELECT theme_id, card_id, result, box, due, updated_at FROM card_progress
-         WHERE user_id = ? AND server_updated_at > ? ORDER BY theme_id, card_id`,
+        `SELECT track_id, card_id, result, box, due, updated_at FROM card_progress
+         WHERE user_id = ? AND server_updated_at > ? ORDER BY track_id, card_id`,
       )
       .bind(userId, after),
     db
@@ -86,7 +86,7 @@ export async function changesSince(
   const settingsRow = (settings.results as SettingsRow[])[0];
   return {
     cards: (cards.results as CardRow[]).map((r) => ({
-      themeId: r.theme_id,
+      trackId: r.track_id,
       cardId: r.card_id,
       result: r.result,
       box: r.box,

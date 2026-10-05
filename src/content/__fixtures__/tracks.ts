@@ -64,22 +64,22 @@ export function codeCard(id = 'docker-compose', extra: Json = {}): Json {
   };
 }
 
-/** Tema só com um concept, sem variants nem compareColumns. */
-export function minimalTheme(): Json {
+/** Trilha só com um concept, sem variants nem compareColumns. */
+export function minimalTrack(): Json {
   return {
-    id: 'tema-minimo',
-    title: 'Tema mínimo',
-    description: 'Um tema de teste.',
+    id: 'trilha-minimo',
+    title: 'Trilha mínima',
+    description: 'Uma trilha de teste.',
     decks: [{ id: 'deck-1', title: 'Deck 1', cards: [conceptCard()] }],
   };
 }
 
-/** Tema com variants, colunas e um card de cada tipo. */
-export function fullTheme(): Json {
+/** Trilha com variants, colunas e um card de cada tipo. */
+export function fullTrack(): Json {
   return {
     id: 'crud-teste',
     title: 'CRUD de teste',
-    description: 'Tema completo de teste.',
+    description: 'Trilha completa de teste.',
     variants: [
       { id: 'express', name: 'Express', language: 'TypeScript' },
       { id: 'spring', name: 'Spring Boot', language: 'Java' },
@@ -97,6 +97,6 @@ export function fullTheme(): Json {
 }
 
 /** Atalho para o card `j` do deck `i`. */
-export function cardAt(theme: Json, deck: number, card: number): Json {
-  return theme.decks[deck].cards[card];
+export function cardAt(track: Json, deck: number, card: number): Json {
+  return track.decks[deck].cards[card];
 }

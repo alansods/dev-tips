@@ -5,10 +5,10 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
-import StudyScreen from '../app/study/[themeId]/[deckId]';
-import ThemeScreen from '../app/theme/[themeId]';
+import StudyScreen from '../app/study/[trackId]/[deckId]';
+import TrackScreen from '../app/track/[trackId]';
 import { resetStudyStore, useStudyStore } from '../study/store';
-import { crudTheme } from '../test-utils';
+import { crudTrack } from '../test-utils';
 
 const APP = {
   _layout: RootLayout,
@@ -16,10 +16,10 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
-  'theme/[themeId]': ThemeScreen,
-  'study/[themeId]/[deckId]': StudyScreen,
+  'track/[trackId]': TrackScreen,
+  'study/[trackId]/[deckId]': StudyScreen,
 };
-const THEME = crudTheme.id;
+const TRACK = crudTrack.id;
 
 async function open(url: string) {
   renderRouter(APP, { initialUrl: url });
@@ -35,7 +35,7 @@ beforeEach(() => resetStudyStore());
 
 describe('Requirement: Gaveta de definição (na sessão)', () => {
   it('Fechar sem perder a sessão', async () => {
-    await open(`/study/${THEME}/passo-a-passo`);
+    await open(`/study/${TRACK}/passo-a-passo`);
     // avança até o Passo 13 (os complementos ficam entre os passos)
     while (!screen.queryByText('Passo 13')) {
       press('Mostrar resposta');
@@ -63,7 +63,7 @@ describe('Requirement: Aba Glossário', () => {
     expect(screen.queryByText(/em construção/i)).toBeNull();
   });
 
-  it('Tema de cada termo', async () => {
+  it('Trilha de cada termo', async () => {
     await open('/glossary');
     expect(
       within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
@@ -72,8 +72,8 @@ describe('Requirement: Aba Glossário', () => {
   });
 
   it('Selo de status', async () => {
-    useStudyStore.getState().answer(THEME, 'cors', 'known');
-    useStudyStore.getState().answer(THEME, 'dto', 'unknown');
+    useStudyStore.getState().answer(TRACK, 'cors', 'known');
+    useStudyStore.getState().answer(TRACK, 'dto', 'unknown');
     await open('/glossary');
     const item = (term: string) => within(screen.getByRole('button', { name: term }));
     expect(item('CORS').getByText('já sabia')).toBeOnTheScreen();

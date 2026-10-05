@@ -11,7 +11,7 @@ import { safeJSONStorage } from '../storage/safeStorage';
 export const SYNC_STORAGE_KEY = 'dev-tips:sync';
 
 export type CardChange = {
-  themeId: string;
+  trackId: string;
   cardId: string;
   result: 'known' | 'unknown' | null;
   box: number | null;
@@ -26,7 +26,7 @@ type SyncData = {
   syncedUserId: string | null;
   lastServerTime: number | null;
   lastSyncedAt: number | null;
-  /** Horário local da última mudança de cada card (`themeId:cardId`). */
+  /** Horário local da última mudança de cada card (`trackId:cardId`). */
   stamps: Record<string, number>;
   settingsStamp: number;
   pendingCards: Record<string, CardChange>;
@@ -43,7 +43,7 @@ type SyncState = SyncData & {
 };
 
 const change = z.object({
-  themeId: z.string(),
+  trackId: z.string(),
   cardId: z.string(),
   result: z.enum(['known', 'unknown']).nullable(),
   box: z.number().nullable(),
