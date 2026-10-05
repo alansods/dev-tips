@@ -1,0 +1,120 @@
+{
+  "title": "Transactions and performance",
+  "description": "ACID, isolation levels, locks and deadlocks, indexes, EXPLAIN, N+1 and pagination.",
+  "decks": {
+    "transacoes": {
+      "title": "Transactions",
+      "description": "Grouping operations with guarantees."
+    },
+    "concorrencia": {
+      "title": "Concurrency and locks",
+      "description": "Locks, deadlocks and optimistic control."
+    },
+    "indices-e-consultas": {
+      "title": "Indexes and queries",
+      "description": "How to make queries fast."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about database transactions and performance that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "transacao": {
+      "term": "Transaction",
+      "definition": "A group of operations the database treats as one: either all are saved (COMMIT) or none are (ROLLBACK). Classic example: transferring money, which debits one account and credits another; if the second fails, the first is undone."
+    },
+    "acid": {
+      "term": "ACID",
+      "definition": "The guarantees of a transaction. Atomicity: all or nothing. Consistency: the database moves from one valid state to another, respecting its rules. Isolation: concurrent transactions do not see each other's unfinished work (at the configured level). Durability: after commit, data survives crashes."
+    },
+    "isolamento": {
+      "term": "Isolation levels",
+      "definition": "How much a transaction sees of others: READ COMMITTED (the PostgreSQL default) sees only committed data, but a re-read can change; REPEATABLE READ (the MySQL default) keeps the same view throughout the transaction; SERIALIZABLE behaves as if transactions ran one at a time. More isolation means more conflicts and retries."
+    },
+    "anomalias-concorrencia": {
+      "term": "Concurrency anomalies",
+      "definition": "What can go wrong with concurrent transactions: dirty read (reading uncommitted data), non-repeatable read (the same SELECT gives different results), phantom read (new rows appear) and lost update (two transactions read, change and one overwrites the other)."
+    },
+    "transferencia": {
+      "title": "Transfer between accounts",
+      "body": "Both updates commit together. If either fails (e.g. the balance constraint), the application issues ROLLBACK and nothing changes."
+    },
+    "lost-update": {
+      "title": "Avoiding lost update",
+      "body": "Reading, computing in the application and writing loses concurrent updates. An atomic update inside the UPDATE itself, or locking the row with FOR UPDATE, solves it."
+    },
+    "lock": {
+      "term": "Lock",
+      "definition": "A lock the database places on rows (or tables) to coordinate concurrent access. Writes to the same row wait for each other until commit. SELECT ... FOR UPDATE locks the rows read by whoever is about to change them."
+    },
+    "deadlock": {
+      "term": "Deadlock",
+      "definition": "Two transactions waiting for each other: A locks row 1 and wants row 2, B locks row 2 and wants row 1. The database detects it and aborts one of them with an error. Prevention: always lock resources in the same order, keep transactions short and retry the aborted one."
+    },
+    "lock-otimista": {
+      "term": "Optimistic and pessimistic locking",
+      "definition": "Pessimistic: lock before changing (FOR UPDATE), good when conflicts are frequent. Optimistic: no lock; keep a version on the row and, on write, check it has not changed (WHERE version = 3); if it has, report or retry. Good for rare conflicts, like editing a profile."
+    },
+    "transacao-longa": {
+      "term": "Long transactions",
+      "definition": "Transactions held open for a long time keep locks, block other writes and, in MVCC databases, prevent cleanup of old row versions. Never leave a transaction open waiting for a user response or an external API."
+    },
+    "otimista-exemplo": {
+      "title": "Optimistic locking with a version",
+      "body": "If someone else saved first, the version changed, the UPDATE affects 0 rows and the application reports the conflict."
+    },
+    "skip-locked": {
+      "title": "Work queue with SKIP LOCKED",
+      "body": "Several workers take tasks from the same table without taking the same one: FOR UPDATE SKIP LOCKED skips rows already locked by another worker."
+    },
+    "indice": {
+      "term": "Index",
+      "definition": "An auxiliary structure (usually a B-tree) that finds rows without reading the whole table, like a book's index. It speeds up WHERE, JOIN and ORDER BY on the indexed columns, but takes space and makes INSERT and UPDATE slower."
+    },
+    "indice-composto": {
+      "term": "Composite index",
+      "definition": "An index on several columns, in the declared order. An index on (customer_id, created_at) works for filtering by customer_id and by customer_id + created_at, but not by created_at alone (the leftmost prefix rule). Put equality columns first, then range or sort columns."
+    },
+    "explain": {
+      "term": "EXPLAIN",
+      "definition": "Shows the plan the database chose for the query: whether it reads the whole table (Seq Scan) or uses an index (Index Scan), how it does the JOINs and how many rows it estimates. EXPLAIN ANALYZE runs the query and shows real timings. It is the first step to investigate slowness."
+    },
+    "paginacao": {
+      "term": "Offset and cursor pagination",
+      "definition": "OFFSET 10000 LIMIT 20 forces the database to walk and discard 10 thousand rows, and gets slow on deep pages. Cursor (keyset) pagination continues where it left off with WHERE id > last_id ORDER BY id LIMIT 20, using the index at constant cost."
+    },
+    "indice-exemplo": {
+      "title": "Index for a frequent query",
+      "body": "The composite index covers the customer filter and the date sort. EXPLAIN confirms whether it is used."
+    },
+    "indice-anulado": {
+      "title": "Queries that skip the index",
+      "body": "Applying a function to the indexed column or starting LIKE with % prevents using a plain index. Rewrite the condition or create an expression index."
+    },
+    "o-que-e-acid": {
+      "question": "What does ACID stand for?",
+      "answer": "Atomicity (the transaction happens entirely or not at all), Consistency (the database rules remain valid), Isolation (concurrent transactions do not interfere, per the chosen level) and Durability (what was committed survives a crash). They are the guarantees that let you trust operations such as a bank transfer."
+    },
+    "consulta-lenta": {
+      "question": "A query got slow. How do you investigate?",
+      "answer": "I run EXPLAIN ANALYZE to see the plan: a full table read where an index should be used, a badly wrong row estimate (stale statistics), an expensive JOIN or a sort spilling to disk. Then I act: create or adjust an index (composite, in the right order), rewrite the condition to use the index, refresh statistics, paginate by cursor, or fetch fewer columns."
+    },
+    "indice-tudo": {
+      "question": "Why not index every column?",
+      "answer": "Because each index takes space and must be updated on every INSERT, UPDATE and DELETE, making writes slower. Low-selectivity indexes (like a boolean) are almost never used. I create indexes from real queries, prioritizing frequent and slow ones, and remove unused ones."
+    },
+    "n-mais-1-banco": {
+      "question": "What is the N+1 problem?",
+      "answer": "It is making 1 query to fetch N items and then 1 more query per item to fetch something related: N+1 database trips where 1 or 2 would do. It shows up a lot with ORMs and lazy loading. I fix it with a JOIN, the ORM's eager loading (JOIN FETCH, select_related, include) or a single query with IN for all the ids."
+    },
+    "deadlock-pergunta": {
+      "question": "What is a deadlock and how do you avoid it?",
+      "answer": "It is when two transactions wait for each other's lock. The database detects it and aborts one. I avoid it by always locking resources in the same order (for example, by ascending id), keeping transactions short, touching as few rows as possible and handling the error with a retry, since rare deadlocks are normal in concurrent systems."
+    },
+    "offset-vs-cursor": {
+      "question": "Offset or cursor pagination: which to choose?",
+      "answer": "Offset is simple and lets you jump to page 7, but it gets slow on deep pages and can repeat or skip items when data is inserted in between. Cursor uses the last seen value (WHERE id > x) with an index, has constant cost and is stable, but only moves forward and back. For feeds and infinite lists, cursor; for small admin tables, offset is fine."
+    }
+  }
+}

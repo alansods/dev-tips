@@ -22,6 +22,14 @@ import springBootEn from '../../content/tracks/spring-boot/translations/en.json'
 import pythonEssencialEn from '../../content/tracks/python-essencial/translations/en.json';
 import fastapiEn from '../../content/tracks/fastapi/translations/en.json';
 import djangoEn from '../../content/tracks/django/translations/en.json';
+import sqlEssencialEn from '../../content/tracks/sql-essencial/translations/en.json';
+import modelagemDeDadosEn from '../../content/tracks/modelagem-de-dados/translations/en.json';
+import transacoesEPerformanceEn from '../../content/tracks/transacoes-e-performance/translations/en.json';
+import postgresqlEn from '../../content/tracks/postgresql/translations/en.json';
+import mysqlEn from '../../content/tracks/mysql/translations/en.json';
+import mongodbEn from '../../content/tracks/mongodb/translations/en.json';
+import redisEn from '../../content/tracks/redis/translations/en.json';
+import nosqlEn from '../../content/tracks/nosql/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -44,4 +52,12 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'python-essencial': { en: pythonEssencialEn },
   fastapi: { en: fastapiEn },
   django: { en: djangoEn },
+  'sql-essencial': { en: sqlEssencialEn },
+  'modelagem-de-dados': { en: modelagemDeDadosEn },
+  'transacoes-e-performance': { en: transacoesEPerformanceEn },
+  postgresql: { en: postgresqlEn },
+  mysql: { en: mysqlEn },
+  mongodb: { en: mongodbEn },
+  redis: { en: redisEn },
+  nosql: { en: nosqlEn },
 };

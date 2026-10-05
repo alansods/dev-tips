@@ -1,0 +1,120 @@
+{
+  "title": "Redis",
+  "description": "The most used in-memory database: data structures, TTL, caching, persistence, pub/sub and queues.",
+  "decks": {
+    "estruturas": {
+      "title": "Data structures",
+      "description": "Redis types and what each one is for."
+    },
+    "cache": {
+      "title": "Cache",
+      "description": "Caching patterns, invalidation and memory limits."
+    },
+    "recursos-redis": {
+      "title": "Persistence, pub/sub and queues",
+      "description": "What Redis offers beyond caching."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Redis questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "redis": {
+      "term": "Redis",
+      "definition": "An in-memory key-value database, very fast (sub-millisecond responses). Values have types with their own operations: string, hash, list, set, sorted set and others. Used as a cache, counter, queue, session store and leaderboard. It runs commands on a main thread, one at a time, so each command is atomic."
+    },
+    "string-hash": {
+      "term": "String and hash",
+      "definition": "A string stores one value per key (text, a number, serialized JSON) and supports INCR for atomic counters. A hash stores an object with several fields under the same key (HSET user:1 name Ana), allowing you to read or change a single field."
+    },
+    "list-set": {
+      "term": "List, set and sorted set",
+      "definition": "A list is ordered by insertion (LPUSH, RPOP), useful for queues and latest items. A set stores unique members with no order (unique visitors, tags). A sorted set attaches a score to each member and keeps them ordered, ideal for leaderboards and scheduling."
+    },
+    "ttl": {
+      "term": "TTL (expiration)",
+      "definition": "A key's time to live: after it, Redis deletes the key on its own. Set with EX on SET or with EXPIRE. It is the basis of caching, sessions, verification codes and per-window rate limits."
+    },
+    "comandos-basicos": {
+      "title": "Everyday commands",
+      "body": "An atomic counter, an object in a hash and a key that expires in 10 minutes."
+    },
+    "ranking": {
+      "title": "Leaderboard with a sorted set",
+      "body": "ZINCRBY adds points; ZREVRANGE returns the top 10 already sorted; ZREVRANK gives a player's position."
+    },
+    "cache-aside": {
+      "term": "Cache-aside",
+      "definition": "The most common caching pattern: the application looks in the cache; if it is not there (a cache miss), it fetches from the database, stores it in the cache with a TTL and returns it. On writes, it updates the database and deletes the cache key, so the next read fetches the new data."
+    },
+    "invalidacao": {
+      "term": "Cache invalidation",
+      "definition": "Making sure the cache does not serve stale data for too long. Strategies: a short TTL, deleting the key when the data changes, versioning the key (product:42:v7) or events that clear the cache. Deleting is safer than updating, because it avoids writing a value from an older write into the cache."
+    },
+    "eviction": {
+      "term": "Eviction policy",
+      "definition": "What Redis does when memory (maxmemory) runs out: with noeviction, it refuses new writes; with allkeys-lru or allkeys-lfu, it removes the least used keys, the right behavior for a cache; with volatile-*, it removes only keys with a TTL."
+    },
+    "cache-stampede": {
+      "term": "Cache stampede",
+      "definition": "When a heavily accessed key expires, hundreds of requests miss it at the same time and all hit the database, which may go down. Solutions: a lock so only one request recomputes (SET NX), refreshing before expiry and adding random jitter to TTLs."
+    },
+    "cache-aside-exemplo": {
+      "title": "Cache-aside in code",
+      "body": "Reads from the cache; on a miss, fetches from the database and stores it with a TTL. When the product is updated, the key is deleted."
+    },
+    "lock-recalculo": {
+      "title": "Lock to recompute only once",
+      "body": "SET with NX only writes if the key does not exist: whoever gets the lock recomputes, the others wait a moment and read the cache."
+    },
+    "persistencia-redis": {
+      "term": "Persistence (RDB and AOF)",
+      "definition": "Redis lives in memory, but it can save to disk. RDB takes periodic snapshots (fast to restart, but loses what changed since the last one). AOF logs every write (losing at most about a second with fsync every second). For a pure cache, both can be turned off."
+    },
+    "pub-sub": {
+      "term": "Pub/sub",
+      "definition": "Publishing messages to channels, delivered immediately to subscribers. It is \"fire and forget\": anyone disconnected misses the message. It fits real-time notifications and invalidating local caches; for messages that must not be lost, use streams."
+    },
+    "streams": {
+      "term": "Streams",
+      "definition": "A persistent message log (XADD), read by consumer groups (XREADGROUP) that split the work and acknowledge processing (XACK). Unacknowledged messages can be reprocessed. It is Redis's way to do reliable queues and events."
+    },
+    "rate-limit": {
+      "term": "Rate limiting",
+      "definition": "Limiting how many requests a client makes per time window. The simplest is a counter per client and minute with INCR and EXPIRE; sliding windows use sorted sets. Since Redis is shared, the limit applies across every API instance."
+    },
+    "rate-limit-exemplo": {
+      "title": "Limit of 100 requests per minute",
+      "body": "The key includes the current minute; INCR counts and the first request sets the expiry. Above 100, the API responds 429."
+    },
+    "stream-exemplo": {
+      "title": "Queue with streams",
+      "body": "The producer adds; each worker in the group receives different messages and acknowledges when done. If a worker crashes, the message stays pending and can be reassigned."
+    },
+    "por-que-redis-rapido": {
+      "question": "Why is Redis so fast?",
+      "answer": "Data lives in memory, the structures are simple and optimized, and commands run on a main thread with no lock contention, with non-blocking network I/O. Most operations are O(1) or O(log n). The cost is memory, pricier than disk, and slow commands (KEYS, operations on huge collections) block everyone."
+    },
+    "estrategia-cache": {
+      "question": "How would you implement a cache with Redis?",
+      "answer": "Cache-aside: I read from Redis; on a miss, I fetch from the database and store it with a TTL. When the data changes, I update the database and delete the key. I set TTLs with random jitter, maxmemory with an allkeys-lru policy and treat a Redis failure as a cache miss, so the application keeps working without it."
+    },
+    "redis-banco-principal": {
+      "question": "Can you use Redis as the primary database?",
+      "answer": "For specific cases, yes (sessions, counters, leaderboards, ephemeral data), with AOF persistence and replicas. As the primary store for business data, usually not: everything must fit in memory, there are no rich queries or relationships, and even with AOF up to about a second can be lost in a crash."
+    },
+    "pubsub-vs-streams": {
+      "question": "What is the difference between pub/sub and streams in Redis?",
+      "answer": "Pub/sub delivers the message only to whoever is connected at that moment and stores nothing: good for real-time notifications. Streams keep the messages, allow reading history, splitting work among consumers in a group and acknowledging processing: good for queues and events that must not be lost."
+    },
+    "cache-stampede-pergunta": {
+      "question": "What is a cache stampede and how do you prevent it?",
+      "answer": "It is when a popular key expires and many requests at once miss it and go to the database to recompute it, overloading it. I prevent it with a lock (SET NX) so only one request recomputes, random jitter on TTLs so keys do not expire together and early refresh of the value before it expires."
+    },
+    "keys-producao": {
+      "question": "Why not use KEYS * in production?",
+      "answer": "Because KEYS walks every key in one go, and since Redis runs one command at a time, everything else waits meanwhile: with millions of keys, the application freezes. I use SCAN, which iterates in batches with a cursor, and avoid needing to list keys by organizing data in sets or hashes."
+    }
+  }
+}

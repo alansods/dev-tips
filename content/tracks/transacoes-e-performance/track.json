@@ -1,0 +1,320 @@
+{
+  "id": "transacoes-e-performance",
+  "title": "Transações e performance",
+  "description": "ACID, níveis de isolamento, locks e deadlocks, índices, EXPLAIN, N+1 e paginação.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "transacoes",
+      "title": "Transações",
+      "description": "Agrupar operações com garantias.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "transacao",
+          "level": "junior",
+          "term": "Transação",
+          "definition": "Grupo de operações que o banco trata como uma só: ou todas são gravadas (COMMIT) ou nenhuma (ROLLBACK). Exemplo clássico: transferir dinheiro, que debita uma conta e credita outra; se a segunda falhar, a primeira é desfeita.",
+          "relatedTerms": [
+            "acid"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "acid",
+          "level": "pleno",
+          "term": "ACID",
+          "definition": "As garantias de uma transação. Atomicidade: tudo ou nada. Consistência: o banco sai de um estado válido para outro, respeitando as regras. Isolamento: transações simultâneas não veem o trabalho incompleto umas das outras (no nível configurado). Durabilidade: depois do commit, os dados sobrevivem a quedas.",
+          "relatedTerms": [
+            "transacao",
+            "isolamento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "isolamento",
+          "level": "senior",
+          "term": "Níveis de isolamento",
+          "definition": "Quanto uma transação enxerga das outras: READ COMMITTED (padrão no PostgreSQL) vê só o que já foi confirmado, mas uma releitura pode mudar; REPEATABLE READ (padrão no MySQL) mantém a mesma visão durante a transação; SERIALIZABLE se comporta como se as transações rodassem uma por vez. Mais isolamento, mais conflitos e reexecuções.",
+          "relatedTerms": [
+            "acid",
+            "anomalias-concorrencia"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "anomalias-concorrencia",
+          "level": "senior",
+          "term": "Anomalias de concorrência",
+          "definition": "O que pode dar errado com transações simultâneas: dirty read (ler dado não confirmado), non-repeatable read (o mesmo SELECT dá resultados diferentes), phantom read (aparecem linhas novas) e lost update (duas transações leem, alteram e uma sobrescreve a outra).",
+          "relatedTerms": [
+            "isolamento"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "transferencia",
+          "level": "junior",
+          "title": "Transferência entre contas",
+          "body": "As duas atualizações confirmam juntas. Se qualquer uma falhar (ex.: a constraint de saldo), a aplicação faz ROLLBACK e nada muda.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "BEGIN;\nUPDATE accounts SET balance = balance - 100 WHERE id = 1;\nUPDATE accounts SET balance = balance + 100 WHERE id = 2;\nCOMMIT;\n-- em caso de erro: ROLLBACK;"
+          },
+          "relatedTerms": [
+            "transacao",
+            "acid"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "lost-update",
+          "level": "senior",
+          "title": "Evitando lost update",
+          "body": "Ler, calcular na aplicação e gravar perde atualizações concorrentes. A atualização atômica no próprio UPDATE, ou travar a linha com FOR UPDATE, resolve.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "-- arriscado: SELECT stock ... ; (aplicação calcula) ; UPDATE ... SET stock = 9\n\n-- atômico\nUPDATE products SET stock = stock - 1 WHERE id = 10 AND stock > 0;\n\n-- ou travando a linha durante a transação\nBEGIN;\nSELECT stock FROM products WHERE id = 10 FOR UPDATE;\nUPDATE products SET stock = stock - 1 WHERE id = 10;\nCOMMIT;"
+          },
+          "relatedTerms": [
+            "anomalias-concorrencia",
+            "transacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concorrencia",
+      "title": "Concorrência e locks",
+      "description": "Travas, deadlocks e controle otimista.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "lock",
+          "level": "pleno",
+          "term": "Lock",
+          "definition": "Trava que o banco coloca em linhas (ou tabelas) para coordenar acessos simultâneos. Escritas na mesma linha esperam umas pelas outras até o commit. SELECT ... FOR UPDATE trava as linhas lidas para quem vai alterá-las em seguida.",
+          "relatedTerms": [
+            "deadlock",
+            "lock-otimista"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "deadlock",
+          "level": "senior",
+          "term": "Deadlock",
+          "definition": "Duas transações esperando uma pela outra: A trava a linha 1 e quer a 2, B trava a 2 e quer a 1. O banco detecta e aborta uma delas com erro. Prevenção: travar recursos sempre na mesma ordem, manter transações curtas e reexecutar a que foi abortada.",
+          "relatedTerms": [
+            "lock"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "lock-otimista",
+          "level": "pleno",
+          "term": "Lock otimista e pessimista",
+          "definition": "Pessimista: trava antes de alterar (FOR UPDATE), bom quando conflitos são frequentes. Otimista: não trava; guarda uma versão na linha e, ao gravar, confere se ela não mudou (WHERE version = 3); se mudou, avisa ou tenta de novo. Bom para conflitos raros, como edição de cadastro.",
+          "relatedTerms": [
+            "lock"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "transacao-longa",
+          "level": "pleno",
+          "term": "Transações longas",
+          "definition": "Transações abertas por muito tempo seguram locks, bloqueiam outras escritas e, em bancos com MVCC, impedem a limpeza de versões antigas. Nunca deixe uma transação aberta esperando resposta do usuário ou de uma API externa.",
+          "relatedTerms": [
+            "lock",
+            "deadlock"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "otimista-exemplo",
+          "level": "pleno",
+          "title": "Lock otimista com versão",
+          "body": "Se outra pessoa salvou antes, a versão mudou, o UPDATE afeta 0 linhas e a aplicação avisa sobre o conflito.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "UPDATE customers\nSET name = 'Ana Souza', version = version + 1\nWHERE id = 7 AND version = 3;\n-- 0 linhas afetadas => conflito: recarregue e tente de novo"
+          },
+          "relatedTerms": [
+            "lock-otimista"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "skip-locked",
+          "level": "senior",
+          "title": "Fila de trabalho com SKIP LOCKED",
+          "body": "Vários workers pegam tarefas da mesma tabela sem pegar a mesma: FOR UPDATE SKIP LOCKED pula as linhas já travadas por outro worker.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "BEGIN;\nSELECT id, payload FROM jobs\nWHERE status = 'pending'\nORDER BY created_at\nLIMIT 1\nFOR UPDATE SKIP LOCKED;\n-- processa e marca como concluído\nUPDATE jobs SET status = 'done' WHERE id = :id;\nCOMMIT;"
+          },
+          "relatedTerms": [
+            "lock",
+            "deadlock"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indices-e-consultas",
+      "title": "Índices e consultas",
+      "description": "Como deixar consultas rápidas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "indice",
+          "level": "junior",
+          "term": "Índice",
+          "definition": "Estrutura auxiliar (normalmente uma árvore B-tree) que permite achar linhas sem ler a tabela inteira, como o índice remissivo de um livro. Acelera WHERE, JOIN e ORDER BY nas colunas indexadas, mas ocupa espaço e deixa INSERT e UPDATE mais lentos.",
+          "relatedTerms": [
+            "indice-composto",
+            "explain"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "indice-composto",
+          "level": "pleno",
+          "term": "Índice composto",
+          "definition": "Índice em várias colunas, na ordem declarada. Um índice (customer_id, created_at) serve para filtrar por customer_id e por customer_id + created_at, mas não só por created_at (regra do prefixo à esquerda). Coloque primeiro as colunas de igualdade e depois as de intervalo ou ordenação.",
+          "relatedTerms": [
+            "indice"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "explain",
+          "level": "pleno",
+          "term": "EXPLAIN",
+          "definition": "Mostra o plano que o banco escolheu para a consulta: se lê a tabela inteira (Seq Scan) ou usa índice (Index Scan), como faz os JOINs e quantas linhas estima. EXPLAIN ANALYZE roda a consulta e mostra os tempos reais. É o primeiro passo para investigar lentidão.",
+          "relatedTerms": [
+            "indice"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "paginacao",
+          "level": "pleno",
+          "term": "Paginação por offset e por cursor",
+          "definition": "OFFSET 10000 LIMIT 20 obriga o banco a percorrer e descartar 10 mil linhas, e fica lento em páginas fundas. A paginação por cursor (keyset) continua de onde parou com WHERE id > último_id ORDER BY id LIMIT 20, usando o índice e com custo constante.",
+          "relatedTerms": [
+            "indice"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "indice-exemplo",
+          "level": "pleno",
+          "title": "Índice para uma consulta frequente",
+          "body": "O índice composto cobre o filtro por cliente e a ordenação por data. O EXPLAIN confirma se ele é usado.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "CREATE INDEX orders_customer_created_idx\n  ON orders (customer_id, created_at DESC);\n\nEXPLAIN ANALYZE\nSELECT id, total FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC\nLIMIT 20;"
+          },
+          "relatedTerms": [
+            "indice-composto",
+            "explain"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "indice-anulado",
+          "level": "senior",
+          "title": "Consultas que não usam o índice",
+          "body": "Aplicar função na coluna indexada ou começar o LIKE com % impede o uso do índice comum. Reescreva a condição ou crie um índice de expressão.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "-- não usa o índice em created_at\nSELECT * FROM orders WHERE DATE(created_at) = '2026-10-01';\n-- usa\nSELECT * FROM orders\nWHERE created_at >= '2026-10-01' AND created_at < '2026-10-02';\n\n-- índice de expressão para busca sem caixa\nCREATE INDEX users_email_lower_idx ON users (lower(email));"
+          },
+          "relatedTerms": [
+            "indice",
+            "explain"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre transações e performance de banco que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "o-que-e-acid",
+          "level": "junior",
+          "question": "O que significa ACID?",
+          "answer": "Atomicidade (a transação acontece inteira ou não acontece), Consistência (as regras do banco continuam válidas), Isolamento (transações simultâneas não interferem, conforme o nível escolhido) e Durabilidade (o que foi confirmado não se perde numa queda). São as garantias que permitem confiar em operações como uma transferência bancária.",
+          "relatedTerms": [
+            "acid"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "consulta-lenta",
+          "level": "pleno",
+          "question": "Uma consulta ficou lenta. Como você investiga?",
+          "answer": "Rodo EXPLAIN ANALYZE para ver o plano: leitura da tabela inteira onde deveria usar índice, estimativa de linhas muito errada (estatísticas desatualizadas), JOIN caro ou ordenação em disco. Depois ajo: crio ou ajusto índice (composto, na ordem certa), reescrevo a condição para usar o índice, atualizo estatísticas, pagino por cursor, ou reduzo as colunas trazidas.",
+          "relatedTerms": [
+            "explain",
+            "indice"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "indice-tudo",
+          "level": "pleno",
+          "question": "Por que não indexar todas as colunas?",
+          "answer": "Porque cada índice ocupa espaço e precisa ser atualizado em todo INSERT, UPDATE e DELETE, deixando as escritas mais lentas. Índices pouco seletivos (como um booleano) quase nunca são usados. Crio índices a partir das consultas reais, priorizando as frequentes e lentas, e removo os que não são usados.",
+          "relatedTerms": [
+            "indice"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "n-mais-1-banco",
+          "level": "pleno",
+          "question": "O que é o problema N+1?",
+          "answer": "É fazer 1 consulta para buscar N itens e depois mais 1 consulta para cada item, para buscar algo relacionado: N+1 idas ao banco onde 1 ou 2 bastariam. Aparece muito com ORMs e carregamento lazy. Resolvo com JOIN, carregamento antecipado do ORM (JOIN FETCH, select_related, include) ou uma consulta com IN para todos os ids.",
+          "relatedTerms": [
+            "explain"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "deadlock-pergunta",
+          "level": "senior",
+          "question": "O que é um deadlock e como evitar?",
+          "answer": "É quando duas transações ficam esperando uma pelo lock da outra. O banco detecta e aborta uma. Evito travando recursos sempre na mesma ordem (por exemplo, por id crescente), mantendo transações curtas, tocando o mínimo de linhas e tratando o erro com uma nova tentativa, já que deadlocks raros são normais em sistemas concorrentes.",
+          "relatedTerms": [
+            "deadlock",
+            "lock"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "offset-vs-cursor",
+          "level": "senior",
+          "question": "Paginação por offset ou por cursor: qual escolher?",
+          "answer": "Offset é simples e permite pular para a página 7, mas fica lento em páginas fundas e pode repetir ou pular itens quando dados entram no meio. Cursor usa o último valor visto (WHERE id > x) com índice, tem custo constante e é estável, mas só anda para a frente e para trás. Para feeds e listas infinitas, cursor; para tabelas administrativas pequenas, offset serve.",
+          "relatedTerms": [
+            "paginacao"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "title": "PostgreSQL",
+  "description": "The most complete open source relational database: advanced types, indexes, MVCC, VACUUM and extensions.",
+  "decks": {
+    "tipos-e-recursos": {
+      "title": "Types and features",
+      "description": "What PostgreSQL offers beyond basic SQL."
+    },
+    "indices-postgres": {
+      "title": "Indexes",
+      "description": "Index types and when to use each."
+    },
+    "mvcc-e-manutencao": {
+      "title": "MVCC and maintenance",
+      "description": "How PostgreSQL handles concurrency and cleanup."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "PostgreSQL questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "jsonb": {
+      "term": "JSONB",
+      "definition": "A type that stores JSON in binary form, with operators to query inside the document (->, ->>, @>) and support for GIN indexes. It lets you mix structured columns with flexible data (variable product attributes) without another database. JSON (without the B) stores the text as it came and is slower to query."
+    },
+    "tipos-postgres": {
+      "term": "Useful PostgreSQL types",
+      "definition": "Beyond the usual ones: TIMESTAMPTZ (date and time with time zone, the right choice for instants), NUMERIC (exact values, for money), UUID, arrays (TEXT[]), ENUM, ranges (tstzrange) and network types (inet). Choosing the right type avoids conversions and bugs."
+    },
+    "upsert": {
+      "term": "Upsert (ON CONFLICT)",
+      "definition": "INSERT ... ON CONFLICT (column) DO UPDATE inserts or, if a row with that unique key already exists, updates, in a single atomic operation. DO NOTHING ignores the duplicate. It avoids the race condition of \"query then insert\"."
+    },
+    "extensoes": {
+      "term": "Extensions",
+      "definition": "Modules that add features to the database with CREATE EXTENSION: pg_trgm (text similarity search), PostGIS (geographic data), pgvector (vectors for semantic search and AI), pg_stat_statements (query statistics). Many needs fit inside PostgreSQL itself."
+    },
+    "jsonb-exemplo": {
+      "title": "Querying JSONB",
+      "body": "->> extracts the value as text; @> tests whether the document contains the fragment, and is sped up by the GIN index."
+    },
+    "upsert-exemplo": {
+      "title": "Counter upsert",
+      "body": "The first visit inserts; later ones add up. EXCLUDED is the row that was being inserted."
+    },
+    "indice-btree": {
+      "term": "B-tree",
+      "definition": "The default index type. It works for equality, ranges (>, <, BETWEEN), sorting and LIKE with a fixed prefix ('abc%'). It is the right choice for keys, dates and most filtered columns."
+    },
+    "indice-gin": {
+      "term": "GIN and GiST",
+      "definition": "Indexes for composite values. GIN indexes the elements inside the value: JSONB, arrays, full-text search and trigrams (pg_trgm, which speeds up LIKE '%text%'). GiST is for geometric data, ranges and proximity (PostGIS, overlap exclusion)."
+    },
+    "indice-parcial": {
+      "term": "Partial and expression index",
+      "definition": "A partial index covers only rows matching a WHERE (e.g. only pending orders), making it smaller and faster. An expression index indexes the result of a function, such as lower(email), for case-insensitive lookups."
+    },
+    "concurrently": {
+      "term": "CREATE INDEX CONCURRENTLY",
+      "definition": "Creates the index without blocking writes to the table, at the cost of taking longer and not being able to run inside a transaction. On large production tables it is the safe way; a plain CREATE INDEX blocks INSERT, UPDATE and DELETE until it finishes."
+    },
+    "indices-exemplo": {
+      "title": "The right index for each case",
+      "body": "Partial for the pending queue, expression for case-insensitive email, trigrams for substring search and CONCURRENTLY to avoid locking the table."
+    },
+    "covering-index": {
+      "title": "Covering index (INCLUDE)",
+      "body": "With the extra columns in INCLUDE, the query is answered from the index alone (Index Only Scan), without reading the table."
+    },
+    "mvcc": {
+      "term": "MVCC",
+      "definition": "Multi-Version Concurrency Control: instead of changing the row in place, each UPDATE creates a new version, and each transaction sees the versions valid for it. That way reads do not block writes and vice versa. Old versions become \"dead tuples\" that must be cleaned up."
+    },
+    "vacuum": {
+      "term": "VACUUM and autovacuum",
+      "definition": "VACUUM reclaims the space of dead tuples and updates the visibility map; ANALYZE refreshes the statistics the planner uses. Autovacuum does this on its own, but tables with many UPDATEs may need tuning. Without cleanup, the table bloats and queries slow down."
+    },
+    "connection-pool": {
+      "term": "Connection pool",
+      "definition": "Each PostgreSQL connection is a process and uses memory; hundreds of direct connections hurt performance. The application uses a pool (in the driver or ORM) and, at scale or with serverless, an external pooler such as PgBouncer, which reuses a few real connections."
+    },
+    "replicacao-postgres": {
+      "term": "Replication and read replicas",
+      "definition": "Streaming replication sends the write-ahead log (WAL) from the primary to replicas, which can serve reads. By default it is asynchronous: the replica may lag a few milliseconds, so reading right after writing may not see the new data."
+    },
+    "pg-stat-statements": {
+      "title": "Finding the most expensive queries",
+      "body": "pg_stat_statements aggregates every executed query; sorting by total time shows where to optimize first."
+    },
+    "bloat-check": {
+      "title": "Tables with many dead tuples",
+      "body": "Shows which tables are piling up dead tuples and when autovacuum last went through them."
+    },
+    "por-que-postgres": {
+      "question": "Why choose PostgreSQL?",
+      "answer": "It is open source, robust and very complete: ACID transactions, advanced types (JSONB, arrays, ranges), several index types, CTEs and window functions, extensions (PostGIS, pgvector) and good SQL standard compliance. It covers everything from plain CRUD to semi-structured and geographic data without another database."
+    },
+    "json-vs-jsonb": {
+      "question": "What is the difference between JSON and JSONB?",
+      "answer": "JSON stores the text exactly as it came (whitespace, order and duplicate keys) and reparses it on every query. JSONB stores an already-parsed binary format: it writes a bit slower, but queries much faster and supports GIN indexes. In practice I use JSONB, unless I need to preserve the original text."
+    },
+    "o-que-e-mvcc": {
+      "question": "What is MVCC and what is its consequence?",
+      "answer": "It is multi-version concurrency control: each UPDATE creates a new row version and each transaction sees its own snapshot, so reads do not block writes. The consequence is piling up dead versions, which VACUUM cleans. Transactions held open for a long time prevent that cleanup and cause bloat."
+    },
+    "busca-texto": {
+      "question": "How do you speed up a LIKE '%text%' search in PostgreSQL?",
+      "answer": "A B-tree index does not help when the pattern starts with %. I use the pg_trgm extension with a GIN trigram index, which speeds up LIKE and ILIKE with a leading wildcard and similarity search. For natural-language search, with ranking and stemming, I use full-text search (tsvector) or an engine like Elasticsearch."
+    },
+    "muitas-conexoes": {
+      "question": "The application exceeds PostgreSQL's connection limit. What do you do?",
+      "answer": "I do not just raise max_connections, because each connection is a process and uses memory. I configure the application pool with a suitable size and, with many instances or serverless functions, put PgBouncer in transaction mode in front. I also check for leaking connections (not returned to the pool) and long transactions."
+    },
+    "indice-producao": {
+      "question": "How do you create an index on a large production table?",
+      "answer": "With CREATE INDEX CONCURRENTLY, which does not block writes. It takes longer, cannot run inside a transaction and, if it fails, leaves an invalid index that I must drop and recreate. Beforehand I check with EXPLAIN that the index will be used, and afterwards I watch the impact on writes."
+    }
+  }
+}

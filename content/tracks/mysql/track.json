@@ -1,0 +1,313 @@
+{
+  "id": "mysql",
+  "title": "MySQL",
+  "description": "O banco relacional mais popular da web: InnoDB, índice clusterizado, replicação, charset e diferenças para o PostgreSQL.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "innodb",
+      "title": "InnoDB",
+      "description": "O motor de armazenamento padrão e suas garantias.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "innodb",
+          "level": "junior",
+          "term": "InnoDB",
+          "definition": "O motor de armazenamento padrão do MySQL: transações ACID, chaves estrangeiras, travas por linha e recuperação após queda. O antigo MyISAM não tem transações nem chaves estrangeiras e não deve ser usado em aplicações.",
+          "relatedTerms": [
+            "indice-clusterizado",
+            "isolamento-mysql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "isolamento-mysql",
+          "level": "pleno",
+          "term": "REPEATABLE READ e gap locks",
+          "definition": "O nível de isolamento padrão do InnoDB é REPEATABLE READ: a transação lê sempre o mesmo snapshot. Para evitar linhas fantasmas em leituras com trava, o InnoDB usa gap locks (travas nos intervalos entre linhas), que podem bloquear inserções inesperadamente e causar deadlocks.",
+          "relatedTerms": [
+            "innodb"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "auto-increment",
+          "level": "junior",
+          "term": "AUTO_INCREMENT",
+          "definition": "Gera o próximo número inteiro para a chave primária a cada inserção. Os valores podem ter buracos (rollback, falhas), então não servem como contagem. LAST_INSERT_ID() devolve o id gerado na conexão atual.",
+          "relatedTerms": [
+            "innodb"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "sql-mode",
+          "level": "pleno",
+          "term": "sql_mode estrito",
+          "definition": "Configuração que define o quanto o MySQL é rigoroso. No modo estrito (padrão nas versões atuais), inserir texto longo demais ou valor inválido dá erro; sem ele, o MySQL corta ou converte o dado em silêncio e só gera um aviso, corrompendo informação.",
+          "relatedTerms": [
+            "innodb"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "tabela-innodb",
+          "level": "junior",
+          "title": "Criando uma tabela",
+          "body": "InnoDB e utf8mb4 explícitos, chave primária com AUTO_INCREMENT e chave estrangeira com índice.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "CREATE TABLE orders (\n  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n  customer_id BIGINT UNSIGNED NOT NULL,\n  total DECIMAL(10, 2) NOT NULL,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  INDEX idx_orders_customer (customer_id),\n  CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES customers (id)\n) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;"
+          },
+          "relatedTerms": [
+            "innodb",
+            "auto-increment"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "upsert-mysql",
+          "level": "pleno",
+          "title": "Upsert no MySQL",
+          "body": "O equivalente ao ON CONFLICT do PostgreSQL é ON DUPLICATE KEY UPDATE, acionado por qualquer chave primária ou única duplicada.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "INSERT INTO page_views (page, day, views)\nVALUES ('/home', CURRENT_DATE, 1)\nON DUPLICATE KEY UPDATE views = views + 1;"
+          },
+          "relatedTerms": [
+            "innodb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indices-mysql",
+      "title": "Índices",
+      "description": "Índice clusterizado, secundários e como o MySQL os usa.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "indice-clusterizado",
+          "level": "senior",
+          "term": "Índice clusterizado",
+          "definition": "No InnoDB, a tabela é guardada ordenada pela chave primária: as linhas ficam dentro do próprio índice da PK. Buscas pela PK são muito rápidas. Por isso uma PK aleatória (UUIDv4) espalha inserções pelo arquivo e fragmenta; chaves sequenciais ou UUIDv7 inserem sempre no fim.",
+          "relatedTerms": [
+            "indice-secundario",
+            "innodb"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "indice-secundario",
+          "level": "pleno",
+          "term": "Índice secundário",
+          "definition": "Qualquer índice que não é a PK. No InnoDB, ele guarda a coluna indexada e o valor da chave primária; achar a linha completa exige uma segunda busca no índice clusterizado. Uma PK grande deixa todos os índices secundários maiores.",
+          "relatedTerms": [
+            "indice-clusterizado",
+            "covering-mysql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "covering-mysql",
+          "level": "pleno",
+          "term": "Índice de cobertura",
+          "definition": "Quando todas as colunas que a consulta precisa estão no índice, o MySQL responde sem ler a linha da tabela. No EXPLAIN aparece \"Using index\". Incluir colunas no índice composto pode eliminar a segunda busca.",
+          "relatedTerms": [
+            "indice-secundario"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "explain-mysql",
+          "level": "pleno",
+          "term": "EXPLAIN no MySQL",
+          "definition": "Mostra o plano por tabela: type (ALL é leitura completa; ref, range e const usam índice), key (índice escolhido), rows (linhas estimadas) e Extra (Using filesort, Using temporary indicam trabalho extra). EXPLAIN ANALYZE, no MySQL 8, executa e mostra os tempos reais.",
+          "relatedTerms": [
+            "covering-mysql"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "explain-exemplo-mysql",
+          "level": "pleno",
+          "title": "Lendo um EXPLAIN",
+          "body": "Antes do índice, type ALL com Using filesort; depois, ref com o índice composto, que também cobre a ordenação.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "EXPLAIN SELECT id, total FROM orders\nWHERE customer_id = 42\nORDER BY created_at DESC LIMIT 20;\n-- type: ALL, Extra: Using where; Using filesort\n\nCREATE INDEX idx_orders_customer_created ON orders (customer_id, created_at);\n-- type: ref, key: idx_orders_customer_created"
+          },
+          "relatedTerms": [
+            "explain-mysql"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "pk-sequencial",
+          "level": "senior",
+          "title": "Escolhendo a chave primária no InnoDB",
+          "body": "BIGINT sequencial é compacto e insere no fim do índice clusterizado. Para UUID, guarde em BINARY(16), e de preferência ordenado pelo tempo.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "-- bom para o índice clusterizado\nid BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY\n\n-- UUID compacto e ordenado pelo tempo (swap_flag = 1 reordena o UUIDv1)\nid BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID(), 1))"
+          },
+          "relatedTerms": [
+            "indice-clusterizado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "replicacao-e-operacao",
+      "title": "Replicação e operação",
+      "description": "Réplicas, charset e diferenças para o PostgreSQL.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "binlog-replicacao",
+          "level": "pleno",
+          "term": "Binlog e replicação",
+          "definition": "O MySQL grava as alterações no binary log (binlog), e as réplicas leem e reaplicam esse log. A replicação é assíncrona por padrão (semissíncrona como opção), então réplicas podem atrasar. O binlog também é usado para recuperar até um ponto no tempo e para captura de mudanças (CDC).",
+          "relatedTerms": [
+            "charset"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "charset",
+          "level": "pleno",
+          "term": "utf8mb4 e collation",
+          "definition": "O \"utf8\" antigo do MySQL guarda só até 3 bytes por caractere e não aceita emojis; o certo é utf8mb4. A collation define como textos são comparados e ordenados: _ai_ci ignora acentos e maiúsculas, o que afeta buscas e índices únicos (\"José\" e \"jose\" viram iguais).",
+          "relatedTerms": [
+            "binlog-replicacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mysql-vs-postgres",
+          "level": "pleno",
+          "term": "MySQL e PostgreSQL",
+          "definition": "Os dois são relacionais, ACID e maduros. O MySQL é simples de operar, muito difundido e otimizado para cargas de leitura típicas da web. O PostgreSQL tem mais recursos (tipos, índices, extensões, conformidade com o padrão SQL). A escolha costuma depender mais do time e do ecossistema do que de desempenho.",
+          "relatedTerms": [
+            "charset"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "online-ddl",
+          "level": "senior",
+          "term": "Alterações de esquema online",
+          "definition": "ALTER TABLE em tabelas grandes pode travar escritas ou demorar horas. O InnoDB suporta várias alterações com ALGORITHM=INSTANT ou INPLACE e LOCK=NONE; para as demais, ferramentas como gh-ost e pt-online-schema-change copiam a tabela em segundo plano e trocam no fim.",
+          "relatedTerms": [
+            "binlog-replicacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "alter-instant",
+          "level": "senior",
+          "title": "ALTER sem travar a tabela",
+          "body": "Pedir o algoritmo explicitamente faz o MySQL falhar na hora se não puder fazer a alteração sem travar, em vez de travar a tabela em silêncio.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "ALTER TABLE orders ADD COLUMN coupon_code VARCHAR(32) NULL, ALGORITHM = INSTANT;\n\nALTER TABLE orders ADD INDEX idx_orders_status (status), ALGORITHM = INPLACE, LOCK = NONE;"
+          },
+          "relatedTerms": [
+            "online-ddl"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "emoji-utf8mb4",
+          "level": "pleno",
+          "title": "Convertendo para utf8mb4",
+          "body": "Com o charset antigo, salvar um emoji falha ou vira \"?\". A conversão da tabela e da conexão resolve.",
+          "snippet": {
+            "file": "mysql.sql",
+            "language": "sql",
+            "code": "ALTER TABLE comments\n  CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;\n\n-- e na conexão da aplicação: charset=utf8mb4"
+          },
+          "relatedTerms": [
+            "charset"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de MySQL que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "innodb-vs-myisam",
+          "level": "junior",
+          "question": "Qual a diferença entre InnoDB e MyISAM?",
+          "answer": "InnoDB tem transações, chaves estrangeiras, travas por linha e recuperação após queda; é o padrão e o certo para aplicações. MyISAM não tem transações nem chaves estrangeiras, trava a tabela inteira nas escritas e pode corromper numa queda. Hoje só aparece em sistemas antigos.",
+          "relatedTerms": [
+            "innodb"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "clusterizado-pergunta",
+          "level": "senior",
+          "question": "O que é um índice clusterizado e por que importa no MySQL?",
+          "answer": "No InnoDB, os dados da tabela ficam fisicamente ordenados pela chave primária, dentro do índice dela. Buscas e intervalos pela PK são rápidos, e todo índice secundário guarda a PK para chegar à linha. Por isso escolho uma PK pequena e crescente: UUID aleatório fragmenta o índice e aumenta todos os secundários.",
+          "relatedTerms": [
+            "indice-clusterizado",
+            "indice-secundario"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "utf8-emoji",
+          "level": "pleno",
+          "question": "Por que o MySQL não salva emojis?",
+          "answer": "Porque a tabela ou a conexão usa o charset utf8 antigo do MySQL, que é limitado a 3 bytes por caractere, e emojis precisam de 4. A solução é usar utf8mb4 nas tabelas, colunas e na conexão da aplicação, com uma collation moderna como utf8mb4_0900_ai_ci.",
+          "relatedTerms": [
+            "charset"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "replica-atrasada",
+          "level": "pleno",
+          "question": "O usuário salvou um dado e não o viu na tela seguinte. O que pode ser?",
+          "answer": "Leitura numa réplica assíncrona que ainda não recebeu a alteração (replication lag). Soluções: ler do primário logo depois de escrever (read-your-writes), por um tempo ou para aquele usuário; direcionar à réplica só leituras que toleram atraso; e monitorar o atraso das réplicas.",
+          "relatedTerms": [
+            "binlog-replicacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mysql-ou-postgres",
+          "level": "pleno",
+          "question": "MySQL ou PostgreSQL: como escolher?",
+          "answer": "Para a maioria das aplicações, os dois resolvem. Escolho PostgreSQL quando preciso de recursos avançados (JSONB com índice, tipos geográficos, extensões como pgvector, consultas analíticas complexas). MySQL é uma boa escolha quando o time e a infraestrutura já o dominam ou o ecossistema (hospedagem, ferramentas) favorece. O mais importante é o time saber operar.",
+          "relatedTerms": [
+            "mysql-vs-postgres"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "gap-lock-pergunta",
+          "level": "senior",
+          "question": "Por que uma inserção ficou bloqueada sem ninguém mexer naquela linha?",
+          "answer": "Provavelmente por um gap lock: no REPEATABLE READ, leituras com trava (SELECT ... FOR UPDATE, UPDATE com faixa) no InnoDB travam também os intervalos entre os registros, para evitar linhas fantasmas. Uma inserção nesse intervalo espera. Reduzo usando condições pela chave exata, índices adequados ou READ COMMITTED quando a aplicação permite.",
+          "relatedTerms": [
+            "isolamento-mysql"
+          ]
+        }
+      ]
+    }
+  ]
+}

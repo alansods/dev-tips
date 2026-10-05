@@ -16,7 +16,7 @@ context: |
   textos exibidos em PT-BR.
   Organização (2026-10-05, changes rename-theme-to-track e
   add-content-taxonomy): o conjunto de decks se chama "trilha" (track).
-  Trilhas ficam em áreas (Fundamentos, Frontend, Backend) e, opcionalmente,
+  Trilhas ficam em áreas (Fundamentos, Frontend, Backend, Banco de dados) e, opcionalmente,
   numa linguagem e num framework do cadastro content/taxonomy.json; trilhas
   com variants são "Comparativos". Todo card tem nível (junior, pleno,
   senior), exibido como chip informativo.

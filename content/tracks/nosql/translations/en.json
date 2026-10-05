@@ -1,0 +1,120 @@
+{
+  "title": "NoSQL: models and when to use them",
+  "description": "The kinds of non-relational database (document, key-value, wide-column, graph and search), the CAP theorem and how to choose.",
+  "decks": {
+    "modelos": {
+      "title": "Data models",
+      "description": "The main kinds of NoSQL database."
+    },
+    "teorema-cap": {
+      "title": "CAP and consistency",
+      "description": "The choices of a distributed database."
+    },
+    "quando-usar": {
+      "title": "When to use each one",
+      "description": "Choosing and combining databases."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about NoSQL and choosing databases that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "nosql": {
+      "term": "NoSQL",
+      "definition": "A generic name for databases that do not use the relational model of tables and JOINs. They trade part of SQL's guarantees and query flexibility for horizontal scale, a flexible schema or performance on a specific access pattern. It is not \"better\" than SQL: it is a different tool."
+    },
+    "banco-documento": {
+      "term": "Document database",
+      "definition": "Stores JSON/BSON documents with a nested, flexible structure, queryable by any field. Good for aggregates read together (profile, catalog, content). Examples: MongoDB, Couchbase, Firestore."
+    },
+    "chave-valor": {
+      "term": "Key-value",
+      "definition": "The simplest model: one value per key, fetched only by key, with very low latency. It fits caches, sessions, counters and settings. Examples: Redis, Memcached, DynamoDB (which also has document features)."
+    },
+    "colunar": {
+      "term": "Wide-column",
+      "definition": "Organizes data into partitions by a key, with rows that can have many columns, and is built for huge volumes of distributed writes. Queries must follow the partition key, so modeling starts from each query. Examples: Cassandra, ScyllaDB, HBase. Not to be confused with columnar analytical databases (such as ClickHouse)."
+    },
+    "grafo": {
+      "term": "Graph database",
+      "definition": "Stores nodes and edges (relationships) as first-class citizens, making it fast to traverse multi-level connections: friends of friends, recommendations, fraud detection, routes. Examples: Neo4j (with the Cypher language), Amazon Neptune."
+    },
+    "motor-busca": {
+      "term": "Search engine",
+      "definition": "Indexes text with an inverted index for relevance-ranked search, typo tolerance, filters and aggregations (facets). It is usually a read copy of the primary database's data, not the source of truth. Examples: Elasticsearch, OpenSearch, Meilisearch."
+    },
+    "teorema-cap": {
+      "term": "CAP theorem",
+      "definition": "In a distributed system, when there is a network partition (P, unavoidable in practice), you must choose between consistency (C: everyone reads the latest data or gets an error) and availability (A: every node responds, even with possibly stale data). Databases position themselves as CP or AP."
+    },
+    "consistencia-eventual": {
+      "term": "Eventual consistency",
+      "definition": "The guarantee that, if writes stop, all replicas will converge to the same value, but a read may see old data for a while. Acceptable for likes, feeds and catalogs; unsuitable for balances and stock, which need strong consistency."
+    },
+    "pacelc": {
+      "term": "PACELC",
+      "definition": "An extension of CAP: with a partition (P), you choose between availability and consistency (A or C); else (E), between latency and consistency (L or C). It shows that even without failures there is a cost: waiting for several replicas to confirm makes operations slower."
+    },
+    "quorum": {
+      "term": "Quorum",
+      "definition": "In replicated databases such as Cassandra, each operation chooses how many replicas must respond. With N replicas, if W (write) + R (read) > N, every read reaches at least one replica with the latest write. QUORUM for both reads and writes is the most common balance."
+    },
+    "quorum-exemplo": {
+      "title": "Tuning consistency in Cassandra",
+      "body": "With 3 replicas, QUORUM requires 2. Writing and reading at QUORUM (2 + 2 > 3) guarantees reading the latest write; ONE responds faster but may read old data."
+    },
+    "read-your-writes": {
+      "title": "Read your writes",
+      "body": "With eventually consistent replicas, a user may not see what they just saved. Routing their reads to the primary for a few seconds after the write fixes the experience without requiring strong consistency everywhere."
+    },
+    "persistencia-poliglota": {
+      "term": "Polyglot persistence",
+      "definition": "Using different databases for different needs in the same system: relational for orders and payments, Redis for cache and sessions, Elasticsearch for search, a graph database for recommendations. The gain is the right tool; the cost is operating and syncing several databases."
+    },
+    "relacional-padrao": {
+      "term": "Relational as the starting point",
+      "definition": "For most applications, a relational database works well: transactions, flexible queries, integrity and plenty of available knowledge. PostgreSQL also covers JSON, full-text search and vectors. Adding NoSQL makes sense when a concrete need appears that relational handles poorly."
+    },
+    "sincronizacao": {
+      "term": "Syncing databases (CDC and outbox)",
+      "definition": "Writing to the primary database and then to another (search, cache) can leave them out of sync if the second write fails. Change Data Capture reads the database log and propagates changes (Debezium); the outbox pattern writes the event to a table in the same transaction, and a process publishes it later."
+    },
+    "escala-horizontal": {
+      "term": "Vertical and horizontal scaling",
+      "definition": "Scaling vertically is using a bigger machine; horizontally, spreading the data across several (sharding). Many NoSQL databases were born to scale horizontally with ease. Relational databases scale reads with replicas and, for writes, need application-level sharding or distributed solutions (Citus, CockroachDB, Vitess)."
+    },
+    "mapa-de-escolha": {
+      "title": "Quick choice map",
+      "body": "A starting point for the conversation, not a rule: the access pattern and the required guarantees decide."
+    },
+    "outbox-exemplo": {
+      "title": "Outbox pattern",
+      "body": "The event is written in the same transaction as the order, so either both exist or neither does. A separate process publishes pending events and updates search and cache."
+    },
+    "sql-vs-nosql": {
+      "question": "What is the difference between SQL and NoSQL?",
+      "answer": "SQL databases use tables with a defined schema, key-based relationships, JOINs and ACID transactions, with very flexible queries. NoSQL is a group of models (document, key-value, wide-column, graph) that trade part of those traits for a flexible schema, horizontal scale or performance on a specific access pattern. The choice depends on how the data is used."
+    },
+    "cap-pergunta": {
+      "question": "Explain the CAP theorem.",
+      "answer": "A distributed system cannot guarantee consistency, availability and partition tolerance at the same time. Since network partitions happen, in practice the choice is, during a partition, between refusing operations to stay consistent (CP) or answering with possibly stale data (AP). PACELC completes it: even without failures, there is a trade-off between latency and consistency."
+    },
+    "consistencia-eventual-pergunta": {
+      "question": "Where is eventual consistency acceptable?",
+      "answer": "Where reading data a few seconds late causes no harm: like counts, views, feeds, catalogs, search results, recommendations. It does not fit balances, stock at purchase time, signup uniqueness or any rule that depends on the exact current value; in those cases I use strong consistency or transactions."
+    },
+    "quando-grafo": {
+      "question": "When does a graph database make sense?",
+      "answer": "When the main queries traverse multi-level relationships and variable paths: social networks (friends of friends), recommendations, fraud detection through connections, dependencies and routes. In relational databases this becomes many JOINs or recursive CTEs that slow down with depth; in a graph, traversing an edge is cheap."
+    },
+    "busca-separada": {
+      "question": "Why use Elasticsearch if the data is already in the database?",
+      "answer": "For quality text search: relevance, typo tolerance, synonyms, facets and good speed at large volumes, which the primary database does poorly or at high cost. Elasticsearch stays as a read copy, fed by CDC or outbox; the database remains the source of truth, and I accept a small indexing delay."
+    },
+    "escolher-banco": {
+      "question": "How do you choose the database for a new system?",
+      "answer": "I start from the access patterns and guarantees: what data exists, how it relates, which queries are critical, volume and growth, and where I need transactions and strong consistency. When in doubt, I start with a relational database such as PostgreSQL, which covers a lot, and add specialized databases (cache, search, graph) when a concrete need shows up, also considering what the team can operate."
+    }
+  }
+}

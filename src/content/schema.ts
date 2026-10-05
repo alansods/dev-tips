@@ -8,7 +8,7 @@ const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const id = () => z.string().regex(KEBAB, { error: 'deve estar em kebab-case (a-z, 0-9 e -)' });
 
 /** Áreas do catálogo, na ordem de exibição. */
-export const AREAS = ['fundamentos', 'frontend', 'backend'] as const;
+export const AREAS = ['fundamentos', 'frontend', 'backend', 'banco-de-dados'] as const;
 
 /** Senioridade em que o assunto do card costuma ser cobrado. */
 export const LEVELS = ['junior', 'pleno', 'senior'] as const;

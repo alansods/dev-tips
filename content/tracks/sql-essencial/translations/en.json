@@ -1,0 +1,120 @@
+{
+  "title": "SQL essentials",
+  "description": "The language of relational databases: queries, filters, JOINs, aggregations, subqueries, CTEs and window functions.",
+  "decks": {
+    "consultas": {
+      "title": "Queries",
+      "description": "SELECT, filters, sorting and NULL."
+    },
+    "joins-e-agregacoes": {
+      "title": "JOINs and aggregations",
+      "description": "Combining tables and summarizing data."
+    },
+    "subqueries-e-janelas": {
+      "title": "Subqueries, CTEs and window functions",
+      "description": "Queries inside queries and calculations over windows."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "SQL questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "select": {
+      "term": "SELECT",
+      "definition": "The command that reads data: it picks the columns (SELECT), the table (FROM), filters rows (WHERE), sorts (ORDER BY) and limits (LIMIT). Avoid SELECT * in application code: fetch only the columns you need."
+    },
+    "where": {
+      "term": "WHERE and operators",
+      "definition": "Filters rows before any grouping, with comparisons (=, <>, >), AND/OR, IN (a list of values), BETWEEN (a range), LIKE (a text pattern with % and _) and IS NULL."
+    },
+    "null-sql": {
+      "term": "NULL",
+      "definition": "Represents \"unknown value\", not zero or empty text. Any comparison with NULL yields unknown, so column = NULL is never true: use IS NULL. COUNT(column) ignores NULLs and COALESCE(column, default) replaces NULL with a value."
+    },
+    "ordem-logica": {
+      "term": "Logical execution order",
+      "definition": "The database processes the query in a different order from how it is written: FROM and JOINs, WHERE, GROUP BY, HAVING, SELECT, DISTINCT, ORDER BY and LIMIT. That is why an alias created in SELECT cannot be used in WHERE, but can be used in ORDER BY."
+    },
+    "select-exemplo": {
+      "title": "Query with filter and sorting",
+      "body": "Active products from two categories, from most to least expensive, only the first 10."
+    },
+    "null-armadilha": {
+      "title": "The NOT IN with NULL pitfall",
+      "body": "If the subquery returns any NULL, NOT IN returns no rows, because the comparison with NULL is unknown. NOT EXISTS does not have this problem."
+    },
+    "inner-join": {
+      "term": "INNER JOIN",
+      "definition": "Combines rows from two tables that satisfy the ON condition, such as orders with their customers. Rows with no match on either side are left out."
+    },
+    "left-join": {
+      "term": "LEFT JOIN",
+      "definition": "Keeps every row from the left table and brings the right one when there is a match; when there is not, the right columns come back NULL. It fits \"customers and their orders, including those who never bought\". RIGHT and FULL JOIN are variations."
+    },
+    "group-by": {
+      "term": "GROUP BY and aggregate functions",
+      "definition": "GROUP BY gathers rows that share the same value in the given columns, and aggregate functions (COUNT, SUM, AVG, MIN, MAX) summarize each group. Every non-aggregated column in SELECT must be in GROUP BY."
+    },
+    "having": {
+      "term": "HAVING",
+      "definition": "Filters groups after aggregation, unlike WHERE, which filters rows before. \"Customers with more than 5 orders\" is HAVING COUNT(*) > 5. Filters that do not depend on the aggregate belong in WHERE, which is cheaper."
+    },
+    "join-agregacao": {
+      "title": "Total per customer",
+      "body": "LEFT JOIN keeps those who never bought (with a total of 0 thanks to COALESCE); HAVING filters after summing."
+    },
+    "left-join-filtro": {
+      "title": "Filter in ON or in WHERE",
+      "body": "In a LEFT JOIN, a condition on the right table in WHERE drops the rows without a match and turns it into an INNER JOIN. In ON, it only restricts what is joined."
+    },
+    "subquery": {
+      "term": "Subquery",
+      "definition": "A query inside another: in WHERE (IN, EXISTS, comparison with a value), in FROM (a derived table) or in SELECT. A correlated subquery uses columns from the outer query and conceptually runs for each row."
+    },
+    "cte": {
+      "term": "CTE (WITH)",
+      "definition": "Common Table Expression: names an intermediate query with WITH, making large queries readable in steps. WITH RECURSIVE walks hierarchies, such as categories with subcategories or an org chart."
+    },
+    "window-function": {
+      "term": "Window function",
+      "definition": "Computes over a set of related rows (the window) without grouping them: every row stays in the result. OVER (PARTITION BY ... ORDER BY ...) defines the window. Uses: ROW_NUMBER, RANK, running totals with SUM, comparison with the previous row using LAG."
+    },
+    "exists": {
+      "term": "EXISTS",
+      "definition": "Checks whether the subquery returns at least one row, stopping at the first. It is the clearest and safest way to write \"customers who have an order\" or, with NOT EXISTS, \"who do not\", without worrying about NULLs."
+    },
+    "top-por-grupo": {
+      "title": "Top 3 best sellers per category",
+      "body": "ROW_NUMBER numbers the products within each category by sales; the CTE lets you filter on that number, which you cannot do directly in WHERE."
+    },
+    "total-acumulado": {
+      "title": "Running total per day",
+      "body": "SUM with an ordered OVER adds from the first row to the current one; LAG takes the previous day's value to compute the change."
+    },
+    "inner-vs-left": {
+      "question": "What is the difference between INNER JOIN and LEFT JOIN?",
+      "answer": "INNER JOIN returns only rows that have a match in both tables. LEFT JOIN returns every row from the left table and, when there is no match, fills the right columns with NULL. To find rows without a match, LEFT JOIN with WHERE right.id IS NULL (or NOT EXISTS)."
+    },
+    "where-vs-having": {
+      "question": "What is the difference between WHERE and HAVING?",
+      "answer": "WHERE filters rows before grouping and cannot use aggregate functions. HAVING filters groups after GROUP BY and is where conditions such as COUNT(*) > 5 go. Anything that can be filtered in WHERE should stay there, because it reduces the rows before the grouping work."
+    },
+    "segundo-maior": {
+      "question": "How do you find the second highest salary?",
+      "answer": "With a window function: SELECT salary FROM (SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS r FROM employees) t WHERE r = 2. DENSE_RANK handles ties. Other ways: ORDER BY salary DESC with OFFSET 1 LIMIT 1 (over distinct values) or MAX with a subquery that excludes the highest."
+    },
+    "null-comparacao": {
+      "question": "Why does WHERE column = NULL not work?",
+      "answer": "Because NULL means unknown, and any comparison with it yields unknown, which WHERE treats as false. The right way is IS NULL or IS NOT NULL. The same reason makes NOT IN fail when the list contains NULL, which is why I prefer NOT EXISTS."
+    },
+    "cte-vs-subquery": {
+      "question": "When should you use a CTE instead of a subquery?",
+      "answer": "When the query has several steps or reuses the same intermediate result: the CTE names each step and reads top to bottom. For hierarchies, only a recursive CTE works. Performance-wise, modern databases usually optimize both forms the same way."
+    },
+    "window-vs-group": {
+      "question": "What is the difference between GROUP BY and a window function?",
+      "answer": "GROUP BY collapses rows: one comes out per group. A window function computes over the group (the window) but keeps every row, so you can show each order alongside the customer's total, its rank position or the previous order's value, without joining an aggregated query."
+    }
+  }
+}

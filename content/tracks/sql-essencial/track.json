@@ -1,0 +1,321 @@
+{
+  "id": "sql-essencial",
+  "title": "SQL essencial",
+  "description": "A linguagem dos bancos relacionais: consultas, filtros, JOINs, agregações, subqueries, CTEs e window functions.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "consultas",
+      "title": "Consultas",
+      "description": "SELECT, filtros, ordenação e NULL.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "select",
+          "level": "junior",
+          "term": "SELECT",
+          "definition": "Comando que lê dados: escolhe as colunas (SELECT), a tabela (FROM), filtra linhas (WHERE), ordena (ORDER BY) e limita (LIMIT). Evite SELECT * em código de aplicação: traga só as colunas necessárias.",
+          "relatedTerms": [
+            "where",
+            "ordem-logica"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "where",
+          "level": "junior",
+          "term": "WHERE e operadores",
+          "definition": "Filtra as linhas antes de qualquer agrupamento, com comparações (=, <>, >), AND/OR, IN (lista de valores), BETWEEN (intervalo), LIKE (padrão de texto com % e _) e IS NULL.",
+          "relatedTerms": [
+            "select",
+            "null-sql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "null-sql",
+          "level": "pleno",
+          "term": "NULL",
+          "definition": "Representa \"valor desconhecido\", não zero nem texto vazio. Qualquer comparação com NULL dá desconhecido, então coluna = NULL nunca é verdadeiro: use IS NULL. COUNT(coluna) ignora NULLs e COALESCE(coluna, padrão) substitui o NULL por um valor.",
+          "relatedTerms": [
+            "where"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ordem-logica",
+          "level": "pleno",
+          "term": "Ordem lógica de execução",
+          "definition": "O banco processa a consulta em outra ordem da escrita: FROM e JOINs, WHERE, GROUP BY, HAVING, SELECT, DISTINCT, ORDER BY e LIMIT. Por isso um alias criado no SELECT não pode ser usado no WHERE, mas pode no ORDER BY.",
+          "relatedTerms": [
+            "select",
+            "where"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "select-exemplo",
+          "level": "junior",
+          "title": "Consulta com filtro e ordenação",
+          "body": "Produtos ativos de duas categorias, do mais caro para o mais barato, só os 10 primeiros.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "SELECT id, name, price\nFROM products\nWHERE active = true\n  AND category IN ('livros', 'jogos')\n  AND name LIKE '%edição%'\nORDER BY price DESC\nLIMIT 10;"
+          },
+          "relatedTerms": [
+            "select",
+            "where"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "null-armadilha",
+          "level": "pleno",
+          "title": "A armadilha do NOT IN com NULL",
+          "body": "Se a subquery devolver algum NULL, NOT IN não retorna nenhuma linha, porque a comparação com NULL é desconhecida. NOT EXISTS não tem esse problema.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "-- se algum order.customer_id for NULL, volta vazio\nSELECT * FROM customers\nWHERE id NOT IN (SELECT customer_id FROM orders);\n\n-- seguro\nSELECT * FROM customers c\nWHERE NOT EXISTS (\n  SELECT 1 FROM orders o WHERE o.customer_id = c.id\n);"
+          },
+          "relatedTerms": [
+            "null-sql"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "joins-e-agregacoes",
+      "title": "JOINs e agregações",
+      "description": "Combinar tabelas e resumir dados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "inner-join",
+          "level": "junior",
+          "term": "INNER JOIN",
+          "definition": "Combina linhas de duas tabelas que satisfazem a condição do ON, como pedidos com seus clientes. Linhas sem correspondência dos dois lados ficam de fora.",
+          "relatedTerms": [
+            "left-join",
+            "group-by"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "left-join",
+          "level": "junior",
+          "term": "LEFT JOIN",
+          "definition": "Mantém todas as linhas da tabela da esquerda e traz as da direita quando há correspondência; quando não há, as colunas da direita vêm NULL. Serve para \"clientes e seus pedidos, inclusive quem nunca comprou\". RIGHT e FULL JOIN são variações.",
+          "relatedTerms": [
+            "inner-join"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "group-by",
+          "level": "junior",
+          "term": "GROUP BY e funções de agregação",
+          "definition": "GROUP BY junta as linhas com o mesmo valor nas colunas indicadas, e funções de agregação (COUNT, SUM, AVG, MIN, MAX) resumem cada grupo. Toda coluna do SELECT que não é agregada precisa estar no GROUP BY.",
+          "relatedTerms": [
+            "having"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "having",
+          "level": "pleno",
+          "term": "HAVING",
+          "definition": "Filtra grupos depois da agregação, ao contrário do WHERE, que filtra linhas antes. \"Clientes com mais de 5 pedidos\" é HAVING COUNT(*) > 5. Filtros que não dependem do agregado devem ficar no WHERE, que é mais barato.",
+          "relatedTerms": [
+            "group-by"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "join-agregacao",
+          "level": "pleno",
+          "title": "Total por cliente",
+          "body": "LEFT JOIN mantém quem nunca comprou (com total 0 graças ao COALESCE); HAVING filtra depois de somar.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "SELECT c.id, c.name,\n       COUNT(o.id) AS orders,\n       COALESCE(SUM(o.total), 0) AS spent\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nGROUP BY c.id, c.name\nHAVING COALESCE(SUM(o.total), 0) < 1000\nORDER BY spent DESC;"
+          },
+          "relatedTerms": [
+            "left-join",
+            "having"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "left-join-filtro",
+          "level": "senior",
+          "title": "Filtro no ON ou no WHERE",
+          "body": "Num LEFT JOIN, uma condição sobre a tabela da direita no WHERE descarta as linhas sem correspondência e o transforma em INNER JOIN. No ON, ela só restringe o que é juntado.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "-- vira INNER JOIN: some quem não tem pedido pago\nSELECT c.name, o.id\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nWHERE o.status = 'paid';\n\n-- mantém todos os clientes\nSELECT c.name, o.id\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'paid';"
+          },
+          "relatedTerms": [
+            "left-join"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "subqueries-e-janelas",
+      "title": "Subqueries, CTEs e window functions",
+      "description": "Consultas dentro de consultas e cálculos por janela.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "subquery",
+          "level": "pleno",
+          "term": "Subquery",
+          "definition": "Consulta dentro de outra: no WHERE (IN, EXISTS, comparação com um valor), no FROM (uma tabela derivada) ou no SELECT. Uma subquery correlacionada usa colunas da consulta de fora e roda conceitualmente para cada linha.",
+          "relatedTerms": [
+            "cte"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cte",
+          "level": "pleno",
+          "term": "CTE (WITH)",
+          "definition": "Common Table Expression: dá nome a uma consulta intermediária com WITH, deixando consultas grandes legíveis em etapas. WITH RECURSIVE percorre hierarquias, como categorias com subcategorias ou um organograma.",
+          "relatedTerms": [
+            "subquery",
+            "window-function"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "window-function",
+          "level": "senior",
+          "term": "Window function",
+          "definition": "Calcula sobre um conjunto de linhas relacionadas (a janela) sem agrupá-las: cada linha continua no resultado. OVER (PARTITION BY ... ORDER BY ...) define a janela. Usos: ROW_NUMBER, RANK, totais acumulados com SUM, comparação com a linha anterior com LAG.",
+          "relatedTerms": [
+            "cte"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "exists",
+          "level": "pleno",
+          "term": "EXISTS",
+          "definition": "Verifica se a subquery retorna ao menos uma linha, parando na primeira. É o jeito mais claro e seguro de escrever \"clientes que têm pedido\" ou, com NOT EXISTS, \"que não têm\", sem se preocupar com NULLs.",
+          "relatedTerms": [
+            "subquery"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "top-por-grupo",
+          "level": "senior",
+          "title": "Os 3 mais vendidos de cada categoria",
+          "body": "ROW_NUMBER numera os produtos dentro de cada categoria pela venda; a CTE permite filtrar pela numeração, o que não dá para fazer direto no WHERE.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "WITH ranked AS (\n  SELECT category, name, sales,\n         ROW_NUMBER() OVER (PARTITION BY category ORDER BY sales DESC) AS position\n  FROM products\n)\nSELECT category, name, sales\nFROM ranked\nWHERE position <= 3\nORDER BY category, position;"
+          },
+          "relatedTerms": [
+            "window-function",
+            "cte"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "total-acumulado",
+          "level": "senior",
+          "title": "Total acumulado por dia",
+          "body": "SUM com OVER ordenado soma da primeira linha até a atual; LAG pega o valor do dia anterior para calcular a variação.",
+          "snippet": {
+            "file": "consulta.sql",
+            "language": "sql",
+            "code": "SELECT day,\n       revenue,\n       SUM(revenue) OVER (ORDER BY day) AS running_total,\n       revenue - LAG(revenue) OVER (ORDER BY day) AS change\nFROM daily_revenue\nORDER BY day;"
+          },
+          "relatedTerms": [
+            "window-function"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de SQL que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "inner-vs-left",
+          "level": "junior",
+          "question": "Qual a diferença entre INNER JOIN e LEFT JOIN?",
+          "answer": "INNER JOIN devolve só as linhas que têm correspondência nas duas tabelas. LEFT JOIN devolve todas as linhas da tabela da esquerda e, quando não há correspondência, preenche as colunas da direita com NULL. Para achar quem não tem correspondência, LEFT JOIN com WHERE direita.id IS NULL (ou NOT EXISTS).",
+          "relatedTerms": [
+            "inner-join",
+            "left-join"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "where-vs-having",
+          "level": "junior",
+          "question": "Qual a diferença entre WHERE e HAVING?",
+          "answer": "WHERE filtra linhas antes do agrupamento e não pode usar funções de agregação. HAVING filtra grupos depois do GROUP BY e é onde ficam condições como COUNT(*) > 5. Tudo o que der para filtrar no WHERE deve ficar lá, porque reduz as linhas antes do trabalho de agrupar.",
+          "relatedTerms": [
+            "having",
+            "group-by"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "segundo-maior",
+          "level": "pleno",
+          "question": "Como achar o segundo maior salário?",
+          "answer": "Com window function: SELECT salary FROM (SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS r FROM employees) t WHERE r = 2. DENSE_RANK trata empates. Outras formas: ORDER BY salary DESC com OFFSET 1 LIMIT 1 (sobre os valores distintos) ou MAX com subquery que exclui o maior.",
+          "relatedTerms": [
+            "window-function"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "null-comparacao",
+          "level": "pleno",
+          "question": "Por que WHERE coluna = NULL não funciona?",
+          "answer": "Porque NULL significa desconhecido, e qualquer comparação com ele resulta em desconhecido, que o WHERE trata como falso. O certo é IS NULL ou IS NOT NULL. O mesmo motivo faz NOT IN falhar quando a lista tem NULL, e é por isso que prefiro NOT EXISTS.",
+          "relatedTerms": [
+            "null-sql",
+            "exists"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cte-vs-subquery",
+          "level": "pleno",
+          "question": "Quando usar CTE em vez de subquery?",
+          "answer": "Quando a consulta tem várias etapas ou reaproveita o mesmo resultado intermediário: a CTE dá nome a cada passo e deixa a leitura de cima para baixo. Para hierarquias, só a CTE recursiva resolve. Em desempenho, os bancos modernos costumam otimizar as duas formas da mesma maneira.",
+          "relatedTerms": [
+            "cte",
+            "subquery"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "window-vs-group",
+          "level": "senior",
+          "question": "Qual a diferença entre GROUP BY e window function?",
+          "answer": "GROUP BY colapsa as linhas: sai uma por grupo. Window function calcula sobre o grupo (a janela) mas mantém todas as linhas, então dá para mostrar cada pedido junto com o total do cliente, a posição num ranking ou o valor do pedido anterior, sem fazer JOIN com uma consulta agregada.",
+          "relatedTerms": [
+            "window-function",
+            "group-by"
+          ]
+        }
+      ]
+    }
+  ]
+}

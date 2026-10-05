@@ -1,0 +1,319 @@
+{
+  "id": "mongodb",
+  "title": "MongoDB",
+  "description": "O banco de documentos mais usado: documentos e coleções, modelagem embutida ou por referência, índices e aggregation pipeline.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "documentos",
+      "title": "Documentos e coleções",
+      "description": "Como o MongoDB guarda e lê dados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "documento",
+          "level": "junior",
+          "term": "Documento",
+          "definition": "Registro no formato BSON (um JSON binário com mais tipos, como datas e ObjectId), com campos que podem conter objetos e arrays. Cada documento tem um _id único. Documentos da mesma coleção podem ter formatos diferentes.",
+          "relatedTerms": [
+            "colecao",
+            "schema-flexivel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "colecao",
+          "level": "junior",
+          "term": "Coleção",
+          "definition": "Grupo de documentos, equivalente a uma tabela. Não exige esquema fixo, é criada no primeiro insert e é onde ficam os índices. Operações básicas: insertOne, find, updateOne, deleteOne.",
+          "relatedTerms": [
+            "documento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "schema-flexivel",
+          "level": "pleno",
+          "term": "Esquema flexível e validação",
+          "definition": "O MongoDB não obriga um formato, o que agiliza a evolução, mas deixa a consistência por conta da aplicação. Para não virar bagunça, use validação de esquema na coleção ($jsonSchema) ou um ODM (como o Mongoose) que define e valida o formato.",
+          "relatedTerms": [
+            "documento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "transacoes-mongo",
+          "level": "senior",
+          "term": "Atomicidade e transações",
+          "definition": "Operações num único documento são atômicas, inclusive com arrays e subdocumentos; por isso a modelagem embutida reduz a necessidade de transações. Desde a versão 4.0 há transações com vários documentos (em replica set), mas são mais caras e devem ser exceção.",
+          "relatedTerms": [
+            "documento"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "crud-mongo",
+          "level": "junior",
+          "title": "Operações básicas",
+          "body": "find recebe um filtro e uma projeção; updateOne usa operadores como $set e $inc para alterar só alguns campos.",
+          "snippet": {
+            "file": "mongosh",
+            "language": "js",
+            "code": "db.products.insertOne({ name: \"Caneca\", price: 29.9, tags: [\"cozinha\"], stock: 10 });\n\ndb.products.find(\n  { price: { $lt: 50 }, tags: \"cozinha\" },\n  { name: 1, price: 1 },\n).sort({ price: 1 });\n\ndb.products.updateOne({ name: \"Caneca\" }, { $inc: { stock: -1 }, $set: { updatedAt: new Date() } });"
+          },
+          "relatedTerms": [
+            "colecao",
+            "documento"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "validacao-colecao",
+          "level": "pleno",
+          "title": "Validação de esquema",
+          "body": "A coleção rejeita documentos sem nome ou com preço negativo, mesmo que a aplicação esqueça de validar.",
+          "snippet": {
+            "file": "mongosh",
+            "language": "js",
+            "code": "db.createCollection(\"products\", {\n  validator: {\n    $jsonSchema: {\n      bsonType: \"object\",\n      required: [\"name\", \"price\"],\n      properties: {\n        name: { bsonType: \"string\", minLength: 1 },\n        price: { bsonType: [\"double\", \"decimal\"], minimum: 0 },\n      },\n    },\n  },\n});"
+          },
+          "relatedTerms": [
+            "schema-flexivel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modelagem-mongo",
+      "title": "Modelagem",
+      "description": "Embutir ou referenciar, a partir de como os dados são lidos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "embutir",
+          "level": "pleno",
+          "term": "Documento embutido",
+          "definition": "Guardar os dados relacionados dentro do documento pai, como os itens dentro do pedido. Uma leitura traz tudo e a atualização é atômica. Bom quando os dados são lidos juntos, pertencem ao pai e têm tamanho limitado.",
+          "relatedTerms": [
+            "referencia",
+            "modelar-pelo-acesso"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "referencia",
+          "level": "pleno",
+          "term": "Referência",
+          "definition": "Guardar só o _id do documento relacionado, como customerId no pedido. Evita duplicar dados que mudam e documentos que crescem sem limite, ao custo de uma segunda consulta ou de um $lookup. Bom para relações de muitos para muitos e dados compartilhados.",
+          "relatedTerms": [
+            "embutir"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "modelar-pelo-acesso",
+          "level": "senior",
+          "term": "Modelar pelos padrões de acesso",
+          "definition": "No relacional, se modela pelos dados e se consulta como quiser. No MongoDB, se modela pelas consultas: quais telas e operações existem e o que cada uma lê junto. Duplicar um pouco de dado (o nome do cliente no pedido) é aceitável se evita leituras extras e o dado raramente muda.",
+          "relatedTerms": [
+            "embutir",
+            "referencia"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "limite-documento",
+          "level": "pleno",
+          "term": "Limite de 16 MB e arrays sem limite",
+          "definition": "Um documento pode ter no máximo 16 MB. Arrays que crescem sem parar (todos os comentários de um post popular, todos os eventos de um usuário) estouram esse limite e deixam leituras e atualizações lentas. Nesses casos, use uma coleção separada com referência ao pai.",
+          "relatedTerms": [
+            "embutir"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "embutido-vs-referencia",
+          "level": "pleno",
+          "title": "Os dois estilos no mesmo modelo",
+          "body": "Os itens são embutidos (lidos com o pedido e com quantidade limitada); o cliente é referenciado, com uma cópia do nome para exibir a lista sem outra consulta.",
+          "snippet": {
+            "file": "orders (documento)",
+            "language": "js",
+            "code": "// pedidos\n{\n  _id: ObjectId(\"...\"),\n  customerId: ObjectId(\"...\"),     // referência\n  customerName: \"Ana Souza\",         // cópia para listagem\n  items: [                           // embutidos\n    { productId: ObjectId(\"...\"), name: \"Caneca\", quantity: 2, unitPrice: 29.9 }\n  ],\n  total: 59.8,\n  createdAt: ISODate(\"2026-10-05T12:00:00Z\")\n}"
+          },
+          "relatedTerms": [
+            "embutir",
+            "referencia"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "bucket-pattern",
+          "level": "senior",
+          "title": "Padrão bucket para séries",
+          "body": "Em vez de um documento por leitura de sensor (ou um array infinito), um documento por sensor por hora, com o array limitado às medições daquela hora.",
+          "snippet": {
+            "file": "mongosh",
+            "language": "js",
+            "code": "db.readings.updateOne(\n  { sensorId: \"s-1\", hour: ISODate(\"2026-10-05T12:00:00Z\") },\n  {\n    $push: { values: { at: new Date(), temp: 22.4 } },\n    $inc: { count: 1 },\n  },\n  { upsert: true },\n);"
+          },
+          "relatedTerms": [
+            "limite-documento",
+            "modelar-pelo-acesso"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "consultas-e-indices",
+      "title": "Consultas, índices e agregação",
+      "description": "Deixar consultas rápidas e calcular no banco.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "indice-mongo",
+          "level": "pleno",
+          "term": "Índices no MongoDB",
+          "definition": "Funcionam como no relacional (B-tree): sem índice, a consulta lê a coleção inteira (COLLSCAN). Há índices simples, compostos (com a regra ESR: igualdade, ordenação, intervalo), multikey (em arrays), de texto, geoespaciais e TTL, que apagam documentos expirados.",
+          "relatedTerms": [
+            "aggregation",
+            "explain-mongo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "aggregation",
+          "level": "pleno",
+          "term": "Aggregation pipeline",
+          "definition": "Sequência de estágios que processam documentos dentro do banco: $match (filtrar), $group (agrupar e somar), $sort, $project (escolher campos), $lookup (juntar com outra coleção) e $unwind (abrir arrays). É o equivalente a GROUP BY e JOIN.",
+          "relatedTerms": [
+            "indice-mongo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "explain-mongo",
+          "level": "pleno",
+          "term": "explain()",
+          "definition": "Mostra o plano da consulta: IXSCAN (usou índice) ou COLLSCAN (leu tudo), e com \"executionStats\" quantos documentos e chaves foram examinados contra quantos voltaram. Muito mais examinados que retornados indica índice faltando ou mal ordenado.",
+          "relatedTerms": [
+            "indice-mongo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "sharding-mongo",
+          "level": "senior",
+          "term": "Replica set e sharding",
+          "definition": "Replica set: um primário recebe as escritas e secundários copiam os dados, assumindo se o primário cair. Sharding: divide uma coleção entre vários servidores por uma shard key, para escalar escritas e volume. Uma shard key ruim (com poucos valores ou sempre crescente) concentra a carga num servidor só.",
+          "relatedTerms": [
+            "indice-mongo"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "aggregation-exemplo",
+          "level": "pleno",
+          "title": "Vendas por categoria",
+          "body": "Filtra os pedidos pagos do mês, abre os itens, soma por categoria e ordena. Pôr o $match primeiro permite usar índice.",
+          "snippet": {
+            "file": "mongosh",
+            "language": "js",
+            "code": "db.orders.aggregate([\n  { $match: { status: \"paid\", createdAt: { $gte: ISODate(\"2026-10-01\") } } },\n  { $unwind: \"$items\" },\n  {\n    $group: {\n      _id: \"$items.category\",\n      revenue: { $sum: { $multiply: [\"$items.quantity\", \"$items.unitPrice\"] } },\n    },\n  },\n  { $sort: { revenue: -1 } },\n]);"
+          },
+          "relatedTerms": [
+            "aggregation"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "indice-esr",
+          "level": "senior",
+          "title": "Índice composto pela regra ESR",
+          "body": "Para filtrar por status (igualdade), ordenar por data (ordenação) e limitar por preço (intervalo), o índice segue essa ordem. O explain confirma o IXSCAN.",
+          "snippet": {
+            "file": "mongosh",
+            "language": "js",
+            "code": "db.orders.createIndex({ status: 1, createdAt: -1, total: 1 });\n\ndb.orders\n  .find({ status: \"paid\", total: { $gt: 100 } })\n  .sort({ createdAt: -1 })\n  .explain(\"executionStats\");"
+          },
+          "relatedTerms": [
+            "indice-mongo",
+            "explain-mongo"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de MongoDB que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "quando-mongo",
+          "level": "pleno",
+          "question": "Quando usar MongoDB em vez de um banco relacional?",
+          "answer": "Quando os dados têm formato variável ou aninhado e são lidos como um agregado (um catálogo com atributos diferentes por produto, conteúdo, eventos), quando o esquema muda muito, ou quando preciso escalar escritas horizontalmente com sharding. Para dados muito relacionados, com consultas imprevisíveis e muitas transações entre entidades, o relacional costuma ser melhor.",
+          "relatedTerms": [
+            "modelar-pelo-acesso",
+            "documento"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "embutir-ou-referenciar",
+          "level": "pleno",
+          "question": "Embutir ou referenciar?",
+          "answer": "Embuto o que é lido junto, pertence ao documento pai e tem tamanho limitado, como os itens de um pedido ou o endereço de entrega. Referencio o que é compartilhado, muda com frequência ou cresce sem limite, como clientes, produtos ou comentários. Posso combinar: referência mais uma cópia de poucos campos para exibição.",
+          "relatedTerms": [
+            "embutir",
+            "referencia"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mongo-sem-esquema",
+          "level": "junior",
+          "question": "MongoDB não tem esquema?",
+          "answer": "O banco não obriga um esquema, mas a aplicação sempre tem um: o código espera certos campos e tipos. Sem controle, documentos ficam inconsistentes. Defino o esquema com validação na coleção ($jsonSchema) ou com um ODM como Mongoose, e trato mudanças de formato com migrations ou versionamento do documento.",
+          "relatedTerms": [
+            "schema-flexivel"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "consulta-lenta-mongo",
+          "level": "pleno",
+          "question": "Uma consulta no MongoDB está lenta. O que você verifica?",
+          "answer": "Rodo explain(\"executionStats\") para ver se é COLLSCAN e quantos documentos são examinados por retornado. Crio ou ajusto o índice composto seguindo a regra igualdade, ordenação, intervalo. Também verifico projeção (trazer só os campos usados), documentos muito grandes e, em agregações, se o $match vem antes de tudo.",
+          "relatedTerms": [
+            "explain-mongo",
+            "indice-mongo"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "transacao-mongo-pergunta",
+          "level": "senior",
+          "question": "O MongoDB tem transações?",
+          "answer": "Sim. Operações num único documento são sempre atômicas, e desde a 4.0 há transações ACID com vários documentos em replica sets (e em clusters com sharding desde a 4.2). Mas elas custam mais e têm limite de tempo, então modelo para que a maioria das operações atômicas caiba num documento só, embutindo o que muda junto.",
+          "relatedTerms": [
+            "transacoes-mongo"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "shard-key",
+          "level": "senior",
+          "question": "Como escolher uma boa shard key?",
+          "answer": "Ela precisa ter muitos valores possíveis (alta cardinalidade), distribuir as escritas de forma equilibrada e aparecer nas consultas mais comuns, para que cada consulta vá a um shard só. Evito chaves sempre crescentes, como data ou ObjectId puros, que mandam todas as inserções para o mesmo shard; uma chave composta ou com hash costuma resolver.",
+          "relatedTerms": [
+            "sharding-mongo"
+          ]
+        }
+      ]
+    }
+  ]
+}
