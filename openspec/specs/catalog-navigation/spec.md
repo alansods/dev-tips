@@ -4,7 +4,7 @@
 Define como o usuário encontra as trilhas: a aba Trilhas lista as áreas, e cada área leva às suas trilhas, linguagens, frameworks e comparativos, conforme a posição declarada em cada trilha.
 ## Requirements
 ### Requirement: Home por áreas
-A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Frontend, Backend. Cada área SHALL aparecer como um card tocável com:
+A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Frontend, Backend, Banco de dados. Cada área SHALL aparecer como um card tocável com:
 - o nome da área;
 - a quantidade de trilhas ("2 trilhas", "1 trilha");
 - uma barra de progresso e o texto "sei/total", somados sobre todos os cards das trilhas da área com a mesma regra de progresso da capability `study-flow`;
@@ -27,6 +27,10 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 #### Scenario: Tocar na área
 - **WHEN** o usuário toca no card "Backend"
 - **THEN** a tela da área Backend abre
+
+#### Scenario: Banco de dados por último
+- **WHEN** o catálogo tem trilhas nas quatro áreas
+- **THEN** a Home mostra Fundamentos, Frontend, Backend e Banco de dados, nessa ordem
 
 ### Requirement: Tela da área
 Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas, com botão de voltar e o nome da área como título. A tela SHALL mostrar, nesta ordem, as seções:
@@ -83,7 +87,7 @@ Os textos da navegação SHALL seguir o idioma do app:
 
 | PT-BR | Inglês |
 |---|---|
-| Fundamentos, Frontend, Backend | Fundamentals, Frontend, Backend |
+| Fundamentos, Frontend, Backend, Banco de dados | Fundamentals, Frontend, Backend, Databases |
 | Trilhas, Linguagens, Comparativos | Tracks, Languages, Comparisons |
 | Linguagem pura, Frameworks | Core language, Frameworks |
 | "1 trilha", "N trilhas" | "1 track", "N tracks" |
