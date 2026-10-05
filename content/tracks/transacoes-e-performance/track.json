@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "relacionais",
   "decks": [
     {
       "id": "transacoes",
@@ -24,7 +25,7 @@
         {
           "type": "concept",
           "id": "acid",
-          "level": "pleno",
+          "level": "junior",
           "term": "ACID",
           "definition": "As garantias de uma transação. Atomicidade: tudo ou nada. Consistência: o banco sai de um estado válido para outro, respeitando as regras. Isolamento: transações simultâneas não veem o trabalho incompleto umas das outras (no nível configurado). Durabilidade: depois do commit, os dados sobrevivem a quedas.",
           "relatedTerms": [
@@ -46,7 +47,7 @@
         {
           "type": "concept",
           "id": "anomalias-concorrencia",
-          "level": "senior",
+          "level": "pleno",
           "term": "Anomalias de concorrência",
           "definition": "O que pode dar errado com transações simultâneas: dirty read (ler dado não confirmado), non-repeatable read (o mesmo SELECT dá resultados diferentes), phantom read (aparecem linhas novas) e lost update (duas transações leem, alteram e uma sobrescreve a outra).",
           "relatedTerms": [
@@ -106,7 +107,7 @@
         {
           "type": "concept",
           "id": "deadlock",
-          "level": "senior",
+          "level": "pleno",
           "term": "Deadlock",
           "definition": "Duas transações esperando uma pela outra: A trava a linha 1 e quer a 2, B trava a 2 e quer a 1. O banco detecta e aborta uma delas com erro. Prevenção: travar recursos sempre na mesma ordem, manter transações curtas e reexecutar a que foi abortada.",
           "relatedTerms": [
@@ -232,7 +233,7 @@
         {
           "type": "code",
           "id": "indice-anulado",
-          "level": "senior",
+          "level": "pleno",
           "title": "Consultas que não usam o índice",
           "body": "Aplicar função na coluna indexada ou começar o LIKE com % impede o uso do índice comum. Reescreva a condição ou crie um índice de expressão.",
           "snippet": {
@@ -307,7 +308,7 @@
         {
           "type": "question",
           "id": "offset-vs-cursor",
-          "level": "senior",
+          "level": "pleno",
           "question": "Paginação por offset ou por cursor: qual escolher?",
           "answer": "Offset é simples e permite pular para a página 7, mas fica lento em páginas fundas e pode repetir ou pular itens quando dados entram no meio. Cursor usa o último valor visto (WHERE id > x) com índice, tem custo constante e é estável, mas só anda para a frente e para trás. Para feeds e listas infinitas, cursor; para tabelas administrativas pequenas, offset serve.",
           "relatedTerms": [

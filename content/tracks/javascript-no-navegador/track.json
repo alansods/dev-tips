@@ -154,7 +154,7 @@
         {
           "type": "code",
           "id": "debounce",
-          "level": "senior",
+          "level": "pleno",
           "title": "Debounce",
           "body": "Atrasa a execução até o usuário parar de disparar o evento por um tempo. Em busca enquanto digita, evita uma requisição por tecla. Usa closure para guardar o timer.",
           "snippet": {

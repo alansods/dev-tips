@@ -236,7 +236,7 @@
         {
           "type": "code",
           "id": "busca-switchmap",
-          "level": "senior",
+          "level": "pleno",
           "title": "Busca com debounce e switchMap",
           "body": "debounceTime espera o usuário parar de digitar, distinctUntilChanged ignora termos repetidos e switchMap cancela a busca anterior quando chega um termo novo, evitando respostas fora de ordem.",
           "snippet": {
@@ -269,7 +269,7 @@
         {
           "type": "question",
           "id": "signals-vs-rxjs",
-          "level": "senior",
+          "level": "pleno",
           "question": "Signals substituem o RxJS?",
           "answer": "Não por completo. Signals são ótimos para estado síncrono da tela: valores, derivados e o que o template lê. RxJS continua melhor para fluxos assíncronos e eventos ao longo do tempo: debounce, cancelamento com switchMap, combinação de fontes, retry. toSignal e toObservable fazem a ponte entre os dois.",
           "relatedTerms": [

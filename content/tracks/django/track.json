@@ -48,7 +48,7 @@
         {
           "type": "concept",
           "id": "select-related",
-          "level": "senior",
+          "level": "pleno",
           "term": "select_related e prefetch_related",
           "definition": "Ferramentas contra o problema N+1. select_related faz JOIN para relações de um (ForeignKey, OneToOne) e traz tudo numa consulta. prefetch_related faz uma consulta extra para relações de muitos (ManyToMany, reversas) e junta em Python.",
           "relatedTerms": [
@@ -74,7 +74,7 @@
         {
           "type": "code",
           "id": "n-mais-1-django",
-          "level": "senior",
+          "level": "pleno",
           "title": "Evitando N+1",
           "body": "Sem select_related, cada order.customer faz uma consulta. Com ele, uma só consulta com JOIN traz os pedidos e os clientes.",
           "snippet": {
@@ -257,7 +257,7 @@
         {
           "type": "question",
           "id": "django-vs-fastapi",
-          "level": "pleno",
+          "level": "senior",
           "question": "Quando escolher Django e quando FastAPI?",
           "answer": "Django quando o projeto se beneficia do pacote completo: ORM, migrations, admin, autenticação, formulários e templates, como um sistema com back-office ou um produto web tradicional. FastAPI quando é uma API enxuta, com foco em async, tipagem e documentação automática, montando ORM e o resto à escolha. Os dois servem bem para APIs; o Django REST Framework compensa o lado de API do Django.",
           "relatedTerms": [
@@ -278,7 +278,7 @@
         {
           "type": "question",
           "id": "n-mais-1-django-pergunta",
-          "level": "senior",
+          "level": "pleno",
           "question": "Como você identifica e resolve N+1 no Django?",
           "answer": "Identifico com o Django Debug Toolbar, logs de SQL ou contando consultas nos testes (assertNumQueries). Resolvo com select_related para ForeignKey e OneToOne (JOIN) e prefetch_related para relações de muitos (uma consulta extra). No DRF, o problema costuma vir de serializers aninhados, então ajusto o queryset do viewset.",
           "relatedTerms": [

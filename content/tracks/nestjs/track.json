@@ -209,7 +209,7 @@
         {
           "type": "concept",
           "id": "ciclo-de-vida",
-          "level": "senior",
+          "level": "pleno",
           "term": "Ciclo de uma requisição",
           "definition": "A ordem no Nest: middlewares, guards, interceptors (antes), pipes, o método do controller, interceptors (depois) e, se algo lançar, os exception filters. Saber a ordem diz onde cada responsabilidade deve ficar.",
           "relatedTerms": [
@@ -235,7 +235,7 @@
         {
           "type": "code",
           "id": "logging-interceptor",
-          "level": "senior",
+          "level": "pleno",
           "title": "Interceptor de tempo de resposta",
           "body": "Marca o início antes do handler e, quando o Observable da resposta emite, registra quanto levou.",
           "snippet": {
@@ -291,7 +291,7 @@
         {
           "type": "question",
           "id": "ordem-execucao-nest",
-          "level": "senior",
+          "level": "pleno",
           "question": "Em que ordem rodam middleware, guard, interceptor, pipe e filter?",
           "answer": "Middleware, guards, interceptors (parte de antes), pipes, o handler, interceptors (parte de depois) e, se houver exceção em qualquer ponto, os exception filters. Dentro de cada tipo, primeiro os globais, depois os do controller e por último os do método.",
           "relatedTerms": [

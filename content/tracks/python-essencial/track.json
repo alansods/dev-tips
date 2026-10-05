@@ -25,7 +25,7 @@
         {
           "type": "concept",
           "id": "mutabilidade",
-          "level": "pleno",
+          "level": "junior",
           "term": "Mutáveis e imutáveis",
           "definition": "int, float, str, tuple e frozenset são imutáveis: \"alterar\" cria um objeto novo. list, dict e set são mutáveis: mudam no lugar, e todas as variáveis que apontam para eles veem a mudança. Só imutáveis (hashable) servem como chave de dict ou item de set.",
           "relatedTerms": [
@@ -202,7 +202,7 @@
         {
           "type": "concept",
           "id": "asyncio",
-          "level": "senior",
+          "level": "pleno",
           "term": "asyncio",
           "definition": "Concorrência com uma thread e um event loop: funções async def pausam em await enquanto esperam I/O, e o loop roda outras. Ideal para muitas conexões simultâneas. Uma chamada bloqueante (requests, time.sleep) dentro de async trava o loop inteiro.",
           "relatedTerms": [

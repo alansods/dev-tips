@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "nao-relacionais",
   "decks": [
     {
       "id": "modelos",

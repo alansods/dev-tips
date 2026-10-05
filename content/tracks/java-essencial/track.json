@@ -117,7 +117,7 @@
         {
           "type": "concept",
           "id": "heranca",
-          "level": "pleno",
+          "level": "junior",
           "term": "Herança e classe abstrata",
           "definition": "Uma classe estende outra (só uma) com extends, herdando campos e métodos. Classe abstrata não pode ser instanciada e pode ter métodos abstratos, implementados pelas filhas. Herança cria acoplamento forte: prefira composição quando a relação não é claramente \"é um\".",
           "relatedTerms": [
@@ -128,7 +128,7 @@
         {
           "type": "concept",
           "id": "polimorfismo",
-          "level": "pleno",
+          "level": "junior",
           "term": "Polimorfismo",
           "definition": "Usar objetos de classes diferentes pela mesma interface, com cada um respondendo do seu jeito. Uma List<Forma> chama area() em círculos e quadrados sem saber qual é qual. O método executado é escolhido em tempo de execução (dynamic dispatch).",
           "relatedTerms": [
@@ -153,7 +153,7 @@
         {
           "type": "code",
           "id": "sealed-pattern",
-          "level": "senior",
+          "level": "pleno",
           "title": "Sealed interfaces e pattern matching",
           "body": "sealed limita quem pode implementar a interface; com isso, o switch com pattern matching (Java 21) sabe que cobriu todos os casos e dispensa o default.",
           "snippet": {
@@ -176,7 +176,7 @@
         {
           "type": "concept",
           "id": "checked-unchecked",
-          "level": "pleno",
+          "level": "junior",
           "term": "Checked e unchecked exceptions",
           "definition": "Checked (subclasses de Exception, como IOException) precisam ser tratadas ou declaradas com throws; o compilador obriga. Unchecked (subclasses de RuntimeException, como NullPointerException e IllegalArgumentException) não. Error indica problema da JVM (OutOfMemoryError) e não deve ser tratado.",
           "relatedTerms": [

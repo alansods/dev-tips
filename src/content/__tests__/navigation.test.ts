@@ -114,3 +114,23 @@ describe('Requirement: Tela do framework', () => {
     expect(frameworkTracks(catalog(), 'frontend', 'java', 'spring')).toEqual([]);
   });
 });
+
+describe('Requirement: Tela da área (seções)', () => {
+  it('Trilhas diretas em seções', () => {
+    const db = [
+      make('nosql', { areas: ['banco-de-dados'], section: 'nao-relacionais' }),
+      make('sql', { areas: ['banco-de-dados'], section: 'relacionais' }),
+      make('pg', { areas: ['banco-de-dados'], section: 'relacionais' }),
+    ];
+    const sections = areaSections(db, taxonomy(), 'banco-de-dados');
+    expect(sections.direct).toEqual([]);
+    expect(sections.grouped.map((g) => [g.section, ids(g.tracks)])).toEqual([
+      ['relacionais', ['sql', 'pg']],
+      ['nao-relacionais', ['nosql']],
+    ]);
+  });
+
+  it('sem seções, grouped fica vazio', () => {
+    expect(areaSections(catalog(), taxonomy(), 'backend').grouped).toEqual([]);
+  });
+});

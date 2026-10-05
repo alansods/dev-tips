@@ -59,7 +59,7 @@
         {
           "type": "code",
           "id": "ordem-de-execucao",
-          "level": "senior",
+          "level": "pleno",
           "title": "Ordem de execução",
           "body": "O código síncrono roda primeiro; depois as microtasks (o then); por último a macrotask (o setTimeout), mesmo com 0 ms.",
           "snippet": {
@@ -210,7 +210,7 @@
         {
           "type": "concept",
           "id": "abort-controller",
-          "level": "senior",
+          "level": "pleno",
           "term": "AbortController",
           "definition": "Forma padrão de cancelar operações assíncronas como fetch: você cria um controller, passa o signal para a operação e chama abort() quando não precisa mais do resultado (ex.: o usuário saiu da tela ou digitou outra busca). AbortSignal.timeout(ms) cria um limite de tempo.",
           "relatedTerms": [
@@ -237,7 +237,7 @@
         {
           "type": "code",
           "id": "await-em-loop",
-          "level": "senior",
+          "level": "pleno",
           "title": "await dentro de laços",
           "body": "forEach não espera callbacks async: o laço termina antes das operações. Use for...of para sequência ou Promise.all com map para paralelo (com cuidado para não disparar milhares de requisições de uma vez).",
           "snippet": {
@@ -282,7 +282,7 @@
         {
           "type": "question",
           "id": "ordem-then-timeout",
-          "level": "senior",
+          "level": "pleno",
           "question": "O que roda primeiro: um then ou um setTimeout de 0 ms?",
           "answer": "O then. Callbacks de Promise são microtasks, e o event loop esvazia toda a fila de microtasks assim que a call stack fica vazia, antes de pegar a próxima macrotask, como o setTimeout. Por isso uma corrente infinita de microtasks consegue travar a renderização.",
           "relatedTerms": [

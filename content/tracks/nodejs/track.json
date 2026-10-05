@@ -47,7 +47,7 @@
         {
           "type": "concept",
           "id": "worker-threads",
-          "level": "senior",
+          "level": "pleno",
           "term": "Worker threads",
           "definition": "Threads extras com seu próprio event loop, para trabalho pesado de CPU (processar imagem, compressão, cálculos) sem travar a thread principal. Comunicam-se por mensagens. Para I/O não ajudam: o I/O já é assíncrono.",
           "relatedTerms": [
@@ -207,7 +207,7 @@
         {
           "type": "concept",
           "id": "graceful-shutdown",
-          "level": "senior",
+          "level": "pleno",
           "term": "Encerramento gracioso",
           "definition": "Ao receber SIGTERM (ex.: num deploy), o servidor para de aceitar conexões novas, termina as requisições em andamento, fecha o banco e só então sai. Evita respostas cortadas e dados pela metade.",
           "relatedTerms": [
@@ -233,7 +233,7 @@
         {
           "type": "code",
           "id": "sigterm",
-          "level": "senior",
+          "level": "pleno",
           "title": "Tratando SIGTERM",
           "body": "server.close para de aceitar conexões e espera as abertas; depois fecha o banco e encerra.",
           "snippet": {

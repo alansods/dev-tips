@@ -10,6 +10,9 @@ const id = () => z.string().regex(KEBAB, { error: 'deve estar em kebab-case (a-z
 /** Áreas do catálogo, na ordem de exibição. */
 export const AREAS = ['fundamentos', 'frontend', 'backend', 'banco-de-dados'] as const;
 
+/** Seções que agrupam trilhas diretas dentro de uma área, na ordem de exibição. */
+export const SECTIONS = ['relacionais', 'nao-relacionais'] as const;
+
 /** Senioridade em que o assunto do card costuma ser cobrado. */
 export const LEVELS = ['junior', 'pleno', 'senior'] as const;
 
@@ -113,6 +116,7 @@ export const trackSchema = z.object({
   areas: z.array(z.enum(AREAS, { error: `área desconhecida; use: ${AREAS.join(', ')}` })).min(1, { error: 'a trilha precisa de pelo menos uma área' }),
   language: id().optional(),
   framework: id().optional(),
+  section: z.enum(SECTIONS, { error: `seção desconhecida; use: ${SECTIONS.join(', ')}` }).optional(),
   variants: z.array(variantSchema).optional(),
   compareColumns: z.array(compareColumnSchema).optional(),
   decks: z.array(deckSchema).min(1, { error: 'a trilha precisa de pelo menos um deck' }),
@@ -121,6 +125,7 @@ export const trackSchema = z.object({
 export type Track = z.output<typeof trackSchema>;
 export type Area = (typeof AREAS)[number];
 export type Level = (typeof LEVELS)[number];
+export type Section = (typeof SECTIONS)[number];
 export type Deck = z.output<typeof deckSchema>;
 export type Card = z.output<typeof cardSchema>;
 export type ConceptCard = z.output<typeof conceptCardSchema>;

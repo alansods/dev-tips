@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "relacionais",
   "decks": [
     {
       "id": "consultas",
@@ -152,7 +153,7 @@
         {
           "type": "code",
           "id": "left-join-filtro",
-          "level": "senior",
+          "level": "pleno",
           "title": "Filtro no ON ou no WHERE",
           "body": "Num LEFT JOIN, uma condição sobre a tabela da direita no WHERE descarta as linhas sem correspondência e o transforma em INNER JOIN. No ON, ela só restringe o que é juntado.",
           "snippet": {
@@ -195,7 +196,7 @@
         {
           "type": "concept",
           "id": "window-function",
-          "level": "senior",
+          "level": "pleno",
           "term": "Window function",
           "definition": "Calcula sobre um conjunto de linhas relacionadas (a janela) sem agrupá-las: cada linha continua no resultado. OVER (PARTITION BY ... ORDER BY ...) define a janela. Usos: ROW_NUMBER, RANK, totais acumulados com SUM, comparação com a linha anterior com LAG.",
           "relatedTerms": [
@@ -231,7 +232,7 @@
         {
           "type": "code",
           "id": "total-acumulado",
-          "level": "senior",
+          "level": "pleno",
           "title": "Total acumulado por dia",
           "body": "SUM com OVER ordenado soma da primeira linha até a atual; LAG pega o valor do dia anterior para calcular a variação.",
           "snippet": {

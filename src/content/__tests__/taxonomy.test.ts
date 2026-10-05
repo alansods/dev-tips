@@ -142,3 +142,22 @@ describe('Requirement: Posicionamento da trilha', () => {
     expect(placementOf(trackOf(fullTrack(), taxonomy()))).toEqual({ kind: 'comparison' });
   });
 });
+
+describe('Requirement: Seção da trilha', () => {
+  it('Trilha direta com seção', () => {
+    const input = { ...minimalTrack(), areas: ['banco-de-dados'], section: 'relacionais' };
+    expect(trackOf(input).section).toBe('relacionais');
+  });
+
+  it('Seção desconhecida', () => {
+    expectErrorAt({ ...minimalTrack(), section: 'colunares' }, 'section');
+  });
+
+  it('Seção em trilha de linguagem', () => {
+    expectErrorAt({ ...minimalTrack(), areas: ['backend'], language: 'java', section: 'relacionais' }, 'section', undefined, taxonomy());
+  });
+
+  it('Seção em trilha comparativa', () => {
+    expectErrorAt({ ...fullTrack(), section: 'relacionais' }, 'section');
+  });
+});

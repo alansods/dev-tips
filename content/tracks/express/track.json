@@ -188,7 +188,7 @@
         {
           "type": "concept",
           "id": "erros-async",
-          "level": "senior",
+          "level": "pleno",
           "term": "Erros em handlers assíncronos",
           "definition": "No Express 4, um erro dentro de uma função async não chega ao middleware de erro: vira uma rejeição não tratada e a requisição fica sem resposta. Era preciso try/catch com next(erro) ou um wrapper. O Express 5 encaminha Promises rejeitadas automaticamente.",
           "relatedTerms": [
@@ -233,7 +233,7 @@
         {
           "type": "code",
           "id": "async-handler",
-          "level": "senior",
+          "level": "pleno",
           "title": "Wrapper para handlers async (Express 4)",
           "body": "O wrapper pega a Promise rejeitada e a entrega ao next, levando o erro ao tratador central. No Express 5 isso já é automático.",
           "snippet": {
@@ -278,7 +278,7 @@
         {
           "type": "question",
           "id": "erro-async-express",
-          "level": "senior",
+          "level": "pleno",
           "question": "Como tratar erros de handlers async no Express?",
           "answer": "No Express 4, a Promise rejeitada não chega ao tratador de erros: uso try/catch com next(erro) ou um wrapper que faz .catch(next). No Express 5, rejeições são encaminhadas automaticamente. Em ambos, tenho um middleware de erro central que traduz erros de domínio em status HTTP e não expõe detalhes internos.",
           "relatedTerms": [
@@ -300,7 +300,7 @@
         {
           "type": "question",
           "id": "organizar-api-express",
-          "level": "pleno",
+          "level": "senior",
           "question": "Como você organiza uma API Express que está crescendo?",
           "answer": "Por recurso: cada um com seu Router, service e repository. As rotas só lidam com HTTP e validação, o service tem as regras e o repository o banco, recebido por parâmetro para facilitar testes. Middlewares transversais (log, auth, erros) ficam num lugar só, e a configuração vem de variáveis de ambiente validadas na inicialização.",
           "relatedTerms": [

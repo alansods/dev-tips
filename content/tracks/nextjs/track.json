@@ -128,7 +128,7 @@
         {
           "type": "concept",
           "id": "hidratacao",
-          "level": "senior",
+          "level": "pleno",
           "term": "Hidratação",
           "definition": "Etapa em que o React, no navegador, liga eventos e estado ao HTML que veio pronto do servidor. Se o HTML do servidor for diferente do que o cliente renderiza (datas, Math.random, window), ocorre um erro de hidratação.",
           "relatedTerms": [
@@ -275,7 +275,7 @@
         {
           "type": "question",
           "id": "erro-hidratacao",
-          "level": "senior",
+          "level": "pleno",
           "question": "O que causa um erro de hidratação e como resolver?",
           "answer": "O HTML gerado no servidor ser diferente da primeira renderização no navegador. Causas comuns: datas e horários (fuso diferente), valores aleatórios, ler window ou localStorage durante a renderização, e HTML inválido (div dentro de p). Resolvo gerando o valor só no cliente dentro de um useEffect, carregando o componente sem SSR, ou garantindo os mesmos dados nos dois lados.",
           "relatedTerms": [

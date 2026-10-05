@@ -131,7 +131,7 @@
         {
           "type": "concept",
           "id": "n-mais-1-jpa",
-          "level": "senior",
+          "level": "pleno",
           "term": "N+1 no JPA",
           "definition": "Uma consulta busca N pedidos e, ao percorrer, cada pedido.getCliente() dispara mais uma consulta: N+1 idas ao banco. Resolve com JOIN FETCH na consulta, @EntityGraph no repositório ou projeções (DTOs) que já trazem só os campos necessários.",
           "relatedTerms": [
@@ -196,7 +196,7 @@
         {
           "type": "concept",
           "id": "spring-security",
-          "level": "senior",
+          "level": "pleno",
           "term": "Spring Security",
           "definition": "Framework de autenticação e autorização baseado numa cadeia de filtros que roda antes dos controllers. Configura-se com um bean SecurityFilterChain: quais rotas são públicas, como autenticar (sessão, JWT via resource server, OAuth2) e regras de acesso por papel, inclusive em métodos com @PreAuthorize.",
           "relatedTerms": [

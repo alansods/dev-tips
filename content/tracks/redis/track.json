@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "nao-relacionais",
   "decks": [
     {
       "id": "estruturas",
@@ -36,7 +37,7 @@
         {
           "type": "concept",
           "id": "list-set",
-          "level": "pleno",
+          "level": "junior",
           "term": "List, set e sorted set",
           "definition": "List é uma lista ordenada por inserção (LPUSH, RPOP), útil para filas e últimos itens. Set guarda membros únicos sem ordem (visitantes únicos, tags). Sorted set associa uma pontuação a cada membro e mantém a ordem, ideal para rankings e agendamentos.",
           "relatedTerms": [
@@ -194,7 +195,7 @@
         {
           "type": "concept",
           "id": "streams",
-          "level": "senior",
+          "level": "pleno",
           "term": "Streams",
           "definition": "Log de mensagens persistente (XADD), lido por grupos de consumidores (XREADGROUP) que dividem o trabalho e confirmam o processamento (XACK). Mensagens não confirmadas podem ser reprocessadas. É a forma do Redis para filas confiáveis e eventos.",
           "relatedTerms": [
@@ -229,7 +230,7 @@
         {
           "type": "code",
           "id": "stream-exemplo",
-          "level": "senior",
+          "level": "pleno",
           "title": "Fila com streams",
           "body": "O produtor adiciona; cada worker do grupo recebe mensagens diferentes e confirma ao terminar. Se um worker cair, a mensagem fica pendente e pode ser reatribuída.",
           "snippet": {
@@ -283,7 +284,7 @@
         {
           "type": "question",
           "id": "pubsub-vs-streams",
-          "level": "senior",
+          "level": "pleno",
           "question": "Qual a diferença entre pub/sub e streams no Redis?",
           "answer": "Pub/sub entrega a mensagem só para quem está conectado naquele instante e não guarda nada: bom para notificações em tempo real. Streams guardam as mensagens, permitem ler o histórico, dividir o trabalho entre consumidores de um grupo e confirmar o processamento: bom para filas e eventos que não podem se perder.",
           "relatedTerms": [
