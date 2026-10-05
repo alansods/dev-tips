@@ -10,6 +10,9 @@ import TrackScreen from '../app/track/[trackId]';
 import { resetStudyStore, useStudyStore } from '../study/store';
 import { crudTrack } from '../test-utils';
 
+
+// Os cenários do glossário descrevem o catálogo com as trilhas CRUD e Fundamentos web.
+jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());
 const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,

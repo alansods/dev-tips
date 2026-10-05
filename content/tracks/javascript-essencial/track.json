@@ -1,0 +1,326 @@
+{
+  "id": "javascript-essencial",
+  "title": "JavaScript essencial",
+  "description": "A base da linguagem: tipos, variáveis, funções, escopo, objetos e protótipos.",
+  "areas": [
+    "frontend",
+    "backend"
+  ],
+  "language": "javascript",
+  "decks": [
+    {
+      "id": "tipos-e-variaveis",
+      "title": "Tipos e variáveis",
+      "description": "Os tipos da linguagem e como declarar variáveis.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "tipos-primitivos",
+          "level": "junior",
+          "term": "Tipos primitivos",
+          "definition": "Os valores mais simples da linguagem: string, number, bigint, boolean, undefined, null e symbol. São imutáveis e comparados por valor. Todo o resto (objetos, arrays, funções) é objeto e comparado por referência.",
+          "relatedTerms": [
+            "referencia-vs-valor",
+            "igualdade-estrita"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "let-const-var",
+          "level": "junior",
+          "term": "let, const e var",
+          "definition": "Formas de declarar variáveis. let e const têm escopo de bloco; const impede reatribuir (mas o objeto apontado ainda pode mudar). var tem escopo de função e sofre hoisting com valor undefined; em código moderno, prefira const e use let só quando precisar reatribuir.",
+          "relatedTerms": [
+            "escopo-lexico",
+            "hoisting"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "coercao",
+          "level": "pleno",
+          "term": "Coerção de tipos",
+          "definition": "Conversão automática de um tipo em outro que o JavaScript faz em operações mistas. \"5\" + 1 vira \"51\" (concatena), \"5\" - 1 vira 4 (converte para número) e if (\"\") é falso. Valores falsy: false, 0, -0, 0n, \"\", null, undefined e NaN.",
+          "relatedTerms": [
+            "igualdade-estrita",
+            "tipos-primitivos"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "igualdade-estrita",
+          "level": "junior",
+          "term": "Igualdade estrita (===)",
+          "definition": "Compara valor e tipo, sem coerção: 1 === \"1\" é false. Já o == converte os tipos antes de comparar (1 == \"1\" é true), o que gera surpresas. Use === sempre; a exceção comum é x == null, que pega null e undefined juntos.",
+          "relatedTerms": [
+            "coercao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "typeof-armadilhas",
+          "level": "pleno",
+          "title": "typeof e suas armadilhas",
+          "body": "typeof diz o tipo de um valor, mas tem pegadinhas históricas: null aparece como \"object\" e arrays também. Para arrays use Array.isArray; para null, compare direto.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "typeof \"oi\";          // \"string\"\ntypeof 42;            // \"number\"\ntypeof undefined;     // \"undefined\"\ntypeof null;          // \"object\"  (bug histórico)\ntypeof [];            // \"object\"\nArray.isArray([]);    // true\ntypeof (() => {});    // \"function\""
+          },
+          "relatedTerms": [
+            "tipos-primitivos",
+            "coercao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "desestruturacao-e-spread",
+          "level": "junior",
+          "title": "Desestruturação e spread",
+          "body": "Desestruturação tira valores de objetos e arrays direto para variáveis, com valor padrão. O spread (...) copia propriedades ou itens para um novo objeto ou array, sem alterar o original.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const user = { name: \"Ana\", age: 30 };\nconst { name, role = \"dev\" } = user;\nconst [first, ...rest] = [1, 2, 3];\n\nconst older = { ...user, age: 31 }; // novo objeto\nconst all = [...rest, 4];           // [2, 3, 4]"
+          },
+          "relatedTerms": [
+            "let-const-var",
+            "referencia-vs-valor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "funcoes-e-escopo",
+      "title": "Funções e escopo",
+      "description": "Onde as variáveis existem, closures e o valor de this.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "escopo-lexico",
+          "level": "junior",
+          "term": "Escopo léxico",
+          "definition": "Regra que define onde uma variável é visível: pelo lugar em que ela foi escrita no código, não por onde a função é chamada. Uma função enxerga as variáveis do bloco em que foi declarada e de todos os blocos de fora.",
+          "relatedTerms": [
+            "closure",
+            "let-const-var"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hoisting",
+          "level": "pleno",
+          "term": "Hoisting",
+          "definition": "Comportamento em que declarações são registradas antes de o código rodar. Funções declaradas com function podem ser chamadas antes da linha em que aparecem; var existe como undefined; let e const existem, mas ficam na \"zona morta temporal\" (TDZ) e dão ReferenceError se usadas antes da declaração.",
+          "relatedTerms": [
+            "let-const-var",
+            "escopo-lexico"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "closure",
+          "level": "pleno",
+          "term": "Closure",
+          "definition": "Uma função que lembra as variáveis do escopo onde foi criada, mesmo depois que esse escopo terminou. É a base de estado privado, de fábricas de funções, de callbacks e de hooks como os do React.",
+          "relatedTerms": [
+            "escopo-lexico"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "this",
+          "level": "pleno",
+          "term": "this",
+          "definition": "Referência ao \"dono\" da chamada, definida na hora da chamada: em obj.metodo(), this é obj; numa função solta, é undefined (modo estrito); com new, é o objeto novo; call, apply e bind escolhem o this. Arrow functions não têm this próprio: usam o do escopo de fora.",
+          "relatedTerms": [
+            "closure",
+            "classe"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "closure-contador",
+          "level": "pleno",
+          "title": "Closure com estado privado",
+          "body": "A variável count só existe dentro da closure: ninguém de fora consegue alterá-la sem passar pelas funções devolvidas.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function createCounter() {\n  let count = 0;\n  return {\n    increment: () => ++count,\n    current: () => count,\n  };\n}\n\nconst counter = createCounter();\ncounter.increment();\ncounter.current(); // 1"
+          },
+          "relatedTerms": [
+            "closure",
+            "escopo-lexico"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "arrow-vs-function",
+          "level": "pleno",
+          "title": "Arrow function e this",
+          "body": "Dentro do setTimeout, a função comum perde o this (vira undefined). A arrow function usa o this do método em volta, por isso funciona.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "class Timer {\n  seconds = 0;\n  startBroken() {\n    setTimeout(function () {\n      this.seconds++; // TypeError: this é undefined\n    }, 1000);\n  }\n  start() {\n    setTimeout(() => {\n      this.seconds++; // this é a instância\n    }, 1000);\n  }\n}"
+          },
+          "relatedTerms": [
+            "this",
+            "closure"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "objetos-e-prototipos",
+      "title": "Objetos e protótipos",
+      "description": "Referências, cópias, classes, herança e módulos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "referencia-vs-valor",
+          "level": "junior",
+          "term": "Referência e valor",
+          "definition": "Primitivos são copiados por valor; objetos e arrays são acessados por referência. Atribuir um objeto a outra variável não o copia: as duas apontam para o mesmo objeto, e mudar por uma muda pela outra.",
+          "relatedTerms": [
+            "tipos-primitivos"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "prototipo",
+          "level": "pleno",
+          "term": "Protótipo",
+          "definition": "Objeto do qual outro objeto herda propriedades. Ao ler uma propriedade que não existe no objeto, o JavaScript procura no protótipo, depois no protótipo do protótipo, e assim por diante: é a cadeia de protótipos (prototype chain).",
+          "relatedTerms": [
+            "classe"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "classe",
+          "level": "junior",
+          "term": "Classe",
+          "definition": "Sintaxe para criar objetos com construtor, métodos, herança (extends/super) e campos privados (#campo). Por baixo, continua sendo herança por protótipos: os métodos ficam no prototype da classe.",
+          "relatedTerms": [
+            "prototipo",
+            "this"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "modulos-es",
+          "level": "junior",
+          "term": "Módulos ES",
+          "definition": "Sistema de módulos padrão da linguagem: cada arquivo tem seu próprio escopo, e o que ele expõe sai com export e entra em outro com import. Os imports são estáticos (analisados antes de rodar), o que permite tree shaking.",
+          "relatedTerms": [
+            "escopo-lexico"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "copia-rasa-profunda",
+          "level": "pleno",
+          "title": "Cópia rasa e cópia profunda",
+          "body": "O spread copia só o primeiro nível: objetos aninhados continuam compartilhados. structuredClone faz uma cópia profunda (não copia funções).",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const original = { name: \"Ana\", address: { city: \"Recife\" } };\n\nconst shallow = { ...original };\nshallow.address.city = \"Natal\";\noriginal.address.city; // \"Natal\" (compartilhado)\n\nconst deep = structuredClone(original);\ndeep.address.city = \"Olinda\";\noriginal.address.city; // continua \"Natal\""
+          },
+          "relatedTerms": [
+            "referencia-vs-valor"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "heranca-prototipos",
+          "level": "senior",
+          "title": "class é açúcar para protótipos",
+          "body": "Os dois trechos criam o mesmo formato de objeto. O método fica no protótipo, compartilhado por todas as instâncias, e não copiado em cada uma.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "class Animal {\n  constructor(name) { this.name = name; }\n  speak() { return `${this.name} faz barulho`; }\n}\n\n// equivalente sem class\nfunction Animal2(name) { this.name = name; }\nAnimal2.prototype.speak = function () {\n  return `${this.name} faz barulho`;\n};\n\nObject.getPrototypeOf(new Animal(\"Rex\")) === Animal.prototype; // true"
+          },
+          "relatedTerms": [
+            "prototipo",
+            "classe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de JavaScript que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "igual-duplo-vs-triplo",
+          "level": "junior",
+          "question": "Qual a diferença entre == e ===?",
+          "answer": "O === compara valor e tipo, sem converter nada. O == converte os tipos antes de comparar (coerção), por isso 0 == \"\" e null == undefined dão true. Na prática, uso sempre ===, e no máximo x == null para checar null e undefined de uma vez.",
+          "relatedTerms": [
+            "igualdade-estrita",
+            "coercao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "var-let-const",
+          "level": "junior",
+          "question": "Quando usar var, let e const?",
+          "answer": "const por padrão, let quando a variável precisa ser reatribuída, e var nunca em código novo. var tem escopo de função e hoisting com undefined, o que causa bugs em loops e blocos; let e const têm escopo de bloco e dão erro se usadas antes da declaração.",
+          "relatedTerms": [
+            "let-const-var",
+            "hoisting"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-closure",
+          "level": "pleno",
+          "question": "O que é closure? Dê um uso real.",
+          "answer": "É uma função que guarda acesso às variáveis do escopo em que foi criada, mesmo depois que aquele escopo acabou. Usos reais: estado privado (um contador ou cache que só a função mexe), funções de configuração como debounce, callbacks de eventos que lembram um id, e os hooks do React, que dependem de closures.",
+          "relatedTerms": [
+            "closure",
+            "escopo-lexico"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "como-this-e-definido",
+          "level": "pleno",
+          "question": "Como o valor de this é definido?",
+          "answer": "Pela forma da chamada: obj.metodo() usa obj; uma função solta tem this undefined no modo estrito; new cria um objeto novo como this; call, apply e bind definem explicitamente. Arrow functions são a exceção: não têm this próprio e usam o do escopo onde foram escritas, por isso são boas para callbacks.",
+          "relatedTerms": [
+            "this"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "copia-objeto",
+          "level": "pleno",
+          "question": "Como copiar um objeto sem alterar o original?",
+          "answer": "Para um nível, spread ({ ...obj }) ou Object.assign. Se o objeto tem objetos aninhados, essas cópias são rasas: o aninhado continua compartilhado. Para cópia profunda, structuredClone(obj), que lida com Date, Map e referências circulares; JSON.parse(JSON.stringify()) perde datas, undefined e funções.",
+          "relatedTerms": [
+            "referencia-vs-valor"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "heranca-prototipal",
+          "level": "senior",
+          "question": "Como funciona a herança em JavaScript, se existem classes?",
+          "answer": "Por protótipos. Cada objeto aponta para um protótipo, e a leitura de propriedades sobe pela cadeia até achar ou chegar em null. class e extends são açúcar sintático: os métodos ficam em Classe.prototype e extends liga o protótipo da filha ao da mãe. Por isso dá para adicionar métodos em tempo de execução e por isso instanceof checa a cadeia, não o \"tipo\".",
+          "relatedTerms": [
+            "prototipo",
+            "classe"
+          ]
+        }
+      ]
+    }
+  ]
+}

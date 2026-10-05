@@ -1,0 +1,320 @@
+{
+  "id": "nextjs",
+  "title": "Next.js",
+  "description": "O framework React para produção: App Router, Server Components, estratégias de renderização e rotas de API.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "javascript",
+  "framework": "nextjs",
+  "decks": [
+    {
+      "id": "roteamento",
+      "title": "Roteamento",
+      "description": "Rotas a partir de pastas e arquivos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "app-router",
+          "level": "junior",
+          "term": "App Router",
+          "definition": "Sistema de rotas do Next.js baseado na pasta app/: cada pasta é um segmento da URL e o arquivo page.js dentro dela é a página. Usa Server Components por padrão e substitui o antigo Pages Router (pasta pages/).",
+          "relatedTerms": [
+            "layout",
+            "rota-dinamica"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "layout",
+          "level": "junior",
+          "term": "Layout",
+          "definition": "Arquivo layout.js que envolve as páginas de um segmento e dos seus filhos (menu, rodapé). Ao navegar entre páginas filhas, o layout não é desmontado: o estado dele se mantém.",
+          "relatedTerms": [
+            "app-router",
+            "arquivos-especiais"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "rota-dinamica",
+          "level": "junior",
+          "term": "Rota dinâmica",
+          "definition": "Segmento entre colchetes, como app/products/[id]/page.js, que casa com qualquer valor naquela posição (/products/42). O valor chega à página em params.",
+          "relatedTerms": [
+            "app-router"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "arquivos-especiais",
+          "level": "pleno",
+          "term": "loading, error e not-found",
+          "definition": "Arquivos convencionais de cada segmento: loading.js mostra um esqueleto enquanto a página carrega (via Suspense), error.js captura erros daquele trecho sem derrubar o app e not-found.js aparece quando notFound() é chamado ou a rota não existe.",
+          "relatedTerms": [
+            "layout"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "pagina-dinamica",
+          "level": "junior",
+          "title": "Página com parâmetro",
+          "body": "Um Server Component assíncrono que lê o id da URL, busca o produto e chama notFound() se não existir. Nas versões recentes, params é uma Promise.",
+          "snippet": {
+            "file": "app/products/[id]/page.js",
+            "language": "js",
+            "code": "import { notFound } from \"next/navigation\";\n\nexport default async function ProductPage({ params }) {\n  const { id } = await params;\n  const product = await getProduct(id);\n  if (!product) notFound();\n  return <h1>{product.name}</h1>;\n}"
+          },
+          "relatedTerms": [
+            "rota-dinamica",
+            "arquivos-especiais"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "link-navegacao",
+          "level": "junior",
+          "title": "Navegação com Link",
+          "body": "Link navega sem recarregar a página e pré-carrega a rota quando o link aparece na tela. Para navegar por código, useRouter em Client Components.",
+          "snippet": {
+            "file": "app/nav.js",
+            "language": "js",
+            "code": "import Link from \"next/link\";\n\nexport default function Nav() {\n  return (\n    <nav>\n      <Link href=\"/\">Início</Link>\n      <Link href=\"/products/42\">Produto 42</Link>\n    </nav>\n  );\n}"
+          },
+          "relatedTerms": [
+            "app-router"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renderizacao",
+      "title": "Renderização",
+      "description": "Onde e quando cada página é gerada.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "server-component",
+          "level": "pleno",
+          "term": "Server Component",
+          "definition": "Componente que roda só no servidor: pode ser async, acessar banco e segredos direto, e o código dele não vai para o navegador. Não pode usar estado, efeitos nem eventos. É o padrão no App Router.",
+          "relatedTerms": [
+            "client-component",
+            "ssr"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "client-component",
+          "level": "pleno",
+          "term": "Client Component",
+          "definition": "Componente marcado com \"use client\" no topo do arquivo, que também roda no navegador e pode usar estado, efeitos, eventos e APIs do navegador. Ele e tudo que ele importa entram no JavaScript enviado ao cliente; por isso convém deixá-lo nas folhas da árvore.",
+          "relatedTerms": [
+            "server-component",
+            "hidratacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ssr",
+          "level": "pleno",
+          "term": "SSR, SSG e ISR",
+          "definition": "Estratégias de geração de páginas. SSG gera o HTML no build (rápido, ideal para conteúdo fixo); SSR gera a cada requisição (dados sempre atuais, mais custo no servidor); ISR é SSG que se regenera depois de um tempo ou sob demanda, sem novo build.",
+          "relatedTerms": [
+            "server-component"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hidratacao",
+          "level": "senior",
+          "term": "Hidratação",
+          "definition": "Etapa em que o React, no navegador, liga eventos e estado ao HTML que veio pronto do servidor. Se o HTML do servidor for diferente do que o cliente renderiza (datas, Math.random, window), ocorre um erro de hidratação.",
+          "relatedTerms": [
+            "client-component",
+            "ssr"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "use-client",
+          "level": "pleno",
+          "title": "Server e Client juntos",
+          "body": "A página busca os dados no servidor e passa para um botão interativo, que é o único trecho enviado como JavaScript ao navegador.",
+          "snippet": {
+            "file": "app/products",
+            "language": "js",
+            "code": "// app/products/like-button.js\n\"use client\";\nimport { useState } from \"react\";\n\nexport function LikeButton({ initial }) {\n  const [likes, setLikes] = useState(initial);\n  return <button onClick={() => setLikes(likes + 1)}>♥ {likes}</button>;\n}\n\n// app/products/page.js (Server Component)\nexport default async function Page() {\n  const product = await db.product.findFirst();\n  return <LikeButton initial={product.likes} />;\n}"
+          },
+          "relatedTerms": [
+            "client-component",
+            "server-component"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "revalidate",
+          "level": "senior",
+          "title": "Cache e revalidação",
+          "body": "next.revalidate regenera o dado depois de 60 segundos (ISR); cache \"no-store\" busca sempre (SSR). revalidatePath, chamado depois de uma alteração, invalida a página na hora. Os padrões de cache mudaram entre versões: confira a documentação da sua.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "// regenera a cada 60 s\nconst posts = await fetch(\"https://api.example.com/posts\", {\n  next: { revalidate: 60 },\n}).then((r) => r.json());\n\n// sempre atualizado\nconst cart = await fetch(\"https://api.example.com/cart\", { cache: \"no-store\" });\n\n// depois de criar um post\nimport { revalidatePath } from \"next/cache\";\nrevalidatePath(\"/posts\");"
+          },
+          "relatedTerms": [
+            "ssr"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dados-e-api",
+      "title": "Dados e rotas de API",
+      "description": "Buscar e alterar dados, e expor endpoints.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "server-action",
+          "level": "pleno",
+          "term": "Server Action",
+          "definition": "Função assíncrona marcada com \"use server\" que roda no servidor e pode ser chamada direto de um formulário ou de um Client Component, sem criar uma rota de API. Como é um endpoint público por baixo, precisa validar a entrada e checar permissão.",
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "route-handler",
+          "level": "junior",
+          "term": "Route Handler",
+          "definition": "Arquivo route.js dentro de app/ que exporta funções com o nome do método HTTP (GET, POST...) e cria um endpoint de API. Usado para webhooks, integrações e clientes que não são o próprio app.",
+          "relatedTerms": [
+            "server-action"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "middleware-next",
+          "level": "pleno",
+          "term": "Middleware",
+          "definition": "Código que roda antes de a requisição chegar à rota, definido num único arquivo na raiz (middleware.js, chamado de proxy nas versões mais novas). Serve para redirecionar, reescrever URLs, checar autenticação de forma leve e ajustar cabeçalhos.",
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "streaming",
+          "level": "senior",
+          "term": "Streaming com Suspense",
+          "definition": "O servidor envia a página em partes: o que já está pronto aparece logo, e os trechos lentos, envolvidos em <Suspense>, chegam depois com um fallback no lugar. Melhora o tempo até o primeiro conteúdo sem esperar a consulta mais lenta.",
+          "relatedTerms": [
+            "server-action"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "route-handler-exemplo",
+          "level": "junior",
+          "title": "Endpoint GET e POST",
+          "body": "Cada função exportada atende um método. Response.json monta a resposta com o status.",
+          "snippet": {
+            "file": "app/api/products/route.js",
+            "language": "js",
+            "code": "export async function GET() {\n  const products = await db.product.findMany();\n  return Response.json(products);\n}\n\nexport async function POST(request) {\n  const data = await request.json();\n  const created = await db.product.create({ data });\n  return Response.json(created, { status: 201 });\n}"
+          },
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "server-action-form",
+          "level": "pleno",
+          "title": "Formulário com Server Action",
+          "body": "O formulário funciona até sem JavaScript no navegador. A action valida, grava e revalida a lista.",
+          "snippet": {
+            "file": "app/products/new/page.js",
+            "language": "js",
+            "code": "import { revalidatePath } from \"next/cache\";\n\nasync function createProduct(formData) {\n  \"use server\";\n  const name = String(formData.get(\"name\") ?? \"\").trim();\n  if (!name) return;\n  await db.product.create({ data: { name } });\n  revalidatePath(\"/products\");\n}\n\nexport default function NewProduct() {\n  return (\n    <form action={createProduct}>\n      <input name=\"name\" />\n      <button type=\"submit\">Salvar</button>\n    </form>\n  );\n}"
+          },
+          "relatedTerms": [
+            "server-action"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Next.js que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "ssr-vs-ssg",
+          "level": "pleno",
+          "question": "Quando usar SSR, SSG ou ISR?",
+          "answer": "SSG para o que não muda entre usuários e quase não muda no tempo (docs, landing pages): é o mais rápido. ISR quando o conteúdo é igual para todos mas muda às vezes (catálogo, blog): estático com revalidação. SSR quando depende da requisição (usuário logado, cookies) ou precisa estar sempre atual.",
+          "relatedTerms": [
+            "ssr"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "server-vs-client",
+          "level": "pleno",
+          "question": "Qual a diferença entre Server e Client Components?",
+          "answer": "Server Components rodam só no servidor: buscam dados direto, não enviam JavaScript ao navegador e não têm estado nem eventos. Client Components (\"use client\") também rodam no navegador e permitem interatividade. Deixo a página como Server Component e marco como client só os pedaços interativos, para mandar menos JavaScript.",
+          "relatedTerms": [
+            "server-component",
+            "client-component"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "erro-hidratacao",
+          "level": "senior",
+          "question": "O que causa um erro de hidratação e como resolver?",
+          "answer": "O HTML gerado no servidor ser diferente da primeira renderização no navegador. Causas comuns: datas e horários (fuso diferente), valores aleatórios, ler window ou localStorage durante a renderização, e HTML inválido (div dentro de p). Resolvo gerando o valor só no cliente dentro de um useEffect, carregando o componente sem SSR, ou garantindo os mesmos dados nos dois lados.",
+          "relatedTerms": [
+            "hidratacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "server-action-seguranca",
+          "level": "senior",
+          "question": "Server Actions são seguras por padrão?",
+          "answer": "Não. Por baixo, cada action é um endpoint POST que qualquer um pode chamar com qualquer dado. Dentro dela eu valido a entrada (Zod), confiro a sessão e a permissão do usuário sobre o recurso, e não confio em ids escondidos no formulário. O Next.js protege contra CSRF comparando a origem, mas autorização é responsabilidade minha.",
+          "relatedTerms": [
+            "server-action"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-nextjs",
+          "level": "junior",
+          "question": "O que o Next.js adiciona ao React?",
+          "answer": "Rotas por arquivos, renderização no servidor (SSR, SSG, ISR e streaming), Server Components, Server Actions e rotas de API, otimização de imagens e fontes, divisão automática do código por rota e um build pronto para produção. Com React puro, cada uma dessas peças é uma escolha e uma configuração à parte.",
+          "relatedTerms": [
+            "app-router",
+            "ssr"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "route-handler-vs-action",
+          "level": "pleno",
+          "question": "Quando usar Route Handler e quando usar Server Action?",
+          "answer": "Server Action para mutações disparadas pelo próprio app (formulários, botões), porque integra com revalidação e funciona sem escrever fetch. Route Handler quando o endpoint é consumido por fora: webhooks, apps mobile, integrações, ou quando preciso controlar método, cabeçalhos e formato da resposta.",
+          "relatedTerms": [
+            "route-handler",
+            "server-action"
+          ]
+        }
+      ]
+    }
+  ]
+}

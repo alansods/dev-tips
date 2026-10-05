@@ -8,12 +8,31 @@
 
 import crud4Frameworks from '../../content/tracks/crud-4-frameworks/track.json';
 import fundamentosWeb from '../../content/tracks/fundamentos-web/track.json';
+import javascriptEssencial from '../../content/tracks/javascript-essencial/track.json';
+import javascriptAssincrono from '../../content/tracks/javascript-assincrono/track.json';
+import javascriptNoNavegador from '../../content/tracks/javascript-no-navegador/track.json';
+import nodejs from '../../content/tracks/nodejs/track.json';
+import react from '../../content/tracks/react/track.json';
+import vue from '../../content/tracks/vue/track.json';
+import nextjs from '../../content/tracks/nextjs/track.json';
+import express from '../../content/tracks/express/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
 import { translationRegistry } from './translations';
 
-const registry: unknown[] = [crud4Frameworks, fundamentosWeb];
+const registry: unknown[] = [
+  crud4Frameworks,
+  fundamentosWeb,
+  javascriptEssencial,
+  javascriptAssincrono,
+  javascriptNoNavegador,
+  nodejs,
+  react,
+  vue,
+  nextjs,
+  express,
+];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));
 

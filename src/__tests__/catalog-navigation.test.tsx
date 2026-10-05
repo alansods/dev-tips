@@ -14,6 +14,10 @@ import * as clock from '../study/clock';
 import { resetStudyStore, useStudyStore } from '../study/store';
 import { crudTrack, webTrack } from '../test-utils';
 
+// Os cenários descrevem o catálogo com as duas trilhas originais (CRUD e
+// Fundamentos web); as trilhas de linguagem têm testes próprios.
+jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());
+
 const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,

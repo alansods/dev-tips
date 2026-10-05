@@ -1,0 +1,120 @@
+{
+  "title": "React",
+  "description": "The most used UI library: components, hooks, rendering and performance.",
+  "decks": {
+    "componentes-e-jsx": {
+      "title": "Components and JSX",
+      "description": "How a React UI is put together."
+    },
+    "hooks": {
+      "title": "Hooks",
+      "description": "State, effects, refs and context."
+    },
+    "renderizacao-e-performance": {
+      "title": "Rendering and performance",
+      "description": "When React renders and how to avoid wasted work."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "React questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "componente": {
+      "term": "Component",
+      "definition": "A function that receives props and returns what should appear on screen. The UI is a tree of reusable components; the name starts with a capital letter so React can tell it apart from HTML tags."
+    },
+    "jsx": {
+      "term": "JSX",
+      "definition": "HTML-like syntax inside JavaScript, compiled into calls that create React elements. Expressions go inside braces ({total}), attributes use camelCase (className, onClick) and text is escaped automatically, which protects against XSS."
+    },
+    "props": {
+      "term": "Props",
+      "definition": "A component's parameters, passed by the parent as attributes. They are read-only: the child does not change its props; it tells the parent through a function (callback) also received as a prop. Data flows down and events flow up."
+    },
+    "key": {
+      "term": "key in lists",
+      "definition": "A stable identifier React uses to know which list item is which between renders. It should come from the data (an id), not the index: with the index, inserting or reordering can move one item's state onto another."
+    },
+    "lista-com-props": {
+      "title": "List with props and key",
+      "body": "The parent passes the data and a function; the child only displays and reports when it is clicked."
+    },
+    "renderizacao-condicional": {
+      "title": "Conditional rendering",
+      "body": "A ternary to choose between two pieces and && to show or hide. Careful: {count && ...} shows \"0\" when count is 0; use {count > 0 && ...}."
+    },
+    "estado": {
+      "term": "State (useState)",
+      "definition": "Data that belongs to a component and changes over time. useState returns the value and a function to change it; calling that function schedules a new render. State must be treated as immutable: create a new object or array instead of changing the current one."
+    },
+    "use-effect": {
+      "term": "useEffect",
+      "definition": "A hook to sync the component with something outside React: subscriptions, timers, browser APIs. It runs after rendering, again when a dependency changes, and can return a cleanup function. It is not the place to compute derived data: that is done directly during rendering."
+    },
+    "regras-dos-hooks": {
+      "term": "Rules of hooks",
+      "definition": "Hooks can only be called at the top level of a component or another hook, never inside an if, a loop or a nested function. React identifies each hook by call order; changing the order between renders mixes up the state."
+    },
+    "contexto": {
+      "term": "Context",
+      "definition": "A way to pass a value to a whole subtree without forwarding props through every level (prop drilling): theme, logged-in user, language. Every component that reads the context re-renders when the value changes, so it is not a general replacement for state managers."
+    },
+    "effect-cleanup": {
+      "title": "Effect with cleanup",
+      "body": "The fetch runs again when userId changes. The cleanup cancels the previous request, so an old response cannot overwrite the new one."
+    },
+    "custom-hook": {
+      "title": "Custom hook",
+      "body": "A function starting with \"use\" that combines other hooks to reuse stateful logic across components."
+    },
+    "renderizacao": {
+      "term": "Rendering",
+      "definition": "When React calls the component to work out what to show. It happens on the first mount and when the state of the component, of a parent or of a context it reads changes. Rendering is not touching the DOM: the DOM only changes where the result differs."
+    },
+    "reconciliacao": {
+      "term": "Reconciliation",
+      "definition": "The process in which React compares the new element tree with the previous one and applies only the differences to the DOM. Elements of a different type in the same position are recreated from scratch (losing their state); in lists, the key tells which items are the same."
+    },
+    "memoizacao": {
+      "term": "memo, useMemo and useCallback",
+      "definition": "Tools to skip work: memo skips rendering a component if its props have not changed; useMemo caches an expensive calculation; useCallback keeps the same function between renders. They only help when measured; the React Compiler can apply them automatically."
+    },
+    "estado-derivado": {
+      "term": "Derived state",
+      "definition": "A value that can be computed from props or other state, such as a cart total or a filtered list. It should be computed during rendering, not kept in another useState synced with useEffect: that duplicates the source of truth and causes extra renders."
+    },
+    "estado-derivado-exemplo": {
+      "title": "Compute instead of syncing",
+      "body": "The useEffect version renders twice and can fall out of date; the computed version is always correct."
+    },
+    "memo-callback": {
+      "title": "memo with useCallback",
+      "body": "Without useCallback, handleSelect would be a new function on every parent render, and the child's memo would never skip anything."
+    },
+    "props-vs-estado": {
+      "question": "What is the difference between props and state?",
+      "answer": "Props come from outside, passed by the parent, and the component does not change them. State is internal, created with useState, and the component changes it in response to interactions. When two components need the same data, the state moves up to the common parent and flows down as props (\"lifting state up\")."
+    },
+    "por-que-key": {
+      "question": "Why not use the index as the key?",
+      "answer": "Because the key tells React which item is which. If the list is reordered or an item is inserted in the middle, the index points to another item, and React reuses the wrong component: inputs keep the wrong text and state goes to the wrong item. I use a stable id from the data; the index only works for fixed lists."
+    },
+    "dependencias-useeffect": {
+      "question": "How does the useEffect dependency array work?",
+      "answer": "With no array, the effect runs after every render; with [], only on mount (and the cleanup on unmount); with values, whenever one of them changes. Every component variable used in the effect must be in the array, or it reads old values (stale closure). If the effect only computes something from props, it probably does not need useEffect at all."
+    },
+    "quando-usar-memo": {
+      "question": "When should you use useMemo and useCallback?",
+      "answer": "When there is a measured problem: an expensive calculation running on every render, or a function/object passed to a memoized child or used as an effect dependency. Otherwise they add cost and complexity for no gain. Before memoizing, I check whether the state can move closer to where it is used; the React Compiler also does part of this on its own."
+    },
+    "context-vs-estado-global": {
+      "question": "Does Context replace a global state library?",
+      "answer": "For values that rarely change (theme, user, language), yes. For state that changes often and is read in many places, no: every consumer re-renders on each value change. Then I use Zustand, Redux Toolkit or Jotai, which let each component subscribe only to the part it uses. Server data fits better in TanStack Query, which handles caching and revalidation."
+    },
+    "virtual-dom": {
+      "question": "What is the Virtual DOM?",
+      "answer": "It is the JavaScript object representation of what the component wants to show. On each render React builds a new tree, compares it with the previous one (reconciliation) and applies only what changed to the real DOM. The advantage is not being \"faster than the DOM\", but letting you write the UI declaratively without updating the DOM by hand."
+    }
+  }
+}

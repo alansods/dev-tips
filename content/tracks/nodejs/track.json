@@ -1,0 +1,322 @@
+{
+  "id": "nodejs",
+  "title": "Node.js",
+  "description": "JavaScript no servidor: o runtime, módulos, npm, streams e processos.",
+  "areas": [
+    "backend"
+  ],
+  "language": "javascript",
+  "decks": [
+    {
+      "id": "runtime",
+      "title": "Runtime",
+      "description": "O que é o Node.js e como ele lida com I/O.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "node",
+          "level": "junior",
+          "term": "Node.js",
+          "definition": "Ambiente que roda JavaScript fora do navegador, usando o motor V8. Troca as APIs do navegador (DOM, window) por APIs de sistema: arquivos, rede, processos. É usado para APIs, ferramentas de linha de comando e build.",
+          "relatedTerms": [
+            "libuv",
+            "io-nao-bloqueante"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "io-nao-bloqueante",
+          "level": "pleno",
+          "term": "I/O não bloqueante",
+          "definition": "Modelo em que ler arquivo, consultar banco ou chamar outra API não trava a thread: a operação é iniciada e o resultado volta por callback ou Promise. Uma única thread atende milhares de conexões porque quase todo o tempo é espera de I/O.",
+          "relatedTerms": [
+            "node",
+            "libuv"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "libuv",
+          "level": "senior",
+          "term": "libuv e thread pool",
+          "definition": "Biblioteca em C por baixo do Node.js que implementa o event loop e o I/O assíncrono. Rede usa os mecanismos do sistema operacional (epoll, kqueue); operações sem suporte assíncrono, como sistema de arquivos, DNS e crypto, vão para um pool de 4 threads (UV_THREADPOOL_SIZE).",
+          "relatedTerms": [
+            "io-nao-bloqueante"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "worker-threads",
+          "level": "senior",
+          "term": "Worker threads",
+          "definition": "Threads extras com seu próprio event loop, para trabalho pesado de CPU (processar imagem, compressão, cálculos) sem travar a thread principal. Comunicam-se por mensagens. Para I/O não ajudam: o I/O já é assíncrono.",
+          "relatedTerms": [
+            "libuv",
+            "node"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "servidor-http",
+          "level": "junior",
+          "title": "Servidor HTTP sem framework",
+          "body": "O módulo http da biblioteca padrão já cria um servidor. Frameworks como Express organizam rotas e middlewares em cima disso.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "import { createServer } from \"node:http\";\n\nconst server = createServer((req, res) => {\n  res.writeHead(200, { \"Content-Type\": \"application/json\" });\n  res.end(JSON.stringify({ ok: true, path: req.url }));\n});\n\nserver.listen(3000, () => console.log(\"ouvindo na 3000\"));"
+          },
+          "relatedTerms": [
+            "node"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "cpu-bloqueia",
+          "level": "pleno",
+          "title": "Trabalho de CPU trava todo mundo",
+          "body": "Enquanto a rota /relatorio faz o laço síncrono, nenhuma outra requisição é atendida. A saída é mover o cálculo para uma worker thread, uma fila ou outro serviço.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "app.get(\"/relatorio\", (req, res) => {\n  let total = 0;\n  for (let i = 0; i < 5_000_000_000; i++) total += i; // segundos de CPU\n  res.json({ total });\n});\n\napp.get(\"/health\", (req, res) => res.send(\"ok\")); // fica esperando"
+          },
+          "relatedTerms": [
+            "io-nao-bloqueante",
+            "worker-threads"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modulos-e-npm",
+      "title": "Módulos e npm",
+      "description": "CommonJS, ES modules, dependências e versões.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "commonjs-vs-esm",
+          "level": "pleno",
+          "term": "CommonJS e ES modules",
+          "definition": "Os dois sistemas de módulos do Node.js. CommonJS usa require e module.exports, carrega de forma síncrona e é o formato antigo. ES modules usa import e export, é o padrão da linguagem e é ativado com \"type\": \"module\" no package.json ou com a extensão .mjs.",
+          "relatedTerms": [
+            "package-json"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "package-json",
+          "level": "junior",
+          "term": "package.json",
+          "definition": "Arquivo que descreve o projeto: nome, scripts (npm run dev), dependências de produção (dependencies), dependências só de desenvolvimento (devDependencies) e configurações como \"type\" e \"engines\".",
+          "relatedTerms": [
+            "semver",
+            "lockfile"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "semver",
+          "level": "pleno",
+          "term": "Versionamento semântico (semver)",
+          "definition": "Versões no formato MAIOR.MENOR.CORREÇÃO: maior quebra compatibilidade, menor adiciona recursos compatíveis, correção só corrige. No package.json, ^1.4.2 aceita até antes de 2.0.0 e ~1.4.2 aceita até antes de 1.5.0.",
+          "relatedTerms": [
+            "package-json",
+            "lockfile"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "lockfile",
+          "level": "pleno",
+          "term": "Lockfile",
+          "definition": "Arquivo (package-lock.json, yarn.lock, pnpm-lock.yaml) que grava a versão exata de cada dependência, inclusive as indiretas. Garante que todo mundo e o servidor instalem a mesma árvore. Vai para o repositório; em CI use npm ci.",
+          "relatedTerms": [
+            "package-json",
+            "semver"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "require-vs-import",
+          "level": "junior",
+          "title": "require e import",
+          "body": "O mesmo módulo nos dois formatos. Em ES modules, caminhos relativos levam a extensão do arquivo.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "// CommonJS (math.cjs)\nfunction sum(a, b) { return a + b; }\nmodule.exports = { sum };\n// uso: const { sum } = require(\"./math.cjs\");\n\n// ES modules (math.mjs)\nexport function sum(a, b) { return a + b; }\n// uso: import { sum } from \"./math.mjs\";"
+          },
+          "relatedTerms": [
+            "commonjs-vs-esm"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "npm-scripts",
+          "level": "junior",
+          "title": "Scripts e dependências",
+          "body": "npm install adiciona a dependência e atualiza o lockfile; -D a marca como de desenvolvimento. npm ci instala exatamente o que está no lockfile, ideal para CI.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "npm init -y\nnpm install express\nnpm install -D vitest\nnpm run test        # roda o script \"test\" do package.json\nnpm ci              # instala só o que está no lockfile"
+          },
+          "relatedTerms": [
+            "package-json",
+            "lockfile"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "streams-e-processos",
+      "title": "Streams e processos",
+      "description": "Dados em pedaços, variáveis de ambiente e encerramento.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "stream",
+          "level": "pleno",
+          "term": "Stream",
+          "definition": "Fluxo de dados processado em pedaços (chunks), em vez de carregar tudo na memória. Existem streams de leitura, de escrita, duplex e de transformação. Servem para arquivos grandes, uploads, downloads e respostas HTTP.",
+          "relatedTerms": [
+            "backpressure"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "backpressure",
+          "level": "senior",
+          "term": "Backpressure",
+          "definition": "Mecanismo que desacelera quem produz dados quando quem consome é mais lento, evitando acumular tudo na memória. pipe e pipeline já fazem isso; escrever à mão exige respeitar o retorno de write() e o evento drain.",
+          "relatedTerms": [
+            "stream"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "process-env",
+          "level": "junior",
+          "term": "process.env",
+          "definition": "Objeto com as variáveis de ambiente do processo: porta, URL do banco, chaves de API. Mantém configuração e segredos fora do código. Desde o Node.js 20.6, node --env-file=.env carrega um arquivo .env sem biblioteca.",
+          "relatedTerms": [
+            "graceful-shutdown"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "graceful-shutdown",
+          "level": "senior",
+          "term": "Encerramento gracioso",
+          "definition": "Ao receber SIGTERM (ex.: num deploy), o servidor para de aceitar conexões novas, termina as requisições em andamento, fecha o banco e só então sai. Evita respostas cortadas e dados pela metade.",
+          "relatedTerms": [
+            "process-env"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "pipeline",
+          "level": "pleno",
+          "title": "Comprimir um arquivo grande",
+          "body": "pipeline liga leitura, compressão e escrita, cuida do backpressure e fecha tudo se der erro. A memória fica baixa mesmo com arquivos de vários GB.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "import { createReadStream, createWriteStream } from \"node:fs\";\nimport { pipeline } from \"node:stream/promises\";\nimport { createGzip } from \"node:zlib\";\n\nawait pipeline(\n  createReadStream(\"logs.txt\"),\n  createGzip(),\n  createWriteStream(\"logs.txt.gz\"),\n);"
+          },
+          "relatedTerms": [
+            "stream",
+            "backpressure"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "sigterm",
+          "level": "senior",
+          "title": "Tratando SIGTERM",
+          "body": "server.close para de aceitar conexões e espera as abertas; depois fecha o banco e encerra.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "process.on(\"SIGTERM\", () => {\n  console.log(\"encerrando...\");\n  server.close(async () => {\n    await db.end();\n    process.exit(0);\n  });\n});"
+          },
+          "relatedTerms": [
+            "graceful-shutdown"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre Node.js que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "node-single-thread",
+          "level": "pleno",
+          "question": "Node.js é single-thread? Então como aguenta muitas requisições?",
+          "answer": "O seu código JavaScript roda numa thread só, mas o I/O não: rede usa o assíncrono do sistema operacional e arquivos, DNS e crypto usam o thread pool da libuv. Como uma API passa a maior parte do tempo esperando banco e rede, uma thread atende muitas conexões. O limite aparece com trabalho pesado de CPU.",
+          "relatedTerms": [
+            "io-nao-bloqueante",
+            "libuv"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cpu-pesado-node",
+          "level": "senior",
+          "question": "Como lidar com uma tarefa pesada de CPU numa API Node.js?",
+          "answer": "Tirar da thread principal. Se é curta e frequente, uma worker thread (ou um pool, como piscina). Se é longa, uma fila (BullMQ, SQS) com workers separados, e a API responde 202 com um id para consultar depois. Escalar horizontalmente com mais processos (cluster ou mais containers) também ajuda, mas não resolve uma requisição lenta.",
+          "relatedTerms": [
+            "worker-threads",
+            "io-nao-bloqueante"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cjs-vs-esm",
+          "level": "pleno",
+          "question": "Qual a diferença entre CommonJS e ES modules?",
+          "answer": "CommonJS (require, module.exports) carrega de forma síncrona e dinâmica, em tempo de execução. ES modules (import, export) é estático: as dependências são conhecidas antes de rodar, o que permite tree shaking e await no topo do arquivo. ESM pode importar CommonJS, e versões recentes do Node.js também aceitam require de ESM síncrono.",
+          "relatedTerms": [
+            "commonjs-vs-esm"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-lockfile",
+          "level": "junior",
+          "question": "Para que serve o package-lock.json?",
+          "answer": "Para fixar a versão exata de cada dependência, inclusive as dependências das dependências. Sem ele, um ^1.2.0 pode instalar 1.9.0 hoje e quebrar algo. Com o lockfile no repositório e npm ci no CI, todo mundo e o servidor rodam exatamente a mesma árvore.",
+          "relatedTerms": [
+            "lockfile",
+            "semver"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-usar-stream",
+          "level": "pleno",
+          "question": "Quando usar streams?",
+          "answer": "Quando o dado é grande ou chega aos poucos: arquivos, uploads, exportação de CSV, proxy de downloads. Em vez de carregar tudo na memória, processo pedaço por pedaço e começo a responder antes de terminar. Uso pipeline, que cuida de backpressure e de erros.",
+          "relatedTerms": [
+            "stream",
+            "backpressure"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "segredos-node",
+          "level": "junior",
+          "question": "Onde guardar configurações e segredos numa aplicação Node.js?",
+          "answer": "Em variáveis de ambiente, lidas por process.env, nunca no código. Em desenvolvimento, um .env fora do Git; em produção, o gerenciador de segredos da plataforma. Valido as variáveis na inicialização (ex.: com Zod) para o app falhar logo se faltar alguma.",
+          "relatedTerms": [
+            "process-env"
+          ]
+        }
+      ]
+    }
+  ]
+}

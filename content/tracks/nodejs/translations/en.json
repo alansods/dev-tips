@@ -1,0 +1,120 @@
+{
+  "title": "Node.js",
+  "description": "JavaScript on the server: the runtime, modules, npm, streams and processes.",
+  "decks": {
+    "runtime": {
+      "title": "Runtime",
+      "description": "What Node.js is and how it handles I/O."
+    },
+    "modulos-e-npm": {
+      "title": "Modules and npm",
+      "description": "CommonJS, ES modules, dependencies and versions."
+    },
+    "streams-e-processos": {
+      "title": "Streams and processes",
+      "description": "Data in chunks, environment variables and shutdown."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Node.js questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "node": {
+      "term": "Node.js",
+      "definition": "An environment that runs JavaScript outside the browser, using the V8 engine. It swaps browser APIs (DOM, window) for system APIs: files, network, processes. It is used for APIs, command-line tools and builds."
+    },
+    "io-nao-bloqueante": {
+      "term": "Non-blocking I/O",
+      "definition": "The model in which reading a file, querying a database or calling another API does not block the thread: the operation is started and the result comes back through a callback or Promise. A single thread serves thousands of connections because almost all the time is spent waiting on I/O."
+    },
+    "libuv": {
+      "term": "libuv and the thread pool",
+      "definition": "The C library under Node.js that implements the event loop and asynchronous I/O. Networking uses operating system mechanisms (epoll, kqueue); operations without async support, such as the file system, DNS and crypto, go to a pool of 4 threads (UV_THREADPOOL_SIZE)."
+    },
+    "worker-threads": {
+      "term": "Worker threads",
+      "definition": "Extra threads with their own event loop, for CPU-heavy work (image processing, compression, calculations) without blocking the main thread. They communicate through messages. They do not help with I/O: I/O is already asynchronous."
+    },
+    "servidor-http": {
+      "title": "HTTP server without a framework",
+      "body": "The standard library http module already creates a server. Frameworks such as Express organize routes and middleware on top of it."
+    },
+    "cpu-bloqueia": {
+      "title": "CPU work blocks everyone",
+      "body": "While the /relatorio route runs the synchronous loop, no other request is served. The way out is to move the calculation to a worker thread, a queue or another service."
+    },
+    "commonjs-vs-esm": {
+      "term": "CommonJS and ES modules",
+      "definition": "The two module systems in Node.js. CommonJS uses require and module.exports, loads synchronously and is the old format. ES modules use import and export, are the language standard and are enabled with \"type\": \"module\" in package.json or with the .mjs extension."
+    },
+    "package-json": {
+      "term": "package.json",
+      "definition": "The file that describes the project: name, scripts (npm run dev), production dependencies (dependencies), development-only dependencies (devDependencies) and settings such as \"type\" and \"engines\"."
+    },
+    "semver": {
+      "term": "Semantic versioning (semver)",
+      "definition": "Versions in MAJOR.MINOR.PATCH format: major breaks compatibility, minor adds compatible features, patch only fixes. In package.json, ^1.4.2 accepts anything below 2.0.0 and ~1.4.2 accepts anything below 1.5.0."
+    },
+    "lockfile": {
+      "term": "Lockfile",
+      "definition": "A file (package-lock.json, yarn.lock, pnpm-lock.yaml) that records the exact version of every dependency, including indirect ones. It ensures everyone and the server install the same tree. It goes into the repository; in CI use npm ci."
+    },
+    "require-vs-import": {
+      "title": "require and import",
+      "body": "The same module in both formats. In ES modules, relative paths include the file extension."
+    },
+    "npm-scripts": {
+      "title": "Scripts and dependencies",
+      "body": "npm install adds the dependency and updates the lockfile; -D marks it as a development one. npm ci installs exactly what is in the lockfile, ideal for CI."
+    },
+    "stream": {
+      "term": "Stream",
+      "definition": "A flow of data processed in chunks instead of loading everything into memory. There are readable, writable, duplex and transform streams. They are used for large files, uploads, downloads and HTTP responses."
+    },
+    "backpressure": {
+      "term": "Backpressure",
+      "definition": "The mechanism that slows down the data producer when the consumer is slower, so nothing piles up in memory. pipe and pipeline already do this; writing by hand requires respecting write()'s return value and the drain event."
+    },
+    "process-env": {
+      "term": "process.env",
+      "definition": "The object with the process environment variables: port, database URL, API keys. It keeps configuration and secrets out of the code. Since Node.js 20.6, node --env-file=.env loads a .env file without a library."
+    },
+    "graceful-shutdown": {
+      "term": "Graceful shutdown",
+      "definition": "When it receives SIGTERM (e.g. during a deploy), the server stops accepting new connections, finishes in-flight requests, closes the database and only then exits. It avoids cut-off responses and half-written data."
+    },
+    "pipeline": {
+      "title": "Compressing a large file",
+      "body": "pipeline connects reading, compression and writing, takes care of backpressure and closes everything on error. Memory stays low even with multi-GB files."
+    },
+    "sigterm": {
+      "title": "Handling SIGTERM",
+      "body": "server.close stops accepting connections and waits for the open ones; then it closes the database and exits."
+    },
+    "node-single-thread": {
+      "question": "Is Node.js single-threaded? Then how does it handle many requests?",
+      "answer": "Your JavaScript code runs on a single thread, but I/O does not: networking uses the operating system's async facilities, and files, DNS and crypto use the libuv thread pool. Since an API spends most of its time waiting for the database and the network, one thread serves many connections. The limit shows up with heavy CPU work."
+    },
+    "cpu-pesado-node": {
+      "question": "How do you handle a CPU-heavy task in a Node.js API?",
+      "answer": "Take it off the main thread. If it is short and frequent, a worker thread (or a pool such as piscina). If it is long, a queue (BullMQ, SQS) with separate workers, and the API replies 202 with an id to check later. Scaling horizontally with more processes (cluster or more containers) also helps, but it does not fix a slow request."
+    },
+    "cjs-vs-esm": {
+      "question": "What is the difference between CommonJS and ES modules?",
+      "answer": "CommonJS (require, module.exports) loads synchronously and dynamically, at runtime. ES modules (import, export) are static: dependencies are known before running, which enables tree shaking and top-level await. ESM can import CommonJS, and recent Node.js versions also allow require of synchronous ESM."
+    },
+    "por-que-lockfile": {
+      "question": "What is package-lock.json for?",
+      "answer": "To pin the exact version of every dependency, including the dependencies of dependencies. Without it, a ^1.2.0 might install 1.9.0 today and break something. With the lockfile in the repository and npm ci in CI, everyone and the server run exactly the same tree."
+    },
+    "quando-usar-stream": {
+      "question": "When should you use streams?",
+      "answer": "When the data is large or arrives gradually: files, uploads, CSV exports, download proxies. Instead of loading everything into memory, I process chunk by chunk and start responding before finishing. I use pipeline, which takes care of backpressure and errors."
+    },
+    "segredos-node": {
+      "question": "Where should you keep configuration and secrets in a Node.js app?",
+      "answer": "In environment variables, read through process.env, never in the code. In development, a .env file kept out of Git; in production, the platform's secret manager. I validate the variables at startup (e.g. with Zod) so the app fails fast if one is missing."
+    }
+  }
+}

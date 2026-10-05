@@ -1,0 +1,316 @@
+{
+  "id": "vue",
+  "title": "Vue",
+  "description": "O framework progressivo: reatividade, Composition API, componentes, Vue Router e Pinia.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "javascript",
+  "framework": "vue",
+  "decks": [
+    {
+      "id": "reatividade",
+      "title": "Reatividade",
+      "description": "Como o Vue sabe o que atualizar.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "reatividade",
+          "level": "pleno",
+          "term": "Reatividade",
+          "definition": "Sistema do Vue que rastreia quais dados cada parte da tela lê e, quando um deles muda, atualiza só o que depende dele. É feito com Proxies do JavaScript: ler uma propriedade registra a dependência e escrever dispara a atualização.",
+          "relatedTerms": [
+            "ref",
+            "reactive"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ref",
+          "level": "junior",
+          "term": "ref",
+          "definition": "Cria um valor reativo de qualquer tipo, guardado em .value. No template o .value é desembrulhado automaticamente. É a forma recomendada para a maior parte do estado.",
+          "relatedTerms": [
+            "reatividade",
+            "reactive"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "reactive",
+          "level": "pleno",
+          "term": "reactive",
+          "definition": "Torna um objeto inteiro reativo, sem .value. Só funciona com objetos e perde a reatividade se você desestruturar ou trocar o objeto inteiro; por isso muitos times preferem ref para tudo.",
+          "relatedTerms": [
+            "ref",
+            "reatividade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "computed",
+          "level": "junior",
+          "term": "computed",
+          "definition": "Valor derivado de outros dados reativos, recalculado só quando uma dependência muda e guardado em cache entre leituras. Use para filtros, totais e formatações, em vez de métodos chamados no template.",
+          "relatedTerms": [
+            "reatividade",
+            "watch"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "watch",
+          "level": "pleno",
+          "term": "watch e watchEffect",
+          "definition": "Executam um efeito colateral quando dados mudam: buscar na API, salvar no storage. watch observa fontes explícitas e recebe o valor novo e o antigo; watchEffect roda na hora e observa o que ler. Para calcular valores, prefira computed.",
+          "relatedTerms": [
+            "computed",
+            "ref"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "contador-composition",
+          "level": "junior",
+          "title": "Composition API com script setup",
+          "body": "ref guarda o estado, computed deriva o dobro e a função altera o .value. Tudo que é declarado no script setup fica disponível no template.",
+          "snippet": {
+            "file": "Counter.vue",
+            "language": "text",
+            "code": "<script setup>\nimport { ref, computed } from \"vue\";\n\nconst count = ref(0);\nconst double = computed(() => count.value * 2);\nfunction increment() {\n  count.value++;\n}\n</script>\n\n<template>\n  <button @click=\"increment\">{{ count }} (dobro: {{ double }})</button>\n</template>"
+          },
+          "relatedTerms": [
+            "ref",
+            "computed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "componentes",
+      "title": "Componentes",
+      "description": "Props, eventos, slots e diretivas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "sfc",
+          "level": "junior",
+          "term": "Single File Component (SFC)",
+          "definition": "Arquivo .vue que junta o template, o script e o estilo de um componente. Com <script setup>, o código fica mais curto e o compilador otimiza o template; <style scoped> aplica o CSS só àquele componente.",
+          "relatedTerms": [
+            "props-e-emits",
+            "diretivas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "props-e-emits",
+          "level": "junior",
+          "term": "Props e emits",
+          "definition": "Props trazem dados do pai para o filho (defineProps) e não devem ser alteradas pelo filho. Para avisar o pai, o filho emite eventos (defineEmits), que o pai escuta com @nome-do-evento.",
+          "relatedTerms": [
+            "sfc",
+            "v-model"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "diretivas",
+          "level": "junior",
+          "term": "Diretivas",
+          "definition": "Atributos especiais do template: v-if e v-show exibem condicionalmente (v-if remove do DOM, v-show só esconde com CSS), v-for repete com :key, v-bind (:) liga atributos e v-on (@) escuta eventos.",
+          "relatedTerms": [
+            "sfc"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "slots",
+          "level": "pleno",
+          "term": "Slots",
+          "definition": "Espaços no template de um componente que o pai preenche com conteúdo próprio, como children no React. Slots nomeados permitem vários espaços (cabeçalho, rodapé) e slots com escopo passam dados do filho para o conteúdo do pai.",
+          "relatedTerms": [
+            "props-e-emits",
+            "sfc"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "v-model",
+          "level": "pleno",
+          "term": "v-model",
+          "definition": "Ligação nos dois sentidos entre um campo e um dado: o campo mostra o valor e atualiza o dado ao ser editado. Em componentes próprios, defineModel cria a prop e o evento de atualização de uma vez.",
+          "relatedTerms": [
+            "props-e-emits"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "props-emits-exemplo",
+          "level": "pleno",
+          "title": "Filho com props e evento",
+          "body": "O filho recebe o produto e emite \"remove\" com o id; quem decide o que fazer é o pai.",
+          "snippet": {
+            "file": "ProductItem.vue",
+            "language": "text",
+            "code": "<script setup>\nconst props = defineProps({ product: { type: Object, required: true } });\nconst emit = defineEmits([\"remove\"]);\n</script>\n\n<template>\n  <li>\n    {{ props.product.name }}\n    <button @click=\"emit('remove', props.product.id)\">Remover</button>\n  </li>\n</template>\n\n<!-- no pai: <ProductItem :product=\"p\" @remove=\"removeProduct\" /> -->"
+          },
+          "relatedTerms": [
+            "props-e-emits",
+            "diretivas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "router-e-pinia",
+      "title": "Router e Pinia",
+      "description": "Navegação entre páginas e estado compartilhado.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "vue-router",
+          "level": "junior",
+          "term": "Vue Router",
+          "definition": "Biblioteca oficial de rotas: liga caminhos de URL a componentes, com parâmetros (/products/:id), rotas aninhadas e navegação sem recarregar a página. <RouterLink> cria links e <RouterView> mostra a página atual.",
+          "relatedTerms": [
+            "navigation-guard"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "navigation-guard",
+          "level": "pleno",
+          "term": "Navigation guard",
+          "definition": "Função que roda antes de uma navegação e pode liberar, redirecionar ou cancelar, como exigir login para áreas privadas. Pode ser global (router.beforeEach) ou por rota (beforeEnter).",
+          "relatedTerms": [
+            "vue-router"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pinia",
+          "level": "junior",
+          "term": "Pinia",
+          "definition": "Biblioteca oficial de estado global do Vue (sucessora do Vuex). Cada store tem state, getters (como computed) e actions (funções que alteram o estado, inclusive assíncronas), com suporte a DevTools e TypeScript.",
+          "relatedTerms": [
+            "store-to-refs"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "store-to-refs",
+          "level": "pleno",
+          "term": "storeToRefs",
+          "definition": "Ao desestruturar uma store do Pinia, as propriedades perdem a reatividade. storeToRefs transforma state e getters em refs reativos para desestruturar com segurança; as actions podem ser desestruturadas direto.",
+          "relatedTerms": [
+            "pinia"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "store-pinia",
+          "level": "pleno",
+          "title": "Store no estilo setup",
+          "body": "Uma store do Pinia escrita como composable: refs viram state, computed vira getter e funções viram actions.",
+          "snippet": {
+            "file": "stores/cart.js",
+            "language": "js",
+            "code": "import { defineStore } from \"pinia\";\nimport { ref, computed } from \"vue\";\n\nexport const useCartStore = defineStore(\"cart\", () => {\n  const items = ref([]);\n  const total = computed(() => items.value.reduce((sum, i) => sum + i.price, 0));\n  function add(product) {\n    items.value.push(product);\n  }\n  return { items, total, add };\n});"
+          },
+          "relatedTerms": [
+            "pinia"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "guard-login",
+          "level": "pleno",
+          "title": "Guard de login",
+          "body": "Rotas marcadas com meta.requiresAuth redirecionam para o login, guardando para onde o usuário queria ir.",
+          "snippet": {
+            "file": "router.js",
+            "language": "js",
+            "code": "router.beforeEach((to) => {\n  const auth = useAuthStore();\n  if (to.meta.requiresAuth && !auth.isLoggedIn) {\n    return { path: \"/login\", query: { redirect: to.fullPath } };\n  }\n});"
+          },
+          "relatedTerms": [
+            "navigation-guard",
+            "pinia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Vue que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "ref-vs-reactive",
+          "level": "pleno",
+          "question": "Quando usar ref e quando usar reactive?",
+          "answer": "ref serve para qualquer tipo e aguenta ser trocado inteiro ou passado adiante sem perder a reatividade, com o custo do .value no script. reactive só aceita objetos e perde a reatividade ao desestruturar ou substituir. Por isso uso ref como padrão e reactive só para objetos que fazem sentido juntos, como um formulário.",
+          "relatedTerms": [
+            "ref",
+            "reactive"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "computed-vs-watch",
+          "level": "junior",
+          "question": "Qual a diferença entre computed e watch?",
+          "answer": "computed deriva um valor e tem cache: só recalcula quando uma dependência muda. watch executa um efeito colateral quando algo muda, como chamar uma API ou salvar no storage. Se a ideia é \"calcular X a partir de Y\", é computed; se é \"quando Y mudar, faça algo\", é watch.",
+          "relatedTerms": [
+            "computed",
+            "watch"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "v-if-vs-v-show",
+          "level": "junior",
+          "question": "Qual a diferença entre v-if e v-show?",
+          "answer": "v-if cria e destrói o elemento conforme a condição: o custo está na troca, mas nada é renderizado quando é falso. v-show sempre renderiza e só alterna display: none: custo inicial maior, troca barata. Uso v-show para coisas que alternam muito, como abas e dropdowns, e v-if para o resto.",
+          "relatedTerms": [
+            "diretivas"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "como-funciona-reatividade",
+          "level": "senior",
+          "question": "Como funciona a reatividade do Vue 3?",
+          "answer": "O estado é envolvido em Proxies. Quando um efeito (a renderização de um componente, um computed, um watch) lê uma propriedade, o Vue registra essa dependência; quando a propriedade é escrita, o Vue agenda só os efeitos que dependem dela, agrupando as atualizações num tick. Por isso trocar um objeto reactive inteiro ou desestruturá-lo quebra a ligação.",
+          "relatedTerms": [
+            "reatividade",
+            "reactive"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "comunicacao-componentes",
+          "level": "pleno",
+          "question": "Como componentes se comunicam no Vue?",
+          "answer": "Do pai para o filho, props; do filho para o pai, eventos com emit; nos dois sentidos num campo, v-model. Para conteúdo, slots. Para dados que atravessam muitos níveis, provide/inject. Para estado compartilhado entre telas, uma store do Pinia.",
+          "relatedTerms": [
+            "props-e-emits",
+            "pinia"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "vue-vs-react",
+          "level": "senior",
+          "question": "Quais as principais diferenças entre Vue e React?",
+          "answer": "Vue tem reatividade fina: rastreia dependências e atualiza só o necessário, sem precisar de memoização manual; React re-renderiza o componente e seus filhos e compara o resultado. Vue usa templates compilados e tem roteador e store oficiais; React usa JSX e deixa essas escolhas ao ecossistema. Os dois são componentizados e têm SSR (Nuxt e Next.js).",
+          "relatedTerms": [
+            "reatividade",
+            "sfc"
+          ]
+        }
+      ]
+    }
+  ]
+}

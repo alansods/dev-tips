@@ -1,0 +1,330 @@
+{
+  "id": "react",
+  "title": "React",
+  "description": "A biblioteca de interfaces mais usada: componentes, hooks, renderização e performance.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "javascript",
+  "framework": "react",
+  "decks": [
+    {
+      "id": "componentes-e-jsx",
+      "title": "Componentes e JSX",
+      "description": "Como uma interface React é montada.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "componente",
+          "level": "junior",
+          "term": "Componente",
+          "definition": "Função que recebe props e devolve o que deve aparecer na tela. A interface é uma árvore de componentes reutilizáveis; o nome começa com letra maiúscula para o React diferenciar de tags HTML.",
+          "relatedTerms": [
+            "props",
+            "jsx"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "jsx",
+          "level": "junior",
+          "term": "JSX",
+          "definition": "Sintaxe parecida com HTML dentro do JavaScript, transformada em chamadas que criam elementos React. Expressões vão entre chaves ({total}), atributos usam camelCase (className, onClick) e o texto é escapado automaticamente, o que protege contra XSS.",
+          "relatedTerms": [
+            "componente"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "props",
+          "level": "junior",
+          "term": "Props",
+          "definition": "Os parâmetros de um componente, passados pelo pai como atributos. São somente leitura: o filho não altera as props, avisa o pai por uma função (callback) recebida também por props. Os dados descem e os eventos sobem.",
+          "relatedTerms": [
+            "componente",
+            "estado"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "key",
+          "level": "pleno",
+          "term": "key em listas",
+          "definition": "Identificador estável que o React usa para saber qual item de uma lista é qual entre renderizações. Deve vir do dado (um id), não do índice: com índice, ao inserir ou reordenar, o estado de um item pode ir parar em outro.",
+          "relatedTerms": [
+            "reconciliacao",
+            "componente"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "lista-com-props",
+          "level": "junior",
+          "title": "Lista com props e key",
+          "body": "O pai passa os dados e uma função; o filho só exibe e avisa quando é clicado.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function ProductItem({ product, onSelect }) {\n  return <li onClick={() => onSelect(product.id)}>{product.name}</li>;\n}\n\nfunction ProductList({ products, onSelect }) {\n  return (\n    <ul>\n      {products.map((p) => (\n        <ProductItem key={p.id} product={p} onSelect={onSelect} />\n      ))}\n    </ul>\n  );\n}"
+          },
+          "relatedTerms": [
+            "props",
+            "key"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "renderizacao-condicional",
+          "level": "junior",
+          "title": "Renderização condicional",
+          "body": "Ternário para escolher entre dois trechos e && para mostrar ou não. Cuidado: {count && ...} mostra \"0\" quando count é 0; use {count > 0 && ...}.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function Cart({ items, loading }) {\n  if (loading) return <p>Carregando...</p>;\n  return (\n    <section>\n      {items.length > 0 ? <ItemList items={items} /> : <p>Carrinho vazio</p>}\n      {items.length > 0 && <CheckoutButton />}\n    </section>\n  );\n}"
+          },
+          "relatedTerms": [
+            "jsx"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hooks",
+      "title": "Hooks",
+      "description": "Estado, efeitos, referências e contexto.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "estado",
+          "level": "junior",
+          "term": "Estado (useState)",
+          "definition": "Dado que pertence a um componente e muda com o tempo. useState devolve o valor e uma função para alterá-lo; chamar essa função agenda uma nova renderização. O estado deve ser tratado como imutável: crie um objeto ou array novo em vez de alterar o atual.",
+          "relatedTerms": [
+            "props",
+            "use-effect"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "use-effect",
+          "level": "pleno",
+          "term": "useEffect",
+          "definition": "Hook para sincronizar o componente com algo de fora do React: assinaturas, timers, APIs do navegador. Roda depois da renderização, de novo quando uma dependência muda, e pode devolver uma função de limpeza. Não é o lugar para calcular dados derivados: isso se faz direto na renderização.",
+          "relatedTerms": [
+            "estado",
+            "regras-dos-hooks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "regras-dos-hooks",
+          "level": "pleno",
+          "term": "Regras dos hooks",
+          "definition": "Hooks só podem ser chamados no topo de um componente ou de outro hook, nunca dentro de if, laço ou função interna. O React identifica cada hook pela ordem de chamada; mudar a ordem entre renderizações mistura os estados.",
+          "relatedTerms": [
+            "use-effect",
+            "estado"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "contexto",
+          "level": "pleno",
+          "term": "Context",
+          "definition": "Forma de passar um valor para toda uma subárvore sem repassar props em cada nível (prop drilling): tema, usuário logado, idioma. Todo componente que lê o contexto re-renderiza quando o valor muda, por isso não é um substituto geral para gerenciadores de estado.",
+          "relatedTerms": [
+            "props",
+            "estado"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "effect-cleanup",
+          "level": "pleno",
+          "title": "Efeito com limpeza",
+          "body": "A busca é refeita quando userId muda. A limpeza cancela a requisição anterior, evitando que uma resposta antiga sobrescreva a nova.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function Profile({ userId }) {\n  const [user, setUser] = useState(null);\n\n  useEffect(() => {\n    const controller = new AbortController();\n    fetch(`/api/users/${userId}`, { signal: controller.signal })\n      .then((r) => r.json())\n      .then(setUser)\n      .catch(() => {});\n    return () => controller.abort();\n  }, [userId]);\n\n  return user ? <h1>{user.name}</h1> : <p>Carregando...</p>;\n}"
+          },
+          "relatedTerms": [
+            "use-effect"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "custom-hook",
+          "level": "pleno",
+          "title": "Hook customizado",
+          "body": "Uma função que começa com \"use\" e combina outros hooks para reaproveitar lógica com estado entre componentes.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function useLocalStorage(key, initial) {\n  const [value, setValue] = useState(() => {\n    const saved = localStorage.getItem(key);\n    return saved !== null ? JSON.parse(saved) : initial;\n  });\n\n  useEffect(() => {\n    localStorage.setItem(key, JSON.stringify(value));\n  }, [key, value]);\n\n  return [value, setValue];\n}"
+          },
+          "relatedTerms": [
+            "regras-dos-hooks",
+            "estado"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "renderizacao-e-performance",
+      "title": "Renderização e performance",
+      "description": "Quando o React renderiza e como evitar trabalho à toa.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "renderizacao",
+          "level": "pleno",
+          "term": "Renderização",
+          "definition": "Quando o React chama o componente para calcular o que mostrar. Acontece na primeira montagem e quando o estado do componente, de um pai ou de um contexto lido muda. Renderizar não é mexer no DOM: o DOM só muda onde o resultado for diferente.",
+          "relatedTerms": [
+            "reconciliacao",
+            "memoizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "reconciliacao",
+          "level": "senior",
+          "term": "Reconciliação",
+          "definition": "O processo em que o React compara a nova árvore de elementos com a anterior e aplica no DOM só as diferenças. Elementos de tipo diferente na mesma posição são recriados do zero (perdendo o estado); em listas, a key diz quais itens são os mesmos.",
+          "relatedTerms": [
+            "renderizacao",
+            "key"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "memoizacao",
+          "level": "senior",
+          "term": "memo, useMemo e useCallback",
+          "definition": "Ferramentas para pular trabalho: memo evita renderizar um componente se as props não mudaram; useMemo guarda um cálculo caro; useCallback guarda a mesma função entre renderizações. Só ajudam com medição; o React Compiler pode aplicar isso automaticamente.",
+          "relatedTerms": [
+            "renderizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "estado-derivado",
+          "level": "pleno",
+          "term": "Estado derivado",
+          "definition": "Valor que pode ser calculado a partir de props ou de outro estado, como o total de um carrinho ou uma lista filtrada. Deve ser calculado na renderização, não guardado em outro useState sincronizado com useEffect: isso duplica a fonte da verdade e causa renderizações extras.",
+          "relatedTerms": [
+            "estado",
+            "use-effect"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "estado-derivado-exemplo",
+          "level": "pleno",
+          "title": "Calcular em vez de sincronizar",
+          "body": "A versão com useEffect renderiza duas vezes e pode ficar defasada; a versão calculada é sempre correta.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "// evite\nconst [visible, setVisible] = useState([]);\nuseEffect(() => {\n  setVisible(todos.filter((t) => !t.done));\n}, [todos]);\n\n// prefira\nconst visible = todos.filter((t) => !t.done);\n// se o cálculo for caro e medido:\nconst visibleMemo = useMemo(() => todos.filter((t) => !t.done), [todos]);"
+          },
+          "relatedTerms": [
+            "estado-derivado",
+            "memoizacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "memo-callback",
+          "level": "senior",
+          "title": "memo com useCallback",
+          "body": "Sem useCallback, handleSelect seria uma função nova a cada renderização do pai, e o memo do filho nunca pularia nada.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const Row = memo(function Row({ item, onSelect }) {\n  return <li onClick={() => onSelect(item.id)}>{item.name}</li>;\n});\n\nfunction Table({ items }) {\n  const [selected, setSelected] = useState(null);\n  const handleSelect = useCallback((id) => setSelected(id), []);\n  return items.map((item) => <Row key={item.id} item={item} onSelect={handleSelect} />);\n}"
+          },
+          "relatedTerms": [
+            "memoizacao",
+            "renderizacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de React que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "props-vs-estado",
+          "level": "junior",
+          "question": "Qual a diferença entre props e estado?",
+          "answer": "Props vêm de fora, passadas pelo pai, e o componente não as altera. Estado é interno, criado com useState, e o componente o altera para reagir a interações. Quando dois componentes precisam do mesmo dado, o estado sobe para o pai comum e desce como props (\"lifting state up\").",
+          "relatedTerms": [
+            "props",
+            "estado"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-key",
+          "level": "pleno",
+          "question": "Por que não usar o índice como key?",
+          "answer": "Porque a key diz ao React qual item é qual. Se a lista é reordenada ou um item é inserido no meio, o índice passa a apontar para outro item, e o React reaproveita o componente errado: inputs ficam com o texto trocado e o estado vai para o item errado. Uso um id estável do dado; o índice só serve para listas fixas.",
+          "relatedTerms": [
+            "key",
+            "reconciliacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "dependencias-useeffect",
+          "level": "pleno",
+          "question": "O que acontece com o array de dependências do useEffect?",
+          "answer": "Sem array, o efeito roda depois de toda renderização; com [], só na montagem (e a limpeza na desmontagem); com valores, sempre que algum deles muda. Toda variável do componente usada no efeito deve estar no array, senão ele lê valores antigos (stale closure). Se o efeito só calcula algo a partir de props, provavelmente nem precisa de useEffect.",
+          "relatedTerms": [
+            "use-effect",
+            "estado-derivado"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-usar-memo",
+          "level": "senior",
+          "question": "Quando usar useMemo e useCallback?",
+          "answer": "Quando há um problema medido: um cálculo caro que roda a cada renderização, ou uma função/objeto passado a um filho com memo ou usado como dependência de efeito. Fora disso, adicionam custo e complexidade sem ganho. Antes de memoizar, vejo se dá para mover o estado para mais perto de onde é usado; o React Compiler também já faz parte disso sozinho.",
+          "relatedTerms": [
+            "memoizacao",
+            "renderizacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "context-vs-estado-global",
+          "level": "senior",
+          "question": "Context substitui uma biblioteca de estado global?",
+          "answer": "Para valores que mudam pouco (tema, usuário, idioma), sim. Para estado que muda muito e é lido em muitos lugares, não: todo consumidor re-renderiza a cada mudança do valor. Aí uso Zustand, Redux Toolkit ou Jotai, que deixam cada componente assinar só a parte que usa. Dados do servidor ficam melhor em TanStack Query, que cuida de cache e revalidação.",
+          "relatedTerms": [
+            "contexto",
+            "estado"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "virtual-dom",
+          "level": "junior",
+          "question": "O que é o Virtual DOM?",
+          "answer": "É a representação em objetos JavaScript do que o componente quer mostrar. A cada renderização o React gera uma nova árvore, compara com a anterior (reconciliação) e aplica no DOM real só o que mudou. A vantagem não é ser \"mais rápido que o DOM\", e sim permitir escrever a interface de forma declarativa sem atualizar o DOM à mão.",
+          "relatedTerms": [
+            "reconciliacao",
+            "renderizacao"
+          ]
+        }
+      ]
+    }
+  ]
+}

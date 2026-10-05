@@ -1,4 +1,4 @@
-import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -206,7 +206,8 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
   it('progresso refletido na Home', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     await open('/');
-    expect(screen.getByText(`4/${TOTAL_CARDS}`)).toBeOnTheScreen();
+    // o card Backend soma todas as trilhas da área
+    expect(within(screen.getByRole('button', { name: /^Backend,/ })).getByText(/^4\/\d+$/)).toBeOnTheScreen();
   });
 });
 

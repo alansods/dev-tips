@@ -1,0 +1,328 @@
+{
+  "id": "javascript-assincrono",
+  "title": "JavaScript assíncrono",
+  "description": "Como o JavaScript faz várias coisas sem travar: event loop, Promises e async/await.",
+  "areas": [
+    "frontend",
+    "backend"
+  ],
+  "language": "javascript",
+  "decks": [
+    {
+      "id": "event-loop",
+      "title": "Event loop",
+      "description": "Uma thread só e a fila de tarefas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "single-thread",
+          "level": "junior",
+          "term": "Thread única",
+          "definition": "O JavaScript executa seu código em uma única thread: uma coisa de cada vez. Operações demoradas (rede, timers, disco) são entregues ao ambiente (navegador ou Node.js), e o resultado volta depois como callback, sem travar a execução.",
+          "relatedTerms": [
+            "event-loop",
+            "call-stack"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "call-stack",
+          "level": "pleno",
+          "term": "Call stack",
+          "definition": "A pilha de funções em execução. Cada chamada empilha um quadro e cada retorno desempilha. Enquanto a pilha não esvazia, nenhum callback da fila roda; uma função muito demorada \"congela\" a página ou o servidor.",
+          "relatedTerms": [
+            "event-loop"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "event-loop",
+          "level": "pleno",
+          "term": "Event loop",
+          "definition": "O ciclo que, quando a call stack esvazia, roda todas as microtasks pendentes e depois pega a próxima tarefa (macrotask) da fila: um timer, um evento de clique, uma resposta de rede. É o que permite concorrência com uma thread só.",
+          "relatedTerms": [
+            "call-stack",
+            "microtask"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "microtask",
+          "level": "senior",
+          "term": "Microtask e macrotask",
+          "definition": "Duas filas com prioridades diferentes. Microtasks (callbacks de Promise, queueMicrotask) rodam assim que a pilha esvazia, todas de uma vez, antes de qualquer macrotask (setTimeout, eventos, I/O). Por isso um then roda antes de um setTimeout de 0 ms.",
+          "relatedTerms": [
+            "event-loop",
+            "promise"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "ordem-de-execucao",
+          "level": "senior",
+          "title": "Ordem de execução",
+          "body": "O código síncrono roda primeiro; depois as microtasks (o then); por último a macrotask (o setTimeout), mesmo com 0 ms.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "console.log(\"1\");\nsetTimeout(() => console.log(\"4\"), 0);\nPromise.resolve().then(() => console.log(\"3\"));\nconsole.log(\"2\");\n\n// saída: 1, 2, 3, 4"
+          },
+          "relatedTerms": [
+            "microtask",
+            "event-loop"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "bloqueio-da-thread",
+          "level": "pleno",
+          "title": "Código que bloqueia a thread",
+          "body": "Um laço síncrono pesado impede o event loop de rodar: o timer só dispara depois que o laço termina. Trabalho pesado deve ir para um Web Worker (navegador) ou worker thread (Node.js).",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "setTimeout(() => console.log(\"timer\"), 0);\n\nconst start = Date.now();\nwhile (Date.now() - start < 3000) {\n  // 3 segundos ocupando a thread\n}\nconsole.log(\"fim do laço\"); // só depois disso aparece \"timer\""
+          },
+          "relatedTerms": [
+            "single-thread",
+            "call-stack"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "promises",
+      "title": "Promises",
+      "description": "Valores que chegam depois e como combiná-los.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "callback",
+          "level": "junior",
+          "term": "Callback",
+          "definition": "Função passada para outra, para ser chamada quando algo terminar. Foi a primeira forma de lidar com código assíncrono; aninhar muitos callbacks gera o \"callback hell\", difícil de ler e de tratar erros.",
+          "relatedTerms": [
+            "promise"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "promise",
+          "level": "junior",
+          "term": "Promise",
+          "definition": "Objeto que representa um resultado futuro. Começa pendente (pending) e termina cumprida (fulfilled), com um valor, ou rejeitada (rejected), com um erro. then recebe o valor, catch recebe o erro e finally roda nos dois casos.",
+          "relatedTerms": [
+            "callback",
+            "encadeamento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "encadeamento",
+          "level": "pleno",
+          "term": "Encadeamento de Promises",
+          "definition": "Cada then devolve uma nova Promise com o valor que o callback retornou, permitindo uma sequência plana de passos. Se o callback devolve outra Promise, a corrente espera por ela. Um único catch no fim pega erros de qualquer passo.",
+          "relatedTerms": [
+            "promise"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "combinadores",
+          "level": "pleno",
+          "term": "Promise.all, allSettled, race e any",
+          "definition": "Formas de esperar várias Promises: all resolve com todos os valores e rejeita no primeiro erro; allSettled espera todas e diz o resultado de cada uma; race termina com a primeira que terminar (sucesso ou erro); any resolve com a primeira que der certo.",
+          "relatedTerms": [
+            "promise"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "callback-para-promise",
+          "level": "pleno",
+          "title": "De callback para Promise",
+          "body": "Envolver uma API de callback em new Promise transforma o resultado em algo encadeável e usável com await.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function wait(ms) {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n}\n\nfunction readJson(text) {\n  return new Promise((resolve, reject) => {\n    try { resolve(JSON.parse(text)); }\n    catch (error) { reject(error); }\n  });\n}\n\nwait(500).then(() => console.log(\"meio segundo depois\"));"
+          },
+          "relatedTerms": [
+            "promise",
+            "callback"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "promise-all",
+          "level": "pleno",
+          "title": "Requisições em paralelo",
+          "body": "Promise.all dispara as três buscas ao mesmo tempo e espera todas. Se uma falhar, o catch recebe o primeiro erro; use allSettled quando quiser o resultado de cada uma.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const [user, orders, cart] = await Promise.all([\n  fetch(\"/api/user\").then((r) => r.json()),\n  fetch(\"/api/orders\").then((r) => r.json()),\n  fetch(\"/api/cart\").then((r) => r.json()),\n]);"
+          },
+          "relatedTerms": [
+            "combinadores",
+            "promise"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "async-await",
+      "title": "async/await",
+      "description": "Código assíncrono com cara de síncrono, e seus erros.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "async-await",
+          "level": "junior",
+          "term": "async/await",
+          "definition": "Sintaxe sobre Promises. Uma função async sempre devolve uma Promise; dentro dela, await pausa a função até a Promise terminar e entrega o valor, sem bloquear a thread. O código fica linear, como se fosse síncrono.",
+          "relatedTerms": [
+            "tratamento-de-erro",
+            "await-sequencial"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tratamento-de-erro",
+          "level": "pleno",
+          "term": "Tratamento de erro assíncrono",
+          "definition": "Com await, uma Promise rejeitada vira exceção e é pega com try/catch. Promise rejeitada sem catch gera \"unhandled rejection\": no Node.js isso derruba o processo por padrão. Todo await precisa de alguém que trate o erro, nele ou em quem chamou.",
+          "relatedTerms": [
+            "async-await"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "await-sequencial",
+          "level": "pleno",
+          "term": "await em sequência e em paralelo",
+          "definition": "Dois awaits seguidos esperam um terminar para começar o outro. Se as operações não dependem uma da outra, dispare as duas e espere juntas com Promise.all: o tempo total cai para o da mais lenta.",
+          "relatedTerms": [
+            "async-await",
+            "combinadores"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "abort-controller",
+          "level": "senior",
+          "term": "AbortController",
+          "definition": "Forma padrão de cancelar operações assíncronas como fetch: você cria um controller, passa o signal para a operação e chama abort() quando não precisa mais do resultado (ex.: o usuário saiu da tela ou digitou outra busca). AbortSignal.timeout(ms) cria um limite de tempo.",
+          "relatedTerms": [
+            "async-await",
+            "promise"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "try-catch-await",
+          "level": "junior",
+          "title": "try/catch com await",
+          "body": "fetch só rejeita em falha de rede; um 404 ou 500 chega como resposta normal. Por isso é preciso checar response.ok e lançar o erro.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "async function loadProduct(id) {\n  try {\n    const response = await fetch(`/api/products/${id}`);\n    if (!response.ok) throw new Error(`HTTP ${response.status}`);\n    return await response.json();\n  } catch (error) {\n    console.error(\"falhou ao carregar\", error);\n    return null;\n  }\n}"
+          },
+          "relatedTerms": [
+            "tratamento-de-erro",
+            "async-await"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "await-em-loop",
+          "level": "senior",
+          "title": "await dentro de laços",
+          "body": "forEach não espera callbacks async: o laço termina antes das operações. Use for...of para sequência ou Promise.all com map para paralelo (com cuidado para não disparar milhares de requisições de uma vez).",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "// errado: não espera nada\nids.forEach(async (id) => await save(id));\n\n// em sequência\nfor (const id of ids) {\n  await save(id);\n}\n\n// em paralelo\nawait Promise.all(ids.map((id) => save(id)));"
+          },
+          "relatedTerms": [
+            "await-sequencial",
+            "async-await"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre JavaScript assíncrono que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "como-js-e-assincrono",
+          "level": "junior",
+          "question": "Se o JavaScript tem uma thread só, como ele faz coisas ao mesmo tempo?",
+          "answer": "Ele não executa duas funções ao mesmo tempo; ele delega. Rede, timers e disco ficam com o ambiente (navegador ou libuv no Node.js), que trabalha em paralelo. Quando terminam, o callback entra numa fila, e o event loop o executa quando a call stack fica vazia. É concorrência, não paralelismo.",
+          "relatedTerms": [
+            "single-thread",
+            "event-loop"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "promise-vs-callback",
+          "level": "junior",
+          "question": "Por que Promises em vez de callbacks?",
+          "answer": "Promises deixam o fluxo plano (encadeamento em vez de aninhamento), centralizam o tratamento de erro num catch e podem ser combinadas (Promise.all, race). Também são a base do async/await. Com callbacks, cada nível precisa tratar o erro à mão e o código vira o \"callback hell\".",
+          "relatedTerms": [
+            "promise",
+            "callback"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "ordem-then-timeout",
+          "level": "senior",
+          "question": "O que roda primeiro: um then ou um setTimeout de 0 ms?",
+          "answer": "O then. Callbacks de Promise são microtasks, e o event loop esvazia toda a fila de microtasks assim que a call stack fica vazia, antes de pegar a próxima macrotask, como o setTimeout. Por isso uma corrente infinita de microtasks consegue travar a renderização.",
+          "relatedTerms": [
+            "microtask",
+            "event-loop"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "promise-all-vs-allsettled",
+          "level": "pleno",
+          "question": "Qual a diferença entre Promise.all e Promise.allSettled?",
+          "answer": "all rejeita assim que uma Promise falha e devolve só os valores quando todas dão certo: bom quando tudo é necessário. allSettled sempre espera todas e devolve { status, value | reason } de cada uma: bom quando cada resultado vale sozinho, como carregar widgets independentes de um painel.",
+          "relatedTerms": [
+            "combinadores"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "await-paralelo",
+          "level": "pleno",
+          "question": "Como acelerar uma função com vários awaits?",
+          "answer": "Ver quais awaits dependem do resultado anterior. Os independentes podem começar juntos: crio as Promises primeiro e espero com Promise.all. Se forem muitos itens, limito a concorrência (em lotes ou com uma fila) para não sobrecarregar a API ou o banco.",
+          "relatedTerms": [
+            "await-sequencial",
+            "combinadores"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cancelar-requisicao",
+          "level": "senior",
+          "question": "Como evitar que uma resposta antiga sobrescreva uma nova numa busca?",
+          "answer": "É uma condição de corrida: a busca \"ab\" pode responder depois da \"abc\". Cancelo a requisição anterior com AbortController a cada nova digitação (e ignoro o AbortError), ou guardo um id da última requisição e descarto respostas antigas. Junto com debounce, isso também reduz chamadas à API.",
+          "relatedTerms": [
+            "abort-controller",
+            "async-await"
+          ]
+        }
+      ]
+    }
+  ]
+}

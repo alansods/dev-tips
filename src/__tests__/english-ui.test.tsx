@@ -87,7 +87,7 @@ describe('Requirement: Interface traduzida', () => {
   it('Glossário em inglês', async () => {
     await open('/glossary');
     expect(screen.getByLabelText('Search term')).toBeOnTheScreen();
-    expect(screen.getByText('45 terms')).toBeOnTheScreen();
+    expect(screen.getByText(/^\d+ terms$/)).toBeOnTheScreen();
   });
 
   it('Home em inglês', async () => {
