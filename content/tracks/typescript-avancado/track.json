@@ -6,7 +6,7 @@
     "frontend",
     "backend"
   ],
-  "language": "typescript",
+  "language": "javascript",
   "decks": [
     {
       "id": "generics",

@@ -2,8 +2,10 @@
  * @jest-environment node
  */
 import { core, describeContentTracks, framework } from '../__fixtures__/languageTracks';
+import { repoTaxonomy } from '../repoTaxonomy';
 
-const ts = core('typescript');
+// TypeScript fica dentro de JavaScript: linguagem pura e frameworks juntos.
+const ts = core('javascript');
 
 describeContentTracks({
   group: 'TypeScript',
@@ -28,15 +30,25 @@ describeContentTracks({
       id: 'angular',
       title: 'Angular',
       areas: ['frontend'],
-      placement: framework('typescript', 'angular'),
+      placement: framework('javascript', 'angular'),
       decks: ['componentes-e-templates', 'di-e-servicos', 'rxjs-e-signals'],
     },
     {
       id: 'nestjs',
       title: 'NestJS',
       areas: ['backend'],
-      placement: framework('typescript', 'nest'),
+      placement: framework('javascript', 'nest'),
       decks: ['modulos-e-providers', 'controllers-e-pipes', 'guards-e-interceptors'],
     },
   ],
+});
+
+describe('Requirement: Trilhas de TypeScript no catálogo', () => {
+  it('Sem linguagem TypeScript no cadastro', () => {
+    expect(repoTaxonomy.languages.map((l) => l.id)).not.toContain('typescript');
+    const language = (id: string) => repoTaxonomy.frameworks.find((f) => f.id === id)?.language;
+    expect([language('angular'), language('nest')]).toEqual(['javascript', 'javascript']);
+    const ids = repoTaxonomy.frameworks.map((f) => f.id);
+    expect(ids.slice(ids.indexOf('express'), ids.indexOf('express') + 3)).toEqual(['express', 'angular', 'nest']);
+  });
 });
