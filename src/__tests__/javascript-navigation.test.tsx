@@ -38,26 +38,46 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
+const CORE = [
+  'JavaScript essencial',
+  'JavaScript assíncrono',
+  'JavaScript no navegador',
+  'Node.js',
+  'TypeScript essencial',
+  'TypeScript avançado',
+];
+const FRAMEWORKS = ['React', 'Vue', 'Next.js', 'Express', 'Angular', 'NestJS'];
+
 describe('Requirement: Trilhas de JavaScript no catálogo', () => {
   it('JavaScript no Frontend', async () => {
     await open('/area/frontend/javascript');
-    expect(buttons(['JavaScript essencial', 'JavaScript assíncrono', 'JavaScript no navegador', 'Node.js'])).toEqual([
+    expect(buttons(CORE)).toEqual([
       'JavaScript essencial',
       'JavaScript assíncrono',
       'JavaScript no navegador',
+      'TypeScript essencial',
+      'TypeScript avançado',
     ]);
-    expect(buttons(['React', 'Vue', 'Next.js', 'Express'])).toEqual(['React', 'Vue', 'Next.js']);
+    expect(buttons(FRAMEWORKS)).toEqual(['React', 'Vue', 'Next.js', 'Angular']);
     expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('1 trilha')).toBeOnTheScreen();
   });
 
   it('JavaScript no Backend', async () => {
     await open('/area/backend/javascript');
-    expect(buttons(['JavaScript essencial', 'JavaScript assíncrono', 'JavaScript no navegador', 'Node.js'])).toEqual([
+    expect(buttons(CORE)).toEqual([
       'JavaScript essencial',
       'JavaScript assíncrono',
       'Node.js',
+      'TypeScript essencial',
+      'TypeScript avançado',
     ]);
-    expect(buttons(['React', 'Vue', 'Next.js', 'Express'])).toEqual(['Express']);
+    expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
+  });
+
+  it('Contagem na tela da área', async () => {
+    await open('/area/frontend');
+    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('9 trilhas')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^TypeScript,/ })).toBeNull();
   });
 
   it('Frontend aparece na Home', async () => {

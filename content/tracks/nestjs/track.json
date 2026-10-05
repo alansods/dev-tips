@@ -5,7 +5,7 @@
   "areas": [
     "backend"
   ],
-  "language": "typescript",
+  "language": "javascript",
   "framework": "nest",
   "decks": [
     {

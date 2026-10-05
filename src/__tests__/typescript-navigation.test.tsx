@@ -38,28 +38,39 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const CORE = ['TypeScript essencial', 'TypeScript avançado'];
-const FRAMEWORKS = ['Angular', 'NestJS'];
+const JS_CORE = ['JavaScript essencial', 'JavaScript assíncrono', 'JavaScript no navegador', 'Node.js'];
+const TS_CORE = ['TypeScript essencial', 'TypeScript avançado'];
+const FRAMEWORKS = ['React', 'Vue', 'Next.js', 'Express', 'Angular', 'NestJS'];
 
 describe('Requirement: Trilhas de TypeScript no catálogo', () => {
   it('TypeScript no Frontend', async () => {
-    await open('/area/frontend/typescript');
-    expect(buttons(CORE)).toEqual(CORE);
-    expect(buttons(FRAMEWORKS)).toEqual(['Angular']);
+    await open('/area/frontend/javascript');
+    expect(buttons([...JS_CORE, ...TS_CORE])).toEqual([
+      'JavaScript essencial',
+      'JavaScript assíncrono',
+      'JavaScript no navegador',
+      ...TS_CORE,
+    ]);
+    expect(buttons(FRAMEWORKS)).toEqual(['React', 'Vue', 'Next.js', 'Angular']);
     expect(within(screen.getByRole('button', { name: /^Angular,/ })).getByText('1 trilha')).toBeOnTheScreen();
   });
 
   it('TypeScript no Backend', async () => {
-    await open('/area/backend/typescript');
-    expect(buttons(CORE)).toEqual(CORE);
-    expect(buttons(FRAMEWORKS)).toEqual(['NestJS']);
+    await open('/area/backend/javascript');
+    expect(buttons([...JS_CORE, ...TS_CORE])).toEqual(['JavaScript essencial', 'JavaScript assíncrono', 'Node.js', ...TS_CORE]);
+    expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
+  });
+
+  it.each(['frontend', 'backend'])('Rota antiga de TypeScript: %s', async (area) => {
+    await open(`/area/${area}/typescript`);
+    expect(screen.getByText('Linguagem não encontrada.')).toBeOnTheScreen();
   });
 });
 
 describe('Requirement: Tradução das trilhas de TypeScript', () => {
   it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/area/frontend/typescript');
+    await open('/area/frontend/javascript');
     expect(screen.getByRole('button', { name: /^TypeScript essentials,/ })).toBeOnTheScreen();
   });
 });

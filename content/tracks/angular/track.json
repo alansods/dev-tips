@@ -5,7 +5,7 @@
   "areas": [
     "frontend"
   ],
-  "language": "typescript",
+  "language": "javascript",
   "framework": "angular",
   "decks": [
     {
