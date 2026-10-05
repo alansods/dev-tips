@@ -1,0 +1,325 @@
+{
+  "id": "angular",
+  "title": "Angular",
+  "description": "O framework completo do Google: componentes standalone, injeção de dependência, RxJS e signals.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "typescript",
+  "framework": "angular",
+  "decks": [
+    {
+      "id": "componentes-e-templates",
+      "title": "Componentes e templates",
+      "description": "A unidade da interface e a sintaxe do template.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "componente-angular",
+          "level": "junior",
+          "term": "Componente",
+          "definition": "Classe com o decorator @Component, que liga um seletor (a tag), um template e estilos. Desde o Angular 17 o padrão é standalone: o componente declara direto o que importa, sem precisar de NgModule.",
+          "relatedTerms": [
+            "binding",
+            "controle-de-fluxo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "binding",
+          "level": "junior",
+          "term": "Data binding",
+          "definition": "As formas de ligar o template à classe: interpolação {{ nome }} para texto, [propriedade]=\"valor\" para propriedades e inputs, (evento)=\"metodo()\" para eventos, e [(ngModel)] para ligação nos dois sentidos em formulários.",
+          "relatedTerms": [
+            "componente-angular",
+            "input-output"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "controle-de-fluxo",
+          "level": "junior",
+          "term": "Controle de fluxo (@if, @for)",
+          "definition": "Sintaxe de blocos do template: @if/@else para condições, @for com track obrigatório para listas e @switch. Substitui as diretivas *ngIf e *ngFor das versões antigas, com melhor desempenho e checagem de tipos.",
+          "relatedTerms": [
+            "componente-angular"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "input-output",
+          "level": "pleno",
+          "term": "Inputs e outputs",
+          "definition": "Como componentes conversam: input() recebe dados do pai (como props) e output() emite eventos para o pai. Nas versões atuais são funções baseadas em signals; nas antigas, decorators @Input e @Output.",
+          "relatedTerms": [
+            "binding",
+            "signal"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "componente-standalone",
+          "level": "junior",
+          "title": "Componente standalone",
+          "body": "Recebe a lista por input, mostra com @for e avisa o pai pelo output. O track usa o id para o Angular reaproveitar os elementos certos.",
+          "snippet": {
+            "file": "product-list.component.ts",
+            "language": "ts",
+            "code": "import { Component, input, output } from \"@angular/core\";\n\n@Component({\n  selector: \"app-product-list\",\n  template: `\n    @for (product of products(); track product.id) {\n      <li (click)=\"selected.emit(product.id)\">{{ product.name }}</li>\n    } @empty {\n      <p>Nenhum produto</p>\n    }\n  `,\n})\nexport class ProductListComponent {\n  products = input.required<{ id: number; name: string }[]>();\n  selected = output<number>();\n}"
+          },
+          "relatedTerms": [
+            "input-output",
+            "controle-de-fluxo"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "formulario-reativo",
+          "level": "pleno",
+          "title": "Formulário reativo",
+          "body": "O formulário é definido na classe, com validadores; o template só se liga a ele. Facilita testar e validar regras complexas.",
+          "snippet": {
+            "file": "login.component.ts",
+            "language": "ts",
+            "code": "import { Component, inject } from \"@angular/core\";\nimport { FormBuilder, ReactiveFormsModule, Validators } from \"@angular/forms\";\n\n@Component({\n  selector: \"app-login\",\n  imports: [ReactiveFormsModule],\n  template: `\n    <form [formGroup]=\"form\" (ngSubmit)=\"submit()\">\n      <input formControlName=\"email\" />\n      <button [disabled]=\"form.invalid\">Entrar</button>\n    </form>\n  `,\n})\nexport class LoginComponent {\n  form = inject(FormBuilder).group({\n    email: [\"\", [Validators.required, Validators.email]],\n  });\n  submit() { console.log(this.form.value); }\n}"
+          },
+          "relatedTerms": [
+            "binding"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "di-e-servicos",
+      "title": "Injeção de dependência e serviços",
+      "description": "Como o Angular cria e compartilha objetos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "servico",
+          "level": "junior",
+          "term": "Serviço",
+          "definition": "Classe com @Injectable que guarda lógica e estado fora dos componentes: chamadas HTTP, regras, cache. Com providedIn: \"root\", existe uma instância única para o app todo.",
+          "relatedTerms": [
+            "injecao-angular",
+            "injector"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "injecao-angular",
+          "level": "pleno",
+          "term": "Injeção de dependência",
+          "definition": "O Angular cria as dependências e as entrega a quem pede, em vez de cada classe criar as suas. Pede-se com inject(Servico) ou pelo construtor. Isso desacopla as classes e permite trocar implementações em testes.",
+          "relatedTerms": [
+            "servico",
+            "injector"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "injector",
+          "level": "senior",
+          "term": "Hierarquia de injectors",
+          "definition": "Os provedores formam uma árvore: o injector raiz (providedIn: \"root\"), os de rotas e os de componentes. Um componente que declara providers ganha uma instância própria para ele e seus filhos; quem pede um serviço recebe o do injector mais próximo.",
+          "relatedTerms": [
+            "injecao-angular"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "httpclient",
+          "level": "junior",
+          "term": "HttpClient",
+          "definition": "Serviço do Angular para requisições HTTP. Devolve Observables, tem tipagem da resposta, converte JSON automaticamente e permite interceptors para adicionar token ou tratar erros em todas as chamadas.",
+          "relatedTerms": [
+            "servico",
+            "observable"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "servico-http",
+          "level": "junior",
+          "title": "Serviço com HttpClient",
+          "body": "O serviço concentra o acesso à API; os componentes só chamam os métodos.",
+          "snippet": {
+            "file": "product.service.ts",
+            "language": "ts",
+            "code": "import { Injectable, inject } from \"@angular/core\";\nimport { HttpClient } from \"@angular/common/http\";\n\nexport interface Product { id: number; name: string }\n\n@Injectable({ providedIn: \"root\" })\nexport class ProductService {\n  private http = inject(HttpClient);\n\n  list() {\n    return this.http.get<Product[]>(\"/api/products\");\n  }\n}"
+          },
+          "relatedTerms": [
+            "servico",
+            "httpclient"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "interceptor",
+          "level": "pleno",
+          "title": "Interceptor de autenticação",
+          "body": "Um interceptor funcional adiciona o token em toda requisição, sem repetir o código em cada serviço. É registrado em provideHttpClient(withInterceptors([...])).",
+          "snippet": {
+            "file": "auth.interceptor.ts",
+            "language": "ts",
+            "code": "import { HttpInterceptorFn } from \"@angular/common/http\";\nimport { inject } from \"@angular/core\";\n\nexport const authInterceptor: HttpInterceptorFn = (req, next) => {\n  const token = inject(AuthService).token();\n  if (!token) return next(req);\n  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));\n};"
+          },
+          "relatedTerms": [
+            "httpclient",
+            "injecao-angular"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rxjs-e-signals",
+      "title": "RxJS e signals",
+      "description": "Fluxos de eventos e estado reativo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "observable",
+          "level": "pleno",
+          "term": "Observable",
+          "definition": "Fluxo de valores ao longo do tempo, da biblioteca RxJS. Nada acontece até alguém assinar (subscribe), e o fluxo pode emitir vários valores, terminar ou dar erro. Operadores (map, filter, switchMap, debounceTime) transformam e combinam fluxos.",
+          "relatedTerms": [
+            "signal",
+            "async-pipe"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "signal",
+          "level": "pleno",
+          "term": "Signal",
+          "definition": "Valor reativo síncrono: signal(0) cria, count() lê e set/update alteram. computed() deriva valores e effect() roda efeitos colaterais. O Angular sabe exatamente quais partes do template leem cada signal e atualiza só elas.",
+          "relatedTerms": [
+            "observable",
+            "change-detection"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "async-pipe",
+          "level": "pleno",
+          "term": "async pipe e vazamento de assinatura",
+          "definition": "Toda assinatura manual de um Observable infinito precisa ser cancelada ao destruir o componente, ou continua viva (memory leak). O pipe async no template, toSignal() e takeUntilDestroyed() fazem isso automaticamente.",
+          "relatedTerms": [
+            "observable"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "change-detection",
+          "level": "senior",
+          "term": "Change detection",
+          "definition": "O mecanismo que decide quando atualizar o DOM. Tradicionalmente o Zone.js avisava o Angular após qualquer evento assíncrono, e a árvore inteira era checada. Com ChangeDetectionStrategy.OnPush e signals, só os componentes afetados são checados; o modo zoneless dispensa o Zone.js.",
+          "relatedTerms": [
+            "signal"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "signals-exemplo",
+          "level": "pleno",
+          "title": "Estado com signals",
+          "body": "O total é derivado com computed e só recalcula quando os itens mudam. update cria um array novo em vez de alterar o atual.",
+          "snippet": {
+            "file": "cart.service.ts",
+            "language": "ts",
+            "code": "import { Injectable, computed, signal } from \"@angular/core\";\n\n@Injectable({ providedIn: \"root\" })\nexport class CartService {\n  readonly items = signal<{ name: string; price: number }[]>([]);\n  readonly total = computed(() => this.items().reduce((sum, i) => sum + i.price, 0));\n\n  add(item: { name: string; price: number }) {\n    this.items.update((list) => [...list, item]);\n  }\n}"
+          },
+          "relatedTerms": [
+            "signal"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "busca-switchmap",
+          "level": "senior",
+          "title": "Busca com debounce e switchMap",
+          "body": "debounceTime espera o usuário parar de digitar, distinctUntilChanged ignora termos repetidos e switchMap cancela a busca anterior quando chega um termo novo, evitando respostas fora de ordem.",
+          "snippet": {
+            "file": "search.component.ts",
+            "language": "ts",
+            "code": "results$ = this.searchControl.valueChanges.pipe(\n  debounceTime(300),\n  distinctUntilChanged(),\n  switchMap((term) => this.productService.search(term ?? \"\")),\n);\n\n// no template: @for (p of results$ | async; track p.id) { ... }"
+          },
+          "relatedTerms": [
+            "observable",
+            "async-pipe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Angular que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "observable-vs-promise",
+          "level": "pleno",
+          "question": "Qual a diferença entre Observable e Promise?",
+          "answer": "A Promise representa um único valor futuro e começa a executar na hora. O Observable pode emitir vários valores, é preguiçoso (só executa quando alguém assina), pode ser cancelado ao cancelar a assinatura e tem operadores para combinar e transformar fluxos. Para uma chamada HTTP única tanto faz; para eventos, buscas e WebSocket, o Observable brilha.",
+          "relatedTerms": [
+            "observable"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "signals-vs-rxjs",
+          "level": "senior",
+          "question": "Signals substituem o RxJS?",
+          "answer": "Não por completo. Signals são ótimos para estado síncrono da tela: valores, derivados e o que o template lê. RxJS continua melhor para fluxos assíncronos e eventos ao longo do tempo: debounce, cancelamento com switchMap, combinação de fontes, retry. toSignal e toObservable fazem a ponte entre os dois.",
+          "relatedTerms": [
+            "signal",
+            "observable"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "onpush",
+          "level": "senior",
+          "question": "O que faz a estratégia OnPush?",
+          "answer": "Faz o Angular checar o componente só quando um input muda de referência, quando um evento ocorre nele, quando um signal lido muda ou quando um async pipe emite. Reduz muito o trabalho em telas grandes, mas exige tratar dados como imutáveis: alterar um objeto por dentro não dispara atualização.",
+          "relatedTerms": [
+            "change-detection"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-di",
+          "level": "junior",
+          "question": "Por que o Angular usa injeção de dependência?",
+          "answer": "Para as classes não criarem suas próprias dependências. O componente pede um ProductService e o Angular entrega a instância certa, compartilhada ou não conforme o provider. Isso facilita trocar implementações (um mock no teste, outra API em outro ambiente) e mantém componentes focados na tela.",
+          "relatedTerms": [
+            "injecao-angular",
+            "servico"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "memory-leak-angular",
+          "level": "pleno",
+          "question": "Como evitar vazamento de memória com Observables no Angular?",
+          "answer": "Evitando subscribe manual quando possível: uso o pipe async no template ou toSignal(), que cancelam sozinhos. Quando preciso assinar no código, uso takeUntilDestroyed() para cancelar na destruição do componente. Observables que completam sozinhos, como uma chamada do HttpClient, não vazam.",
+          "relatedTerms": [
+            "async-pipe",
+            "observable"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "standalone-vs-ngmodule",
+          "level": "junior",
+          "question": "O que são componentes standalone?",
+          "answer": "Componentes que declaram suas próprias dependências no imports do @Component, sem precisar de um NgModule. Simplificam a estrutura, facilitam o carregamento sob demanda por rota e são o padrão desde o Angular 17. NgModules ainda funcionam e aparecem em projetos legados.",
+          "relatedTerms": [
+            "componente-angular"
+          ]
+        }
+      ]
+    }
+  ]
+}

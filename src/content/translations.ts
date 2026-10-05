@@ -12,6 +12,10 @@ import reactEn from '../../content/tracks/react/translations/en.json';
 import vueEn from '../../content/tracks/vue/translations/en.json';
 import nextjsEn from '../../content/tracks/nextjs/translations/en.json';
 import expressEn from '../../content/tracks/express/translations/en.json';
+import typescriptEssencialEn from '../../content/tracks/typescript-essencial/translations/en.json';
+import typescriptAvancadoEn from '../../content/tracks/typescript-avancado/translations/en.json';
+import angularEn from '../../content/tracks/angular/translations/en.json';
+import nestjsEn from '../../content/tracks/nestjs/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -24,4 +28,8 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   vue: { en: vueEn },
   nextjs: { en: nextjsEn },
   express: { en: expressEn },
+  'typescript-essencial': { en: typescriptEssencialEn },
+  'typescript-avancado': { en: typescriptAvancadoEn },
+  angular: { en: angularEn },
+  nestjs: { en: nestjsEn },
 };

@@ -1,0 +1,320 @@
+{
+  "id": "typescript-avancado",
+  "title": "TypeScript avançado",
+  "description": "Tipos reutilizáveis: generics, utility types, tipos mapeados e condicionais, keyof e type guards.",
+  "areas": [
+    "frontend",
+    "backend"
+  ],
+  "language": "typescript",
+  "decks": [
+    {
+      "id": "generics",
+      "title": "Generics",
+      "description": "Tipos e funções que funcionam com vários tipos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "generic",
+          "level": "pleno",
+          "term": "Generic",
+          "definition": "Parâmetro de tipo (como <T>) que deixa uma função, classe ou tipo funcionar com vários tipos sem perder a informação. Uma função first<T>(list: T[]): T devolve string para string[] e User para User[], em vez de any.",
+          "relatedTerms": [
+            "restricao-generica",
+            "inferencia-generica"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "restricao-generica",
+          "level": "pleno",
+          "term": "Restrição (extends)",
+          "definition": "Limita o que um parâmetro de tipo aceita: <T extends { id: number }> exige que T tenha id. Dentro da função, o compilador sabe que pode usar id. Sem a restrição, T poderia ser qualquer coisa e nenhuma propriedade estaria garantida.",
+          "relatedTerms": [
+            "generic",
+            "keyof"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "inferencia-generica",
+          "level": "pleno",
+          "term": "Inferência de parâmetros de tipo",
+          "definition": "Quem chama raramente escreve o tipo: em identity(\"oi\"), o TypeScript infere T = string pelos argumentos. Escrever o tipo explicitamente (useState<User | null>(null)) é necessário quando o valor inicial não diz tudo.",
+          "relatedTerms": [
+            "generic"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "keyof",
+          "level": "pleno",
+          "term": "keyof e typeof",
+          "definition": "keyof T dá a union das chaves de um tipo (\"id\" | \"name\"). typeof, num contexto de tipo, pega o tipo de um valor existente. Juntos, derivam tipos do código em vez de repeti-los: keyof typeof config.",
+          "relatedTerms": [
+            "restricao-generica"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "get-property",
+          "level": "pleno",
+          "title": "Função genérica com keyof",
+          "body": "K só aceita chaves de T, e o retorno é exatamente o tipo daquela propriedade: T[K] (indexed access).",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\n\nconst user = { id: 1, name: \"Ana\" };\nconst name = getProperty(user, \"name\"); // string\ngetProperty(user, \"email\");            // erro: não é chave de user"
+          },
+          "relatedTerms": [
+            "keyof",
+            "restricao-generica"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "repositorio-generico",
+          "level": "senior",
+          "title": "Interface genérica",
+          "body": "Um contrato de repositório que serve para qualquer entidade com id. O tipo de criação omite o id, que o banco gera.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "interface Entity { id: number }\n\ninterface Repository<T extends Entity> {\n  findById(id: number): Promise<T | null>;\n  findAll(): Promise<T[]>;\n  create(data: Omit<T, \"id\">): Promise<T>;\n}\n\ninterface Product extends Entity { name: string; price: number }\ndeclare const products: Repository<Product>;\nproducts.create({ name: \"Caneca\", price: 30 });"
+          },
+          "relatedTerms": [
+            "generic",
+            "restricao-generica"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "utility-types",
+      "title": "Utility types",
+      "description": "Tipos prontos para transformar outros tipos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "partial-required",
+          "level": "junior",
+          "term": "Partial e Required",
+          "definition": "Partial<T> torna todas as propriedades opcionais (bom para o corpo de um PATCH); Required<T> torna todas obrigatórias. Readonly<T> impede reatribuir todas.",
+          "relatedTerms": [
+            "pick-omit"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pick-omit",
+          "level": "junior",
+          "term": "Pick e Omit",
+          "definition": "Pick<T, \"a\" | \"b\"> cria um tipo só com as chaves escolhidas; Omit<T, \"senha\"> cria um tipo sem elas. Servem para derivar DTOs da entidade sem copiar campos à mão.",
+          "relatedTerms": [
+            "partial-required",
+            "record"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "record",
+          "level": "pleno",
+          "term": "Record",
+          "definition": "Record<K, V> descreve um objeto cujas chaves são do tipo K e os valores do tipo V. Com K sendo uma union de literais, obriga a ter uma entrada para cada chave: Record<Status, string> exige um texto para cada status.",
+          "relatedTerms": [
+            "pick-omit"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "returntype",
+          "level": "pleno",
+          "term": "ReturnType, Parameters e Awaited",
+          "definition": "Extraem tipos de funções existentes: ReturnType<typeof fn> é o tipo de retorno, Parameters<typeof fn> a tupla de parâmetros e Awaited<T> o valor dentro de uma Promise. Úteis para tipar a partir de bibliotecas que não exportam seus tipos.",
+          "relatedTerms": [
+            "record"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "dtos-derivados",
+          "level": "pleno",
+          "title": "DTOs derivados da entidade",
+          "body": "Uma fonte da verdade: se a entidade ganhar um campo, os DTOs acompanham. O de saída nunca expõe a senha.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "interface User {\n  id: number;\n  name: string;\n  email: string;\n  password: string;\n  createdAt: Date;\n}\n\ntype CreateUserDto = Omit<User, \"id\" | \"createdAt\">;\ntype UpdateUserDto = Partial<CreateUserDto>;\ntype PublicUser = Omit<User, \"password\">;"
+          },
+          "relatedTerms": [
+            "pick-omit",
+            "partial-required"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "record-exaustivo",
+          "level": "pleno",
+          "title": "Record exaustivo",
+          "body": "Ao adicionar um status novo à union, o objeto deixa de compilar até ganhar o rótulo correspondente.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "type OrderStatus = \"pending\" | \"paid\" | \"shipped\";\n\nconst labels: Record<OrderStatus, string> = {\n  pending: \"Aguardando pagamento\",\n  paid: \"Pago\",\n  shipped: \"Enviado\",\n};"
+          },
+          "relatedTerms": [
+            "record"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tipos-mapeados-e-condicionais",
+      "title": "Tipos mapeados e condicionais",
+      "description": "Construindo tipos a partir de outros tipos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "mapped-type",
+          "level": "senior",
+          "term": "Mapped type",
+          "definition": "Tipo que percorre as chaves de outro e transforma cada uma: { [K in keyof T]: ... }. Partial, Readonly e Record são mapped types. Dá para mudar o tipo do valor, tornar opcional (?), somar ou tirar readonly e até renomear chaves com as.",
+          "relatedTerms": [
+            "conditional-type"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "conditional-type",
+          "level": "senior",
+          "term": "Conditional type",
+          "definition": "Tipo com escolha: T extends U ? X : Y. Aplicado a uma union, é distribuído por cada membro. Com infer, extrai partes de um tipo, como o elemento de um array ou o valor de uma Promise.",
+          "relatedTerms": [
+            "mapped-type",
+            "type-guard"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "type-guard",
+          "level": "pleno",
+          "term": "Type guard",
+          "definition": "Função que devolve value is Tipo e, quando retorna true, estreita o tipo de quem chamou. Encapsula checagens repetidas, como \"é um produto válido?\", e é a ponte entre unknown e um tipo concreto.",
+          "relatedTerms": [
+            "conditional-type"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "satisfies",
+          "level": "pleno",
+          "term": "satisfies e as const",
+          "definition": "as const torna literais e readonly tudo o que está no objeto ou array. satisfies Tipo checa se o valor é compatível com o tipo sem alargá-lo: o objeto continua com os tipos precisos de cada propriedade. Juntos, dão configurações checadas e bem tipadas.",
+          "relatedTerms": [
+            "type-guard"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "mapped-exemplo",
+          "level": "senior",
+          "title": "Mapped type com renomeação",
+          "body": "Gera os getters de qualquer tipo: getName, getAge. Template literal types e as renomeiam as chaves.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "type Getters<T> = {\n  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];\n};\n\ntype Person = { name: string; age: number };\ntype PersonGetters = Getters<Person>;\n// { getName: () => string; getAge: () => number }"
+          },
+          "relatedTerms": [
+            "mapped-type"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "type-guard-exemplo",
+          "level": "pleno",
+          "title": "Type guard para dados de fora",
+          "body": "O JSON chega como unknown; depois do if, o compilador trata data como Product. Para esquemas grandes, Zod gera o guard e o tipo de uma vez.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "interface Product { id: number; name: string }\n\nfunction isProduct(value: unknown): value is Product {\n  return (\n    typeof value === \"object\" && value !== null &&\n    typeof (value as Product).id === \"number\" &&\n    typeof (value as Product).name === \"string\"\n  );\n}\n\nconst data: unknown = await response.json();\nif (isProduct(data)) console.log(data.name);"
+          },
+          "relatedTerms": [
+            "type-guard"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de TypeScript avançado que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "por-que-generics",
+          "level": "pleno",
+          "question": "Para que servem generics? Por que não usar any?",
+          "answer": "Generics deixam uma função ou tipo funcionar com vários tipos mantendo a ligação entre entrada e saída: se entra string[], sai string. Com any, a função aceita tudo mas o retorno perde o tipo, e o erro só aparece em tempo de execução. Uso restrições (extends) quando preciso de alguma propriedade do tipo.",
+          "relatedTerms": [
+            "generic",
+            "restricao-generica"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "partial-pick-omit",
+          "level": "junior",
+          "question": "Cite utility types que você usa no dia a dia.",
+          "answer": "Partial para corpos de atualização, Pick e Omit para derivar DTOs da entidade (por exemplo, tirar a senha da resposta), Record para mapas de chave conhecida, Readonly para dados que não devem mudar, e ReturnType ou Awaited para reaproveitar o tipo de funções de bibliotecas.",
+          "relatedTerms": [
+            "partial-required",
+            "pick-omit"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "type-guard-pergunta",
+          "level": "pleno",
+          "question": "O que é um type guard?",
+          "answer": "É uma checagem que estreita o tipo. Pode ser nativa (typeof, instanceof, in) ou uma função minha que devolve value is Tipo. Se ela retorna true, o compilador passa a tratar o valor com aquele tipo. O cuidado é que o compilador confia na função: se a checagem estiver errada, o tipo mente.",
+          "relatedTerms": [
+            "type-guard"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "conditional-infer",
+          "level": "senior",
+          "question": "Como funciona infer em conditional types?",
+          "answer": "Dentro do extends de um conditional type, infer declara uma variável de tipo que o TypeScript preenche com a parte que casar. type ElementOf<T> = T extends (infer U)[] ? U : never extrai o tipo dos itens de um array. É assim que ReturnType, Parameters e Awaited são implementados.",
+          "relatedTerms": [
+            "conditional-type"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "satisfies-vs-anotacao",
+          "level": "senior",
+          "question": "Qual a diferença entre anotar o tipo e usar satisfies?",
+          "answer": "Anotar (const config: Config = ...) faz a variável ter exatamente o tipo Config, perdendo detalhes: uma propriedade string | number vira o tipo amplo. satisfies Config checa a compatibilidade mas mantém o tipo inferido, mais preciso. Uso satisfies em objetos de configuração e mapas, onde quero a checagem e os literais.",
+          "relatedTerms": [
+            "satisfies"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mapped-pergunta",
+          "level": "senior",
+          "question": "Como você implementaria o Partial do zero?",
+          "answer": "Com um mapped type: type MyPartial<T> = { [K in keyof T]?: T[K] }. Ele percorre cada chave de T e a declara como opcional, mantendo o tipo do valor. Para uma versão profunda, aplico recursivamente quando T[K] é objeto, usando um conditional type.",
+          "relatedTerms": [
+            "mapped-type",
+            "partial-required"
+          ]
+        }
+      ]
+    }
+  ]
+}
