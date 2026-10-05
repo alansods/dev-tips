@@ -38,45 +38,39 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const TRACKS = [
-  'SQL essencial',
-  'Modelagem de dados',
-  'Transações e performance',
-  'PostgreSQL',
-  'MySQL',
-  'MongoDB',
-  'Redis',
-  'NoSQL: modelos e quando usar',
-];
 const headers = () => screen.getAllByRole('header').map((h) => String(h.props.children));
+const CI = ['CI/CD essencial', 'GitHub Actions'];
+const AWS = ['AWS essencial', 'Deploy na AWS'];
 
-describe('Requirement: Trilhas de banco de dados no catálogo', () => {
-  it('Área Banco de dados', async () => {
-    await open('/area/banco-de-dados');
-    expect(headers()).toEqual(expect.arrayContaining(['Banco de dados', 'Relacionais', 'Não relacionais']));
-    expect(headers().indexOf('Relacionais')).toBeLessThan(headers().indexOf('Não relacionais'));
+describe('Requirement: Trilhas de DevOps e Cloud no catálogo', () => {
+  it('Área DevOps e Cloud', async () => {
+    await open('/area/devops');
+    expect(headers()).toEqual(expect.arrayContaining(['DevOps e Cloud', 'CI/CD', 'AWS']));
+    expect(headers().indexOf('CI/CD')).toBeLessThan(headers().indexOf('AWS'));
     for (const absent of ['Trilhas', 'Linguagens', 'Comparativos']) expect(headers()).not.toContain(absent);
-    expect(buttons(TRACKS)).toEqual(TRACKS);
-  });
-
-  it('a Home mostra Banco de dados com as 8 trilhas', async () => {
-    await open('/');
-    expect(within(screen.getByRole('button', { name: /^Banco de dados,/ })).getByText('8 trilhas')).toBeOnTheScreen();
+    expect(buttons([...CI, ...AWS])).toEqual([...CI, ...AWS]);
   });
 });
 
-describe('Requirement: Tradução das trilhas de banco de dados', () => {
+describe('Requirement: Home por áreas', () => {
+  it('Mobile e DevOps e Cloud no fim', async () => {
+    await open('/');
+    const names = ['Fundamentos', 'Frontend', 'Backend', 'Banco de dados', 'Mobile', 'DevOps e Cloud'];
+    expect(buttons(names)).toEqual(names);
+    expect(within(screen.getByRole('button', { name: /^DevOps e Cloud,/ })).getByText('4 trilhas')).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Tradução das trilhas de DevOps e Cloud', () => {
   it('Área em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/');
-    expect(screen.getByRole('button', { name: /^Databases,/ })).toBeOnTheScreen();
+    await open('/area/devops');
+    expect(headers()).toEqual(expect.arrayContaining(['DevOps & Cloud', 'CI/CD', 'AWS']));
   });
-});
 
-describe('Requirement: Textos da navegação (seções)', () => {
-  it('seções em inglês', async () => {
+  it('Área DevOps em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/area/banco-de-dados');
-    expect(headers()).toEqual(expect.arrayContaining(['Relational', 'Non-relational']));
+    await open('/');
+    expect(screen.getByRole('button', { name: /^DevOps & Cloud,/ })).toBeOnTheScreen();
   });
 });

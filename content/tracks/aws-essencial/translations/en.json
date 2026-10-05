@@ -1,0 +1,120 @@
+{
+  "title": "AWS essentials",
+  "description": "The core AWS services that come up in interviews: IAM, regions, EC2, VPC, S3, RDS and DynamoDB.",
+  "decks": {
+    "iam-e-conta": {
+      "title": "IAM and account",
+      "description": "Who can do what, and where resources live."
+    },
+    "computacao-e-rede": {
+      "title": "Compute and networking",
+      "description": "Virtual machines, private networking, firewalls and scaling."
+    },
+    "armazenamento-e-dados": {
+      "title": "Storage and data",
+      "description": "Files in S3 and managed databases."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "AWS questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "iam": {
+      "term": "IAM",
+      "definition": "The service that controls who can do what in the account. Identities: users (people or systems with their own credentials), groups (sets of users) and roles (identities assumed temporarily). Permissions are JSON policies with Effect, Action, Resource and, optionally, Condition. Everything is denied by default, and an explicit Deny beats any Allow."
+    },
+    "menor-privilegio": {
+      "term": "Principle of least privilege",
+      "definition": "Each identity gets only the permissions its task needs, on the specific resources, and nothing more. Avoid \"Action\": \"*\" and \"Resource\": \"*\". If a credential leaks, the damage is limited. In practice: start restricted, widen when something is missing, and review with IAM Access Analyzer."
+    },
+    "role-e-sts": {
+      "term": "Roles and temporary credentials",
+      "definition": "A role has no password or static key: whoever is allowed assumes it and gets credentials from STS that expire in minutes or hours. An EC2 instance uses a role through its instance profile, a Lambda through its execution role, a pipeline through OIDC and a person through SSO (IAM Identity Center). It is the recommended way to grant access, instead of long-lived access keys."
+    },
+    "regioes-e-zonas": {
+      "term": "Regions and Availability Zones",
+      "definition": "A Region (us-east-1, sa-east-1) is an independent geographic area, with its own prices and services; data does not leave it on its own. Each Region has several Availability Zones (AZs), separate data centers linked by a fast network. Spreading the application across two or more AZs protects against one going down. The Region is chosen by latency, cost and data law."
+    },
+    "politica-iam": {
+      "title": "Read policy on an S3 prefix",
+      "body": "Allows only reading objects from a bucket's uploads/ folder, and nothing else."
+    },
+    "aws-cli-sso": {
+      "title": "AWS CLI with SSO",
+      "body": "Sign in through IAM Identity Center, without storing an access key on the computer, and check who is authenticated."
+    },
+    "ec2": {
+      "term": "EC2",
+      "definition": "Virtual machines on AWS. You pick the image (AMI), the instance type (CPU and memory, such as t3.micro or m7g.large), the disk (EBS) and the network. You pay for the time it runs. Pricing options: on-demand, Savings Plans/reserved instances (usage commitment, cheaper) and Spot (spare capacity, much cheaper, but can be interrupted)."
+    },
+    "vpc": {
+      "term": "VPC and subnets",
+      "definition": "A private, isolated network in your account, split into subnets, each in one AZ. A public subnet has a route to the Internet Gateway and holds the load balancer. A private subnet is not reachable from the internet and holds the application and the database; to go out (download packages, call APIs), it uses a NAT Gateway. Route tables define where traffic goes."
+    },
+    "security-group": {
+      "term": "Security group",
+      "definition": "A virtual firewall attached to an instance, database or load balancer. It only has allow rules (everything else is blocked) and is stateful: if inbound traffic was allowed, the response goes out automatically. A rule can reference another security group, for example \"the database accepts port 5432 only from the app's SG\". Network ACLs are another layer, at the subnet, stateless and with deny rules."
+    },
+    "auto-scaling-e-elb": {
+      "term": "Load balancer and Auto Scaling",
+      "definition": "The Application Load Balancer (ALB) receives HTTP(S) traffic, terminates TLS and distributes it among healthy instances, checked by health checks, across several AZs. The Auto Scaling Group keeps a minimum number of instances, replaces those that fail and scales the count up or down based on a metric, such as CPU or requests per target."
+    },
+    "user-data": {
+      "title": "EC2 user data",
+      "body": "A script run once when the instance first boots: installs and starts the service."
+    },
+    "regra-por-security-group": {
+      "title": "Database reachable only by the app",
+      "body": "The rule's source is the app's security group, not an IP: new app instances get access automatically."
+    },
+    "s3": {
+      "term": "S3",
+      "definition": "Object storage: files stored in buckets and accessed by key (uploads/photo.jpg), over an HTTP API. Designed for 99.999999999% durability and virtually unlimited capacity. Used for uploads, backups, logs and static sites. Buckets are private by default, with Block Public Access on; access is granted by policies or presigned URLs."
+    },
+    "classes-e-ciclo-de-vida": {
+      "term": "Storage classes and lifecycle",
+      "definition": "Each S3 object has a class: Standard (frequent access), Standard-IA (rare access, charged per read), Glacier (archive, reads in minutes or hours) and Intelligent-Tiering (moves objects automatically based on usage). Lifecycle rules move objects to cheaper classes or delete them after N days, for example old logs."
+    },
+    "rds": {
+      "term": "RDS",
+      "definition": "A managed relational database (PostgreSQL, MySQL, MariaDB and others; Aurora is AWS's own version). AWS handles installation, patches, automated backups and point-in-time restore. Multi-AZ keeps a synchronous replica in another AZ for automatic failover. Read replicas are asynchronous copies for scaling reads."
+    },
+    "dynamodb": {
+      "term": "DynamoDB",
+      "definition": "A serverless key-value and document database, with millisecond latency at any scale. Each item is located by its partition key (and, optionally, its sort key). Queries must follow keys and secondary indexes, so the model starts from access patterns. It charges per read and write (on-demand) or by provisioned capacity."
+    },
+    "url-pre-assinada": {
+      "title": "Direct upload with a presigned URL",
+      "body": "The API generates a temporary URL and the app uploads the file straight to S3, without going through the server."
+    },
+    "s3-pela-cli": {
+      "title": "S3 from the command line",
+      "body": "Create a bucket, upload a folder and list its contents."
+    },
+    "responsabilidade-compartilhada": {
+      "question": "What is the shared responsibility model?",
+      "answer": "AWS handles security of the cloud: data centers, hardware, the physical network and the virtualization layer. The customer handles security in the cloud: IAM, network configuration and security groups, encryption, OS patches on an EC2 instance and their own data. The more managed the service (Lambda, RDS, S3), the more responsibility stays with AWS."
+    },
+    "app-acessar-s3-sem-chave": {
+      "question": "How does an application running on AWS access S3 without an access key in the code?",
+      "answer": "With a role. On EC2, through the instance profile; on ECS, through the task role; on Lambda, through the execution role. The SDK fetches temporary credentials on its own and renews them before they expire. The role's policy grants only the needed actions and buckets. Keys in code or environment variables can leak through the repository and logs."
+    },
+    "sg-vs-nacl": {
+      "question": "What is the difference between a security group and a Network ACL?",
+      "answer": "A security group sits on the resource (instance, database, load balancer), has only allow rules and is stateful: the response to allowed traffic returns automatically. A Network ACL sits on the subnet, accepts allow and deny rules evaluated in order and is stateless: both inbound and outbound must be allowed. Day to day, fine-grained control uses security groups."
+    },
+    "multi-az-vs-replica": {
+      "question": "What is the difference between RDS Multi-AZ and a read replica?",
+      "answer": "Multi-AZ is for availability: a synchronous replica in another AZ that takes over automatically if the primary fails, with no loss of committed data. In its classic form, it does not serve reads. A read replica is for read scaling: an asynchronous copy, which may lag and can even sit in another Region, and which can be promoted manually. The two are often used together."
+    },
+    "bucket-vazado": {
+      "question": "How do you prevent an S3 bucket from exposing data by mistake?",
+      "answer": "Keep Block Public Access on for the account and the buckets, grant access through least-privilege policies, serve public content through CloudFront with OAC instead of making the bucket public, use short-lived presigned URLs for uploads and downloads, enable encryption, and watch alerts from IAM Access Analyzer and AWS Config."
+    },
+    "alta-disponibilidade": {
+      "question": "How would you design a highly available web application in one AWS Region?",
+      "answer": "A VPC with public and private subnets in at least two AZs. An ALB in the public ones, with health checks. A stateless app in an Auto Scaling Group or ECS in the private ones, spread across AZs. An RDS Multi-AZ database, sessions and cache outside the instances (ElastiCache or DynamoDB) and files in S3. CloudWatch alarms, tested backups and infrastructure as code to recreate everything. To tolerate losing the whole Region, a multi-Region strategy comes in."
+    }
+  }
+}

@@ -19,7 +19,7 @@ describe('Requirement: Áreas da trilha', () => {
 
   it('Área desconhecida', () => {
     const input = minimalTrack();
-    input.areas = ['mobile'];
+    input.areas = ['games'];
     expectErrorAt(input, 'areas[0]');
   });
 
@@ -33,6 +33,11 @@ describe('Requirement: Áreas da trilha', () => {
     const input = minimalTrack();
     input.areas = ['banco-de-dados'];
     expect(trackOf(input).areas).toEqual(['banco-de-dados']);
+  });
+
+  it('Áreas de mobile e DevOps', () => {
+    expect(trackOf({ ...minimalTrack(), areas: ['mobile'] }).areas).toEqual(['mobile']);
+    expect(trackOf({ ...minimalTrack(), areas: ['devops'] }).areas).toEqual(['devops']);
   });
 
   it('Trilha em duas áreas', () => {
@@ -147,6 +152,11 @@ describe('Requirement: Seção da trilha', () => {
   it('Trilha direta com seção', () => {
     const input = { ...minimalTrack(), areas: ['banco-de-dados'], section: 'relacionais' };
     expect(trackOf(input).section).toBe('relacionais');
+  });
+
+  it('Seções de DevOps', () => {
+    expect(trackOf({ ...minimalTrack(), areas: ['devops'], section: 'ci-cd' }).section).toBe('ci-cd');
+    expect(trackOf({ ...minimalTrack(), areas: ['devops'], section: 'aws' }).section).toBe('aws');
   });
 
   it('Seção desconhecida', () => {

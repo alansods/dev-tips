@@ -119,7 +119,7 @@ describe('Requirement: Tela da área', () => {
   });
 
   it('Área não encontrada', async () => {
-    await open('/area/mobile');
+    await open('/area/games');
     expect(screen.getByText('Área não encontrada.')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Voltar' })).toBeOnTheScreen();
   });
@@ -181,7 +181,7 @@ describe('Requirement: Textos da navegação', () => {
   });
 
   it('não encontrado em inglês', async () => {
-    await open('/area/mobile');
+    await open('/area/games');
     expect(screen.getByText('Area not found.')).toBeOnTheScreen();
   });
 });

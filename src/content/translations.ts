@@ -30,6 +30,11 @@ import mysqlEn from '../../content/tracks/mysql/translations/en.json';
 import mongodbEn from '../../content/tracks/mongodb/translations/en.json';
 import redisEn from '../../content/tracks/redis/translations/en.json';
 import nosqlEn from '../../content/tracks/nosql/translations/en.json';
+import reactNativeEn from '../../content/tracks/react-native/translations/en.json';
+import ciCdEssencialEn from '../../content/tracks/ci-cd-essencial/translations/en.json';
+import githubActionsEn from '../../content/tracks/github-actions/translations/en.json';
+import awsEssencialEn from '../../content/tracks/aws-essencial/translations/en.json';
+import deployNaAwsEn from '../../content/tracks/deploy-na-aws/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -60,4 +65,9 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   mongodb: { en: mongodbEn },
   redis: { en: redisEn },
   nosql: { en: nosqlEn },
+  'react-native': { en: reactNativeEn },
+  'ci-cd-essencial': { en: ciCdEssencialEn },
+  'github-actions': { en: githubActionsEn },
+  'aws-essencial': { en: awsEssencialEn },
+  'deploy-na-aws': { en: deployNaAwsEn },
 };

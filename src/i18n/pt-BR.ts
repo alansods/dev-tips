@@ -87,7 +87,14 @@ export const ptBR = {
     dueBadge: (n: number) => `${n} para revisar hoje`,
   },
   nav: {
-    areas: { fundamentos: 'Fundamentos', frontend: 'Frontend', backend: 'Backend', 'banco-de-dados': 'Banco de dados' },
+    areas: {
+      fundamentos: 'Fundamentos',
+      frontend: 'Frontend',
+      backend: 'Backend',
+      'banco-de-dados': 'Banco de dados',
+      mobile: 'Mobile',
+      devops: 'DevOps e Cloud',
+    },
     areaKicker: 'Área',
     sections: {
       tracks: 'Trilhas',
@@ -97,6 +104,8 @@ export const ptBR = {
       frameworks: 'Frameworks',
       relacionais: 'Relacionais',
       'nao-relacionais': 'Não relacionais',
+      'ci-cd': 'CI/CD',
+      aws: 'AWS',
     },
     trackCount: (n: number) => `${n} ${plural(n, 'trilha', 'trilhas')}`,
     areaLabel: (area: string, tracks: string, known: number, total: number) =>

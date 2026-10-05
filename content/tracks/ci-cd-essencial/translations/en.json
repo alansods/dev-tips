@@ -1,0 +1,120 @@
+{
+  "title": "CI/CD essentials",
+  "description": "From commit to production: continuous integration, pipelines, tests, artifacts and deployment strategies.",
+  "decks": {
+    "pipeline-e-etapas": {
+      "title": "Pipeline and stages",
+      "description": "What CI is, what CD is and how a pipeline is organized."
+    },
+    "testes-e-artefatos": {
+      "title": "Tests, artifacts and versions",
+      "description": "What to test in the pipeline and how to ensure what was tested is what ships."
+    },
+    "estrategias-de-deploy": {
+      "title": "Deployment strategies",
+      "description": "How to replace the production version without downtime and how to roll back."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "CI/CD questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "integracao-continua": {
+      "term": "Continuous integration (CI)",
+      "definition": "The practice of merging everyone's code into the main branch often, several times a day, and validating each merge automatically: build, lint and tests. The goal is to find conflicts and bugs minutes after they are introduced, when they are cheap to fix, instead of at the end of a long isolated branch."
+    },
+    "entrega-continua": {
+      "term": "Continuous delivery and continuous deployment (CD)",
+      "definition": "Continuous delivery: every commit that passes the pipeline produces a production-ready version, and deploying is one click. Continuous deployment goes further: that version goes to production on its own, with no manual approval. Both require reliable automated tests and small, frequent deploys."
+    },
+    "pipeline": {
+      "term": "Pipeline",
+      "definition": "An automated sequence of stages that takes a commit to deployment, for example: install dependencies, lint, tests, build, publish the artifact and deploy. Independent stages run in parallel, and a failure stops the following ones. Fast stages come first, so the developer gets feedback early (fail fast)."
+    },
+    "trunk-based": {
+      "term": "Trunk-based development",
+      "definition": "A branching model where everyone integrates into one main branch (trunk) with short branches, lasting hours or a few days. Unfinished features go in hidden behind feature flags. It fits CI/CD because it avoids big merges and keeps main always deployable. It is the opposite of long-lived branches, as in GitFlow."
+    },
+    "pipeline-com-etapas": {
+      "title": "Pipeline with dependent stages",
+      "body": "Lint and tests run in parallel; the build only starts if both pass (needs)."
+    },
+    "script-que-falha-cedo": {
+      "title": "A script that fails early",
+      "body": "Without set -e, a command that fails mid-script goes unnoticed and the stage turns green."
+    },
+    "piramide-de-testes": {
+      "term": "Test pyramid",
+      "definition": "Many unit tests (fast and cheap), fewer integration tests (components together, a real database) and few end-to-end tests (slow and brittle). In the pipeline, the pyramid sets the order: unit tests first, for feedback in seconds, and E2E at the end or in a staging environment."
+    },
+    "artefato-imutavel": {
+      "term": "Immutable artifact",
+      "definition": "The build output (Docker image, package, bundle) is produced once, identified by the version or the commit hash, and promoted unchanged across environments: staging and then production. Only configuration changes between environments, passed through variables. That way, what was tested is exactly what ships (\"build once, deploy many\")."
+    },
+    "versionamento-semantico": {
+      "term": "Semantic versioning",
+      "definition": "A version in the MAJOR.MINOR.PATCH format. MAJOR goes up on breaking changes, MINOR on compatible new features, PATCH on fixes only. Release tools can compute the version from commit messages (Conventional Commits, such as \"feat:\" and \"fix:\") and generate the changelog."
+    },
+    "testes-instaveis": {
+      "term": "Flaky tests",
+      "definition": "Tests that pass and fail with no code change, because of timing, execution order, network or shared state. They are dangerous because they teach the team to ignore red and re-run until green. The fix is to quarantine them, fix the cause (wait for conditions, isolated data, a controlled clock) and track the failure rate."
+    },
+    "imagem-por-commit": {
+      "title": "Image tagged by commit",
+      "body": "The tag is the commit hash, not \"latest\": you know exactly what is running and can go back to a previous version."
+    },
+    "cobertura-minima": {
+      "title": "Minimum coverage as a gate",
+      "body": "If coverage drops below the threshold, Jest fails and the pipeline stops. It is a floor, not a goal."
+    },
+    "rolling-update": {
+      "term": "Rolling update",
+      "definition": "Replaces old-version instances with new ones gradually, a few at a time, while the rest keep serving. It needs no extra infrastructure, but during the switch both versions serve at the same time, so the API and the database must be compatible with both. A health check decides whether each new instance can receive traffic."
+    },
+    "blue-green": {
+      "term": "Blue/green",
+      "definition": "Two full environments: blue serves production and green gets the new version. After green is validated, the load balancer or DNS switches all traffic at once. Rollback is switching back, in seconds. The cost is running doubled infrastructure during the deploy and handling the database, which is usually shared."
+    },
+    "canary": {
+      "term": "Canary",
+      "definition": "The new version first gets a small fraction of traffic (1%, then 10%, 50%) while error and latency metrics are compared with the stable version. If they get worse, traffic goes back, ideally automatically. It limits a bug's impact to few users, but requires good observability and percentage-based routing."
+    },
+    "feature-flags": {
+      "term": "Feature flags",
+      "definition": "Configuration switches that turn a feature on or off at runtime, with no new deploy. They separate deployment (the code reaches production) from release (users see it). They allow enabling for only some users and turning off immediately if something breaks. Old flags become technical debt and must be removed."
+    },
+    "expand-contract": {
+      "term": "Expand/contract (zero-downtime migration)",
+      "definition": "A way to change the database while old and new code versions coexist. Expand: add the new structure without removing the old one (a new nullable column). Migrate: the code writes to both and old data is copied. Contract: only after no version uses the old structure is it removed. Each step is a separate, reversible deploy."
+    },
+    "smoke-test": {
+      "title": "Smoke test after deploy",
+      "body": "A quick check of the new version; if it fails, the pipeline triggers a rollback."
+    },
+    "ci-vs-cd": {
+      "question": "What is the difference between CI, continuous delivery and continuous deployment?",
+      "answer": "CI is integrating code often and validating each integration automatically with build and tests. Continuous delivery ensures every approved commit produces a production-ready version, with deployment by human decision. Continuous deployment takes that version to production automatically, with no manual approval."
+    },
+    "pipeline-lento": {
+      "question": "The pipeline takes 40 minutes. How would you make it faster?",
+      "answer": "First I measure how long each stage takes. Then: cache dependencies and builds, run independent jobs in parallel, split tests across machines (sharding), put fast stages first to fail early, run only what was affected in a monorepo, and leave heavy E2E for merge time or a nightly job. I also remove duplicated stages and use runner images with tools preinstalled."
+    },
+    "teste-flaky": {
+      "question": "A test fails now and then in CI and passes on re-run. What do you do?",
+      "answer": "Do not normalize \"just re-run it\". I quarantine the test so it does not block the team, log an issue and look for the cause: timing or order dependence, fixed waits (sleep), data shared between tests, external network. I fix it with condition-based waits, isolated data and clock and network mocks, and track the flaky test rate."
+    },
+    "testado-e-o-que-sobe": {
+      "question": "How do you ensure what was tested in staging is exactly what goes to production?",
+      "answer": "By building once and promoting the same artifact, identified by the commit hash or a digest, from staging to production. Nothing is rebuilt per environment; only configuration changes, through variables and secrets. That also makes rollback simple: just redeploy the previous artifact."
+    },
+    "migracao-sem-downtime": {
+      "question": "How do you rename a column the application uses without taking the system down?",
+      "answer": "With expand/contract, in separate deploys. 1) Add the new column. 2) The code writes to both and reads from the new one with a fallback to the old one; old data is copied in batches. 3) The code uses only the new one. 4) Drop the old column. At every step, both the new and the old code work with the database, so rolling updates and rollbacks stay safe."
+    },
+    "blue-green-ou-canary": {
+      "question": "When do you choose blue/green and when canary?",
+      "answer": "Blue/green when I want instant switch and rollback and can pay for a duplicate environment during the deploy; it suits all-or-nothing changes. Canary when I want to limit risk by exposing the new version to few users and decide based on real metrics; it requires percentage-based routing and good observability. Both can be combined with feature flags."
+    }
+  }
+}

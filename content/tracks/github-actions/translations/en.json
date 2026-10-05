@@ -1,0 +1,120 @@
+{
+  "title": "GitHub Actions",
+  "description": "GitHub's CI/CD tool: workflows, jobs, secrets, caching, matrices and deployment with OIDC.",
+  "decks": {
+    "workflows-e-jobs": {
+      "title": "Workflows and jobs",
+      "description": "How a workflow is triggered and how jobs are organized."
+    },
+    "segredos-cache-e-matriz": {
+      "title": "Secrets, cache and matrix",
+      "description": "Credentials, faster workflows and tests across several versions."
+    },
+    "deploy-e-ambientes": {
+      "title": "Deploy, OIDC and environments",
+      "description": "How to deploy safely: temporary credentials, approvals and one deploy at a time."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "GitHub Actions questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "workflow": {
+      "term": "Workflow",
+      "definition": "A YAML file in .github/workflows/ that describes an automation. The \"on\" key defines the events that trigger it: push, pull_request, a schedule, a manual trigger (workflow_dispatch) or another workflow. A repository can have several workflows, such as CI, deploy and release."
+    },
+    "job-e-step": {
+      "term": "Job and step",
+      "definition": "A workflow has jobs, and each job runs on its own machine (runner), in parallel by default. \"needs\" creates a dependency between jobs. Each job has steps, executed in order on the same machine: \"run\" executes a shell command and \"uses\" runs an action. Jobs do not share files; for that, they use artifacts or outputs."
+    },
+    "action": {
+      "term": "Action",
+      "definition": "A reusable step, published in a repository and referenced with \"uses: owner/name@version\", such as actions/checkout or actions/setup-node. It takes parameters in \"with\". Since it is third-party code running with access to your repository and secrets, it should come from trusted sources and have its version pinned."
+    },
+    "runner": {
+      "term": "Runner",
+      "definition": "The machine that runs jobs. GitHub-hosted runners (ubuntu-latest, windows-latest, macos-latest) are created clean for each job and discarded afterwards. Self-hosted runners run on your infrastructure, useful for specific hardware or a private network, but they need maintenance and should not serve public repositories, because a PR could run code on your machine."
+    },
+    "workflow-de-ci": {
+      "title": "CI workflow for Node",
+      "body": "Runs on every PR and on push to main: checkout, Node with npm cache, install, lint and tests."
+    },
+    "gatilhos": {
+      "title": "Triggers with filters",
+      "body": "The workflow only runs when API files change, every day at 6:00 (UTC) or when someone triggers it manually."
+    },
+    "secrets-e-variaveis": {
+      "term": "Secrets and variables",
+      "definition": "Secrets store sensitive values (tokens, passwords) encrypted, at the repository, organization or environment level, and are masked in logs. They are read with ${{ secrets.NAME }}. Variables (vars) hold non-sensitive configuration. Workflows triggered by PRs from forks do not receive secrets."
+    },
+    "cache-de-dependencias": {
+      "term": "Dependency caching",
+      "definition": "Reuses files across runs, such as the npm cache, so everything is not downloaded again. The key includes the lockfile hash: when it changes, the cache is rebuilt. actions/setup-node does this with \"cache: npm\"; actions/cache works for any folder. Cache the package manager's cache, not node_modules, and never cache secrets."
+    },
+    "matriz": {
+      "term": "Matrix (strategy.matrix)",
+      "definition": "Generates several jobs from combinations of values, for example Node versions and operating systems, each running in parallel. \"include\" and \"exclude\" adjust combinations, \"fail-fast\" decides whether one failure cancels the others, and \"max-parallel\" limits how many run together."
+    },
+    "permissoes-do-token": {
+      "term": "GITHUB_TOKEN permissions",
+      "definition": "Each run gets a temporary GITHUB_TOKEN to access its own repository. The \"permissions\" key defines what it can do; the safe default is contents: read, granting only what each job needs. A token with write access plus a compromised action can change code and releases. The pull_request_target event runs with secrets and write access, so it must never execute code from the PR."
+    },
+    "matriz-com-cache": {
+      "title": "Matrix with cache",
+      "body": "Six jobs in parallel (2 versions × 3 systems), each with the npm cache."
+    },
+    "permissoes-minimas": {
+      "title": "Least-privilege permissions",
+      "body": "Read-only for the whole workflow; only the release job can write, and only to contents."
+    },
+    "oidc": {
+      "term": "OIDC (credentials without static keys)",
+      "definition": "GitHub issues each job a signed identity token stating which repository, branch and environment are running. The cloud provider trusts that issuer and exchanges the token for temporary credentials of a role. That way, no long-lived access key is stored in secrets. The job needs the id-token: write permission."
+    },
+    "environments": {
+      "term": "Environments",
+      "definition": "Named environments, such as staging and production, with protection rules: required reviewers, a wait timer and which branches can deploy. They have their own secrets and variables, released only to jobs that declare \"environment\". Each environment's deployment history shows in the repository."
+    },
+    "concurrency": {
+      "term": "Concurrency",
+      "definition": "Groups runs by a key and ensures only one per group runs at a time. In deploys, it stops two consecutive pushes from deploying simultaneously and arriving out of order. With cancel-in-progress: true, the new run cancels the previous one, which is good for PR CI. In production, the previous one is usually allowed to finish."
+    },
+    "workflows-reutilizaveis": {
+      "term": "Reusable workflows and composite actions",
+      "definition": "To avoid copying YAML across repositories. A reusable workflow declares on: workflow_call, takes inputs and secrets and is called as a whole job. A composite action bundles several steps into one \"uses\". This lets a platform team keep a standard pipeline, and one fix applies to every team."
+    },
+    "deploy-com-oidc": {
+      "title": "Deploy to AWS with OIDC",
+      "body": "No stored key: the job requests the OIDC token, assumes the role and gets temporary credentials."
+    },
+    "trust-policy-oidc": {
+      "title": "The role's trust policy",
+      "body": "Only this repository's production environment can assume the role. The \"sub\" format varies by repository (those created from July 2026 include numeric ids); check the emitted claim."
+    },
+    "job-vs-step": {
+      "question": "What is the difference between a job and a step in a workflow?",
+      "answer": "Jobs run on separate runners and, by default, in parallel; \"needs\" defines the order between them. Steps live inside a job, run in sequence on the same machine and share the file system. To pass data between jobs, I use outputs or artifacts."
+    },
+    "acesso-a-nuvem-sem-chave": {
+      "question": "How does a workflow deploy to AWS without storing an access key in secrets?",
+      "answer": "With OIDC. I register GitHub as an identity provider in AWS and create a role whose trust policy only accepts tokens from my repository and the right environment. The job declares id-token: write and uses configure-aws-credentials with role-to-assume. Credentials last minutes, there is no key to leak or rotate, and the role's permissions are kept to the minimum."
+    },
+    "workflow-lento-actions": {
+      "question": "How do you make a GitHub Actions workflow faster?",
+      "answer": "Dependency caching (setup-node with cache: npm or actions/cache), independent jobs in parallel, paths filters so unchanged parts do not run, concurrency with cancel-in-progress on PRs to drop stale runs, tests split with a matrix, and larger runners when CPU is the bottleneck."
+    },
+    "fixar-por-sha": {
+      "question": "Why pin third-party actions by commit SHA instead of by tag?",
+      "answer": "Tags can be moved: if the action's repository is compromised, the v1 tag can point to malicious code that will run with access to your secrets and token. A full SHA is immutable. I combine that with least-privilege GITHUB_TOKEN permissions, updates reviewed via a dependency bot, and a preference for official or verified actions."
+    },
+    "dois-deploys-juntos": {
+      "question": "Two consecutive merges triggered two deploys at the same time. How do you prevent it?",
+      "answer": "With concurrency on the deploy job or workflow, using one key per environment (for example, deploy-production). That way only one deploy runs at a time and the next waits in the queue. For production, I leave cancel-in-progress off, so a deploy is not interrupted halfway. An environment with reviewers also helps control what ships."
+    },
+    "pull-request-target": {
+      "question": "What is the risk of the pull_request_target event?",
+      "answer": "It runs in the context of the base branch, with access to secrets and a token with write access, even for PRs from forks. If the workflow checks out the PR's code and runs it (npm install, tests, scripts), an attacker runs code with those privileges. I use pull_request to test external code and keep pull_request_target for tasks that do not run the PR's code, such as labeling."
+    }
+  }
+}
