@@ -38,7 +38,7 @@ Tocar num chip de termo SHALL abrir uma gaveta sobre a tela com o nome do termo,
 A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do catálogo, na ordem das trilhas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de uma trilha, cada item SHALL mostrar também o título da trilha a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquela trilha.
 
 #### Scenario: Lista completa
-- **WHEN** o usuário abre a aba Glossário sem busca
+- **WHEN** o catálogo tem só as trilhas CRUD e Fundamentos web e o usuário abre a aba Glossário sem busca
 - **THEN** aparecem os 24 termos da trilha CRUD seguidos dos 21 termos de Fundamentos web, e o texto "45 termos"
 
 #### Scenario: Trilha de cada termo
@@ -57,7 +57,7 @@ A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do c
 A aba Glossário SHALL ter um campo de busca, com rótulo acessível "Buscar termo", que filtra a lista por nome do termo, definição ou outros nomes (`aliases`), sem diferenciar maiúsculas, minúsculas e acentos. Com a busca vazia, todos os termos aparecem. Sem resultados, SHALL aparecer "Nenhum termo encontrado." A contagem SHALL refletir os termos exibidos.
 
 #### Scenario: Buscar pelo nome
-- **WHEN** o usuário digita "cors"
+- **WHEN** o catálogo tem só as trilhas CRUD e Fundamentos web e o usuário digita "cors"
 - **THEN** a lista mostra CORS e "Política de mesma origem" (cuja definição cita CORS), e a contagem "2 termos"
 
 #### Scenario: Buscar sem acento
