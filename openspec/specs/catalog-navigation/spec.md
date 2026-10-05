@@ -28,10 +28,6 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 - **WHEN** o usuário toca no card "Backend"
 - **THEN** a tela da área Backend abre
 
-#### Scenario: Banco de dados por último
-- **WHEN** o catálogo tem trilhas nas quatro áreas
-- **THEN** a Home mostra Fundamentos, Frontend, Backend e Banco de dados, nessa ordem
-
 #### Scenario: Mobile e DevOps e Cloud no fim
 - **WHEN** o catálogo tem trilhas nas seis áreas
 - **THEN** a Home mostra Fundamentos, Frontend, Backend, Banco de dados, Mobile e DevOps e Cloud, nessa ordem
