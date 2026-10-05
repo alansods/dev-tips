@@ -15,7 +15,8 @@ import TrackScreen from '../app/track/[trackId]';
 jest.mock('../content/catalog', () => {
   const { trackSchema } = jest.requireActual('../content/schema');
   const { minimalTrack } = jest.requireActual('../content/__fixtures__/tracks');
-  const make = (id: string, title: string, extra: object) => trackSchema.parse({ ...minimalTrack(), id, title, ...extra });
+  const make = (id: string, title: string, extra: object) =>
+    trackSchema.parse({ ...minimalTrack(), id, title, ...extra });
   const extra = [
     make('java-puro', 'Java do zero', { areas: ['backend'], language: 'java' }),
     make('spring-di', 'Injeção no Spring', { areas: ['backend'], language: 'java', framework: 'spring' }),

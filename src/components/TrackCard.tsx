@@ -58,7 +58,10 @@ export function TrackCard({ track }: { track: Track }) {
   const stats = trackStats(track, progress);
   const due = useDue([track]);
   return (
-    <Card label={t.home.cardLabel(track.title, stats.known, stats.total)} onPress={() => router.push(`/track/${track.id}`)}>
+    <Card
+      label={t.home.cardLabel(track.title, stats.known, stats.total)}
+      onPress={() => router.push(`/track/${track.id}`)}
+    >
       <AppText font="semibold" size={16}>
         {track.title}
       </AppText>
@@ -66,7 +69,11 @@ export function TrackCard({ track }: { track: Track }) {
         {track.description}
       </AppText>
       <ProgressLine known={stats.known} total={stats.total} />
-      {due > 0 && <AppText font="medium" size={13} tone="warn">{t.home.dueBadge(due)}</AppText>}
+      {due > 0 && (
+        <AppText font="medium" size={13} tone="warn">
+          {t.home.dueBadge(due)}
+        </AppText>
+      )}
     </Card>
   );
 }
@@ -86,7 +93,11 @@ export function AreaCard({ name, tracks, onPress }: { name: string; tracks: read
         {count}
       </AppText>
       <ProgressLine known={stats.known} total={stats.total} />
-      {due > 0 && <AppText font="medium" size={13} tone="warn">{t.home.dueBadge(due)}</AppText>}
+      {due > 0 && (
+        <AppText font="medium" size={13} tone="warn">
+          {t.home.dueBadge(due)}
+        </AppText>
+      )}
     </Card>
   );
 }

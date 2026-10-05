@@ -89,7 +89,9 @@ describe('Requirement: Permissão sob demanda', () => {
     expect(toggle()).toHaveProp('value', true);
     expect(radio('Noite 20:00')).toBeChecked();
     expect(N.scheduleNotificationAsync).toHaveBeenCalledTimes(7);
-    const hours = N.scheduleNotificationAsync.mock.calls.map(([req]) => (req.trigger as { date: Date }).date.getHours());
+    const hours = N.scheduleNotificationAsync.mock.calls.map(([req]) =>
+      (req.trigger as { date: Date }).date.getHours(),
+    );
     expect(new Set(hours)).toEqual(new Set([20]));
   });
 
@@ -150,7 +152,9 @@ describe('Requirement: Abrir pela notificação', () => {
   const tap = (id: string, kind = 'reminder') =>
     ({ notification: { date: 1, request: { identifier: id, content: { data: { kind } } } } }) as never;
   const seedDue = (trackId: string, n: number) => {
-    const cards = getTrack(trackId)!.decks.flatMap((d) => d.cards).slice(0, n);
+    const cards = getTrack(trackId)!
+      .decks.flatMap((d) => d.cards)
+      .slice(0, n);
     cards.forEach((c) => useStudyStore.getState().answer(trackId, c.id, 'unknown'));
   };
 

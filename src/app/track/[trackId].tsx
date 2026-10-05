@@ -100,7 +100,9 @@ function ReviewToday({ track }: { track: Track }) {
       </AppText>
       {due ? (
         <>
-          <AppText font="semibold" size={16}>{t.track.dueToday(due)}</AppText>
+          <AppText font="semibold" size={16}>
+            {t.track.dueToday(due)}
+          </AppText>
           <View style={{ flexDirection: 'row' }}>
             <Button title={t.track.reviewNow} onPress={() => router.push(`/review/${track.id}`)} />
           </View>
@@ -138,7 +140,9 @@ function DeckItem({ track, deck, index }: { track: Track; deck: Deck; index: num
               {deck.description}
             </AppText>
           ) : null}
-          <AppText size={12} tone="muted">{t.track.deckCards(stats.total)}</AppText>
+          <AppText size={12} tone="muted">
+            {t.track.deckCards(stats.total)}
+          </AppText>
         </View>
       </View>
       <View style={styles.progressRow}>

@@ -64,7 +64,9 @@ describe('Requirement: Tradução completa para inglês', () => {
     await open('/glossary');
     fireEvent.changeText(screen.getByLabelText('Search term'), 'Set-Cookie');
     fireEvent.press(screen.getByRole('button', { name: 'Cookie' }));
-    expect(within(screen.getByTestId('term-sheet')).getByText(/A small piece of data the server stores/)).toBeOnTheScreen();
+    expect(
+      within(screen.getByTestId('term-sheet')).getByText(/A small piece of data the server stores/),
+    ).toBeOnTheScreen();
     await open('/study/fundamentos-web/perguntas-de-entrevista');
     expect(screen.getByText('What happens when you type a URL and press Enter?')).toBeOnTheScreen();
   });

@@ -61,7 +61,8 @@ export const en: Messages = {
     delete: 'Delete account',
     deleteHint: 'Deletes your data in the cloud. Progress on this device stays.',
     deleteTitle: 'Delete your account?',
-    deleteBody: 'Your data in the cloud (progress, reviews and preferences) will be deleted forever. This can’t be undone.',
+    deleteBody:
+      'Your data in the cloud (progress, reviews and preferences) will be deleted forever. This can’t be undone.',
     deleteKeep: 'Progress on this device stays, and you can keep using the app without an account.',
     deleteConfirm: 'Delete my account',
     deleteOffline: 'No connection. Try again when you’re online.',

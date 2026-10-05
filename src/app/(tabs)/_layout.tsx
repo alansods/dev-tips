@@ -45,7 +45,10 @@ export default function TabsLayout() {
         tabBarLabelStyle: { fontFamily: family('semibold'), fontSize: 11.5 },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t.tabs.tracks, tabBarIcon: ({ color }) => <TracksIcon color={color} /> }} />
+      <Tabs.Screen
+        name="index"
+        options={{ title: t.tabs.tracks, tabBarIcon: ({ color }) => <TracksIcon color={color} /> }}
+      />
       <Tabs.Screen
         name="glossary"
         options={{ title: t.tabs.glossary, tabBarIcon: ({ color }) => <GlossaryIcon color={color} /> }}

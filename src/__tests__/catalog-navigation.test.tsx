@@ -79,7 +79,9 @@ describe('Requirement: Revisão na Home', () => {
   it('Aviso na Home', async () => {
     glossaryIds.slice(0, 2).forEach((id) => useStudyStore.getState().answer(crudTrack.id, id, 'unknown'));
     await open('/');
-    expect(within(screen.getByRole('button', { name: /^Backend,/ })).getByText('2 para revisar hoje')).toBeOnTheScreen();
+    expect(
+      within(screen.getByRole('button', { name: /^Backend,/ })).getByText('2 para revisar hoje'),
+    ).toBeOnTheScreen();
   });
 
   it('Aviso no card da trilha', async () => {
@@ -135,7 +137,8 @@ describe('Requirement: Tela da trilha', () => {
     await open('/');
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks,/);
-    for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI']) expect(screen.getByText(name)).toBeOnTheScreen();
+    for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
+      expect(screen.getByText(name)).toBeOnTheScreen();
   });
 
   it('Voltar para as trilhas', async () => {
