@@ -23,6 +23,9 @@ import nestjs from '../../content/tracks/nestjs/track.json';
 import javaEssencial from '../../content/tracks/java-essencial/track.json';
 import javaColecoesEConcorrencia from '../../content/tracks/java-colecoes-e-concorrencia/track.json';
 import springBoot from '../../content/tracks/spring-boot/track.json';
+import pythonEssencial from '../../content/tracks/python-essencial/track.json';
+import fastapi from '../../content/tracks/fastapi/track.json';
+import django from '../../content/tracks/django/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -46,6 +49,9 @@ const registry: unknown[] = [
   javaEssencial,
   javaColecoesEConcorrencia,
   springBoot,
+  pythonEssencial,
+  fastapi,
+  django,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

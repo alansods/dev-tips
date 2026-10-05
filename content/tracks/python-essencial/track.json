@@ -1,0 +1,313 @@
+{
+  "id": "python-essencial",
+  "title": "Python essencial",
+  "description": "A base do Python: tipos, mutabilidade, coleções, funções, decorators, generators e ambiente.",
+  "areas": [
+    "backend"
+  ],
+  "language": "python",
+  "decks": [
+    {
+      "id": "tipos-e-colecoes",
+      "title": "Tipos e coleções",
+      "description": "Os tipos de dados e as estruturas do dia a dia.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "tipagem-dinamica",
+          "level": "junior",
+          "term": "Tipagem dinâmica e forte",
+          "definition": "Em Python, o tipo pertence ao valor, não à variável: a mesma variável pode apontar para um int e depois para uma str (dinâmica). Mas o Python não converte tipos sozinho em operações misturadas: \"1\" + 1 dá TypeError (forte). Type hints documentam tipos e são checados por ferramentas como mypy, não em tempo de execução.",
+          "relatedTerms": [
+            "mutabilidade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mutabilidade",
+          "level": "pleno",
+          "term": "Mutáveis e imutáveis",
+          "definition": "int, float, str, tuple e frozenset são imutáveis: \"alterar\" cria um objeto novo. list, dict e set são mutáveis: mudam no lugar, e todas as variáveis que apontam para eles veem a mudança. Só imutáveis (hashable) servem como chave de dict ou item de set.",
+          "relatedTerms": [
+            "list-tuple",
+            "dict-set"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "list-tuple",
+          "level": "junior",
+          "term": "list e tuple",
+          "definition": "Sequências ordenadas. list é mutável e serve para coleções que crescem; tuple é imutável, mais leve, e serve para registros fixos (coordenadas, retornos múltiplos) e como chave de dict. O desempacotamento x, y = ponto funciona com as duas.",
+          "relatedTerms": [
+            "mutabilidade",
+            "comprehension"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "dict-set",
+          "level": "junior",
+          "term": "dict e set",
+          "definition": "dict mapeia chaves a valores e mantém a ordem de inserção (desde o 3.7); set guarda itens únicos sem ordem. Os dois usam tabela hash: in, inserção e busca em tempo constante na média. dict.get(chave, padrão) evita KeyError.",
+          "relatedTerms": [
+            "mutabilidade",
+            "comprehension"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "comprehension",
+          "level": "junior",
+          "term": "Comprehension",
+          "definition": "Sintaxe curta para criar coleções a partir de outras, com filtro opcional: [x * 2 for x in nums if x > 0]. Existe para list, dict ({k: v ...}) e set ({x ...}). Com parênteses, vira uma generator expression, que não monta a lista na memória.",
+          "relatedTerms": [
+            "list-tuple",
+            "generator"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "referencia-compartilhada",
+          "level": "pleno",
+          "title": "Referência compartilhada",
+          "body": "b = a não copia a lista: as duas variáveis apontam para o mesmo objeto. copy faz cópia rasa e deepcopy copia também o que está aninhado.",
+          "snippet": {
+            "file": "exemplo.py",
+            "language": "python",
+            "code": "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)          # [1, 2, 3, 4]\nprint(a is b)     # True\n\nimport copy\nc = a.copy()      # cópia rasa\nd = copy.deepcopy([[1], [2]])"
+          },
+          "relatedTerms": [
+            "mutabilidade",
+            "list-tuple"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "funcoes-e-decorators",
+      "title": "Funções e decorators",
+      "description": "Parâmetros, escopo, closures e decorators.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "args-kwargs",
+          "level": "junior",
+          "term": "*args e **kwargs",
+          "definition": "*args recebe os argumentos posicionais extras numa tupla e **kwargs os nomeados extras num dict. Também servem para repassar argumentos: f(*lista, **opcoes). Usados em wrappers e funções que aceitam configuração flexível.",
+          "relatedTerms": [
+            "decorator"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "argumento-padrao-mutavel",
+          "level": "pleno",
+          "term": "Argumento padrão mutável",
+          "definition": "O valor padrão de um parâmetro é criado uma vez só, quando a função é definida. Com def add(item, lista=[]), a mesma lista é reaproveitada entre chamadas e vai acumulando itens. O padrão correto é lista=None e criar a lista dentro da função.",
+          "relatedTerms": [
+            "args-kwargs"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "decorator",
+          "level": "pleno",
+          "term": "Decorator",
+          "definition": "Função que recebe uma função e devolve outra que a envolve, adicionando comportamento: log, cache, autenticação, medição de tempo. @decorator acima da definição é o mesmo que f = decorator(f). functools.wraps preserva o nome e a docstring da original.",
+          "relatedTerms": [
+            "closure-python",
+            "args-kwargs"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "closure-python",
+          "level": "pleno",
+          "term": "Closure e escopo (LEGB)",
+          "definition": "Python busca nomes na ordem Local, Enclosing (funções de fora), Global e Built-in. Uma função interna que usa variáveis da externa forma uma closure. Para reatribuir essas variáveis, é preciso nonlocal (ou global para o módulo).",
+          "relatedTerms": [
+            "decorator"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "decorator-tempo",
+          "level": "pleno",
+          "title": "Decorator que mede tempo",
+          "body": "O wrapper aceita qualquer assinatura com *args e **kwargs, mede a execução e devolve o resultado original.",
+          "snippet": {
+            "file": "exemplo.py",
+            "language": "python",
+            "code": "import functools\nimport time\n\ndef timed(func):\n    @functools.wraps(func)\n    def wrapper(*args, **kwargs):\n        start = time.perf_counter()\n        try:\n            return func(*args, **kwargs)\n        finally:\n            print(f\"{func.__name__} levou {time.perf_counter() - start:.3f}s\")\n    return wrapper\n\n@timed\ndef load_report(month: int) -> list[dict]:\n    ..."
+          },
+          "relatedTerms": [
+            "decorator",
+            "args-kwargs"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "padrao-mutavel-exemplo",
+          "level": "pleno",
+          "title": "O bug do padrão mutável",
+          "body": "A segunda chamada \"lembra\" o item da primeira. Com None como padrão, cada chamada recebe uma lista nova.",
+          "snippet": {
+            "file": "exemplo.py",
+            "language": "python",
+            "code": "def add_tag(tag, tags=[]):\n    tags.append(tag)\n    return tags\n\nadd_tag(\"a\")  # [\"a\"]\nadd_tag(\"b\")  # [\"a\", \"b\"]  bug!\n\ndef add_tag_ok(tag: str, tags: list[str] | None = None) -> list[str]:\n    tags = [] if tags is None else tags\n    tags.append(tag)\n    return tags"
+          },
+          "relatedTerms": [
+            "argumento-padrao-mutavel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "generators-e-ambiente",
+      "title": "Generators e ambiente",
+      "description": "Iteração preguiçosa, contexto, GIL e dependências.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "generator",
+          "level": "pleno",
+          "term": "Generator",
+          "definition": "Função com yield que produz valores um de cada vez, sob demanda, pausando entre eles. Usa memória constante mesmo para sequências enormes ou infinitas (linhas de um arquivo gigante, páginas de uma API). Só pode ser percorrido uma vez.",
+          "relatedTerms": [
+            "context-manager",
+            "gil"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "context-manager",
+          "level": "pleno",
+          "term": "Context manager (with)",
+          "definition": "Objeto usado com with que prepara e libera um recurso automaticamente, mesmo com erro: arquivos, conexões, locks, transações. Implementa __enter__ e __exit__, ou é criado com @contextmanager a partir de um generator.",
+          "relatedTerms": [
+            "generator"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "gil",
+          "level": "senior",
+          "term": "GIL",
+          "definition": "Global Interpreter Lock: no CPython, só uma thread executa bytecode Python por vez. Threads ainda ajudam em I/O (o GIL é liberado na espera), mas não paralelizam CPU; para isso usa-se multiprocessing ou bibliotecas em C. O Python 3.13 trouxe uma versão experimental sem GIL.",
+          "relatedTerms": [
+            "asyncio"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "asyncio",
+          "level": "senior",
+          "term": "asyncio",
+          "definition": "Concorrência com uma thread e um event loop: funções async def pausam em await enquanto esperam I/O, e o loop roda outras. Ideal para muitas conexões simultâneas. Uma chamada bloqueante (requests, time.sleep) dentro de async trava o loop inteiro.",
+          "relatedTerms": [
+            "gil",
+            "generator"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "venv",
+          "level": "junior",
+          "term": "Ambiente virtual (venv)",
+          "definition": "Pasta isolada com um interpretador e os pacotes de um projeto, para que cada projeto tenha suas versões sem conflitar com outros nem com o sistema. Criado com python -m venv .venv; as dependências ficam em requirements.txt ou pyproject.toml (com ferramentas como uv ou Poetry).",
+          "relatedTerms": [
+            "asyncio"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "generator-arquivo",
+          "level": "pleno",
+          "title": "Lendo um arquivo enorme",
+          "body": "O with fecha o arquivo; o generator entrega uma linha por vez, então a memória não cresce com o tamanho do arquivo.",
+          "snippet": {
+            "file": "exemplo.py",
+            "language": "python",
+            "code": "from collections.abc import Iterator\n\ndef error_lines(path: str) -> Iterator[str]:\n    with open(path, encoding=\"utf-8\") as file:\n        for line in file:\n            if \"ERROR\" in line:\n                yield line.rstrip()\n\nfor line in error_lines(\"app.log\"):\n    print(line)"
+          },
+          "relatedTerms": [
+            "generator",
+            "context-manager"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Python que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "list-vs-tuple-pergunta",
+          "level": "junior",
+          "question": "Qual a diferença entre list e tuple?",
+          "answer": "list é mutável: dá para adicionar, remover e alterar itens. tuple é imutável, ocupa menos memória e pode ser chave de dict ou item de set. Uso tuple para registros de tamanho fixo e dados que não devem mudar, e list para coleções que crescem.",
+          "relatedTerms": [
+            "list-tuple",
+            "mutabilidade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "is-vs-igual",
+          "level": "junior",
+          "question": "Qual a diferença entre is e ==?",
+          "answer": "== compara valores (chama __eq__); is compara identidade, se é o mesmo objeto na memória. is serve para None (x is None) e para sentinelas. Comparar números ou strings com is pode até funcionar por causa de caches internos, mas é um bug esperando para acontecer.",
+          "relatedTerms": [
+            "mutabilidade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-decorator",
+          "level": "pleno",
+          "question": "O que é um decorator e onde você usaria?",
+          "answer": "É uma função que recebe outra função e devolve uma versão envolvida, adicionando comportamento sem mexer no código original. Uso para log, medição de tempo, retry, cache (functools.lru_cache), checagem de permissão e registro de rotas, como o @app.get do FastAPI. Sempre com functools.wraps para preservar o nome da função.",
+          "relatedTerms": [
+            "decorator",
+            "closure-python"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "generator-pergunta",
+          "level": "pleno",
+          "question": "Quando usar um generator em vez de uma lista?",
+          "answer": "Quando os dados são grandes, infinitos ou chegam aos poucos, e eu só preciso percorrê-los uma vez: ler um arquivo gigante, paginar uma API, processar em pipeline. O generator calcula cada item sob demanda e usa memória constante. Se preciso acessar por índice ou percorrer várias vezes, uso lista.",
+          "relatedTerms": [
+            "generator"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "gil-pergunta",
+          "level": "senior",
+          "question": "O que é o GIL e como ele afeta a concorrência?",
+          "answer": "É a trava do CPython que deixa só uma thread executar bytecode por vez. Para I/O isso quase não importa, porque o GIL é liberado durante a espera; aí uso threads ou asyncio. Para CPU, threads não dão paralelismo real; uso multiprocessing ou ProcessPoolExecutor, ou bibliotecas como NumPy, que trabalham fora do GIL.",
+          "relatedTerms": [
+            "gil",
+            "asyncio"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "padrao-mutavel-pergunta",
+          "level": "pleno",
+          "question": "O que há de errado em def f(itens=[])?",
+          "answer": "O valor padrão é avaliado uma vez, na definição da função, então a mesma lista é compartilhada entre todas as chamadas e acumula itens. O certo é usar None como padrão e criar a lista dentro da função. Vale para qualquer padrão mutável, como dict e set.",
+          "relatedTerms": [
+            "argumento-padrao-mutavel",
+            "mutabilidade"
+          ]
+        }
+      ]
+    }
+  ]
+}
