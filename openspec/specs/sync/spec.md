@@ -6,7 +6,7 @@ Mantém uma cópia do progresso e das preferências na conta do usuário, juntan
 ## Requirements
 
 ### Requirement: Enviar mudanças à API
-`PUT /sync`, com sessão válida, SHALL receber `{ "cards": [{ "themeId", "cardId", "result", "box", "due", "updatedAt" }], "settings": { "language", "preferredVariant", "updatedAt" } }` (as duas partes opcionais; `result`, `box` e `due` nulos significam "sem resposta", usados ao zerar). Para cada card, a API SHALL guardar a versão recebida só se o `updatedAt` dela for maior que o guardado; o mesmo vale para `settings`. A resposta SHALL ser `200` com `{ "serverTime" }`. Um corpo inválido SHALL responder `400` com o código `invalid_body`; mais de 500 cards numa requisição SHALL responder `400` com o código `too_many_items`.
+`PUT /sync`, com sessão válida, SHALL receber `{ "cards": [{ "trackId", "cardId", "result", "box", "due", "updatedAt" }], "settings": { "language", "preferredVariant", "updatedAt" } }` (as duas partes opcionais; `result`, `box` e `due` nulos significam "sem resposta", usados ao zerar). Para cada card, a API SHALL guardar a versão recebida só se o `updatedAt` dela for maior que o guardado; o mesmo vale para `settings`. A resposta SHALL ser `200` com `{ "serverTime" }`. Um corpo inválido SHALL responder `400` com o código `invalid_body`; mais de 500 cards numa requisição SHALL responder `400` com o código `too_many_items`.
 
 #### Scenario: Mudança nova
 - **WHEN** o card `cors` está guardado com `updatedAt` 100 e o aparelho envia `cors` com `updatedAt` 200
@@ -36,7 +36,7 @@ Mantém uma cópia do progresso e das preferências na conta do usuário, juntan
 - **THEN** a resposta traz todos os cards e as preferências da conta
 
 ### Requirement: O que sincroniza
-Com sessão, o app SHALL sincronizar, por card, a resposta ("já sabia" ou "não sabia") com a caixa e a data de revisão, além do idioma escolhido e do framework preferido de cada tema. Os lembretes e o último dia de estudo MUST continuar só no aparelho. Sem sessão, o app MUST NOT chamar a API de sincronização.
+Com sessão, o app SHALL sincronizar, por card, a resposta ("já sabia" ou "não sabia") com a caixa e a data de revisão, além do idioma escolhido e do framework preferido de cada trilha. Os lembretes e o último dia de estudo MUST continuar só no aparelho. Sem sessão, o app MUST NOT chamar a API de sincronização.
 
 #### Scenario: Progresso em outro aparelho
 - **WHEN** o usuário marca `cors` como "já sabia" no aparelho A, e o aparelho B, com a mesma conta, sincroniza
@@ -84,11 +84,11 @@ No primeiro login de um aparelho, o progresso local SHALL ser juntado ao da cont
 - **THEN** depois do login, o aparelho e a conta têm `api` e `cors`
 
 ### Requirement: Zerar sincronizado
-"Zerar progresso" de um tema, com sessão, SHALL zerar também esse tema na conta, para que os outros aparelhos zerem na próxima sincronização.
+"Zerar progresso" de uma trilha, com sessão, SHALL zerar também essa trilha na conta, para que os outros aparelhos zerem na próxima sincronização.
 
 #### Scenario: Zerar em um aparelho
-- **WHEN** o usuário zera o tema CRUD no aparelho A, e o aparelho B sincroniza
-- **THEN** no aparelho B o tema CRUD também aparece zerado
+- **WHEN** o usuário zera a trilha CRUD no aparelho A, e o aparelho B sincroniza
+- **THEN** no aparelho B a trilha CRUD também aparece zerado
 
 ### Requirement: Estado da sincronização
 A tela Conta e a linha da conta em Ajustes SHALL mostrar o estado da sincronização: "Sincronizado agora há pouco" (ou "Sincronizado há N minutos"), "Sincronizando…", "Aguardando conexão" (sem conexão, com mudanças na fila) ou "Não foi possível sincronizar" (erro da API).
@@ -106,7 +106,7 @@ Com sessão e sem conexão, as abas SHALL mostrar abaixo do cabeçalho o aviso "
 
 #### Scenario: Ficar offline com conta
 - **WHEN** há sessão e a conexão cai
-- **THEN** a aba Temas mostra "Offline. Seu progresso será enviado depois." e os cards continuam abrindo normalmente
+- **THEN** a aba Trilhas mostra "Offline. Seu progresso será enviado depois." e os cards continuam abrindo normalmente
 
 #### Scenario: Reconectar
 - **WHEN** a conexão volta

@@ -35,13 +35,13 @@ Tocar num chip de termo SHALL abrir uma gaveta sobre a tela com o nome do termo,
 - **THEN** a gaveta some e o verso do Passo 13 continua visível, com os botões "Não sabia" e "Já sabia"
 
 ### Requirement: Aba Glossário
-A aba Glossário SHALL listar todos os termos (cards `concept`) dos temas do catálogo, na ordem dos temas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de um tema, cada item SHALL mostrar também o título do tema a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquele tema.
+A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do catálogo, na ordem das trilhas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de uma trilha, cada item SHALL mostrar também o título da trilha a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquela trilha.
 
 #### Scenario: Lista completa
 - **WHEN** o usuário abre a aba Glossário sem busca
-- **THEN** aparecem os 24 termos do tema CRUD seguidos dos 21 termos de Fundamentos web, e o texto "45 termos"
+- **THEN** aparecem os 24 termos da trilha CRUD seguidos dos 21 termos de Fundamentos web, e o texto "45 termos"
 
-#### Scenario: Tema de cada termo
+#### Scenario: Trilha de cada termo
 - **WHEN** a lista é exibida
 - **THEN** o item "CORS" mostra "O mesmo CRUD em quatro frameworks" e o item "Cookie" mostra "Fundamentos web"
 

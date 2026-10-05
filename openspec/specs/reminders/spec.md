@@ -34,7 +34,7 @@ O app MUST NOT pedir permissão de notificação ao abrir. Ao ligar o lembrete, 
 - **THEN** o lembrete continua desligado e aparecem a mensagem "Ative as notificações nas configurações do aparelho." e o botão "Abrir ajustes"
 
 ### Requirement: Uma notificação por dia com texto do dia
-Com o lembrete ligado, o app SHALL manter agendada uma notificação por dia, no horário escolhido, para os próximos 7 dias, a partir do primeiro horário ainda não passado. O texto de cada notificação SHALL depender dos cards para revisar naquele dia, somando todos os temas e contando os cards cuja data de revisão é igual ou anterior a esse dia:
+Com o lembrete ligado, o app SHALL manter agendada uma notificação por dia, no horário escolhido, para os próximos 7 dias, a partir do primeiro horário ainda não passado. O texto de cada notificação SHALL depender dos cards para revisar naquele dia, somando todas as trilhas e contando os cards cuja data de revisão é igual ou anterior a esse dia:
 - com N > 0 cards: título "Dev Tips" e texto "Revisão do dia: N cards esperando por você" ("1 card esperando por você" quando N = 1);
 - sem cards: título "Dev Tips" e texto "5 minutos de estudo? Continue de onde parou."
 
@@ -91,15 +91,15 @@ O app SHALL refazer o agendamento, substituindo todas as notificações anterior
 - **THEN** a notificação de amanhã passa a dizer "5 minutos de estudo? Continue de onde parou."
 
 ### Requirement: Abrir pela notificação
-Tocar numa notificação de lembrete SHALL abrir o app. Se houver cards para revisar no momento do toque, o app SHALL abrir a tela do tema com mais cards para revisar (no empate, o primeiro na ordem do catálogo). Sem cards para revisar, o app SHALL abrir a aba Temas.
+Tocar numa notificação de lembrete SHALL abrir o app. Se houver cards para revisar no momento do toque, o app SHALL abrir a tela da trilha com mais cards para revisar (no empate, o primeiro na ordem do catálogo). Sem cards para revisar, o app SHALL abrir a aba Trilhas.
 
 #### Scenario: Toque com revisão pendente
-- **WHEN** o tema CRUD tem 2 cards para revisar, Fundamentos web tem 5, e o usuário toca na notificação
-- **THEN** o app abre a tela do tema Fundamentos web
+- **WHEN** a trilha CRUD tem 2 cards para revisar, Fundamentos web tem 5, e o usuário toca na notificação
+- **THEN** o app abre a tela da trilha Fundamentos web
 
 #### Scenario: Toque sem revisão
 - **WHEN** nenhum card está para revisar e o usuário toca na notificação
-- **THEN** o app abre a aba Temas
+- **THEN** o app abre a aba Trilhas
 
 ### Requirement: Configuração salva no aparelho
 A escolha de ligado ou desligado e o horário SHALL ser salvos no aparelho e restaurados ao abrir o app. Se a leitura falhar ou os dados forem inválidos, o app SHALL abrir com o lembrete desligado, sem exibir erro. O último dia em que o usuário respondeu um card SHALL ser salvo junto com o progresso; dados de versões anteriores, sem esse dia, MUST continuar válidos.

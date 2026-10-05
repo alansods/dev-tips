@@ -24,6 +24,6 @@
 
 - [x] 4.1 README: "theme" → "track" (Pick a **track**…)
 - [x] 4.2 Conferir com `grep -rni "theme" src content api/src api/test` que só restam o tema visual (`src/theme/`, `useTheme`, `ThemeProvider`, `themeToggle`, `ThemeToggle`)
-- [ ] 4.3 Depois do archive: ajustar a seção Purpose das specs principais que citam "tema" como conteúdo (o delta não alcança Purpose)
-- [ ] 4.4 Aplicar a 0003 no D1 local e, com confirmação do usuário, no remoto (`npm run db:migrate`) e fazer deploy da API
+- [x] 4.3 Depois do archive: ajustar a seção Purpose das specs principais que citam "tema" como conteúdo (o delta não alcança Purpose)
+- [ ] 4.4 Aplicar a 0003 no D1 local e, com confirmação do usuário, no remoto (`npm run db:migrate`) e fazer deploy da API — local aplicada; remoto e deploy pendentes, a rodar pelo usuário (bloqueado pela permissão de produção do agente)
 - [x] 4.5 Rodar `openspec validate --strict`, `npm test`, `npm run lint` e `npx tsc --noEmit`

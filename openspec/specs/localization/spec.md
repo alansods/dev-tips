@@ -30,14 +30,14 @@ Escolher um idioma em Ajustes SHALL mudar todo o app para esse idioma imediatame
 
 #### Scenario: Troca imediata
 - **WHEN** o app está em PT-BR e o usuário escolhe "English" em Ajustes
-- **THEN** o título da tela passa a "Settings" e, ao voltar, as abas mostram "Topics", "Glossary" e "Progress"
+- **THEN** o título da tela passa a "Settings" e, ao voltar, as abas mostram "Tracks", "Glossary" e "Progress"
 
 #### Scenario: Escolha mantida ao reabrir
 - **WHEN** o aparelho está em inglês, o usuário escolhe "Português (Brasil)", fecha o app e abre de novo
 - **THEN** o app abre em PT-BR
 
 #### Scenario: Progresso preservado
-- **WHEN** o tema CRUD tem 4 cards como já sabidos e o usuário troca o idioma
+- **WHEN** a trilha CRUD tem 4 cards como já sabidos e o usuário troca o idioma
 - **THEN** a aba Progresso continua mostrando 4 cards já sabidos
 
 #### Scenario: Valor salvo inválido
@@ -46,11 +46,11 @@ Escolher um idioma em Ajustes SHALL mudar todo o app para esse idioma imediatame
 
 ### Requirement: Interface traduzida
 Todo texto fixo da interface SHALL existir nos dois idiomas e ser exibido no idioma atual: títulos das abas e telas, botões, rótulos, contadores, mensagens de estado vazio, confirmações, rótulos acessíveis e textos das notificações. Os textos em inglês dos principais rótulos SHALL ser:
-- abas: "Topics", "Glossary", "Progress"; tela de ajustes: "Settings";
+- abas: "Tracks", "Glossary", "Progress"; tela de ajustes: "Settings";
 - botões de resposta: "I didn't know" e "I knew it"; "Show answer";
 - ações do deck: "Study", "Continue", "Study again";
 - revisão: "Today's review", "Review now", "Nothing to review today.";
-- resumo: "Review the ones I missed", "Back to topic";
+- resumo: "Review the ones I missed", "Back to track";
 - progresso: "Reset progress", "Reset", "Cancel".
 
 O app MUST NOT exibir texto fixo de interface no idioma diferente do escolhido.
@@ -68,7 +68,7 @@ O app MUST NOT exibir texto fixo de interface no idioma diferente do escolhido.
 - **THEN** todo texto do dicionário PT-BR tem um texto correspondente, não vazio, no dicionário inglês, e vice-versa
 
 ### Requirement: Conteúdo no idioma escolhido
-Com o app em inglês, cada texto de tema, deck e card SHALL ser exibido em inglês quando houver tradução para ele, e em PT-BR quando não houver, campo a campo. Com o app em PT-BR, o conteúdo SHALL ser o original. Código de snippets, ids, métodos HTTP, caminhos, status, nomes de variantes e linguagens MUST NOT mudar com o idioma.
+Com o app em inglês, cada texto de trilha, deck e card SHALL ser exibido em inglês quando houver tradução para ele, e em PT-BR quando não houver, campo a campo. Com o app em PT-BR, o conteúdo SHALL ser o original. Código de snippets, ids, métodos HTTP, caminhos, status, nomes de variantes e linguagens MUST NOT mudar com o idioma.
 
 #### Scenario: Card traduzido
 - **WHEN** o app está em inglês e o card concept "CORS" tem `definition` traduzida
@@ -78,9 +78,9 @@ Com o app em inglês, cada texto de tema, deck e card SHALL ser exibido em ingl�
 - **WHEN** o app está em inglês e um card step tem só `title` traduzido
 - **THEN** o card mostra o título em inglês e o "o que é" e o "por que importa" em PT-BR
 
-#### Scenario: Tema sem tradução
-- **WHEN** o app está em inglês e o tema não tem arquivo de tradução
-- **THEN** o tema aparece todo em PT-BR, com a interface em inglês, sem erro
+#### Scenario: Trilha sem tradução
+- **WHEN** o app está em inglês e a trilha não tem arquivo de tradução
+- **THEN** a trilha aparece todo em PT-BR, com a interface em inglês, sem erro
 
 #### Scenario: Código não muda
 - **WHEN** o usuário troca o idioma com um card step aberto
