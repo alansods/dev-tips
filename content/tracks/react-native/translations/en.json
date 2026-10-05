@@ -60,9 +60,13 @@
       "term": "EAS (Build, Submit and Update)",
       "definition": "Expo's cloud services. EAS Build compiles and signs the app without a local Xcode or Android Studio, with profiles in eas.json (development, preview, production). EAS Submit sends the binary to the stores. EAS Update publishes over-the-air (OTA) updates of JavaScript and assets to channels, without going through store review."
     },
-    "runtime-version": {
-      "term": "Runtime version",
-      "definition": "Identifies which native layer a JavaScript bundle is compatible with. A build only receives OTA updates with the same runtime version, which stops new JS from calling a native module the binary does not have. The \"fingerprint\" policy hashes what defines the native build and changes the version automatically when something native changes."
+    "update-ota": {
+      "term": "OTA update (over-the-air)",
+      "definition": "Over-the-air means updating an installed app through the internet, with no new build and no store review. It works because the app has two layers: the native binary, which only changes through a build and the store, and the JavaScript bundle with its assets, which the binary loads on launch. Example: you fix a bug on a screen, run eas update --channel production, and the user gets the fix the next time they open the app. To avoid shipping JS that calls a native module that does not exist, each build has a runtime version and only receives updates with the same version. The \"fingerprint\" policy computes that version automatically.",
+      "aliases": [
+        "OTA",
+        "over-the-air"
+      ]
     },
     "rota-dinamica": {
       "title": "Dynamic route with Expo Router",
