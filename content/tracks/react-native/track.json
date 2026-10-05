@@ -136,15 +136,19 @@
           "definition": "Serviços na nuvem da Expo. EAS Build compila e assina o app sem Xcode ou Android Studio local, com perfis no eas.json (development, preview, production). EAS Submit envia o binário às lojas. EAS Update publica atualizações over-the-air (OTA) do JavaScript e dos assets em canais, sem passar pela revisão da loja.",
           "relatedTerms": [
             "development-build",
-            "runtime-version"
+            "update-ota"
           ]
         },
         {
           "type": "concept",
-          "id": "runtime-version",
-          "level": "senior",
-          "term": "Runtime version",
-          "definition": "Identifica com qual camada nativa um bundle JavaScript é compatível. Um build só recebe updates OTA com a mesma runtime version, o que impede que um JS novo chame um módulo nativo que o binário não tem. A política \"fingerprint\" calcula um hash do que define o build nativo e muda a versão sozinha quando algo nativo muda.",
+          "id": "update-ota",
+          "level": "pleno",
+          "term": "Update OTA (over-the-air)",
+          "definition": "Over-the-air quer dizer \"pelo ar\": atualizar o app já instalado pela internet, sem build novo e sem revisão da loja. Funciona porque o app tem duas camadas: o binário nativo, que só muda com build e loja, e o bundle JavaScript com os assets, que o binário carrega ao abrir. Exemplo: você corrige um bug numa tela, roda eas update --channel production, e o usuário recebe a correção na próxima vez que abrir o app. Para não mandar JS que chame um módulo nativo inexistente, cada build tem uma runtime version, e só recebe updates com a mesma versão. A política \"fingerprint\" calcula essa versão sozinha.",
+          "aliases": [
+            "OTA",
+            "over-the-air"
+          ],
           "relatedTerms": [
             "eas"
           ]
@@ -294,7 +298,7 @@
           "question": "O que pode e o que não pode ser entregue por update OTA?",
           "answer": "Pode: JavaScript, estilos, textos e imagens, ou seja, tudo o que está no bundle. Não pode: código nativo, novas bibliotecas nativas, permissões ou mudanças no app.json que afetam o binário. Isso exige build novo e, em produção, envio à loja. A runtime version garante que um update só chegue aos binários compatíveis. Também é preciso respeitar as regras das lojas, que proíbem mudar o propósito do app por OTA, e ter rollback para um update ruim.",
           "relatedTerms": [
-            "runtime-version",
+            "update-ota",
             "eas"
           ]
         },
