@@ -292,7 +292,7 @@
           "id": "fixar-por-sha",
           "level": "senior",
           "question": "Por que fixar actions de terceiros pelo SHA do commit, e não pela tag?",
-          "answer": "Tags podem ser movidas: se o repositório da action for comprometido, a tag v1 passa a apontar para código malicioso, que rodará com acesso aos seus segredos e ao token. Um SHA completo é imutável. Combino isso com permissões mínimas no GITHUB_TOKEN, revisão das atualizações por um bot de dependências e preferência por actions oficiais ou verificadas.",
+          "answer": "Tags podem ser movidas: se o repositório da action for comprometido, a tag v1 passa a apontar para código malicioso, que rodará com acesso aos seus segredos e ao token. Um SHA completo é imutável. Combino isso com permissões mínimas no GITHUB_TOKEN, revisão das atualizações por um bot de dependências e preferência por actions oficiais ou verificadas. Os exemplos desta trilha usam tags para facilitar a leitura; em produção, o ideal é o SHA, com a tag num comentário.",
           "relatedTerms": [
             "action",
             "permissoes-do-token"

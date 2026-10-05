@@ -106,7 +106,7 @@
     },
     "fixar-por-sha": {
       "question": "Why pin third-party actions by commit SHA instead of by tag?",
-      "answer": "Tags can be moved: if the action's repository is compromised, the v1 tag can point to malicious code that will run with access to your secrets and token. A full SHA is immutable. I combine that with least-privilege GITHUB_TOKEN permissions, updates reviewed via a dependency bot, and a preference for official or verified actions."
+      "answer": "Tags can be moved: if the action's repository is compromised, the v1 tag can point to malicious code that will run with access to your secrets and token. A full SHA is immutable. I combine that with least-privilege GITHUB_TOKEN permissions, updates reviewed via a dependency bot, and a preference for official or verified actions. The examples in this track use tags for readability; in production, the SHA is better, with the tag in a comment."
     },
     "dois-deploys-juntos": {
       "question": "Two consecutive merges triggered two deploys at the same time. How do you prevent it?",
