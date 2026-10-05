@@ -1,8 +1,5 @@
-# catalog-navigation Specification
+## MODIFIED Requirements
 
-## Purpose
-Define como o usuário encontra as trilhas: a aba Trilhas lista as áreas, e cada área leva às suas trilhas, linguagens, frameworks e comparativos, conforme a posição declarada em cada trilha.
-## Requirements
 ### Requirement: Home por áreas
 A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud. Cada área SHALL aparecer como um card tocável com:
 - o nome da área;
@@ -73,28 +70,6 @@ Seções sem itens MUST NOT aparecer. As trilhas SHALL aparecer na ordem do cat�
 - **WHEN** a área tem trilhas diretas com `section: "aws"` registradas antes de outras com `section: "ci-cd"`
 - **THEN** a tela mostra a seção "CI/CD" e depois a seção "AWS", cada uma com as suas trilhas
 
-### Requirement: Tela da linguagem
-Tocar numa linguagem SHALL abrir a tela da linguagem, com o nome da linguagem como título e o nome da área acima dele. A tela SHALL mostrar, nesta ordem, as seções:
-1. **Linguagem pura**: as trilhas da linguagem nessa área sem framework;
-2. **Frameworks**: os frameworks da linguagem que têm pelo menos uma trilha nessa área, na ordem do cadastro, cada um com o nome e a quantidade de trilhas.
-
-Seções sem itens MUST NOT aparecer. Tocar num framework SHALL abrir a tela do framework. Uma linguagem sem trilhas na área SHALL mostrar "Linguagem não encontrada.".
-
-#### Scenario: Linguagem com as duas seções
-- **WHEN** o usuário abre Java na área Backend, que tem uma trilha de Java puro e uma de Spring Boot
-- **THEN** a tela mostra "Linguagem pura" com a trilha de Java e "Frameworks" com "Spring Boot" e "1 trilha"
-
-#### Scenario: Linguagem só com frameworks
-- **WHEN** a linguagem não tem trilha sem framework na área
-- **THEN** a seção "Linguagem pura" não aparece
-
-### Requirement: Tela do framework
-Tocar num framework SHALL abrir a tela do framework, com o nome do framework como título e "Área › Linguagem" acima dele, listando as trilhas desse framework na área, como cards de trilha. Um framework sem trilhas na área SHALL mostrar "Framework não encontrado.".
-
-#### Scenario: Trilhas do framework
-- **WHEN** o usuário abre Spring Boot em Backend › Java
-- **THEN** a tela lista as trilhas da área Backend que declaram o framework Spring Boot
-
 ### Requirement: Textos da navegação
 Os textos da navegação SHALL seguir o idioma do app:
 
@@ -120,4 +95,3 @@ Os nomes de linguagens e frameworks SHALL ser os do cadastro nos dois idiomas.
 #### Scenario: Área DevOps em inglês
 - **WHEN** o app está em inglês e a aba Trilhas é exibida
 - **THEN** o card da área DevOps e Cloud mostra "DevOps & Cloud"
-
