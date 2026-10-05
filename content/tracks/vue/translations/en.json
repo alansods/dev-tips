@@ -1,0 +1,120 @@
+{
+  "title": "Vue",
+  "description": "The progressive framework: reactivity, the Composition API, components, Vue Router and Pinia.",
+  "decks": {
+    "reatividade": {
+      "title": "Reactivity",
+      "description": "How Vue knows what to update."
+    },
+    "componentes": {
+      "title": "Components",
+      "description": "Props, events, slots and directives."
+    },
+    "router-e-pinia": {
+      "title": "Router and Pinia",
+      "description": "Navigation between pages and shared state."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Vue questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "reatividade": {
+      "term": "Reactivity",
+      "definition": "Vue's system that tracks which data each part of the screen reads and, when one of them changes, updates only what depends on it. It is built with JavaScript Proxies: reading a property registers the dependency and writing triggers the update."
+    },
+    "ref": {
+      "term": "ref",
+      "definition": "Creates a reactive value of any type, stored in .value. In the template, .value is unwrapped automatically. It is the recommended way for most state."
+    },
+    "reactive": {
+      "term": "reactive",
+      "definition": "Makes a whole object reactive, without .value. It only works with objects and loses reactivity if you destructure it or replace the whole object; that is why many teams prefer ref for everything."
+    },
+    "computed": {
+      "term": "computed",
+      "definition": "A value derived from other reactive data, recalculated only when a dependency changes and cached between reads. Use it for filters, totals and formatting, instead of methods called in the template."
+    },
+    "watch": {
+      "term": "watch and watchEffect",
+      "definition": "Run a side effect when data changes: fetching from the API, saving to storage. watch observes explicit sources and receives the new and old values; watchEffect runs immediately and observes whatever it reads. To compute values, prefer computed."
+    },
+    "contador-composition": {
+      "title": "Composition API with script setup",
+      "body": "ref holds the state, computed derives the double and the function changes .value. Everything declared in script setup is available in the template."
+    },
+    "sfc": {
+      "term": "Single File Component (SFC)",
+      "definition": "A .vue file that brings together a component's template, script and style. With <script setup>, the code is shorter and the compiler optimizes the template; <style scoped> applies the CSS only to that component."
+    },
+    "props-e-emits": {
+      "term": "Props and emits",
+      "definition": "Props bring data from parent to child (defineProps) and must not be changed by the child. To notify the parent, the child emits events (defineEmits), which the parent listens to with @event-name."
+    },
+    "diretivas": {
+      "term": "Directives",
+      "definition": "Special template attributes: v-if and v-show render conditionally (v-if removes from the DOM, v-show only hides with CSS), v-for repeats with :key, v-bind (:) binds attributes and v-on (@) listens to events."
+    },
+    "slots": {
+      "term": "Slots",
+      "definition": "Spaces in a component's template that the parent fills with its own content, like children in React. Named slots allow several spaces (header, footer) and scoped slots pass data from the child to the parent's content."
+    },
+    "v-model": {
+      "term": "v-model",
+      "definition": "Two-way binding between a field and a piece of data: the field shows the value and updates the data when edited. In your own components, defineModel creates the prop and the update event at once."
+    },
+    "props-emits-exemplo": {
+      "title": "Child with props and an event",
+      "body": "The child receives the product and emits \"remove\" with the id; the parent decides what to do."
+    },
+    "vue-router": {
+      "term": "Vue Router",
+      "definition": "The official routing library: maps URL paths to components, with params (/products/:id), nested routes and navigation without reloading the page. <RouterLink> creates links and <RouterView> shows the current page."
+    },
+    "navigation-guard": {
+      "term": "Navigation guard",
+      "definition": "A function that runs before a navigation and can allow, redirect or cancel it, such as requiring login for private areas. It can be global (router.beforeEach) or per route (beforeEnter)."
+    },
+    "pinia": {
+      "term": "Pinia",
+      "definition": "Vue's official global state library (the successor to Vuex). Each store has state, getters (like computed) and actions (functions that change state, including async ones), with DevTools and TypeScript support."
+    },
+    "store-to-refs": {
+      "term": "storeToRefs",
+      "definition": "When you destructure a Pinia store, the properties lose reactivity. storeToRefs turns state and getters into reactive refs so you can destructure safely; actions can be destructured directly."
+    },
+    "store-pinia": {
+      "title": "Setup-style store",
+      "body": "A Pinia store written as a composable: refs become state, computed becomes getters and functions become actions."
+    },
+    "guard-login": {
+      "title": "Login guard",
+      "body": "Routes marked with meta.requiresAuth redirect to login, keeping where the user wanted to go."
+    },
+    "ref-vs-reactive": {
+      "question": "When should you use ref and when reactive?",
+      "answer": "ref works for any type and survives being replaced entirely or passed around without losing reactivity, at the cost of .value in the script. reactive only accepts objects and loses reactivity when destructured or replaced. That is why I default to ref and use reactive only for objects that belong together, like a form."
+    },
+    "computed-vs-watch": {
+      "question": "What is the difference between computed and watch?",
+      "answer": "computed derives a value and is cached: it only recalculates when a dependency changes. watch runs a side effect when something changes, like calling an API or saving to storage. If the idea is \"compute X from Y\", it is computed; if it is \"when Y changes, do something\", it is watch."
+    },
+    "v-if-vs-v-show": {
+      "question": "What is the difference between v-if and v-show?",
+      "answer": "v-if creates and destroys the element according to the condition: the cost is in toggling, but nothing renders when it is false. v-show always renders and only toggles display: none: higher initial cost, cheap toggling. I use v-show for things that toggle often, like tabs and dropdowns, and v-if for the rest."
+    },
+    "como-funciona-reatividade": {
+      "question": "How does Vue 3 reactivity work?",
+      "answer": "State is wrapped in Proxies. When an effect (a component render, a computed, a watch) reads a property, Vue records that dependency; when the property is written, Vue schedules only the effects that depend on it, batching updates within a tick. That is why replacing a whole reactive object or destructuring it breaks the link."
+    },
+    "comunicacao-componentes": {
+      "question": "How do components communicate in Vue?",
+      "answer": "Parent to child, props; child to parent, events with emit; both ways on a field, v-model. For content, slots. For data that crosses many levels, provide/inject. For state shared between screens, a Pinia store."
+    },
+    "vue-vs-react": {
+      "question": "What are the main differences between Vue and React?",
+      "answer": "Vue has fine-grained reactivity: it tracks dependencies and updates only what is needed, with no manual memoization; React re-renders the component and its children and diffs the result. Vue uses compiled templates and has an official router and store; React uses JSX and leaves those choices to the ecosystem. Both are component-based and have SSR (Nuxt and Next.js)."
+    }
+  }
+}

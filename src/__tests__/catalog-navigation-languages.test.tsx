@@ -10,10 +10,9 @@ import LanguageScreen from '../app/area/[areaId]/[languageId]/index';
 import FrameworkScreen from '../app/area/[areaId]/[languageId]/[frameworkId]';
 import TrackScreen from '../app/track/[trackId]';
 
-// O repositório ainda não tem trilhas de linguagem nem de framework: este
-// teste acrescenta algumas ao catálogo real, usando o cadastro do repositório.
+// Catálogo controlado: as trilhas originais mais algumas de linguagem e
+// framework, usando o cadastro do repositório.
 jest.mock('../content/catalog', () => {
-  const actual = jest.requireActual('../content/catalog');
   const { trackSchema } = jest.requireActual('../content/schema');
   const { minimalTrack } = jest.requireActual('../content/__fixtures__/tracks');
   const make = (id: string, title: string, extra: object) => trackSchema.parse({ ...minimalTrack(), id, title, ...extra });
@@ -22,13 +21,7 @@ jest.mock('../content/catalog', () => {
     make('spring-di', 'Injeção no Spring', { areas: ['backend'], language: 'java', framework: 'spring' }),
     make('fastapi-basico', 'FastAPI básico', { areas: ['backend'], language: 'python', framework: 'fastapi' }),
   ];
-  const catalog = [...actual.catalog, ...extra];
-  return {
-    ...actual,
-    catalog,
-    getCatalog: () => catalog,
-    getTrack: (id: string) => catalog.find((t: { id: string }) => t.id === id),
-  };
+  return jest.requireActual('../test-catalog').originalCatalogMock(extra);
 });
 
 const APP = {

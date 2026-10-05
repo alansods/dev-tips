@@ -1,0 +1,120 @@
+{
+  "title": "JavaScript essentials",
+  "description": "The language basics: types, variables, functions, scope, objects and prototypes.",
+  "decks": {
+    "tipos-e-variaveis": {
+      "title": "Types and variables",
+      "description": "The language types and how to declare variables."
+    },
+    "funcoes-e-escopo": {
+      "title": "Functions and scope",
+      "description": "Where variables live, closures and the value of this."
+    },
+    "objetos-e-prototipos": {
+      "title": "Objects and prototypes",
+      "description": "References, copies, classes, inheritance and modules."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "JavaScript questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "tipos-primitivos": {
+      "term": "Primitive types",
+      "definition": "The simplest values in the language: string, number, bigint, boolean, undefined, null and symbol. They are immutable and compared by value. Everything else (objects, arrays, functions) is an object and compared by reference."
+    },
+    "let-const-var": {
+      "term": "let, const and var",
+      "definition": "Ways to declare variables. let and const are block-scoped; const prevents reassignment (but the object it points to can still change). var is function-scoped and is hoisted with the value undefined; in modern code, prefer const and use let only when you need to reassign."
+    },
+    "coercao": {
+      "term": "Type coercion",
+      "definition": "Automatic conversion from one type to another that JavaScript does in mixed operations. \"5\" + 1 becomes \"51\" (concatenation), \"5\" - 1 becomes 4 (converts to number) and if (\"\") is false. Falsy values: false, 0, -0, 0n, \"\", null, undefined and NaN."
+    },
+    "igualdade-estrita": {
+      "term": "Strict equality (===)",
+      "definition": "Compares value and type, with no coercion: 1 === \"1\" is false. The == operator converts types before comparing (1 == \"1\" is true), which leads to surprises. Always use ===; the common exception is x == null, which catches null and undefined together."
+    },
+    "typeof-armadilhas": {
+      "title": "typeof and its pitfalls",
+      "body": "typeof tells a value's type, but it has historical gotchas: null shows up as \"object\", and so do arrays. Use Array.isArray for arrays; for null, compare directly."
+    },
+    "desestruturacao-e-spread": {
+      "title": "Destructuring and spread",
+      "body": "Destructuring pulls values out of objects and arrays straight into variables, with defaults. Spread (...) copies properties or items into a new object or array without changing the original."
+    },
+    "escopo-lexico": {
+      "term": "Lexical scope",
+      "definition": "The rule that defines where a variable is visible: by where it was written in the code, not by where the function is called. A function sees the variables of the block it was declared in and of every enclosing block."
+    },
+    "hoisting": {
+      "term": "Hoisting",
+      "definition": "The behavior where declarations are registered before the code runs. Functions declared with function can be called before the line where they appear; var exists as undefined; let and const exist but stay in the \"temporal dead zone\" (TDZ) and throw a ReferenceError if used before the declaration."
+    },
+    "closure": {
+      "term": "Closure",
+      "definition": "A function that remembers the variables of the scope where it was created, even after that scope has finished. It is the basis of private state, function factories, callbacks and hooks like React's."
+    },
+    "this": {
+      "term": "this",
+      "definition": "A reference to the \"owner\" of the call, decided at call time: in obj.method(), this is obj; in a plain function, it is undefined (strict mode); with new, it is the new object; call, apply and bind choose this. Arrow functions have no this of their own: they use the outer scope's."
+    },
+    "closure-contador": {
+      "title": "Closure with private state",
+      "body": "The count variable exists only inside the closure: nobody outside can change it without going through the returned functions."
+    },
+    "arrow-vs-function": {
+      "title": "Arrow functions and this",
+      "body": "Inside setTimeout, the regular function loses this (it becomes undefined). The arrow function uses the this of the surrounding method, so it works."
+    },
+    "referencia-vs-valor": {
+      "term": "Reference and value",
+      "definition": "Primitives are copied by value; objects and arrays are accessed by reference. Assigning an object to another variable does not copy it: both point to the same object, and changing it through one changes it through the other."
+    },
+    "prototipo": {
+      "term": "Prototype",
+      "definition": "The object another object inherits properties from. When you read a property the object does not have, JavaScript looks it up in the prototype, then in the prototype's prototype, and so on: this is the prototype chain."
+    },
+    "classe": {
+      "term": "Class",
+      "definition": "Syntax to create objects with a constructor, methods, inheritance (extends/super) and private fields (#field). Under the hood it is still prototype inheritance: methods live on the class prototype."
+    },
+    "modulos-es": {
+      "term": "ES modules",
+      "definition": "The language's standard module system: each file has its own scope, and what it exposes leaves with export and enters another file with import. Imports are static (analyzed before running), which enables tree shaking."
+    },
+    "copia-rasa-profunda": {
+      "title": "Shallow and deep copy",
+      "body": "Spread copies only the first level: nested objects stay shared. structuredClone makes a deep copy (it does not copy functions)."
+    },
+    "heranca-prototipos": {
+      "title": "class is sugar over prototypes",
+      "body": "Both snippets create the same object shape. The method lives on the prototype, shared by every instance, not copied into each one."
+    },
+    "igual-duplo-vs-triplo": {
+      "question": "What is the difference between == and ===?",
+      "answer": "=== compares value and type without converting anything. == converts types before comparing (coercion), which is why 0 == \"\" and null == undefined are true. In practice I always use ===, and at most x == null to check for null and undefined at once."
+    },
+    "var-let-const": {
+      "question": "When should you use var, let and const?",
+      "answer": "const by default, let when the variable needs to be reassigned, and never var in new code. var is function-scoped and hoisted as undefined, which causes bugs in loops and blocks; let and const are block-scoped and throw if used before the declaration."
+    },
+    "o-que-e-closure": {
+      "question": "What is a closure? Give a real use.",
+      "answer": "It is a function that keeps access to the variables of the scope it was created in, even after that scope has ended. Real uses: private state (a counter or cache only the function touches), configured functions such as debounce, event callbacks that remember an id, and React hooks, which rely on closures."
+    },
+    "como-this-e-definido": {
+      "question": "How is the value of this decided?",
+      "answer": "By how the function is called: obj.method() uses obj; a plain function has this undefined in strict mode; new creates a new object as this; call, apply and bind set it explicitly. Arrow functions are the exception: they have no this of their own and use the one from where they were written, which makes them good for callbacks."
+    },
+    "copia-objeto": {
+      "question": "How do you copy an object without changing the original?",
+      "answer": "For one level, spread ({ ...obj }) or Object.assign. If the object has nested objects, those copies are shallow: the nested part stays shared. For a deep copy, structuredClone(obj), which handles Date, Map and circular references; JSON.parse(JSON.stringify()) loses dates, undefined and functions."
+    },
+    "heranca-prototipal": {
+      "question": "How does inheritance work in JavaScript, given there are classes?",
+      "answer": "Through prototypes. Each object points to a prototype, and reading a property walks up the chain until it finds it or reaches null. class and extends are syntactic sugar: methods live on Class.prototype and extends links the child's prototype to the parent's. That is why you can add methods at runtime and why instanceof checks the chain, not a \"type\"."
+    }
+  }
+}

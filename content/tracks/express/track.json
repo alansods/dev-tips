@@ -1,0 +1,325 @@
+{
+  "id": "express",
+  "title": "Express",
+  "description": "O framework minimalista de APIs no Node.js: rotas, middlewares, requisição, resposta e erros.",
+  "areas": [
+    "backend"
+  ],
+  "language": "javascript",
+  "framework": "express",
+  "decks": [
+    {
+      "id": "rotas-e-middlewares",
+      "title": "Rotas e middlewares",
+      "description": "Como uma requisição passa pela aplicação.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rota",
+          "level": "junior",
+          "term": "Rota",
+          "definition": "Ligação entre um método HTTP, um caminho e uma função: app.get(\"/products/:id\", handler). O Express testa as rotas na ordem em que foram registradas e usa a primeira que casa.",
+          "relatedTerms": [
+            "middleware",
+            "router"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "middleware",
+          "level": "junior",
+          "term": "Middleware",
+          "definition": "Função (req, res, next) que roda no caminho da requisição: pode ler e alterar req e res, encerrar a resposta ou chamar next() para passar adiante. Logs, autenticação, CORS e leitura de JSON são middlewares. A ordem de registro é a ordem de execução.",
+          "relatedTerms": [
+            "rota",
+            "next"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "next",
+          "level": "pleno",
+          "term": "next()",
+          "definition": "Função que passa a requisição para o próximo middleware ou rota. Esquecer de chamar next() (ou de responder) deixa a requisição pendurada até o timeout. next(erro) pula direto para o middleware de erro.",
+          "relatedTerms": [
+            "middleware"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "router",
+          "level": "pleno",
+          "term": "Router",
+          "definition": "Mini-aplicação com rotas e middlewares próprios (express.Router()), montada num prefixo com app.use(\"/products\", router). Organiza a API por recurso, cada um no seu arquivo.",
+          "relatedTerms": [
+            "rota",
+            "middleware"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "app-basico",
+          "level": "junior",
+          "title": "App com JSON e rotas",
+          "body": "express.json() é o middleware que lê o corpo JSON para req.body. Sem ele, req.body fica undefined.",
+          "snippet": {
+            "file": "server.js",
+            "language": "js",
+            "code": "import express from \"express\";\n\nconst app = express();\napp.use(express.json());\n\napp.get(\"/health\", (req, res) => res.json({ ok: true }));\napp.post(\"/products\", (req, res) => {\n  const product = { id: Date.now(), ...req.body };\n  res.status(201).json(product);\n});\n\napp.listen(3000);"
+          },
+          "relatedTerms": [
+            "rota",
+            "middleware"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "middleware-auth",
+          "level": "pleno",
+          "title": "Middleware de autenticação",
+          "body": "O middleware valida o token e guarda o usuário em req.user; só as rotas que o recebem ficam protegidas.",
+          "snippet": {
+            "file": "auth.js",
+            "language": "js",
+            "code": "function requireAuth(req, res, next) {\n  const token = req.headers.authorization?.replace(\"Bearer \", \"\");\n  const user = token && verifyToken(token);\n  if (!user) return res.status(401).json({ error: \"unauthorized\" });\n  req.user = user;\n  next();\n}\n\nrouter.get(\"/me\", requireAuth, (req, res) => res.json(req.user));"
+          },
+          "relatedTerms": [
+            "middleware",
+            "next"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "requisicao-e-resposta",
+      "title": "Requisição e resposta",
+      "description": "Ler o que chega e responder do jeito certo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "req",
+          "level": "junior",
+          "term": "Objeto req",
+          "definition": "Representa a requisição: req.params traz os segmentos da rota (:id), req.query a query string (?page=2), req.body o corpo já lido por um middleware e req.headers os cabeçalhos. Tudo chega como string ou como o cliente mandou, por isso precisa de validação.",
+          "relatedTerms": [
+            "res",
+            "validacao-entrada"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "res",
+          "level": "junior",
+          "term": "Objeto res",
+          "definition": "Monta a resposta: res.status(201) define o código, res.json() envia JSON, res.send() envia texto, res.sendStatus(204) envia só o status e res.set() define cabeçalhos. Cada requisição deve receber exatamente uma resposta.",
+          "relatedTerms": [
+            "req"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "validacao-entrada",
+          "level": "pleno",
+          "term": "Validação de entrada",
+          "definition": "Checar o formato de params, query e body antes de usar, respondendo 400 com os erros quando não bate. O Express não valida nada; bibliotecas como Zod ou Joi definem o esquema e convertem tipos (a query \"2\" vira o número 2).",
+          "relatedTerms": [
+            "req"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "headers-already-sent",
+          "level": "pleno",
+          "term": "Cannot set headers after they are sent",
+          "definition": "Erro clássico de responder duas vezes à mesma requisição, normalmente por esquecer um return depois de res.json() dentro de um if. Toda resposta antecipada deve terminar a função: return res.status(404).json(...).",
+          "relatedTerms": [
+            "res"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "params-e-query",
+          "level": "junior",
+          "title": "params, query e 404",
+          "body": "O id vem de params e a paginação de query, com padrões e conversão para número. O return evita responder duas vezes.",
+          "snippet": {
+            "file": "products.routes.js",
+            "language": "js",
+            "code": "router.get(\"/products/:id\", async (req, res) => {\n  const product = await repo.findById(Number(req.params.id));\n  if (!product) return res.status(404).json({ error: \"not_found\" });\n  res.json(product);\n});\n\nrouter.get(\"/products\", async (req, res) => {\n  const page = Number(req.query.page ?? 1);\n  const limit = Math.min(Number(req.query.limit ?? 20), 100);\n  res.json(await repo.list({ page, limit }));\n});"
+          },
+          "relatedTerms": [
+            "req",
+            "headers-already-sent"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "validar-com-zod",
+          "level": "pleno",
+          "title": "Validar o corpo com Zod",
+          "body": "safeParse devolve sucesso ou os erros sem lançar exceção; o handler responde 400 e só usa os dados validados.",
+          "snippet": {
+            "file": "products.routes.js",
+            "language": "js",
+            "code": "import { z } from \"zod\";\n\nconst productSchema = z.object({\n  name: z.string().min(1),\n  price: z.number().positive(),\n});\n\nrouter.post(\"/products\", async (req, res) => {\n  const parsed = productSchema.safeParse(req.body);\n  if (!parsed.success) return res.status(400).json(parsed.error.flatten());\n  res.status(201).json(await repo.create(parsed.data));\n});"
+          },
+          "relatedTerms": [
+            "validacao-entrada"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "erros-e-organizacao",
+      "title": "Erros e organização",
+      "description": "Tratar erros num lugar só e organizar o projeto.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "middleware-de-erro",
+          "level": "pleno",
+          "term": "Middleware de erro",
+          "definition": "Middleware com quatro parâmetros (err, req, res, next), registrado depois de todas as rotas. Recebe os erros lançados nas rotas ou passados com next(erro) e monta uma resposta padronizada, sem vazar stack trace para o cliente.",
+          "relatedTerms": [
+            "erros-async",
+            "camadas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "erros-async",
+          "level": "senior",
+          "term": "Erros em handlers assíncronos",
+          "definition": "No Express 4, um erro dentro de uma função async não chega ao middleware de erro: vira uma rejeição não tratada e a requisição fica sem resposta. Era preciso try/catch com next(erro) ou um wrapper. O Express 5 encaminha Promises rejeitadas automaticamente.",
+          "relatedTerms": [
+            "middleware-de-erro"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "camadas",
+          "level": "pleno",
+          "term": "Camadas (routes, service, repository)",
+          "definition": "Separação comum em APIs Express: as rotas cuidam de HTTP (ler req, responder), o service guarda a regra de negócio e o repository acessa o banco. Deixa cada parte testável sozinha e evita regra de negócio presa ao Express.",
+          "relatedTerms": [
+            "middleware-de-erro"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "helmet-cors",
+          "level": "pleno",
+          "term": "Middlewares de segurança",
+          "definition": "O Express vem quase sem proteções. helmet define cabeçalhos de segurança, cors controla quais origens podem chamar a API, express-rate-limit limita requisições por cliente e limitar o tamanho do corpo (express.json({ limit })) evita payloads gigantes.",
+          "relatedTerms": [
+            "camadas"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "error-handler",
+          "level": "pleno",
+          "title": "Tratador de erros central",
+          "body": "Erros conhecidos viram o status certo; o resto vira 500 genérico, com o detalhe só no log.",
+          "snippet": {
+            "file": "server.js",
+            "language": "js",
+            "code": "class NotFoundError extends Error {\n  status = 404;\n}\n\n// depois de todas as rotas\napp.use((err, req, res, next) => {\n  if (err.status) return res.status(err.status).json({ error: err.message });\n  console.error(err);\n  res.status(500).json({ error: \"internal_error\" });\n});"
+          },
+          "relatedTerms": [
+            "middleware-de-erro"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "async-handler",
+          "level": "senior",
+          "title": "Wrapper para handlers async (Express 4)",
+          "body": "O wrapper pega a Promise rejeitada e a entrega ao next, levando o erro ao tratador central. No Express 5 isso já é automático.",
+          "snippet": {
+            "file": "products.routes.js",
+            "language": "js",
+            "code": "const asyncHandler = (fn) => (req, res, next) =>\n  Promise.resolve(fn(req, res, next)).catch(next);\n\nrouter.get(\n  \"/products/:id\",\n  asyncHandler(async (req, res) => {\n    const product = await service.get(Number(req.params.id)); // pode lançar\n    res.json(product);\n  }),\n);"
+          },
+          "relatedTerms": [
+            "erros-async",
+            "middleware-de-erro"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Express que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "o-que-e-middleware",
+          "level": "junior",
+          "question": "O que é um middleware no Express?",
+          "answer": "Uma função (req, res, next) que fica no caminho entre a requisição e a resposta. Pode ler ou alterar req e res, responder e encerrar, ou chamar next() para seguir. Eles rodam na ordem em que foram registrados, por isso express.json() e autenticação vêm antes das rotas e o tratador de erros vem por último.",
+          "relatedTerms": [
+            "middleware",
+            "next"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "req-body-undefined",
+          "level": "junior",
+          "question": "Por que req.body vem undefined?",
+          "answer": "Porque o Express não lê o corpo sozinho: falta app.use(express.json()) (ou express.urlencoded para formulários) antes das rotas. Também acontece se o cliente não manda Content-Type: application/json, já que o middleware só lê o que reconhece.",
+          "relatedTerms": [
+            "req",
+            "middleware"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "erro-async-express",
+          "level": "senior",
+          "question": "Como tratar erros de handlers async no Express?",
+          "answer": "No Express 4, a Promise rejeitada não chega ao tratador de erros: uso try/catch com next(erro) ou um wrapper que faz .catch(next). No Express 5, rejeições são encaminhadas automaticamente. Em ambos, tenho um middleware de erro central que traduz erros de domínio em status HTTP e não expõe detalhes internos.",
+          "relatedTerms": [
+            "erros-async",
+            "middleware-de-erro"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "headers-sent",
+          "level": "pleno",
+          "question": "O que causa \"Cannot set headers after they are sent\"?",
+          "answer": "Responder duas vezes à mesma requisição. O caso típico é um if que responde 404 sem return, e o código continua até o res.json do fim. Também acontece chamando next() depois de responder. A correção é sempre usar return res... nas respostas antecipadas.",
+          "relatedTerms": [
+            "headers-already-sent",
+            "res"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "organizar-api-express",
+          "level": "pleno",
+          "question": "Como você organiza uma API Express que está crescendo?",
+          "answer": "Por recurso: cada um com seu Router, service e repository. As rotas só lidam com HTTP e validação, o service tem as regras e o repository o banco, recebido por parâmetro para facilitar testes. Middlewares transversais (log, auth, erros) ficam num lugar só, e a configuração vem de variáveis de ambiente validadas na inicialização.",
+          "relatedTerms": [
+            "camadas",
+            "router"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "seguranca-express",
+          "level": "pleno",
+          "question": "Que cuidados de segurança uma API Express precisa?",
+          "answer": "helmet para cabeçalhos, cors liberando só as origens conhecidas, rate limit nas rotas sensíveis (login), limite de tamanho do corpo, validação de toda entrada, queries parametrizadas contra SQL injection, autenticação e autorização em middleware, e respostas de erro sem stack trace. Também desligo o cabeçalho X-Powered-By (o helmet já faz).",
+          "relatedTerms": [
+            "helmet-cors",
+            "validacao-entrada"
+          ]
+        }
+      ]
+    }
+  ]
+}

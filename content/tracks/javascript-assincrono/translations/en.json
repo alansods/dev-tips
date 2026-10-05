@@ -1,0 +1,120 @@
+{
+  "title": "Asynchronous JavaScript",
+  "description": "How JavaScript does many things without blocking: the event loop, Promises and async/await.",
+  "decks": {
+    "event-loop": {
+      "title": "Event loop",
+      "description": "A single thread and the task queue."
+    },
+    "promises": {
+      "title": "Promises",
+      "description": "Values that arrive later and how to combine them."
+    },
+    "async-await": {
+      "title": "async/await",
+      "description": "Asynchronous code that reads like synchronous code, and its errors."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Asynchronous JavaScript questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "single-thread": {
+      "term": "Single thread",
+      "definition": "JavaScript runs your code on a single thread: one thing at a time. Slow operations (network, timers, disk) are handed to the environment (browser or Node.js), and the result comes back later as a callback, without blocking execution."
+    },
+    "call-stack": {
+      "term": "Call stack",
+      "definition": "The stack of running functions. Each call pushes a frame and each return pops one. While the stack is not empty, no callback from the queue runs; a very slow function \"freezes\" the page or the server."
+    },
+    "event-loop": {
+      "term": "Event loop",
+      "definition": "The cycle that, when the call stack is empty, runs all pending microtasks and then takes the next task (macrotask) from the queue: a timer, a click event, a network response. It is what allows concurrency with a single thread."
+    },
+    "microtask": {
+      "term": "Microtask and macrotask",
+      "definition": "Two queues with different priorities. Microtasks (Promise callbacks, queueMicrotask) run as soon as the stack is empty, all at once, before any macrotask (setTimeout, events, I/O). That is why a then runs before a 0 ms setTimeout."
+    },
+    "ordem-de-execucao": {
+      "title": "Execution order",
+      "body": "Synchronous code runs first; then the microtasks (the then); finally the macrotask (the setTimeout), even with 0 ms."
+    },
+    "bloqueio-da-thread": {
+      "title": "Code that blocks the thread",
+      "body": "A heavy synchronous loop prevents the event loop from running: the timer only fires after the loop ends. Heavy work should go to a Web Worker (browser) or a worker thread (Node.js)."
+    },
+    "callback": {
+      "term": "Callback",
+      "definition": "A function passed to another one, to be called when something finishes. It was the first way to handle asynchronous code; nesting many callbacks leads to \"callback hell\", hard to read and to handle errors in."
+    },
+    "promise": {
+      "term": "Promise",
+      "definition": "An object that represents a future result. It starts pending and ends fulfilled, with a value, or rejected, with an error. then receives the value, catch receives the error and finally runs in both cases."
+    },
+    "encadeamento": {
+      "term": "Promise chaining",
+      "definition": "Each then returns a new Promise with the value the callback returned, allowing a flat sequence of steps. If the callback returns another Promise, the chain waits for it. A single catch at the end handles errors from any step."
+    },
+    "combinadores": {
+      "term": "Promise.all, allSettled, race and any",
+      "definition": "Ways to wait for several Promises: all resolves with every value and rejects on the first error; allSettled waits for all and reports each result; race settles with the first one to settle (success or error); any resolves with the first one that succeeds."
+    },
+    "callback-para-promise": {
+      "title": "From callback to Promise",
+      "body": "Wrapping a callback API in new Promise turns the result into something you can chain and use with await."
+    },
+    "promise-all": {
+      "title": "Parallel requests",
+      "body": "Promise.all fires the three fetches at the same time and waits for all of them. If one fails, catch receives the first error; use allSettled when you want each one's result."
+    },
+    "async-await": {
+      "term": "async/await",
+      "definition": "Syntax on top of Promises. An async function always returns a Promise; inside it, await pauses the function until the Promise settles and gives you the value, without blocking the thread. The code reads linearly, as if it were synchronous."
+    },
+    "tratamento-de-erro": {
+      "term": "Async error handling",
+      "definition": "With await, a rejected Promise becomes an exception and is caught with try/catch. A rejected Promise with no catch causes an \"unhandled rejection\": in Node.js this crashes the process by default. Every await needs someone to handle the error, there or in the caller."
+    },
+    "await-sequencial": {
+      "term": "Sequential and parallel await",
+      "definition": "Two awaits in a row wait for one to finish before starting the other. If the operations do not depend on each other, start both and wait together with Promise.all: total time drops to the slowest one."
+    },
+    "abort-controller": {
+      "term": "AbortController",
+      "definition": "The standard way to cancel async operations such as fetch: you create a controller, pass its signal to the operation and call abort() when you no longer need the result (e.g. the user left the screen or typed another search). AbortSignal.timeout(ms) creates a time limit."
+    },
+    "try-catch-await": {
+      "title": "try/catch with await",
+      "body": "fetch only rejects on network failure; a 404 or 500 arrives as a normal response. That is why you must check response.ok and throw the error."
+    },
+    "await-em-loop": {
+      "title": "await inside loops",
+      "body": "forEach does not wait for async callbacks: the loop ends before the operations. Use for...of for a sequence or Promise.all with map for parallel work (careful not to fire thousands of requests at once)."
+    },
+    "como-js-e-assincrono": {
+      "question": "If JavaScript has a single thread, how does it do things at the same time?",
+      "answer": "It does not run two functions at the same time; it delegates. Network, timers and disk are handled by the environment (the browser, or libuv in Node.js), which works in parallel. When they finish, the callback goes into a queue, and the event loop runs it when the call stack is empty. It is concurrency, not parallelism."
+    },
+    "promise-vs-callback": {
+      "question": "Why Promises instead of callbacks?",
+      "answer": "Promises keep the flow flat (chaining instead of nesting), centralize error handling in one catch and can be combined (Promise.all, race). They are also the basis of async/await. With callbacks, each level has to handle errors by hand and the code turns into \"callback hell\"."
+    },
+    "ordem-then-timeout": {
+      "question": "What runs first: a then or a 0 ms setTimeout?",
+      "answer": "The then. Promise callbacks are microtasks, and the event loop drains the whole microtask queue as soon as the call stack is empty, before taking the next macrotask such as setTimeout. That is why an endless chain of microtasks can block rendering."
+    },
+    "promise-all-vs-allsettled": {
+      "question": "What is the difference between Promise.all and Promise.allSettled?",
+      "answer": "all rejects as soon as one Promise fails and returns only the values when all succeed: good when everything is required. allSettled always waits for all and returns { status, value | reason } for each: good when each result stands alone, like loading independent widgets on a dashboard."
+    },
+    "await-paralelo": {
+      "question": "How do you speed up a function with several awaits?",
+      "answer": "Look at which awaits depend on the previous result. The independent ones can start together: I create the Promises first and wait with Promise.all. With many items, I limit concurrency (in batches or with a queue) so as not to overload the API or the database."
+    },
+    "cancelar-requisicao": {
+      "question": "How do you stop an old response from overwriting a new one in a search?",
+      "answer": "It is a race condition: the \"ab\" search can respond after the \"abc\" one. I cancel the previous request with AbortController on each new keystroke (and ignore the AbortError), or keep the id of the latest request and discard older responses. Together with debounce, this also cuts API calls."
+    }
+  }
+}

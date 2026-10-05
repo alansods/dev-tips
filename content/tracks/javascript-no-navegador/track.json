@@ -1,0 +1,320 @@
+{
+  "id": "javascript-no-navegador",
+  "title": "JavaScript no navegador",
+  "description": "O JavaScript que roda na página: DOM, eventos, requisições, armazenamento e renderização.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "javascript",
+  "decks": [
+    {
+      "id": "dom",
+      "title": "DOM",
+      "description": "A página como árvore de objetos e como alterá-la.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "dom",
+          "level": "junior",
+          "term": "DOM",
+          "definition": "Document Object Model: a representação da página HTML como uma árvore de objetos (nós) que o JavaScript pode ler e alterar. Mudar o DOM muda o que aparece na tela.",
+          "relatedTerms": [
+            "seletores",
+            "reflow"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "seletores",
+          "level": "junior",
+          "term": "Seletores",
+          "definition": "Formas de achar elementos no DOM. querySelector devolve o primeiro que casa com um seletor CSS e querySelectorAll devolve todos (uma NodeList estática); getElementById busca pelo id.",
+          "relatedTerms": [
+            "dom"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "reflow",
+          "level": "senior",
+          "term": "Reflow e repaint",
+          "definition": "Etapas que o navegador refaz quando a página muda. Reflow (layout) recalcula tamanho e posição dos elementos e é caro; repaint só redesenha cores e bordas. Ler medidas (offsetHeight) logo depois de escrever estilos força um reflow síncrono: alternar leitura e escrita em laço causa \"layout thrashing\".",
+          "relatedTerms": [
+            "dom"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "xss-innerhtml",
+          "level": "pleno",
+          "term": "innerHTML e textContent",
+          "definition": "innerHTML interpreta a string como HTML; textContent a trata como texto puro. Colocar dado do usuário em innerHTML abre brecha para XSS (um <img onerror=...> executa código). Para texto, use textContent.",
+          "relatedTerms": [
+            "dom"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "criar-elementos",
+          "level": "junior",
+          "title": "Criar e inserir elementos",
+          "body": "createElement cria o nó, textContent põe o texto com segurança e append o coloca na página.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const list = document.querySelector(\"#todos\");\n\nfunction addTodo(text) {\n  const item = document.createElement(\"li\");\n  item.textContent = text; // seguro contra XSS\n  item.classList.add(\"todo\");\n  list.append(item);\n}"
+          },
+          "relatedTerms": [
+            "seletores",
+            "xss-innerhtml"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "fragment",
+          "level": "pleno",
+          "title": "Inserir muitos itens de uma vez",
+          "body": "Montar os itens num DocumentFragment e inserir uma vez só evita mil alterações separadas no DOM.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const fragment = document.createDocumentFragment();\nfor (const product of products) {\n  const li = document.createElement(\"li\");\n  li.textContent = product.name;\n  fragment.append(li);\n}\nlist.append(fragment); // uma única inserção"
+          },
+          "relatedTerms": [
+            "reflow",
+            "dom"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eventos",
+      "title": "Eventos",
+      "description": "Como a página reage a cliques, teclas e formulários.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "event-listener",
+          "level": "junior",
+          "term": "Event listener",
+          "definition": "Função registrada com addEventListener para ser chamada quando um evento acontece num elemento (click, input, submit, keydown). Recebe o objeto do evento, com o alvo (target) e detalhes como a tecla.",
+          "relatedTerms": [
+            "propagacao",
+            "prevent-default"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "propagacao",
+          "level": "pleno",
+          "term": "Propagação (bubbling)",
+          "definition": "Um evento passa por três fases: captura (da raiz até o alvo), o alvo e bubbling (do alvo de volta até a raiz). Por padrão os listeners rodam no bubbling, por isso um clique num botão também chega à div que o contém. stopPropagation interrompe o caminho.",
+          "relatedTerms": [
+            "event-listener",
+            "delegacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "delegacao",
+          "level": "pleno",
+          "term": "Delegação de eventos",
+          "definition": "Técnica de colocar um único listener no elemento pai em vez de um em cada filho, usando o bubbling e event.target para saber quem foi clicado. Funciona também para itens adicionados depois e economiza memória em listas grandes.",
+          "relatedTerms": [
+            "propagacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "prevent-default",
+          "level": "junior",
+          "term": "preventDefault",
+          "definition": "Cancela a ação padrão do navegador para aquele evento: enviar o formulário recarregando a página, seguir um link, marcar um checkbox. Não para a propagação; para isso existe stopPropagation.",
+          "relatedTerms": [
+            "event-listener",
+            "propagacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "delegacao-exemplo",
+          "level": "pleno",
+          "title": "Delegação na prática",
+          "body": "Um listener na lista atende todos os botões de remover, inclusive os criados depois. closest sobe do elemento clicado até o botão.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "list.addEventListener(\"click\", (event) => {\n  const button = event.target.closest(\"button[data-remove]\");\n  if (!button) return;\n  button.closest(\"li\").remove();\n});"
+          },
+          "relatedTerms": [
+            "delegacao",
+            "event-listener"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "debounce",
+          "level": "senior",
+          "title": "Debounce",
+          "body": "Atrasa a execução até o usuário parar de disparar o evento por um tempo. Em busca enquanto digita, evita uma requisição por tecla. Usa closure para guardar o timer.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "function debounce(fn, ms) {\n  let timer;\n  return (...args) => {\n    clearTimeout(timer);\n    timer = setTimeout(() => fn(...args), ms);\n  };\n}\n\ninput.addEventListener(\"input\", debounce((e) => search(e.target.value), 300));"
+          },
+          "relatedTerms": [
+            "event-listener"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rede-e-armazenamento",
+      "title": "Rede e armazenamento",
+      "description": "Buscar dados, guardar no navegador e carregar a página.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "fetch",
+          "level": "junior",
+          "term": "fetch",
+          "definition": "API do navegador para fazer requisições HTTP. Devolve uma Promise com a resposta; o corpo é lido à parte (response.json(), text()). Só rejeita em falha de rede: status 404 ou 500 precisam ser checados com response.ok.",
+          "relatedTerms": [
+            "web-storage"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "web-storage",
+          "level": "junior",
+          "term": "localStorage e sessionStorage",
+          "definition": "Armazenamento chave-valor de strings no navegador, por origem. localStorage persiste até ser apagado; sessionStorage dura enquanto a aba estiver aberta. É síncrono e acessível a qualquer script da página, então não serve para segredos.",
+          "relatedTerms": [
+            "indexeddb",
+            "fetch"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "indexeddb",
+          "level": "pleno",
+          "term": "IndexedDB",
+          "definition": "Banco de dados do navegador para volumes maiores e dados estruturados (objetos, arquivos), com índices e transações. É assíncrono, ao contrário do localStorage. Usado em apps offline, geralmente por bibliotecas como idb ou Dexie.",
+          "relatedTerms": [
+            "web-storage"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "caminho-critico",
+          "level": "senior",
+          "term": "Caminho crítico de renderização",
+          "definition": "Os passos até o primeiro desenho da página: baixar o HTML, montar o DOM e o CSSOM, combinar na render tree, calcular o layout e pintar. Scripts no <head> sem defer ou async bloqueiam a montagem do DOM; CSS bloqueia a pintura.",
+          "relatedTerms": [
+            "fetch"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "fetch-post",
+          "level": "junior",
+          "title": "Enviar JSON com fetch",
+          "body": "Para enviar dados, informe o método, o cabeçalho Content-Type e o corpo em string com JSON.stringify.",
+          "snippet": {
+            "file": "exemplo.js",
+            "language": "js",
+            "code": "const response = await fetch(\"/api/products\", {\n  method: \"POST\",\n  headers: { \"Content-Type\": \"application/json\" },\n  body: JSON.stringify({ name: \"Caneca\", price: 29.9 }),\n});\nif (!response.ok) throw new Error(`HTTP ${response.status}`);\nconst created = await response.json();"
+          },
+          "relatedTerms": [
+            "fetch"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "defer-async",
+          "level": "pleno",
+          "title": "defer e async em scripts",
+          "body": "defer baixa em paralelo e executa na ordem depois de o HTML ser lido: é o padrão para o script do app. async executa assim que baixa, sem ordem: bom para scripts independentes, como analytics. type=\"module\" já se comporta como defer.",
+          "snippet": {
+            "file": "index.html",
+            "language": "text",
+            "code": "<head>\n  <script src=\"/app.js\" defer></script>\n  <script src=\"https://analytics.example.com/a.js\" async></script>\n  <script type=\"module\" src=\"/main.js\"></script>\n</head>"
+          },
+          "relatedTerms": [
+            "caminho-critico"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre JavaScript no navegador que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "bubbling-e-captura",
+          "level": "pleno",
+          "question": "O que é event bubbling?",
+          "answer": "É a fase em que o evento, depois de chegar ao elemento alvo, sobe pelos ancestrais até o document, disparando os listeners de cada um. Antes dela existe a captura, de cima para baixo. O bubbling é o que permite delegação de eventos; stopPropagation interrompe a subida.",
+          "relatedTerms": [
+            "propagacao",
+            "delegacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "local-vs-session",
+          "level": "junior",
+          "question": "Qual a diferença entre localStorage, sessionStorage e cookie?",
+          "answer": "localStorage persiste sem prazo; sessionStorage some quando a aba fecha; os dois guardam alguns MB, só strings e não vão ao servidor. Cookies são pequenos (cerca de 4 KB), têm validade e vão automaticamente em toda requisição ao domínio; com HttpOnly, o JavaScript nem consegue lê-los, o que os torna melhores para sessão.",
+          "relatedTerms": [
+            "web-storage"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "defer-vs-async",
+          "level": "pleno",
+          "question": "Qual a diferença entre script com defer e com async?",
+          "answer": "Os dois baixam sem bloquear a leitura do HTML. defer executa depois que o HTML foi todo lido, na ordem em que os scripts aparecem: ideal para o código da aplicação. async executa assim que termina de baixar, interrompendo a leitura e sem ordem garantida: ideal para scripts independentes.",
+          "relatedTerms": [
+            "caminho-critico"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-delegar",
+          "level": "pleno",
+          "question": "Por que usar delegação de eventos?",
+          "answer": "Com um listener no pai, eu atendo todos os filhos, inclusive os adicionados depois, sem registrar e remover listeners a cada mudança. Em listas grandes economiza memória. O cuidado é identificar o alvo certo com event.target.closest e lembrar que alguns eventos (focus, blur) não fazem bubbling.",
+          "relatedTerms": [
+            "delegacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pagina-lenta",
+          "level": "senior",
+          "question": "Uma página trava ao rolar. Como você investiga?",
+          "answer": "Abro o painel Performance do DevTools e gravo a rolagem, procurando tarefas longas e reflows forçados. Causas comuns: listeners de scroll pesados (uso throttle ou passive: true), leitura e escrita alternadas de layout (agrupo leituras antes das escritas ou uso requestAnimationFrame), DOM enorme (virtualização) e animações de propriedades que causam layout (prefiro transform e opacity).",
+          "relatedTerms": [
+            "reflow",
+            "event-listener"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "innerhtml-perigo",
+          "level": "junior",
+          "question": "Por que tomar cuidado com innerHTML?",
+          "answer": "Porque ele interpreta HTML: se o conteúdo vem do usuário, um atacante pode injetar uma tag com código (XSS). Para texto, uso textContent; quando preciso de HTML vindo de fora, passo por um sanitizador como DOMPurify. Frameworks como React escapam o texto por padrão pelo mesmo motivo.",
+          "relatedTerms": [
+            "xss-innerhtml",
+            "dom"
+          ]
+        }
+      ]
+    }
+  ]
+}

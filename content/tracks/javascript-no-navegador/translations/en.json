@@ -1,0 +1,120 @@
+{
+  "title": "JavaScript in the browser",
+  "description": "The JavaScript that runs on the page: DOM, events, requests, storage and rendering.",
+  "decks": {
+    "dom": {
+      "title": "DOM",
+      "description": "The page as a tree of objects and how to change it."
+    },
+    "eventos": {
+      "title": "Events",
+      "description": "How the page reacts to clicks, keys and forms."
+    },
+    "rede-e-armazenamento": {
+      "title": "Network and storage",
+      "description": "Fetching data, storing it in the browser and loading the page."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about JavaScript in the browser that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "dom": {
+      "term": "DOM",
+      "definition": "Document Object Model: the representation of the HTML page as a tree of objects (nodes) that JavaScript can read and change. Changing the DOM changes what appears on screen."
+    },
+    "seletores": {
+      "term": "Selectors",
+      "definition": "Ways to find elements in the DOM. querySelector returns the first match for a CSS selector and querySelectorAll returns all of them (a static NodeList); getElementById looks up by id."
+    },
+    "reflow": {
+      "term": "Reflow and repaint",
+      "definition": "Steps the browser redoes when the page changes. Reflow (layout) recalculates the size and position of elements and is expensive; repaint only redraws colors and borders. Reading measurements (offsetHeight) right after writing styles forces a synchronous reflow: alternating reads and writes in a loop causes \"layout thrashing\"."
+    },
+    "xss-innerhtml": {
+      "term": "innerHTML and textContent",
+      "definition": "innerHTML interprets the string as HTML; textContent treats it as plain text. Putting user data into innerHTML opens the door to XSS (an <img onerror=...> runs code). For text, use textContent."
+    },
+    "criar-elementos": {
+      "title": "Creating and inserting elements",
+      "body": "createElement creates the node, textContent sets the text safely and append puts it on the page."
+    },
+    "fragment": {
+      "title": "Inserting many items at once",
+      "body": "Building the items in a DocumentFragment and inserting once avoids a thousand separate DOM changes."
+    },
+    "event-listener": {
+      "term": "Event listener",
+      "definition": "A function registered with addEventListener to be called when an event happens on an element (click, input, submit, keydown). It receives the event object, with the target and details such as the key."
+    },
+    "propagacao": {
+      "term": "Propagation (bubbling)",
+      "definition": "An event goes through three phases: capture (from the root down to the target), the target, and bubbling (from the target back up to the root). By default listeners run during bubbling, which is why a click on a button also reaches the div that contains it. stopPropagation stops the trip."
+    },
+    "delegacao": {
+      "term": "Event delegation",
+      "definition": "The technique of putting a single listener on the parent element instead of one on each child, using bubbling and event.target to know what was clicked. It also works for items added later and saves memory in large lists."
+    },
+    "prevent-default": {
+      "term": "preventDefault",
+      "definition": "Cancels the browser's default action for that event: submitting the form and reloading the page, following a link, ticking a checkbox. It does not stop propagation; that is what stopPropagation is for."
+    },
+    "delegacao-exemplo": {
+      "title": "Delegation in practice",
+      "body": "One listener on the list handles every remove button, including the ones created later. closest walks up from the clicked element to the button."
+    },
+    "debounce": {
+      "title": "Debounce",
+      "body": "Delays execution until the user stops firing the event for a while. In search-as-you-type, it avoids one request per keystroke. It uses a closure to keep the timer."
+    },
+    "fetch": {
+      "term": "fetch",
+      "definition": "The browser API to make HTTP requests. It returns a Promise with the response; the body is read separately (response.json(), text()). It only rejects on network failure: 404 or 500 statuses must be checked with response.ok."
+    },
+    "web-storage": {
+      "term": "localStorage and sessionStorage",
+      "definition": "Key-value string storage in the browser, per origin. localStorage persists until cleared; sessionStorage lasts while the tab is open. It is synchronous and readable by any script on the page, so it is not for secrets."
+    },
+    "indexeddb": {
+      "term": "IndexedDB",
+      "definition": "The browser database for larger volumes and structured data (objects, files), with indexes and transactions. It is asynchronous, unlike localStorage. Used in offline apps, usually through libraries such as idb or Dexie."
+    },
+    "caminho-critico": {
+      "term": "Critical rendering path",
+      "definition": "The steps up to the page's first paint: download the HTML, build the DOM and the CSSOM, combine them into the render tree, compute layout and paint. Scripts in <head> without defer or async block DOM construction; CSS blocks painting."
+    },
+    "fetch-post": {
+      "title": "Sending JSON with fetch",
+      "body": "To send data, set the method, the Content-Type header and the body as a string with JSON.stringify."
+    },
+    "defer-async": {
+      "title": "defer and async on scripts",
+      "body": "defer downloads in parallel and runs in order after the HTML is parsed: it is the default choice for the app script. async runs as soon as it downloads, in no order: good for independent scripts such as analytics. type=\"module\" already behaves like defer."
+    },
+    "bubbling-e-captura": {
+      "question": "What is event bubbling?",
+      "answer": "It is the phase in which the event, after reaching the target element, travels up through its ancestors to the document, firing each one's listeners. Before it there is capture, top-down. Bubbling is what makes event delegation possible; stopPropagation stops the climb."
+    },
+    "local-vs-session": {
+      "question": "What is the difference between localStorage, sessionStorage and cookies?",
+      "answer": "localStorage persists with no expiry; sessionStorage is gone when the tab closes; both hold a few MB, strings only, and are not sent to the server. Cookies are small (about 4 KB), have an expiry and are sent automatically with every request to the domain; with HttpOnly, JavaScript cannot even read them, which makes them better for sessions."
+    },
+    "defer-vs-async": {
+      "question": "What is the difference between a script with defer and with async?",
+      "answer": "Both download without blocking HTML parsing. defer runs after the whole HTML has been parsed, in the order the scripts appear: ideal for the application code. async runs as soon as it finishes downloading, interrupting parsing and with no guaranteed order: ideal for independent scripts."
+    },
+    "por-que-delegar": {
+      "question": "Why use event delegation?",
+      "answer": "With one listener on the parent I handle every child, including those added later, without registering and removing listeners on every change. In large lists it saves memory. The care points are finding the right target with event.target.closest and remembering that some events (focus, blur) do not bubble."
+    },
+    "pagina-lenta": {
+      "question": "A page stutters when scrolling. How do you investigate?",
+      "answer": "I open the DevTools Performance panel and record the scroll, looking for long tasks and forced reflows. Common causes: heavy scroll listeners (I use throttle or passive: true), interleaved layout reads and writes (I batch reads before writes or use requestAnimationFrame), a huge DOM (virtualization) and animations of properties that trigger layout (I prefer transform and opacity)."
+    },
+    "innerhtml-perigo": {
+      "question": "Why be careful with innerHTML?",
+      "answer": "Because it interprets HTML: if the content comes from the user, an attacker can inject a tag with code (XSS). For text I use textContent; when I need HTML from outside, I run it through a sanitizer such as DOMPurify. Frameworks like React escape text by default for the same reason."
+    }
+  }
+}

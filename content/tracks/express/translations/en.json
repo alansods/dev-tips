@@ -1,0 +1,120 @@
+{
+  "title": "Express",
+  "description": "The minimalist API framework for Node.js: routes, middleware, request, response and errors.",
+  "decks": {
+    "rotas-e-middlewares": {
+      "title": "Routes and middleware",
+      "description": "How a request flows through the application."
+    },
+    "requisicao-e-resposta": {
+      "title": "Request and response",
+      "description": "Reading what comes in and responding the right way."
+    },
+    "erros-e-organizacao": {
+      "title": "Errors and organization",
+      "description": "Handling errors in one place and organizing the project."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Express questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "rota": {
+      "term": "Route",
+      "definition": "The link between an HTTP method, a path and a function: app.get(\"/products/:id\", handler). Express tries routes in the order they were registered and uses the first match."
+    },
+    "middleware": {
+      "term": "Middleware",
+      "definition": "A function (req, res, next) that runs along the request's path: it can read and change req and res, end the response or call next() to pass it on. Logging, authentication, CORS and JSON parsing are middleware. Registration order is execution order."
+    },
+    "next": {
+      "term": "next()",
+      "definition": "The function that hands the request to the next middleware or route. Forgetting to call next() (or to respond) leaves the request hanging until it times out. next(error) jumps straight to the error middleware."
+    },
+    "router": {
+      "term": "Router",
+      "definition": "A mini application with its own routes and middleware (express.Router()), mounted on a prefix with app.use(\"/products\", router). It organizes the API by resource, each in its own file."
+    },
+    "app-basico": {
+      "title": "App with JSON and routes",
+      "body": "express.json() is the middleware that reads the JSON body into req.body. Without it, req.body is undefined."
+    },
+    "middleware-auth": {
+      "title": "Authentication middleware",
+      "body": "The middleware validates the token and stores the user in req.user; only the routes that receive it are protected."
+    },
+    "req": {
+      "term": "The req object",
+      "definition": "Represents the request: req.params has the route segments (:id), req.query the query string (?page=2), req.body the body already parsed by a middleware and req.headers the headers. Everything arrives as strings or as the client sent it, so it needs validation."
+    },
+    "res": {
+      "term": "The res object",
+      "definition": "Builds the response: res.status(201) sets the code, res.json() sends JSON, res.send() sends text, res.sendStatus(204) sends only the status and res.set() sets headers. Each request must get exactly one response."
+    },
+    "validacao-entrada": {
+      "term": "Input validation",
+      "definition": "Checking the shape of params, query and body before using them, replying 400 with the errors when they do not match. Express validates nothing; libraries such as Zod or Joi define the schema and convert types (the query \"2\" becomes the number 2)."
+    },
+    "headers-already-sent": {
+      "term": "Cannot set headers after they are sent",
+      "definition": "The classic error of responding twice to the same request, usually from forgetting a return after res.json() inside an if. Every early response must end the function: return res.status(404).json(...)."
+    },
+    "params-e-query": {
+      "title": "params, query and 404",
+      "body": "The id comes from params and pagination from query, with defaults and conversion to number. The return prevents responding twice."
+    },
+    "validar-com-zod": {
+      "title": "Validating the body with Zod",
+      "body": "safeParse returns success or the errors without throwing; the handler replies 400 and only uses the validated data."
+    },
+    "middleware-de-erro": {
+      "term": "Error middleware",
+      "definition": "A middleware with four parameters (err, req, res, next), registered after all routes. It receives errors thrown in routes or passed with next(error) and builds a standard response, without leaking the stack trace to the client."
+    },
+    "erros-async": {
+      "term": "Errors in async handlers",
+      "definition": "In Express 4, an error inside an async function does not reach the error middleware: it becomes an unhandled rejection and the request gets no response. You needed try/catch with next(error) or a wrapper. Express 5 forwards rejected Promises automatically."
+    },
+    "camadas": {
+      "term": "Layers (routes, service, repository)",
+      "definition": "A common split in Express APIs: routes handle HTTP (reading req, responding), the service holds the business rules and the repository accesses the database. It keeps each part testable on its own and stops business rules from being tied to Express."
+    },
+    "helmet-cors": {
+      "term": "Security middleware",
+      "definition": "Express comes with almost no protections. helmet sets security headers, cors controls which origins can call the API, express-rate-limit limits requests per client and limiting the body size (express.json({ limit })) prevents huge payloads."
+    },
+    "error-handler": {
+      "title": "Central error handler",
+      "body": "Known errors get the right status; everything else becomes a generic 500, with the details only in the log."
+    },
+    "async-handler": {
+      "title": "Wrapper for async handlers (Express 4)",
+      "body": "The wrapper catches the rejected Promise and hands it to next, taking the error to the central handler. In Express 5 this is automatic."
+    },
+    "o-que-e-middleware": {
+      "question": "What is middleware in Express?",
+      "answer": "A function (req, res, next) that sits between the request and the response. It can read or change req and res, respond and stop, or call next() to continue. They run in registration order, which is why express.json() and authentication come before the routes and the error handler comes last."
+    },
+    "req-body-undefined": {
+      "question": "Why is req.body undefined?",
+      "answer": "Because Express does not parse the body on its own: app.use(express.json()) (or express.urlencoded for forms) is missing before the routes. It also happens if the client does not send Content-Type: application/json, since the middleware only parses what it recognizes."
+    },
+    "erro-async-express": {
+      "question": "How do you handle errors from async handlers in Express?",
+      "answer": "In Express 4, a rejected Promise does not reach the error handler: I use try/catch with next(error) or a wrapper that does .catch(next). In Express 5, rejections are forwarded automatically. In both, I have a central error middleware that turns domain errors into HTTP statuses and does not expose internal details."
+    },
+    "headers-sent": {
+      "question": "What causes \"Cannot set headers after they are sent\"?",
+      "answer": "Responding twice to the same request. The typical case is an if that responds 404 without return, and the code continues to the res.json at the end. It also happens when calling next() after responding. The fix is to always use return res... for early responses."
+    },
+    "organizar-api-express": {
+      "question": "How do you organize a growing Express API?",
+      "answer": "By resource: each with its own Router, service and repository. Routes only handle HTTP and validation, the service holds the rules and the repository the database, passed in as a parameter to ease testing. Cross-cutting middleware (logging, auth, errors) lives in one place, and configuration comes from environment variables validated at startup."
+    },
+    "seguranca-express": {
+      "question": "What security measures does an Express API need?",
+      "answer": "helmet for headers, cors allowing only known origins, rate limiting on sensitive routes (login), a body size limit, validation of every input, parameterized queries against SQL injection, authentication and authorization in middleware, and error responses without stack traces. I also turn off the X-Powered-By header (helmet already does)."
+    }
+  }
+}
