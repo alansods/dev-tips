@@ -39,6 +39,11 @@ describe('Requirement: Home por áreas', () => {
     ]);
   });
 
+  it('Banco de dados por último', () => {
+    const all = [...catalog(), make('sql', { areas: ['banco-de-dados'] })];
+    expect(areasWithTracks(all).map((a) => a.area)).toEqual(['fundamentos', 'frontend', 'backend', 'banco-de-dados']);
+  });
+
   it('Trilha em duas áreas', () => {
     expect(ids(tracksInArea(catalog(), 'frontend'))).toContain('ts-tipos');
     expect(ids(tracksInArea(catalog(), 'backend'))).toContain('ts-tipos');

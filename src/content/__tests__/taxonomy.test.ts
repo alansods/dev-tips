@@ -29,6 +29,12 @@ describe('Requirement: Áreas da trilha', () => {
     expectErrorAt(input, 'areas', 'backend');
   });
 
+  it('Área de banco de dados', () => {
+    const input = minimalTrack();
+    input.areas = ['banco-de-dados'];
+    expect(trackOf(input).areas).toEqual(['banco-de-dados']);
+  });
+
   it('Trilha em duas áreas', () => {
     const input = minimalTrack();
     input.areas = ['frontend', 'backend'];

@@ -233,7 +233,7 @@ Uma trilha MAY ter um arquivo de tradução para inglês em `content/tracks/<tra
 - **THEN** todo arquivo `translations/en.json` em `content/tracks/` é validado contra a trilha correspondente, e um erro faz a suíte falhar
 
 ### Requirement: Áreas da trilha
-Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `frontend` (Frontend) e `backend` (Backend). Uma trilha MAY estar em mais de uma área.
+Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `frontend` (Frontend), `backend` (Backend) e `banco-de-dados` (Banco de dados). Uma trilha MAY estar em mais de uma área.
 
 #### Scenario: Trilha sem áreas
 - **WHEN** uma trilha não declara `areas` ou declara a lista vazia
@@ -249,6 +249,10 @@ Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de á
 
 #### Scenario: Trilha em duas áreas
 - **WHEN** uma trilha declara `areas: ["frontend", "backend"]`
+- **THEN** a validação aceita a trilha
+
+#### Scenario: Área de banco de dados
+- **WHEN** uma trilha declara `areas: ["banco-de-dados"]`
 - **THEN** a validação aceita a trilha
 
 ### Requirement: Cadastro de linguagens e frameworks

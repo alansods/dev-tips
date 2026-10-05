@@ -1,0 +1,307 @@
+{
+  "id": "nosql",
+  "title": "NoSQL: modelos e quando usar",
+  "description": "Os tipos de banco não relacional (documento, chave-valor, colunar, grafo e busca), o teorema CAP e como escolher.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "modelos",
+      "title": "Modelos de dados",
+      "description": "Os principais tipos de banco NoSQL.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "nosql",
+          "level": "junior",
+          "term": "NoSQL",
+          "definition": "Nome genérico para bancos que não usam o modelo relacional de tabelas e JOINs. Trocam parte das garantias e da flexibilidade de consulta do SQL por escala horizontal, esquema flexível ou desempenho num tipo específico de acesso. Não é \"melhor\" que SQL: é outra ferramenta.",
+          "relatedTerms": [
+            "banco-documento",
+            "chave-valor"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "banco-documento",
+          "level": "junior",
+          "term": "Banco de documentos",
+          "definition": "Guarda documentos JSON/BSON com estrutura aninhada e flexível, consultáveis por qualquer campo. Bom para agregados lidos juntos (perfil, catálogo, conteúdo). Exemplos: MongoDB, Couchbase, Firestore.",
+          "relatedTerms": [
+            "nosql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "chave-valor",
+          "level": "junior",
+          "term": "Chave-valor",
+          "definition": "O modelo mais simples: um valor por chave, buscado só pela chave, com latência muito baixa. Serve para cache, sessão, contadores e configurações. Exemplos: Redis, Memcached, DynamoDB (que também tem recursos de documento).",
+          "relatedTerms": [
+            "nosql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "colunar",
+          "level": "pleno",
+          "term": "Colunar (wide-column)",
+          "definition": "Organiza os dados em partições por uma chave, com linhas que podem ter muitas colunas, e é feito para volumes enormes de escrita distribuída. As consultas precisam seguir a chave de partição, então a modelagem parte de cada consulta. Exemplos: Cassandra, ScyllaDB, HBase. Não confundir com bancos analíticos colunares (como ClickHouse).",
+          "relatedTerms": [
+            "nosql",
+            "teorema-cap"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "grafo",
+          "level": "pleno",
+          "term": "Banco de grafos",
+          "definition": "Guarda nós e arestas (relacionamentos) como cidadãos de primeira classe, tornando rápido percorrer conexões de vários níveis: amigos de amigos, recomendações, detecção de fraude, rotas. Exemplos: Neo4j (com a linguagem Cypher), Amazon Neptune.",
+          "relatedTerms": [
+            "nosql"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "motor-busca",
+          "level": "pleno",
+          "term": "Motor de busca",
+          "definition": "Indexa texto com índice invertido para busca por relevância, tolerância a erros de digitação, filtros e agregações (facetas). Costuma ser uma cópia de leitura dos dados do banco principal, não a fonte da verdade. Exemplos: Elasticsearch, OpenSearch, Meilisearch.",
+          "relatedTerms": [
+            "nosql"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "teorema-cap",
+      "title": "CAP e consistência",
+      "description": "As escolhas de um banco distribuído.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "teorema-cap",
+          "level": "pleno",
+          "term": "Teorema CAP",
+          "definition": "Num sistema distribuído, quando há uma partição de rede (P, inevitável na prática), é preciso escolher entre consistência (C: todos leem o dado mais recente ou recebem erro) e disponibilidade (A: todo nó responde, mesmo com dado possivelmente desatualizado). Bancos se posicionam como CP ou AP.",
+          "relatedTerms": [
+            "consistencia-eventual",
+            "pacelc"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "consistencia-eventual",
+          "level": "pleno",
+          "term": "Consistência eventual",
+          "definition": "Garantia de que, se as escritas pararem, todas as réplicas vão convergir para o mesmo valor, mas uma leitura pode ver um dado antigo por um tempo. Aceitável para curtidas, feeds e catálogos; inadequada para saldo e estoque, que pedem consistência forte.",
+          "relatedTerms": [
+            "teorema-cap"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pacelc",
+          "level": "senior",
+          "term": "PACELC",
+          "definition": "Extensão do CAP: com partição (P), escolhe-se entre disponibilidade e consistência (A ou C); senão (Else), entre latência e consistência (L ou C). Mostra que mesmo sem falhas há um custo: esperar a confirmação de várias réplicas deixa as operações mais lentas.",
+          "relatedTerms": [
+            "teorema-cap"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "quorum",
+          "level": "senior",
+          "term": "Quórum",
+          "definition": "Em bancos replicados como Cassandra, cada operação escolhe quantas réplicas precisam responder. Com N réplicas, se W (escrita) + R (leitura) > N, toda leitura alcança ao menos uma réplica com a escrita mais recente. QUORUM em leitura e escrita é o equilíbrio mais comum.",
+          "relatedTerms": [
+            "consistencia-eventual"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "quorum-exemplo",
+          "level": "senior",
+          "title": "Ajustando consistência no Cassandra",
+          "body": "Com 3 réplicas, QUORUM exige 2. Escrita e leitura em QUORUM (2 + 2 > 3) garantem ler a última escrita; ONE responde mais rápido, mas pode ler dado antigo.",
+          "snippet": {
+            "file": "cqlsh",
+            "language": "sql",
+            "code": "-- cqlsh\nCONSISTENCY QUORUM;\nINSERT INTO users_by_email (email, user_id) VALUES ('ana@example.com', 42);\nSELECT user_id FROM users_by_email WHERE email = 'ana@example.com';\n\nCONSISTENCY ONE; -- mais rápido, possivelmente desatualizado"
+          },
+          "relatedTerms": [
+            "quorum"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "read-your-writes",
+          "level": "pleno",
+          "title": "Leia o que você escreveu",
+          "body": "Com réplicas eventualmente consistentes, um usuário pode não ver o que acabou de salvar. Direcionar a leitura dele para o primário por alguns segundos depois da escrita resolve a experiência sem exigir consistência forte em tudo.",
+          "snippet": {
+            "file": "exemplo",
+            "language": "text",
+            "code": "escrita do usuário 42 -> primário\n  grava \"acabou de escrever: user 42, até agora + 5 s\"\n\nleitura do usuário 42:\n  dentro da janela -> primário (vê a própria escrita)\n  fora da janela  -> réplica (mais barata, talvez atrasada)"
+          },
+          "relatedTerms": [
+            "consistencia-eventual"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "quando-usar",
+      "title": "Quando usar cada um",
+      "description": "Escolhendo e combinando bancos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "persistencia-poliglota",
+          "level": "pleno",
+          "term": "Persistência poliglota",
+          "definition": "Usar bancos diferentes para necessidades diferentes no mesmo sistema: relacional para pedidos e pagamentos, Redis para cache e sessão, Elasticsearch para busca, um banco de grafos para recomendações. O ganho é a ferramenta certa; o custo é operar e sincronizar vários bancos.",
+          "relatedTerms": [
+            "relacional-padrao",
+            "sincronizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "relacional-padrao",
+          "level": "junior",
+          "term": "Relacional como ponto de partida",
+          "definition": "Para a maioria das aplicações, um banco relacional resolve bem: transações, consultas flexíveis, integridade e muito conhecimento disponível. PostgreSQL ainda cobre JSON, busca textual e vetores. Adicionar NoSQL faz sentido quando aparece uma necessidade concreta que o relacional atende mal.",
+          "relatedTerms": [
+            "persistencia-poliglota"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "sincronizacao",
+          "level": "senior",
+          "term": "Sincronizar bancos (CDC e outbox)",
+          "definition": "Gravar no banco principal e depois em outro (busca, cache) pode deixar os dois divergentes se a segunda escrita falhar. Change Data Capture lê o log do banco e propaga as mudanças (Debezium); o padrão outbox grava o evento numa tabela na mesma transação, e um processo o publica depois.",
+          "relatedTerms": [
+            "persistencia-poliglota"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "escala-horizontal",
+          "level": "pleno",
+          "term": "Escala vertical e horizontal",
+          "definition": "Escalar verticalmente é usar uma máquina maior; horizontalmente, distribuir os dados entre várias (sharding). Muitos bancos NoSQL nasceram para escalar horizontalmente com facilidade. Bancos relacionais escalam leituras com réplicas e, para escritas, exigem sharding na aplicação ou soluções distribuídas (Citus, CockroachDB, Vitess).",
+          "relatedTerms": [
+            "relacional-padrao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "mapa-de-escolha",
+          "level": "pleno",
+          "title": "Mapa rápido de escolha",
+          "body": "Um ponto de partida para a conversa, não uma regra: o padrão de acesso e as garantias necessárias decidem.",
+          "snippet": {
+            "file": "exemplo",
+            "language": "text",
+            "code": "Pedidos, pagamentos, estoque      -> relacional (PostgreSQL, MySQL)\nCatálogo com atributos variáveis  -> documento (MongoDB) ou JSONB\nCache, sessão, ranking, rate limit -> chave-valor (Redis)\nBusca por texto com relevância     -> motor de busca (Elasticsearch)\nRelações em vários níveis          -> grafo (Neo4j)\nEscrita massiva distribuída        -> colunar (Cassandra)\nMétricas e eventos no tempo        -> séries temporais (TimescaleDB)"
+          },
+          "relatedTerms": [
+            "persistencia-poliglota",
+            "relacional-padrao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "outbox-exemplo",
+          "level": "senior",
+          "title": "Padrão outbox",
+          "body": "O evento é gravado na mesma transação do pedido, então ou os dois existem ou nenhum. Um processo separado publica os eventos pendentes e atualiza a busca e o cache.",
+          "snippet": {
+            "file": "outbox.sql",
+            "language": "sql",
+            "code": "BEGIN;\nINSERT INTO orders (id, customer_id, total) VALUES (1001, 42, 59.80);\nINSERT INTO outbox (aggregate_id, type, payload)\nVALUES (1001, 'order_created', '{\"total\": 59.80}');\nCOMMIT;\n-- um worker lê a outbox, publica e marca como enviado"
+          },
+          "relatedTerms": [
+            "sincronizacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre NoSQL e escolha de bancos que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "sql-vs-nosql",
+          "level": "junior",
+          "question": "Qual a diferença entre SQL e NoSQL?",
+          "answer": "Bancos SQL usam tabelas com esquema definido, relacionamentos por chaves, JOINs e transações ACID, com consultas muito flexíveis. NoSQL é um grupo de modelos (documento, chave-valor, colunar, grafo) que trocam parte dessas características por esquema flexível, escala horizontal ou desempenho num padrão de acesso específico. A escolha depende de como os dados são usados.",
+          "relatedTerms": [
+            "nosql",
+            "relacional-padrao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cap-pergunta",
+          "level": "pleno",
+          "question": "Explique o teorema CAP.",
+          "answer": "Um sistema distribuído não garante ao mesmo tempo consistência, disponibilidade e tolerância a partição. Como partições de rede acontecem, na prática a escolha é, durante uma partição, entre recusar operações para manter a consistência (CP) ou responder com dados possivelmente desatualizados (AP). O PACELC completa: mesmo sem falhas, há um equilíbrio entre latência e consistência.",
+          "relatedTerms": [
+            "teorema-cap",
+            "pacelc"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "consistencia-eventual-pergunta",
+          "level": "pleno",
+          "question": "Onde consistência eventual é aceitável?",
+          "answer": "Onde ler um dado alguns segundos atrasado não causa dano: contagem de curtidas, visualizações, feed, catálogo, resultados de busca, recomendações. Não serve para saldo, estoque na hora da compra, unicidade de cadastro ou qualquer regra que dependa do valor exato no momento; nesses casos uso consistência forte ou transações.",
+          "relatedTerms": [
+            "consistencia-eventual"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-grafo",
+          "level": "pleno",
+          "question": "Quando faz sentido um banco de grafos?",
+          "answer": "Quando as consultas principais percorrem relacionamentos de vários níveis e caminhos variáveis: rede social (amigos de amigos), recomendações, detecção de fraude por conexões, dependências e rotas. No relacional isso vira muitos JOINs ou CTEs recursivas que ficam lentas com a profundidade; no grafo, percorrer uma aresta é barato.",
+          "relatedTerms": [
+            "grafo"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "busca-separada",
+          "level": "senior",
+          "question": "Por que usar Elasticsearch se o dado já está no banco?",
+          "answer": "Para busca textual de qualidade: relevância, tolerância a erros, sinônimos, facetas e boa velocidade em grandes volumes, coisas que o banco principal faz mal ou com custo alto. O Elasticsearch fica como cópia de leitura, alimentada por CDC ou outbox; o banco continua sendo a fonte da verdade, e aceito um pequeno atraso na indexação.",
+          "relatedTerms": [
+            "motor-busca",
+            "sincronizacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "escolher-banco",
+          "level": "senior",
+          "question": "Como você escolhe o banco de dados para um sistema novo?",
+          "answer": "Parto dos padrões de acesso e das garantias: que dados existem, como se relacionam, quais consultas são críticas, volume e crescimento, e onde preciso de transação e consistência forte. Na dúvida, começo com um relacional como PostgreSQL, que cobre muito, e adiciono bancos especializados (cache, busca, grafo) quando uma necessidade concreta aparecer, considerando também o que o time sabe operar.",
+          "relatedTerms": [
+            "relacional-padrao",
+            "persistencia-poliglota"
+          ]
+        }
+      ]
+    }
+  ]
+}

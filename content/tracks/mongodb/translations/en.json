@@ -1,0 +1,120 @@
+{
+  "title": "MongoDB",
+  "description": "The most used document database: documents and collections, embedded or referenced modeling, indexes and the aggregation pipeline.",
+  "decks": {
+    "documentos": {
+      "title": "Documents and collections",
+      "description": "How MongoDB stores and reads data."
+    },
+    "modelagem-mongo": {
+      "title": "Modeling",
+      "description": "Embed or reference, based on how the data is read."
+    },
+    "consultas-e-indices": {
+      "title": "Queries, indexes and aggregation",
+      "description": "Making queries fast and computing in the database."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "MongoDB questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "documento": {
+      "term": "Document",
+      "definition": "A record in BSON format (a binary JSON with more types, such as dates and ObjectId), with fields that can contain objects and arrays. Each document has a unique _id. Documents in the same collection can have different shapes."
+    },
+    "colecao": {
+      "term": "Collection",
+      "definition": "A group of documents, equivalent to a table. It requires no fixed schema, is created on the first insert and is where indexes live. Basic operations: insertOne, find, updateOne, deleteOne."
+    },
+    "schema-flexivel": {
+      "term": "Flexible schema and validation",
+      "definition": "MongoDB does not enforce a shape, which speeds up evolution but leaves consistency to the application. To keep it from becoming a mess, use schema validation on the collection ($jsonSchema) or an ODM (such as Mongoose) that defines and validates the shape."
+    },
+    "transacoes-mongo": {
+      "term": "Atomicity and transactions",
+      "definition": "Operations on a single document are atomic, including arrays and subdocuments; that is why embedded modeling reduces the need for transactions. Since version 4.0 there are multi-document transactions (on a replica set), but they are more expensive and should be the exception."
+    },
+    "crud-mongo": {
+      "title": "Basic operations",
+      "body": "find takes a filter and a projection; updateOne uses operators such as $set and $inc to change only some fields."
+    },
+    "validacao-colecao": {
+      "title": "Schema validation",
+      "body": "The collection rejects documents without a name or with a negative price, even if the application forgets to validate."
+    },
+    "embutir": {
+      "term": "Embedded document",
+      "definition": "Storing related data inside the parent document, like the items inside the order. One read brings everything and the update is atomic. Good when the data is read together, belongs to the parent and has a bounded size."
+    },
+    "referencia": {
+      "term": "Reference",
+      "definition": "Storing only the related document's _id, like customerId on the order. It avoids duplicating data that changes and documents that grow without limit, at the cost of a second query or a $lookup. Good for many-to-many relations and shared data."
+    },
+    "modelar-pelo-acesso": {
+      "term": "Modeling by access patterns",
+      "definition": "In relational databases you model the data and query however you like. In MongoDB you model for the queries: which screens and operations exist and what each one reads together. Duplicating a little data (the customer name on the order) is acceptable if it avoids extra reads and the data rarely changes."
+    },
+    "limite-documento": {
+      "term": "16 MB limit and unbounded arrays",
+      "definition": "A document can be at most 16 MB. Arrays that grow forever (every comment on a popular post, every event of a user) blow past that limit and slow down reads and updates. In those cases, use a separate collection with a reference to the parent."
+    },
+    "embutido-vs-referencia": {
+      "title": "Both styles in the same model",
+      "body": "The items are embedded (read with the order and limited in number); the customer is referenced, with a copy of the name to show the list without another query."
+    },
+    "bucket-pattern": {
+      "title": "Bucket pattern for series",
+      "body": "Instead of one document per sensor reading (or an endless array), one document per sensor per hour, with the array limited to that hour's readings."
+    },
+    "indice-mongo": {
+      "term": "Indexes in MongoDB",
+      "definition": "They work as in relational databases (B-tree): without an index, the query reads the whole collection (COLLSCAN). There are single-field, compound (following the ESR rule: equality, sort, range), multikey (on arrays), text, geospatial and TTL indexes, which delete expired documents."
+    },
+    "aggregation": {
+      "term": "Aggregation pipeline",
+      "definition": "A sequence of stages that process documents inside the database: $match (filter), $group (group and sum), $sort, $project (choose fields), $lookup (join with another collection) and $unwind (expand arrays). It is the equivalent of GROUP BY and JOIN."
+    },
+    "explain-mongo": {
+      "term": "explain()",
+      "definition": "Shows the query plan: IXSCAN (used an index) or COLLSCAN (read everything), and with \"executionStats\" how many documents and keys were examined versus how many were returned. Far more examined than returned signals a missing or badly ordered index."
+    },
+    "sharding-mongo": {
+      "term": "Replica set and sharding",
+      "definition": "Replica set: a primary takes the writes and secondaries copy the data, taking over if the primary goes down. Sharding: splits a collection across several servers by a shard key, to scale writes and volume. A poor shard key (with few values or always increasing) concentrates the load on a single server."
+    },
+    "aggregation-exemplo": {
+      "title": "Sales by category",
+      "body": "Filters the month's paid orders, expands the items, sums by category and sorts. Putting $match first allows using an index."
+    },
+    "indice-esr": {
+      "title": "Compound index by the ESR rule",
+      "body": "To filter by status (equality), sort by date (sort) and bound by price (range), the index follows that order. explain confirms the IXSCAN."
+    },
+    "quando-mongo": {
+      "question": "When should you use MongoDB instead of a relational database?",
+      "answer": "When data has a variable or nested shape and is read as an aggregate (a catalog with different attributes per product, content, events), when the schema changes a lot, or when I need to scale writes horizontally with sharding. For highly related data, with unpredictable queries and many transactions across entities, relational is usually better."
+    },
+    "embutir-ou-referenciar": {
+      "question": "Embed or reference?",
+      "answer": "I embed what is read together, belongs to the parent and has a bounded size, such as the items of an order or the shipping address. I reference what is shared, changes often or grows without limit, such as customers, products or comments. I can combine them: a reference plus a copy of a few fields for display."
+    },
+    "mongo-sem-esquema": {
+      "question": "Does MongoDB have no schema?",
+      "answer": "The database does not enforce a schema, but the application always has one: the code expects certain fields and types. Without control, documents become inconsistent. I define the schema with collection validation ($jsonSchema) or an ODM such as Mongoose, and handle shape changes with migrations or document versioning."
+    },
+    "consulta-lenta-mongo": {
+      "question": "A MongoDB query is slow. What do you check?",
+      "answer": "I run explain(\"executionStats\") to see whether it is a COLLSCAN and how many documents are examined per returned one. I create or adjust the compound index following the equality, sort, range rule. I also check projection (fetching only the used fields), very large documents and, in aggregations, whether $match comes first."
+    },
+    "transacao-mongo-pergunta": {
+      "question": "Does MongoDB have transactions?",
+      "answer": "Yes. Operations on a single document are always atomic, and since 4.0 there are multi-document ACID transactions on replica sets (and on sharded clusters since 4.2). But they cost more and have a time limit, so I model so that most atomic operations fit in a single document, embedding what changes together."
+    },
+    "shard-key": {
+      "question": "How do you choose a good shard key?",
+      "answer": "It needs many possible values (high cardinality), to spread writes evenly and to appear in the most common queries, so each query goes to a single shard. I avoid always-increasing keys, like a plain date or ObjectId, which send every insert to the same shard; a compound or hashed key usually solves it."
+    }
+  }
+}

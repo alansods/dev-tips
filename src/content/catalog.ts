@@ -26,6 +26,14 @@ import springBoot from '../../content/tracks/spring-boot/track.json';
 import pythonEssencial from '../../content/tracks/python-essencial/track.json';
 import fastapi from '../../content/tracks/fastapi/track.json';
 import django from '../../content/tracks/django/track.json';
+import sqlEssencial from '../../content/tracks/sql-essencial/track.json';
+import modelagemDeDados from '../../content/tracks/modelagem-de-dados/track.json';
+import transacoesEPerformance from '../../content/tracks/transacoes-e-performance/track.json';
+import postgresql from '../../content/tracks/postgresql/track.json';
+import mysql from '../../content/tracks/mysql/track.json';
+import mongodb from '../../content/tracks/mongodb/track.json';
+import redis from '../../content/tracks/redis/track.json';
+import nosql from '../../content/tracks/nosql/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -52,6 +60,14 @@ const registry: unknown[] = [
   pythonEssencial,
   fastapi,
   django,
+  sqlEssencial,
+  modelagemDeDados,
+  transacoesEPerformance,
+  postgresql,
+  mysql,
+  mongodb,
+  redis,
+  nosql,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

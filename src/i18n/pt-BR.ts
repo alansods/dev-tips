@@ -87,7 +87,7 @@ export const ptBR = {
     dueBadge: (n: number) => `${n} para revisar hoje`,
   },
   nav: {
-    areas: { fundamentos: 'Fundamentos', frontend: 'Frontend', backend: 'Backend' },
+    areas: { fundamentos: 'Fundamentos', frontend: 'Frontend', backend: 'Backend', 'banco-de-dados': 'Banco de dados' },
     areaKicker: 'Área',
     sections: {
       tracks: 'Trilhas',

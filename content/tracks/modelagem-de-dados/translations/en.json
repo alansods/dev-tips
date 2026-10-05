@@ -1,0 +1,120 @@
+{
+  "title": "Data modeling",
+  "description": "How to design tables: keys, relationships, normalization, denormalization and constraints.",
+  "decks": {
+    "chaves-e-relacionamentos": {
+      "title": "Keys and relationships",
+      "description": "How to identify rows and link tables."
+    },
+    "normalizacao": {
+      "title": "Normalization",
+      "description": "Avoiding redundancy and when to break the rule."
+    },
+    "restricoes-e-evolucao": {
+      "title": "Constraints and schema evolution",
+      "description": "Rules in the database and how to change the schema safely."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Data modeling questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "chave-primaria": {
+      "term": "Primary key",
+      "definition": "A column (or set of columns) that uniquely identifies each row and is never null. It can be natural (a national ID) or surrogate (a generated id, sequential integer or UUID). Surrogate keys are the default, because real-world data changes."
+    },
+    "chave-estrangeira": {
+      "term": "Foreign key",
+      "definition": "A column that points to another table's primary key, such as orders.customer_id. The database enforces referential integrity: it will not create an order for a nonexistent customer and defines what happens when the customer is deleted (RESTRICT, CASCADE, SET NULL)."
+    },
+    "cardinalidade": {
+      "term": "Cardinality (1:1, 1:N, N:N)",
+      "definition": "How many rows of one table relate to how many of another. 1:N (one customer, many orders) uses a foreign key on the N side. N:N (orders and products) needs a junction table. 1:1 is rare and is usually a single table, or a split for security or performance."
+    },
+    "tabela-juncao": {
+      "term": "Junction table",
+      "definition": "A table that resolves an N:N relationship with two foreign keys, such as order_items(order_id, product_id). It usually holds attributes of the relationship itself (quantity, price at purchase time) and a composite or unique key on both columns."
+    },
+    "esquema-pedidos": {
+      "title": "Orders schema",
+      "body": "Customers 1:N orders and orders N:N products, via order_items. The price is stored on the item because the product price may change later."
+    },
+    "uuid-vs-serial": {
+      "title": "Sequential integer or UUID",
+      "body": "Integers are compact and fast to index, but they reveal volume and order. A UUID can be generated outside the database and cannot be guessed; UUIDv7, ordered by time, avoids the index fragmentation of random UUIDv4."
+    },
+    "normalizacao": {
+      "term": "Normalization",
+      "definition": "The process of organizing tables so each fact lives in one place only, avoiding redundancy and anomalies (updating the customer's address on a thousand orders). It is done through normal forms; in practice, reaching 3NF is the common goal."
+    },
+    "formas-normais": {
+      "term": "1NF, 2NF and 3NF",
+      "definition": "1NF: each column holds an atomic value, with no lists or repeating groups. 2NF: also, every column depends on the whole key (it matters for composite keys). 3NF: also, no column depends on another non-key column (the city name does not live on the customer if it depends on the city code)."
+    },
+    "anomalias": {
+      "term": "Update anomalies",
+      "definition": "Problems caused by repeated data: updating it in one place and forgetting another (inconsistency), being unable to insert something without other data (insertion) and losing information when deleting a row (deletion). Normalization exists to avoid them."
+    },
+    "desnormalizacao": {
+      "term": "Denormalization",
+      "definition": "Duplicating data on purpose to read faster: storing the total on the order, the comment count on the post, a ready-made reporting table. The price is keeping the copies in sync (transaction, trigger or async process). It should be a measured decision, not the starting point."
+    },
+    "antes-e-depois": {
+      "title": "Normalizing a table",
+      "body": "In the original version, customer data repeats on every order and products sit in a text list. Splitting into tables puts each fact in a single place."
+    },
+    "contador-desnormalizado": {
+      "title": "Counter kept in the same transaction",
+      "body": "The counter avoids a COUNT(*) on every post read. Updated together with the insert, in the same transaction, it never drifts."
+    },
+    "constraints": {
+      "term": "Constraints",
+      "definition": "Rules the database itself enforces: NOT NULL, UNIQUE, CHECK (price > 0), FOREIGN KEY and PRIMARY KEY. They protect the data even when someone writes directly to the database or the application has a bug; validation in the application is still useful for better messages."
+    },
+    "migration-db": {
+      "term": "Migration",
+      "definition": "A versioned script that changes the schema (create a table, add a column, create an index), applied in order across every environment by a tool (Flyway, Liquibase, Prisma, Alembic, Django migrations). It ensures every database has the same schema and that the change ships with the code."
+    },
+    "expand-contract": {
+      "term": "Expand and contract",
+      "definition": "A pattern to change the schema without stopping the system: first expand (add the new column, compatible with old code), migrate the data and write to both places; once all code uses the new one, contract (remove the old one). Renaming a column directly breaks the running version during the deploy."
+    },
+    "soft-delete": {
+      "term": "Soft delete",
+      "definition": "Marking the row as deleted (deleted_at) instead of removing it, so it can be undone or audited. The cost: every query must filter out deleted rows, unique indexes must account for the flag and personal data may have to be truly deleted by law (GDPR)."
+    },
+    "check-constraint": {
+      "title": "Rules in the schema",
+      "body": "CHECK prevents a negative price and an invalid status; UNIQUE guarantees one SKU per product."
+    },
+    "renomear-sem-parar": {
+      "title": "Renaming a column without downtime",
+      "body": "Each step is a separate deploy; at no point does the running version read a column that does not exist."
+    },
+    "modelar-n-n": {
+      "question": "How do you model a many-to-many relationship?",
+      "answer": "With a junction table holding both foreign keys, such as students_classes(student_id, class_id), with a composite primary key or a unique index on both columns. Attributes of the relationship, like the student's grade in that class, live in that table."
+    },
+    "o-que-e-normalizar": {
+      "question": "What is normalization and why do it?",
+      "answer": "It is organizing tables so each piece of information lives in one place, following the normal forms (in practice, up to 3NF). It avoids inconsistent updates, orphan data and waste. The cost is more JOINs on reads, which is when you consider denormalizing measured spots."
+    },
+    "quando-desnormalizar": {
+      "question": "When does denormalizing make sense?",
+      "answer": "When a frequent, critical read gets expensive because of JOINs or aggregations, and indexes do not fix it: counters, totals, a read table for reports or a copied field for filtering. I measure first; then I keep it in sync in the same transaction or with an async process and accept the lag."
+    },
+    "validacao-banco-ou-app": {
+      "question": "Validate in the application or in the database?",
+      "answer": "Both. The application validates to give clear messages and reject early; the database enforces the essential rules (NOT NULL, UNIQUE, CHECK, foreign keys) even with bugs, manual scripts or another service writing. Uniqueness, for example, is only truly guaranteed by a unique index: checking first and inserting later has a race condition."
+    },
+    "mudar-esquema-producao": {
+      "question": "How do you change the schema of a large table in production?",
+      "answer": "In compatible steps (expand and contract), each in its own deploy. I avoid operations that lock the table: in PostgreSQL, I create indexes with CREATE INDEX CONCURRENTLY and add columns without a volatile default; data backfill in small batches. I also test the migration on a similar volume and have the rollback planned."
+    },
+    "chave-natural-ou-substituta": {
+      "question": "Natural key or surrogate key?",
+      "answer": "I prefer a surrogate key (a generated id) as the primary key, because real-world data changes or has exceptions (a mistyped ID number, an email that changes) and would propagate through every foreign key. The natural value keeps a UNIQUE constraint, enforcing the business rule."
+    }
+  }
+}

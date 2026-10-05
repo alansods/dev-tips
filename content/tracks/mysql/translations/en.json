@@ -1,0 +1,120 @@
+{
+  "title": "MySQL",
+  "description": "The web's most popular relational database: InnoDB, clustered index, replication, charset and differences from PostgreSQL.",
+  "decks": {
+    "innodb": {
+      "title": "InnoDB",
+      "description": "The default storage engine and its guarantees."
+    },
+    "indices-mysql": {
+      "title": "Indexes",
+      "description": "Clustered index, secondary indexes and how MySQL uses them."
+    },
+    "replicacao-e-operacao": {
+      "title": "Replication and operations",
+      "description": "Replicas, charset and differences from PostgreSQL."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "MySQL questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "innodb": {
+      "term": "InnoDB",
+      "definition": "MySQL's default storage engine: ACID transactions, foreign keys, row-level locking and crash recovery. The old MyISAM has no transactions or foreign keys and should not be used in applications."
+    },
+    "isolamento-mysql": {
+      "term": "REPEATABLE READ and gap locks",
+      "definition": "InnoDB's default isolation level is REPEATABLE READ: the transaction always reads the same snapshot. To avoid phantom rows in locking reads, InnoDB uses gap locks (locks on the ranges between rows), which can unexpectedly block inserts and cause deadlocks."
+    },
+    "auto-increment": {
+      "term": "AUTO_INCREMENT",
+      "definition": "Generates the next integer for the primary key on each insert. Values can have gaps (rollback, failures), so they are not a count. LAST_INSERT_ID() returns the id generated on the current connection."
+    },
+    "sql-mode": {
+      "term": "Strict sql_mode",
+      "definition": "The setting that defines how strict MySQL is. In strict mode (the default in current versions), inserting text that is too long or an invalid value raises an error; without it, MySQL silently truncates or converts the data and only emits a warning, corrupting information."
+    },
+    "tabela-innodb": {
+      "title": "Creating a table",
+      "body": "Explicit InnoDB and utf8mb4, a primary key with AUTO_INCREMENT and a foreign key with an index."
+    },
+    "upsert-mysql": {
+      "title": "Upsert in MySQL",
+      "body": "The equivalent of PostgreSQL's ON CONFLICT is ON DUPLICATE KEY UPDATE, triggered by any duplicate primary or unique key."
+    },
+    "indice-clusterizado": {
+      "term": "Clustered index",
+      "definition": "In InnoDB, the table is stored ordered by the primary key: the rows live inside the PK index itself. PK lookups are very fast. That is why a random PK (UUIDv4) scatters inserts across the file and fragments it; sequential keys or UUIDv7 always insert at the end."
+    },
+    "indice-secundario": {
+      "term": "Secondary index",
+      "definition": "Any index that is not the PK. In InnoDB, it stores the indexed column and the primary key value; fetching the full row requires a second lookup in the clustered index. A large PK makes every secondary index bigger."
+    },
+    "covering-mysql": {
+      "term": "Covering index",
+      "definition": "When every column the query needs is in the index, MySQL answers without reading the table row. In EXPLAIN it shows as \"Using index\". Adding columns to a composite index can remove the second lookup."
+    },
+    "explain-mysql": {
+      "term": "EXPLAIN in MySQL",
+      "definition": "Shows the plan per table: type (ALL is a full scan; ref, range and const use an index), key (the chosen index), rows (estimated rows) and Extra (Using filesort, Using temporary signal extra work). EXPLAIN ANALYZE, in MySQL 8, runs the query and shows real timings."
+    },
+    "explain-exemplo-mysql": {
+      "title": "Reading an EXPLAIN",
+      "body": "Before the index, type ALL with Using filesort; after, ref with the composite index, which also covers the sort."
+    },
+    "pk-sequencial": {
+      "title": "Choosing the primary key in InnoDB",
+      "body": "A sequential BIGINT is compact and inserts at the end of the clustered index. For UUIDs, store them in BINARY(16), preferably time-ordered."
+    },
+    "binlog-replicacao": {
+      "term": "Binlog and replication",
+      "definition": "MySQL writes changes to the binary log (binlog), and replicas read and replay that log. Replication is asynchronous by default (semi-synchronous as an option), so replicas can lag. The binlog is also used for point-in-time recovery and change data capture (CDC)."
+    },
+    "charset": {
+      "term": "utf8mb4 and collation",
+      "definition": "MySQL's old \"utf8\" stores at most 3 bytes per character and does not accept emojis; the right one is utf8mb4. The collation defines how text is compared and sorted: _ai_ci ignores accents and case, which affects searches and unique indexes (\"José\" and \"jose\" become equal)."
+    },
+    "mysql-vs-postgres": {
+      "term": "MySQL and PostgreSQL",
+      "definition": "Both are relational, ACID and mature. MySQL is simple to operate, very widespread and optimized for typical web read workloads. PostgreSQL has more features (types, indexes, extensions, SQL standard compliance). The choice usually depends more on the team and the ecosystem than on performance."
+    },
+    "online-ddl": {
+      "term": "Online schema changes",
+      "definition": "ALTER TABLE on large tables can block writes or take hours. InnoDB supports many changes with ALGORITHM=INSTANT or INPLACE and LOCK=NONE; for the rest, tools such as gh-ost and pt-online-schema-change copy the table in the background and swap at the end."
+    },
+    "alter-instant": {
+      "title": "ALTER without locking the table",
+      "body": "Asking for the algorithm explicitly makes MySQL fail right away if it cannot make the change without locking, instead of silently locking the table."
+    },
+    "emoji-utf8mb4": {
+      "title": "Converting to utf8mb4",
+      "body": "With the old charset, saving an emoji fails or turns into \"?\". Converting the table and the connection fixes it."
+    },
+    "innodb-vs-myisam": {
+      "question": "What is the difference between InnoDB and MyISAM?",
+      "answer": "InnoDB has transactions, foreign keys, row-level locking and crash recovery; it is the default and the right choice for applications. MyISAM has no transactions or foreign keys, locks the whole table on writes and can get corrupted in a crash. Today it only shows up in old systems."
+    },
+    "clusterizado-pergunta": {
+      "question": "What is a clustered index and why does it matter in MySQL?",
+      "answer": "In InnoDB, the table data is physically ordered by the primary key, inside its index. PK lookups and ranges are fast, and every secondary index stores the PK to reach the row. That is why I choose a small, increasing PK: a random UUID fragments the index and enlarges every secondary one."
+    },
+    "utf8-emoji": {
+      "question": "Why does MySQL not save emojis?",
+      "answer": "Because the table or the connection uses MySQL's old utf8 charset, which is limited to 3 bytes per character, and emojis need 4. The fix is to use utf8mb4 on the tables, columns and the application connection, with a modern collation such as utf8mb4_0900_ai_ci."
+    },
+    "replica-atrasada": {
+      "question": "The user saved data and did not see it on the next screen. What could it be?",
+      "answer": "A read from an asynchronous replica that has not received the change yet (replication lag). Solutions: read from the primary right after writing (read-your-writes), for a while or for that user; send only lag-tolerant reads to replicas; and monitor replica lag."
+    },
+    "mysql-ou-postgres": {
+      "question": "MySQL or PostgreSQL: how do you choose?",
+      "answer": "For most applications, both work. I pick PostgreSQL when I need advanced features (indexed JSONB, geographic types, extensions like pgvector, complex analytical queries). MySQL is a good choice when the team and the infrastructure already master it or the ecosystem (hosting, tools) favors it. What matters most is that the team can operate it."
+    },
+    "gap-lock-pergunta": {
+      "question": "Why was an insert blocked when nobody was touching that row?",
+      "answer": "Probably a gap lock: under REPEATABLE READ, locking reads (SELECT ... FOR UPDATE, an UPDATE over a range) in InnoDB also lock the ranges between records, to prevent phantom rows. An insert into that range waits. I reduce it by filtering on the exact key, using proper indexes or READ COMMITTED when the application allows."
+    }
+  }
+}

@@ -1,0 +1,320 @@
+{
+  "id": "modelagem-de-dados",
+  "title": "Modelagem de dados",
+  "description": "Como desenhar tabelas: chaves, relacionamentos, normalização, desnormalização e restrições.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "chaves-e-relacionamentos",
+      "title": "Chaves e relacionamentos",
+      "description": "Como identificar linhas e ligar tabelas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "chave-primaria",
+          "level": "junior",
+          "term": "Chave primária",
+          "definition": "Coluna (ou conjunto de colunas) que identifica cada linha de forma única e nunca é nula. Pode ser natural (um CPF) ou substituta (um id gerado, inteiro sequencial ou UUID). Chaves substitutas são o padrão, porque dados do mundo real mudam.",
+          "relatedTerms": [
+            "chave-estrangeira"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "chave-estrangeira",
+          "level": "junior",
+          "term": "Chave estrangeira",
+          "definition": "Coluna que aponta para a chave primária de outra tabela, como orders.customer_id. O banco garante a integridade referencial: não deixa criar pedido para cliente inexistente e define o que acontece ao apagar o cliente (RESTRICT, CASCADE, SET NULL).",
+          "relatedTerms": [
+            "chave-primaria",
+            "cardinalidade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cardinalidade",
+          "level": "junior",
+          "term": "Cardinalidade (1:1, 1:N, N:N)",
+          "definition": "Quantas linhas de uma tabela se ligam a quantas da outra. 1:N (um cliente, muitos pedidos) usa uma chave estrangeira do lado N. N:N (pedidos e produtos) precisa de uma tabela de junção. 1:1 é raro e costuma ser uma tabela só, ou uma separação por segurança ou desempenho.",
+          "relatedTerms": [
+            "tabela-juncao",
+            "chave-estrangeira"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tabela-juncao",
+          "level": "pleno",
+          "term": "Tabela de junção",
+          "definition": "Tabela que resolve um relacionamento N:N com duas chaves estrangeiras, como order_items(order_id, product_id). Costuma ter atributos do próprio relacionamento (quantidade, preço na hora da compra) e chave primária composta ou única pelas duas colunas.",
+          "relatedTerms": [
+            "cardinalidade"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "esquema-pedidos",
+          "level": "junior",
+          "title": "Esquema de pedidos",
+          "body": "Clientes 1:N pedidos e pedidos N:N produtos, via order_items. O preço fica gravado no item porque o preço do produto pode mudar depois.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "CREATE TABLE customers (\n  id BIGSERIAL PRIMARY KEY,\n  email TEXT NOT NULL UNIQUE\n);\n\nCREATE TABLE orders (\n  id BIGSERIAL PRIMARY KEY,\n  customer_id BIGINT NOT NULL REFERENCES customers(id),\n  created_at TIMESTAMPTZ NOT NULL DEFAULT now()\n);\n\nCREATE TABLE order_items (\n  order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,\n  product_id BIGINT NOT NULL REFERENCES products(id),\n  quantity INT NOT NULL CHECK (quantity > 0),\n  unit_price NUMERIC(10, 2) NOT NULL,\n  PRIMARY KEY (order_id, product_id)\n);"
+          },
+          "relatedTerms": [
+            "tabela-juncao",
+            "chave-estrangeira"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "uuid-vs-serial",
+          "level": "senior",
+          "title": "Inteiro sequencial ou UUID",
+          "body": "Inteiros são compactos e rápidos de indexar, mas expõem volume e ordem. UUID pode ser gerado fora do banco e não é adivinhável; o UUIDv7, ordenado pelo tempo, evita a fragmentação de índice do UUIDv4 aleatório.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "-- inteiro sequencial\nCREATE TABLE invoices (id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY);\n\n-- UUID (PostgreSQL 13+ tem gen_random_uuid(); UUIDv7 via extensão ou na aplicação)\nCREATE TABLE sessions (\n  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_id BIGINT NOT NULL\n);"
+          },
+          "relatedTerms": [
+            "chave-primaria"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "normalizacao",
+      "title": "Normalização",
+      "description": "Evitar redundância e quando quebrar a regra.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "normalizacao",
+          "level": "pleno",
+          "term": "Normalização",
+          "definition": "Processo de organizar as tabelas para que cada fato fique em um lugar só, evitando redundância e anomalias (atualizar o endereço do cliente em mil pedidos). É feito por formas normais; na prática, chegar à 3FN é o objetivo comum.",
+          "relatedTerms": [
+            "formas-normais",
+            "desnormalizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "formas-normais",
+          "level": "pleno",
+          "term": "1FN, 2FN e 3FN",
+          "definition": "1FN: cada coluna guarda um valor atômico, sem listas nem grupos repetidos. 2FN: além disso, toda coluna depende da chave inteira (importa em chaves compostas). 3FN: além disso, nenhuma coluna depende de outra coluna que não é chave (o nome da cidade não fica no cliente se depende do código da cidade).",
+          "relatedTerms": [
+            "normalizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "anomalias",
+          "level": "junior",
+          "term": "Anomalias de atualização",
+          "definition": "Problemas causados por dados repetidos: atualizar o dado num lugar e esquecer em outro (inconsistência), não conseguir cadastrar algo sem outro dado (inserção) e perder informação ao apagar uma linha (exclusão). A normalização existe para evitá-las.",
+          "relatedTerms": [
+            "normalizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "desnormalizacao",
+          "level": "senior",
+          "term": "Desnormalização",
+          "definition": "Duplicar dados de propósito para ler mais rápido: guardar o total no pedido, o contador de comentários no post, uma tabela de relatório pronta. O preço é manter as cópias em sincronia (transação, trigger ou processo assíncrono). Deve ser uma decisão medida, não o ponto de partida.",
+          "relatedTerms": [
+            "normalizacao",
+            "anomalias"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "antes-e-depois",
+          "level": "pleno",
+          "title": "Normalizando uma tabela",
+          "body": "Na versão original, os dados do cliente se repetem em cada pedido e os produtos ficam numa lista em texto. Separando em tabelas, cada fato fica em um lugar só.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "-- antes: orders(id, customer_name, customer_email, products = 'caneca,livro')\n\n-- depois\nCREATE TABLE customers (id BIGINT PRIMARY KEY, name TEXT, email TEXT UNIQUE);\nCREATE TABLE orders (id BIGINT PRIMARY KEY, customer_id BIGINT REFERENCES customers(id));\nCREATE TABLE order_items (\n  order_id BIGINT REFERENCES orders(id),\n  product_id BIGINT REFERENCES products(id),\n  PRIMARY KEY (order_id, product_id)\n);"
+          },
+          "relatedTerms": [
+            "formas-normais",
+            "anomalias"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "contador-desnormalizado",
+          "level": "senior",
+          "title": "Contador mantido na mesma transação",
+          "body": "O contador evita um COUNT(*) a cada leitura do post. Atualizado junto com o insert, na mesma transação, nunca fica divergente.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "BEGIN;\nINSERT INTO comments (post_id, author_id, body) VALUES (42, 7, 'Ótimo!');\nUPDATE posts SET comment_count = comment_count + 1 WHERE id = 42;\nCOMMIT;"
+          },
+          "relatedTerms": [
+            "desnormalizacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "restricoes-e-evolucao",
+      "title": "Restrições e evolução do esquema",
+      "description": "Regras no banco e como mudar o esquema com segurança.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "constraints",
+          "level": "junior",
+          "term": "Constraints",
+          "definition": "Regras que o próprio banco garante: NOT NULL, UNIQUE, CHECK (preço > 0), FOREIGN KEY e PRIMARY KEY. Protegem os dados mesmo quando alguém escreve direto no banco ou a aplicação tem um bug; a validação na aplicação continua útil para dar mensagens melhores.",
+          "relatedTerms": [
+            "migration-db"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "migration-db",
+          "level": "pleno",
+          "term": "Migration",
+          "definition": "Script versionado que altera o esquema (criar tabela, adicionar coluna, criar índice), aplicado em ordem em todos os ambientes por uma ferramenta (Flyway, Liquibase, Prisma, Alembic, migrations do Django). Garante que todos os bancos tenham o mesmo esquema e que a mudança vá junto com o código.",
+          "relatedTerms": [
+            "constraints",
+            "expand-contract"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "expand-contract",
+          "level": "senior",
+          "term": "Expand and contract",
+          "definition": "Padrão para mudar o esquema sem parar o sistema: primeiro expande (adiciona a coluna nova, compatível com o código antigo), migra os dados e passa a escrever nos dois lugares; depois que todo o código usa o novo, contrai (remove o antigo). Renomear uma coluna direto quebra a versão em produção durante o deploy.",
+          "relatedTerms": [
+            "migration-db"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "soft-delete",
+          "level": "pleno",
+          "term": "Soft delete",
+          "definition": "Marcar a linha como apagada (deleted_at) em vez de removê-la, para poder desfazer ou auditar. O custo: toda consulta precisa filtrar os apagados, índices únicos precisam considerar a marcação e dados pessoais podem ter que ser apagados de verdade por lei (LGPD).",
+          "relatedTerms": [
+            "constraints"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "check-constraint",
+          "level": "junior",
+          "title": "Regras no esquema",
+          "body": "CHECK impede preço negativo e status inválido; UNIQUE garante um SKU por produto.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "CREATE TABLE products (\n  id BIGSERIAL PRIMARY KEY,\n  sku TEXT NOT NULL UNIQUE,\n  price NUMERIC(10, 2) NOT NULL CHECK (price >= 0),\n  status TEXT NOT NULL DEFAULT 'draft'\n    CHECK (status IN ('draft', 'active', 'archived'))\n);"
+          },
+          "relatedTerms": [
+            "constraints"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "renomear-sem-parar",
+          "level": "senior",
+          "title": "Renomeando uma coluna sem downtime",
+          "body": "Cada passo é um deploy separado; em nenhum momento a versão em produção lê uma coluna que não existe.",
+          "snippet": {
+            "file": "schema.sql",
+            "language": "sql",
+            "code": "-- 1. expandir: nova coluna, o código escreve nas duas\nALTER TABLE users ADD COLUMN full_name TEXT;\n\n-- 2. copiar os dados antigos\nUPDATE users SET full_name = name WHERE full_name IS NULL;\n\n-- 3. o código passa a ler full_name\n\n-- 4. contrair: remover a coluna antiga\nALTER TABLE users DROP COLUMN name;"
+          },
+          "relatedTerms": [
+            "expand-contract",
+            "migration-db"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de modelagem de dados que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "modelar-n-n",
+          "level": "junior",
+          "question": "Como modelar um relacionamento muitos para muitos?",
+          "answer": "Com uma tabela de junção que tem as duas chaves estrangeiras, como alunos_turmas(aluno_id, turma_id), com chave primária composta ou um índice único nas duas colunas. Atributos do relacionamento, como a nota do aluno naquela turma, ficam nessa tabela.",
+          "relatedTerms": [
+            "tabela-juncao",
+            "cardinalidade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-normalizar",
+          "level": "pleno",
+          "question": "O que é normalização e por que fazer?",
+          "answer": "É organizar as tabelas para que cada informação fique num lugar só, seguindo as formas normais (na prática, até a 3FN). Evita inconsistência ao atualizar, dados órfãos e desperdício. O custo é ter mais JOINs nas leituras, que é quando se considera desnormalizar pontos medidos.",
+          "relatedTerms": [
+            "normalizacao",
+            "formas-normais"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-desnormalizar",
+          "level": "senior",
+          "question": "Quando faz sentido desnormalizar?",
+          "answer": "Quando uma leitura frequente e crítica fica cara por causa de JOINs ou agregações, e índices não resolvem: contadores, totais, uma tabela de leitura para relatórios ou um campo copiado para filtrar. Antes meço; depois, garanto a sincronia na mesma transação ou com um processo assíncrono e aceito o atraso.",
+          "relatedTerms": [
+            "desnormalizacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "validacao-banco-ou-app",
+          "level": "pleno",
+          "question": "Validar na aplicação ou no banco?",
+          "answer": "Nos dois. A aplicação valida para dar mensagens claras e rejeitar cedo; o banco garante as regras essenciais (NOT NULL, UNIQUE, CHECK, chaves estrangeiras) mesmo com bugs, scripts manuais ou outro serviço escrevendo. Unicidade, por exemplo, só é garantida de verdade por um índice único: checar antes e inserir depois tem condição de corrida.",
+          "relatedTerms": [
+            "constraints"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mudar-esquema-producao",
+          "level": "senior",
+          "question": "Como mudar o esquema de uma tabela grande em produção?",
+          "answer": "Em etapas compatíveis (expand and contract), cada uma num deploy. Evito operações que travam a tabela: no PostgreSQL, crio índices com CREATE INDEX CONCURRENTLY e adiciono coluna sem padrão volátil; backfill de dados em lotes pequenos. Também testo a migration num volume parecido e tenho o rollback planejado.",
+          "relatedTerms": [
+            "expand-contract",
+            "migration-db"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "chave-natural-ou-substituta",
+          "level": "pleno",
+          "question": "Chave natural ou chave substituta?",
+          "answer": "Prefiro chave substituta (id gerado) como chave primária, porque dados do mundo real mudam ou têm exceções (CPF digitado errado, e-mail que muda) e seriam propagados em todas as chaves estrangeiras. O dado natural continua com uma constraint UNIQUE, garantindo a regra de negócio.",
+          "relatedTerms": [
+            "chave-primaria",
+            "constraints"
+          ]
+        }
+      ]
+    }
+  ]
+}

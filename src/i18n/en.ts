@@ -88,7 +88,7 @@ export const en: Messages = {
     dueBadge: (n) => `${n} to review today`,
   },
   nav: {
-    areas: { fundamentos: 'Fundamentals', frontend: 'Frontend', backend: 'Backend' },
+    areas: { fundamentos: 'Fundamentals', frontend: 'Frontend', backend: 'Backend', 'banco-de-dados': 'Databases' },
     areaKicker: 'Area',
     sections: {
       tracks: 'Tracks',

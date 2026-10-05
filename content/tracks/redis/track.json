@@ -1,0 +1,317 @@
+{
+  "id": "redis",
+  "title": "Redis",
+  "description": "O banco em memória mais usado: estruturas de dados, TTL, cache, persistência, pub/sub e filas.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "estruturas",
+      "title": "Estruturas de dados",
+      "description": "Os tipos do Redis e para que serve cada um.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "redis",
+          "level": "junior",
+          "term": "Redis",
+          "definition": "Banco chave-valor em memória, muito rápido (respostas em menos de um milissegundo). Os valores têm tipos com operações próprias: string, hash, list, set, sorted set e outros. Usado como cache, contador, fila, sessão e ranking. Executa os comandos numa thread principal, um por vez, então cada comando é atômico.",
+          "relatedTerms": [
+            "string-hash",
+            "ttl"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "string-hash",
+          "level": "junior",
+          "term": "String e hash",
+          "definition": "String guarda um valor por chave (texto, número, JSON serializado) e suporta INCR para contadores atômicos. Hash guarda um objeto com vários campos na mesma chave (HSET user:1 name Ana), permitindo ler ou alterar um campo só.",
+          "relatedTerms": [
+            "redis",
+            "list-set"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "list-set",
+          "level": "pleno",
+          "term": "List, set e sorted set",
+          "definition": "List é uma lista ordenada por inserção (LPUSH, RPOP), útil para filas e últimos itens. Set guarda membros únicos sem ordem (visitantes únicos, tags). Sorted set associa uma pontuação a cada membro e mantém a ordem, ideal para rankings e agendamentos.",
+          "relatedTerms": [
+            "string-hash"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ttl",
+          "level": "junior",
+          "term": "TTL (expiração)",
+          "definition": "Tempo de vida de uma chave: depois dele, o Redis apaga a chave sozinho. Definido com EX no SET ou com EXPIRE. É a base de cache, sessões, códigos de verificação e limites de requisições por janela de tempo.",
+          "relatedTerms": [
+            "redis"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "comandos-basicos",
+          "level": "junior",
+          "title": "Comandos do dia a dia",
+          "body": "Contador atômico, objeto em hash e chave com expiração de 10 minutos.",
+          "snippet": {
+            "file": "redis-cli",
+            "language": "bash",
+            "code": "INCR page:home:views\nHSET user:1 name \"Ana\" plan \"pro\"\nHGET user:1 plan\nSET otp:5511999999999 \"482913\" EX 600\nTTL otp:5511999999999   # segundos restantes"
+          },
+          "relatedTerms": [
+            "string-hash",
+            "ttl"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "ranking",
+          "level": "pleno",
+          "title": "Ranking com sorted set",
+          "body": "ZINCRBY soma pontos; ZREVRANGE traz o top 10 já ordenado; ZREVRANK diz a posição de um jogador.",
+          "snippet": {
+            "file": "redis-cli",
+            "language": "bash",
+            "code": "ZINCRBY leaderboard 50 \"ana\"\nZINCRBY leaderboard 30 \"bruno\"\nZREVRANGE leaderboard 0 9 WITHSCORES   # top 10\nZREVRANK leaderboard \"ana\"            # posição (começa em 0)"
+          },
+          "relatedTerms": [
+            "list-set"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cache",
+      "title": "Cache",
+      "description": "Padrões de cache, invalidação e limite de memória.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "cache-aside",
+          "level": "pleno",
+          "term": "Cache-aside",
+          "definition": "O padrão de cache mais comum: a aplicação procura no cache; se não acha (cache miss), busca no banco, grava no cache com TTL e devolve. Na escrita, atualiza o banco e apaga a chave do cache, para a próxima leitura buscar o dado novo.",
+          "relatedTerms": [
+            "invalidacao",
+            "eviction"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "invalidacao",
+          "level": "senior",
+          "term": "Invalidação de cache",
+          "definition": "Garantir que o cache não sirva dado velho por tempo demais. Estratégias: TTL curto, apagar a chave ao alterar o dado, versionar a chave (product:42:v7) ou eventos que limpam o cache. Apagar é mais seguro que atualizar, porque evita gravar no cache um valor de uma escrita mais antiga.",
+          "relatedTerms": [
+            "cache-aside"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "eviction",
+          "level": "pleno",
+          "term": "Política de eviction",
+          "definition": "O que o Redis faz quando a memória (maxmemory) acaba: com noeviction, recusa novas escritas; com allkeys-lru ou allkeys-lfu, remove as chaves menos usadas, o comportamento certo para cache; com volatile-*, remove só chaves com TTL.",
+          "relatedTerms": [
+            "cache-aside"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cache-stampede",
+          "level": "senior",
+          "term": "Cache stampede",
+          "definition": "Quando uma chave muito acessada expira, centenas de requisições não a acham ao mesmo tempo e todas vão ao banco, que pode cair. Soluções: um lock para que só uma requisição recalcule (SET NX), renovar antes de expirar e adicionar variação aleatória nos TTLs.",
+          "relatedTerms": [
+            "cache-aside",
+            "invalidacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "cache-aside-exemplo",
+          "level": "pleno",
+          "title": "Cache-aside em código",
+          "body": "Lê do cache; no miss, busca no banco e grava com TTL. Ao atualizar o produto, a chave é apagada.",
+          "snippet": {
+            "file": "products.js",
+            "language": "js",
+            "code": "async function getProduct(id) {\n  const cached = await redis.get(`product:${id}`);\n  if (cached) return JSON.parse(cached);\n\n  const product = await db.products.findById(id);\n  await redis.set(`product:${id}`, JSON.stringify(product), { EX: 300 });\n  return product;\n}\n\nasync function updateProduct(id, data) {\n  await db.products.update(id, data);\n  await redis.del(`product:${id}`);\n}"
+          },
+          "relatedTerms": [
+            "cache-aside",
+            "invalidacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "lock-recalculo",
+          "level": "senior",
+          "title": "Lock para recalcular uma vez só",
+          "body": "SET com NX só grava se a chave não existe: quem consegue o lock recalcula, os outros esperam um pouco e leem o cache.",
+          "snippet": {
+            "file": "redis-cli",
+            "language": "bash",
+            "code": "SET lock:report:today \"worker-7\" NX EX 30\n# OK  -> este processo recalcula e grava report:today\n# nil -> outro já está recalculando: aguarde e leia report:today"
+          },
+          "relatedTerms": [
+            "cache-stampede"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "recursos-redis",
+      "title": "Persistência, pub/sub e filas",
+      "description": "O que o Redis oferece além do cache.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "persistencia-redis",
+          "level": "pleno",
+          "term": "Persistência (RDB e AOF)",
+          "definition": "O Redis vive em memória, mas pode salvar em disco. RDB tira fotos periódicas (rápido para reiniciar, mas perde o que mudou desde a última foto). AOF registra cada escrita num log (perde no máximo cerca de um segundo com fsync a cada segundo). Para cache puro, pode-se desligar os dois.",
+          "relatedTerms": [
+            "pub-sub"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pub-sub",
+          "level": "pleno",
+          "term": "Pub/sub",
+          "definition": "Publicação de mensagens em canais, entregues na hora a quem está inscrito. É \"dispare e esqueça\": quem estiver desconectado perde a mensagem. Serve para notificações em tempo real e invalidação de caches locais; para mensagens que não podem se perder, use streams.",
+          "relatedTerms": [
+            "streams"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "streams",
+          "level": "senior",
+          "term": "Streams",
+          "definition": "Log de mensagens persistente (XADD), lido por grupos de consumidores (XREADGROUP) que dividem o trabalho e confirmam o processamento (XACK). Mensagens não confirmadas podem ser reprocessadas. É a forma do Redis para filas confiáveis e eventos.",
+          "relatedTerms": [
+            "pub-sub"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "rate-limit",
+          "level": "pleno",
+          "term": "Rate limiting",
+          "definition": "Limitar quantas requisições um cliente faz por janela de tempo. O mais simples é um contador por cliente e minuto com INCR e EXPIRE; janelas deslizantes usam sorted sets. Como o Redis é compartilhado, o limite vale para todas as instâncias da API.",
+          "relatedTerms": [
+            "persistencia-redis"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "rate-limit-exemplo",
+          "level": "pleno",
+          "title": "Limite de 100 requisições por minuto",
+          "body": "A chave inclui o minuto atual; INCR conta e a primeira requisição define a expiração. Acima de 100, a API responde 429.",
+          "snippet": {
+            "file": "redis-cli",
+            "language": "bash",
+            "code": "MULTI\nINCR rate:user:42:2026-10-05T14:05\nEXPIRE rate:user:42:2026-10-05T14:05 60 NX\nEXEC\n# se o contador passar de 100 -> 429 Too Many Requests"
+          },
+          "relatedTerms": [
+            "rate-limit"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "stream-exemplo",
+          "level": "senior",
+          "title": "Fila com streams",
+          "body": "O produtor adiciona; cada worker do grupo recebe mensagens diferentes e confirma ao terminar. Se um worker cair, a mensagem fica pendente e pode ser reatribuída.",
+          "snippet": {
+            "file": "redis-cli",
+            "language": "bash",
+            "code": "XADD emails * to \"ana@example.com\" template \"welcome\"\nXGROUP CREATE emails senders $ MKSTREAM\nXREADGROUP GROUP senders worker-1 COUNT 10 BLOCK 5000 STREAMS emails >\nXACK emails senders 1728137100000-0"
+          },
+          "relatedTerms": [
+            "streams"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Redis que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "por-que-redis-rapido",
+          "level": "junior",
+          "question": "Por que o Redis é tão rápido?",
+          "answer": "Os dados ficam em memória, as estruturas são simples e otimizadas, e os comandos rodam numa thread principal sem disputa por locks, com I/O de rede não bloqueante. A maioria das operações é O(1) ou O(log n). O custo é a memória, mais cara que disco, e comandos lentos (KEYS, operações em coleções enormes) travam todo mundo.",
+          "relatedTerms": [
+            "redis"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "estrategia-cache",
+          "level": "pleno",
+          "question": "Como você implementaria um cache com Redis?",
+          "answer": "Cache-aside: leio do Redis; no miss, busco no banco e gravo com TTL. Ao alterar o dado, atualizo o banco e apago a chave. Defino TTLs com variação aleatória, maxmemory com política allkeys-lru e trato a falha do Redis como cache miss, para a aplicação continuar funcionando sem ele.",
+          "relatedTerms": [
+            "cache-aside",
+            "eviction"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "redis-banco-principal",
+          "level": "pleno",
+          "question": "Dá para usar o Redis como banco principal?",
+          "answer": "Para casos específicos, sim (sessões, contadores, rankings, dados efêmeros), com persistência AOF e réplicas. Como banco principal de dados de negócio, em geral não: tudo precisa caber em memória, não há consultas ricas nem relacionamentos, e mesmo com AOF pode haver perda de cerca de um segundo numa queda.",
+          "relatedTerms": [
+            "persistencia-redis",
+            "redis"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pubsub-vs-streams",
+          "level": "senior",
+          "question": "Qual a diferença entre pub/sub e streams no Redis?",
+          "answer": "Pub/sub entrega a mensagem só para quem está conectado naquele instante e não guarda nada: bom para notificações em tempo real. Streams guardam as mensagens, permitem ler o histórico, dividir o trabalho entre consumidores de um grupo e confirmar o processamento: bom para filas e eventos que não podem se perder.",
+          "relatedTerms": [
+            "pub-sub",
+            "streams"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "cache-stampede-pergunta",
+          "level": "senior",
+          "question": "O que é cache stampede e como evitar?",
+          "answer": "É quando uma chave popular expira e muitas requisições, ao mesmo tempo, não a acham e vão ao banco para recalcular, sobrecarregando-o. Evito com um lock (SET NX) para que só uma requisição recalcule, variação aleatória nos TTLs para chaves não expirarem juntas e renovação antecipada do valor antes de ele expirar.",
+          "relatedTerms": [
+            "cache-stampede"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "keys-producao",
+          "level": "pleno",
+          "question": "Por que não usar KEYS * em produção?",
+          "answer": "Porque KEYS percorre todas as chaves de uma vez, e como o Redis executa um comando por vez, todo o resto fica parado enquanto isso: com milhões de chaves, a aplicação trava. Uso SCAN, que percorre em lotes com cursor, e evito precisar listar chaves organizando os dados em sets ou hashes.",
+          "relatedTerms": [
+            "redis"
+          ]
+        }
+      ]
+    }
+  ]
+}

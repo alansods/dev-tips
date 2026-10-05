@@ -1,0 +1,316 @@
+{
+  "id": "postgresql",
+  "title": "PostgreSQL",
+  "description": "O banco relacional open source mais completo: tipos avançados, índices, MVCC, VACUUM e extensões.",
+  "areas": [
+    "banco-de-dados"
+  ],
+  "decks": [
+    {
+      "id": "tipos-e-recursos",
+      "title": "Tipos e recursos",
+      "description": "O que o PostgreSQL oferece além do SQL básico.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "jsonb",
+          "level": "pleno",
+          "term": "JSONB",
+          "definition": "Tipo que guarda JSON em formato binário, com operadores para consultar dentro do documento (->, ->>, @>) e suporte a índices GIN. Permite misturar colunas estruturadas com dados flexíveis (atributos variáveis de produtos) sem outro banco. JSON (sem B) guarda o texto como veio e é mais lento de consultar.",
+          "relatedTerms": [
+            "indice-gin",
+            "tipos-postgres"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipos-postgres",
+          "level": "junior",
+          "term": "Tipos úteis do PostgreSQL",
+          "definition": "Além dos comuns: TIMESTAMPTZ (data e hora com fuso, o certo para instantes), NUMERIC (valores exatos, para dinheiro), UUID, arrays (TEXT[]), ENUM, intervalos (tstzrange) e tipos de rede (inet). Escolher o tipo certo evita conversões e bugs.",
+          "relatedTerms": [
+            "jsonb"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "upsert",
+          "level": "pleno",
+          "term": "Upsert (ON CONFLICT)",
+          "definition": "INSERT ... ON CONFLICT (coluna) DO UPDATE insere ou, se já existir uma linha com aquela chave única, atualiza, numa única operação atômica. DO NOTHING ignora a duplicata. Evita a condição de corrida de \"consultar e depois inserir\".",
+          "relatedTerms": [
+            "tipos-postgres"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "extensoes",
+          "level": "pleno",
+          "term": "Extensões",
+          "definition": "Módulos que adicionam recursos ao banco com CREATE EXTENSION: pg_trgm (busca por semelhança de texto), PostGIS (dados geográficos), pgvector (vetores para busca semântica e IA), pg_stat_statements (estatísticas das consultas). Boa parte das necessidades cabe no próprio PostgreSQL.",
+          "relatedTerms": [
+            "jsonb"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "jsonb-exemplo",
+          "level": "pleno",
+          "title": "Consultando JSONB",
+          "body": "->> extrai o valor como texto; @> testa se o documento contém o trecho, e é acelerado pelo índice GIN.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "CREATE TABLE products (\n  id BIGSERIAL PRIMARY KEY,\n  name TEXT NOT NULL,\n  attributes JSONB NOT NULL DEFAULT '{}'\n);\nCREATE INDEX products_attributes_idx ON products USING GIN (attributes);\n\nSELECT name, attributes->>'color' AS color\nFROM products\nWHERE attributes @> '{\"size\": \"M\"}';"
+          },
+          "relatedTerms": [
+            "jsonb",
+            "indice-gin"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "upsert-exemplo",
+          "level": "pleno",
+          "title": "Upsert de contador",
+          "body": "Primeira visita insere; as seguintes somam. EXCLUDED é a linha que se tentou inserir.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "INSERT INTO page_views (page, day, views)\nVALUES ('/home', CURRENT_DATE, 1)\nON CONFLICT (page, day)\nDO UPDATE SET views = page_views.views + EXCLUDED.views;"
+          },
+          "relatedTerms": [
+            "upsert"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "indices-postgres",
+      "title": "Índices",
+      "description": "Os tipos de índice e quando usar cada um.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "indice-btree",
+          "level": "junior",
+          "term": "B-tree",
+          "definition": "Tipo de índice padrão. Serve para igualdade, intervalos (>, <, BETWEEN), ordenação e LIKE com prefixo fixo ('abc%'). É o certo para chaves, datas e a maioria das colunas filtradas.",
+          "relatedTerms": [
+            "indice-gin",
+            "indice-parcial"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "indice-gin",
+          "level": "pleno",
+          "term": "GIN e GiST",
+          "definition": "Índices para valores compostos. GIN indexa os elementos de dentro do valor: JSONB, arrays, busca textual e trigramas (pg_trgm, que acelera LIKE '%texto%'). GiST serve para dados geométricos, intervalos e proximidade (PostGIS, exclusão de sobreposição).",
+          "relatedTerms": [
+            "indice-btree"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "indice-parcial",
+          "level": "pleno",
+          "term": "Índice parcial e de expressão",
+          "definition": "Índice parcial cobre só as linhas que atendem um WHERE (ex.: só pedidos pendentes), ficando menor e mais rápido. Índice de expressão indexa o resultado de uma função, como lower(email), para buscas sem diferenciar maiúsculas.",
+          "relatedTerms": [
+            "indice-btree"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "concurrently",
+          "level": "senior",
+          "term": "CREATE INDEX CONCURRENTLY",
+          "definition": "Cria o índice sem bloquear as escritas na tabela, ao custo de demorar mais e não poder rodar dentro de uma transação. Em tabelas grandes de produção, é o jeito seguro; um CREATE INDEX comum trava INSERT, UPDATE e DELETE até terminar.",
+          "relatedTerms": [
+            "indice-btree"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "indices-exemplo",
+          "level": "pleno",
+          "title": "Índices certos para cada caso",
+          "body": "Parcial para a fila de pendentes, de expressão para e-mail sem caixa, trigramas para busca por trecho e CONCURRENTLY para não travar a tabela.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "CREATE INDEX CONCURRENTLY orders_pending_idx\n  ON orders (created_at) WHERE status = 'pending';\n\nCREATE UNIQUE INDEX users_email_idx ON users (lower(email));\n\nCREATE EXTENSION IF NOT EXISTS pg_trgm;\nCREATE INDEX products_name_trgm_idx ON products USING GIN (name gin_trgm_ops);\n-- acelera: WHERE name ILIKE '%caneca%'"
+          },
+          "relatedTerms": [
+            "indice-parcial",
+            "indice-gin"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "covering-index",
+          "level": "senior",
+          "title": "Índice de cobertura (INCLUDE)",
+          "body": "Com as colunas extras no INCLUDE, a consulta é respondida só pelo índice (Index Only Scan), sem ler a tabela.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "CREATE INDEX orders_customer_idx\n  ON orders (customer_id) INCLUDE (total, status);\n\nEXPLAIN SELECT total, status FROM orders WHERE customer_id = 42;\n-- Index Only Scan using orders_customer_idx"
+          },
+          "relatedTerms": [
+            "indice-btree"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mvcc-e-manutencao",
+      "title": "MVCC e manutenção",
+      "description": "Como o PostgreSQL lida com concorrência e limpeza.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "mvcc",
+          "level": "senior",
+          "term": "MVCC",
+          "definition": "Multi-Version Concurrency Control: em vez de alterar a linha no lugar, cada UPDATE cria uma nova versão, e cada transação enxerga as versões válidas para ela. Assim leituras não bloqueiam escritas e vice-versa. As versões antigas viram \"tuplas mortas\" que precisam ser limpas.",
+          "relatedTerms": [
+            "vacuum"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "vacuum",
+          "level": "senior",
+          "term": "VACUUM e autovacuum",
+          "definition": "VACUUM recupera o espaço das tuplas mortas e atualiza o mapa de visibilidade; ANALYZE atualiza as estatísticas usadas pelo planejador. O autovacuum faz isso sozinho, mas tabelas com muitos UPDATEs podem precisar de ajuste. Sem limpeza, a tabela incha (bloat) e as consultas ficam lentas.",
+          "relatedTerms": [
+            "mvcc"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "connection-pool",
+          "level": "pleno",
+          "term": "Pool de conexões",
+          "definition": "Cada conexão no PostgreSQL é um processo e consome memória; centenas de conexões diretas derrubam o desempenho. A aplicação usa um pool (no driver ou ORM) e, em escala ou com serverless, um pooler externo como PgBouncer, que reaproveita poucas conexões reais.",
+          "relatedTerms": [
+            "replicacao-postgres"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "replicacao-postgres",
+          "level": "pleno",
+          "term": "Replicação e réplicas de leitura",
+          "definition": "A replicação por streaming envia o log de escrita (WAL) do primário para réplicas, que podem atender leituras. Por padrão é assíncrona: a réplica pode estar alguns milissegundos atrás, então ler logo após escrever pode não ver o dado novo.",
+          "relatedTerms": [
+            "mvcc"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "pg-stat-statements",
+          "level": "senior",
+          "title": "Achando as consultas mais caras",
+          "body": "pg_stat_statements agrega todas as consultas executadas; ordenar pelo tempo total mostra onde otimizar primeiro.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;\n\nSELECT query, calls,\n       round(total_exec_time) AS total_ms,\n       round(mean_exec_time, 1) AS avg_ms\nFROM pg_stat_statements\nORDER BY total_exec_time DESC\nLIMIT 10;"
+          },
+          "relatedTerms": [
+            "vacuum",
+            "mvcc"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "bloat-check",
+          "level": "senior",
+          "title": "Tabelas com muitas tuplas mortas",
+          "body": "Mostra quais tabelas acumulam tuplas mortas e quando o autovacuum passou por elas pela última vez.",
+          "snippet": {
+            "file": "postgres.sql",
+            "language": "sql",
+            "code": "SELECT relname, n_live_tup, n_dead_tup, last_autovacuum\nFROM pg_stat_user_tables\nORDER BY n_dead_tup DESC\nLIMIT 10;"
+          },
+          "relatedTerms": [
+            "vacuum"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de PostgreSQL que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "por-que-postgres",
+          "level": "junior",
+          "question": "Por que escolher PostgreSQL?",
+          "answer": "É open source, robusto e muito completo: transações ACID, tipos avançados (JSONB, arrays, intervalos), vários tipos de índice, CTEs e window functions, extensões (PostGIS, pgvector) e boa conformidade com o padrão SQL. Cobre do CRUD comum a dados semiestruturados e geográficos sem precisar de outro banco.",
+          "relatedTerms": [
+            "tipos-postgres",
+            "extensoes"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "json-vs-jsonb",
+          "level": "pleno",
+          "question": "Qual a diferença entre JSON e JSONB?",
+          "answer": "JSON guarda o texto exatamente como veio (espaços, ordem e chaves duplicadas) e reprocessa a cada consulta. JSONB guarda em formato binário já processado: grava um pouco mais devagar, mas consulta muito mais rápido e aceita índices GIN. Na prática uso JSONB, a não ser que precise preservar o texto original.",
+          "relatedTerms": [
+            "jsonb"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-mvcc",
+          "level": "senior",
+          "question": "O que é MVCC e qual sua consequência?",
+          "answer": "É o controle de concorrência por múltiplas versões: cada UPDATE cria uma nova versão da linha e cada transação vê o snapshot que lhe cabe, então leituras não bloqueiam escritas. A consequência é acumular versões mortas, que o VACUUM limpa. Transações abertas por muito tempo impedem essa limpeza e causam inchaço.",
+          "relatedTerms": [
+            "mvcc",
+            "vacuum"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "busca-texto",
+          "level": "pleno",
+          "question": "Como acelerar uma busca LIKE '%texto%' no PostgreSQL?",
+          "answer": "Um índice B-tree não serve quando o padrão começa com %. Uso a extensão pg_trgm com um índice GIN de trigramas, que acelera LIKE e ILIKE com curinga no começo e busca por semelhança. Para busca em linguagem natural, com relevância e radicais, uso a busca textual (tsvector) ou um motor como Elasticsearch.",
+          "relatedTerms": [
+            "indice-gin",
+            "extensoes"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "muitas-conexoes",
+          "level": "pleno",
+          "question": "A aplicação estoura o limite de conexões do PostgreSQL. O que fazer?",
+          "answer": "Não aumento o max_connections sem pensar, porque cada conexão é um processo e consome memória. Configuro o pool da aplicação com um tamanho adequado e, com muitas instâncias ou funções serverless, coloco um PgBouncer em modo transaction na frente. Também verifico conexões vazando (que não voltam ao pool) e transações longas.",
+          "relatedTerms": [
+            "connection-pool"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "indice-producao",
+          "level": "senior",
+          "question": "Como criar um índice numa tabela grande em produção?",
+          "answer": "Com CREATE INDEX CONCURRENTLY, que não bloqueia as escritas. Ele demora mais, não roda dentro de transação e, se falhar, deixa um índice inválido que preciso apagar e recriar. Antes confiro com EXPLAIN que o índice vai ser usado, e depois acompanho o impacto nas escritas.",
+          "relatedTerms": [
+            "concurrently"
+          ]
+        }
+      ]
+    }
+  ]
+}
