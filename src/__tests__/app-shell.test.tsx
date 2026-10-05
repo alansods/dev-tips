@@ -61,17 +61,17 @@ describe('Requirement: Navegação por abas', () => {
   });
 });
 
-describe('Requirement: Home mínima', () => {
-  it('Lista de trilhas', async () => {
+describe('Requirement: Home por áreas', () => {
+  it('a aba Trilhas lista as áreas', async () => {
     await renderApp();
-    expect(screen.getByText('O mesmo CRUD em quatro frameworks')).toBeOnTheScreen();
+    expect(screen.getByText('Backend')).toBeOnTheScreen();
   });
 });
 
 describe('Requirement: Fontes do design', () => {
   it('usa IBM Plex Sans quando as fontes carregam', async () => {
     await renderApp();
-    const title = screen.getByText('O mesmo CRUD em quatro frameworks');
+    const title = screen.getByText('Backend');
     expect(StyleSheet.flatten(title.props.style).fontFamily).toMatch(/^IBMPlexSans_/);
   });
 
@@ -80,7 +80,7 @@ describe('Requirement: Fontes do design', () => {
     await renderApp();
     expect(SplashScreen.hideAsync).toHaveBeenCalled();
     expect(tab('Trilhas')).toBeSelected();
-    const title = screen.getByText('O mesmo CRUD em quatro frameworks');
+    const title = screen.getByText('Backend');
     expect(StyleSheet.flatten(title.props.style).fontFamily).toBeUndefined();
   });
 
@@ -90,7 +90,7 @@ describe('Requirement: Fontes do design', () => {
     renderRouter(APP, { initialUrl: '/' });
     await act(async () => {});
     expect(SplashScreen.hideAsync).not.toHaveBeenCalled();
-    expect(screen.queryByText('O mesmo CRUD em quatro frameworks')).toBeNull();
+    expect(screen.queryByText('Backend')).toBeNull();
   });
 });
 

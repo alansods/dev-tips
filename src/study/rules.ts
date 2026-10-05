@@ -32,6 +32,16 @@ export const trackStats = (track: Track, progress: Progress): Stats =>
     progress,
   );
 
+/** Progresso somado de várias trilhas (ex.: todas as de uma área). */
+export const tracksStats = (tracks: readonly Track[], progress: Progress): Stats =>
+  tracks.reduce<Stats>(
+    (sum, track) => {
+      const s = trackStats(track, progress);
+      return { total: sum.total + s.total, known: sum.known + s.known, unknown: sum.unknown + s.unknown, answered: sum.answered + s.answered };
+    },
+    { total: 0, known: 0, unknown: 0, answered: 0 },
+  );
+
 export type DeckAction = 'start' | 'continue' | 'restart';
 
 export function deckAction(stats: Stats): DeckAction {

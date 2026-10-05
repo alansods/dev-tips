@@ -1,0 +1,15 @@
+{
+  "languages": [
+    { "id": "javascript", "name": "JavaScript" },
+    { "id": "typescript", "name": "TypeScript" },
+    { "id": "java", "name": "Java" },
+    { "id": "python", "name": "Python" }
+  ],
+  "frameworks": [
+    { "id": "react", "name": "React", "language": "typescript" },
+    { "id": "express", "name": "Express", "language": "javascript" },
+    { "id": "nest", "name": "NestJS", "language": "typescript" },
+    { "id": "spring", "name": "Spring Boot", "language": "java" },
+    { "id": "fastapi", "name": "FastAPI", "language": "python" }
+  ]
+}

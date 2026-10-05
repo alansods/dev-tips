@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
+import AreaScreen from '../app/area/[areaId]/index';
 import ReviewScreen from '../app/review/[trackId]';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
@@ -18,6 +19,7 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
+  'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
   'review/[trackId]': ReviewScreen,
@@ -117,6 +119,7 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
     fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
     fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
+    press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });

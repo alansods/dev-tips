@@ -140,3 +140,26 @@ describe('Requirement: Frente e verso por tipo de card (pergunta)', () => {
     expect(screen.getByText(/curl -X PUT[\s\S]*curl -X PATCH/)).toBeOnTheScreen();
   });
 });
+
+describe('Requirement: Nível no card', () => {
+  it('Nível na frente', () => {
+    show('step-05', 'front'); // level: pleno
+    expect(screen.getByText('Pleno')).toBeOnTheScreen();
+    expect(screen.getByText('Passo 5')).toBeOnTheScreen();
+  });
+
+  it('Nível no verso', () => {
+    show('transacoes', 'back'); // level: senior
+    expect(screen.getByText('Sênior')).toBeOnTheScreen();
+  });
+
+  it('júnior', () => {
+    show('endpoint-create', 'front');
+    expect(screen.getByText('Júnior')).toBeOnTheScreen();
+  });
+
+  it('Nível em inglês', () => {
+    renderWithTheme(<Harness card={cardById('step-05')} side="front" />, { language: 'en' });
+    expect(screen.getByText('Mid-level')).toBeOnTheScreen();
+  });
+});

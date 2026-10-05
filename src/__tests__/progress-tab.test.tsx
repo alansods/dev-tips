@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
+import AreaScreen from '../app/area/[areaId]/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import { progressKey } from '../study/rules';
@@ -17,6 +18,7 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
+  'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
 };
@@ -81,6 +83,7 @@ describe('Requirement: Zerar progresso de uma trilha', () => {
     expect(useStudyStore.getState().progress).toEqual({});
 
     fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
+    press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks/);
     for (const deck of crudTrack.decks) {
       expect(screen.getByRole('button', { name: `Estudar ${deck.title}` })).toBeOnTheScreen();

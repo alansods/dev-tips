@@ -4,6 +4,7 @@ import { expectErrorAt, trackOf } from '../__fixtures__/expect';
 
 const questionCard = (extra: Record<string, unknown> = {}) => ({
   type: 'question',
+  level: 'pleno',
   id: 'put-vs-patch',
   origin: 'supplement',
   question: 'Qual a diferença entre PUT e PATCH?',

@@ -11,12 +11,13 @@ export function snippet(code = 'echo ok', extra: Json = {}): Json {
 }
 
 export function conceptCard(id = 'api', term = 'API', extra: Json = {}): Json {
-  return { type: 'concept', id, term, definition: `Definição de ${term}.`, ...extra };
+  return { type: 'concept', level: 'junior', id, term, definition: `Definição de ${term}.`, ...extra };
 }
 
 export function endpointCard(id = 'ep-delete', extra: Json = {}): Json {
   return {
     type: 'endpoint',
+    level: 'junior',
     id,
     method: 'DELETE',
     path: '/products/{id}',
@@ -31,6 +32,7 @@ export function endpointCard(id = 'ep-delete', extra: Json = {}): Json {
 export function stepCard(number = 1, extra: Json = {}, variants = VARIANT_IDS): Json {
   return {
     type: 'step',
+    level: 'junior',
     id: `step-${number}`,
     number,
     title: `Passo ${number}`,
@@ -44,6 +46,7 @@ export function stepCard(number = 1, extra: Json = {}, variants = VARIANT_IDS): 
 export function compareCard(id = 'cmp-dto', extra: Json = {}, columns = COLUMN_IDS): Json {
   return {
     type: 'compare',
+    level: 'junior',
     id,
     concept: 'DTO',
     explanation: 'O formato dos dados que entram e saem da API.',
@@ -55,6 +58,7 @@ export function compareCard(id = 'cmp-dto', extra: Json = {}, columns = COLUMN_I
 export function codeCard(id = 'docker-compose', extra: Json = {}): Json {
   return {
     type: 'code',
+    level: 'junior',
     id,
     origin: 'supplement',
     title: 'docker-compose.yml',
@@ -70,6 +74,7 @@ export function minimalTrack(): Json {
     id: 'trilha-minimo',
     title: 'Trilha mínima',
     description: 'Uma trilha de teste.',
+    areas: ['fundamentos'],
     decks: [{ id: 'deck-1', title: 'Deck 1', cards: [conceptCard()] }],
   };
 }
@@ -80,6 +85,7 @@ export function fullTrack(): Json {
     id: 'crud-teste',
     title: 'CRUD de teste',
     description: 'Trilha completa de teste.',
+    areas: ['backend'],
     variants: [
       { id: 'express', name: 'Express', language: 'TypeScript' },
       { id: 'spring', name: 'Spring Boot', language: 'Java' },
@@ -92,6 +98,22 @@ export function fullTrack(): Json {
       { id: 'passos', title: 'Passo a passo', cards: [stepCard(1, { relatedTerms: ['api'] }), codeCard()] },
       { id: 'mapa', title: 'Mapa mental', cards: [compareCard()] },
       { id: 'glossario', title: 'Glossário', cards: [conceptCard(), conceptCard('cors', 'CORS', { relatedTerms: ['api'] })] },
+    ],
+  };
+}
+
+/** Cadastro de linguagens e frameworks para os testes. */
+export function testTaxonomy(): Json {
+  return {
+    languages: [
+      { id: 'java', name: 'Java' },
+      { id: 'python', name: 'Python' },
+      { id: 'typescript', name: 'TypeScript' },
+    ],
+    frameworks: [
+      { id: 'spring', name: 'Spring Boot', language: 'java' },
+      { id: 'fastapi', name: 'FastAPI', language: 'python' },
+      { id: 'nest', name: 'NestJS', language: 'typescript' },
     ],
   };
 }

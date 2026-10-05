@@ -86,6 +86,24 @@ export const ptBR = {
     cardLabel: (title: string, known: number, total: number) => `${title}, ${known} de ${total} cards que você sabe`,
     dueBadge: (n: number) => `${n} para revisar hoje`,
   },
+  nav: {
+    areas: { fundamentos: 'Fundamentos', frontend: 'Frontend', backend: 'Backend' },
+    areaKicker: 'Área',
+    sections: {
+      tracks: 'Trilhas',
+      languages: 'Linguagens',
+      comparisons: 'Comparativos',
+      core: 'Linguagem pura',
+      frameworks: 'Frameworks',
+    },
+    trackCount: (n: number) => `${n} ${plural(n, 'trilha', 'trilhas')}`,
+    areaLabel: (area: string, tracks: string, known: number, total: number) =>
+      `${area}, ${tracks}, ${known} de ${total} cards que você sabe`,
+    rowLabel: (name: string, tracks: string) => `${name}, ${tracks}`,
+    areaNotFound: 'Área não encontrada.',
+    languageNotFound: 'Linguagem não encontrada.',
+    frameworkNotFound: 'Framework não encontrado.',
+  },
   track: {
     kicker: 'Trilha',
     knownLabel: (known: number, total: number) => `${known} de ${total} cards que você sabe`,
@@ -130,6 +148,7 @@ export const ptBR = {
     },
     stepNumber: (n: number) => `Passo ${n}`,
     supplement: 'Complemento',
+    levels: { junior: 'Júnior', pleno: 'Pleno', senior: 'Sênior' },
     relatedTerms: 'Termos relacionados',
     success: 'Sucesso',
     errors: 'Erros',

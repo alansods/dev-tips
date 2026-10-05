@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { getGlossary, validateTrack, type Card, type CodeCard, type EndpointCard, type StepCard, type Track } from '../index';
+import { getGlossary, placementOf, validateTrack, type Card, type CodeCard, type EndpointCard, type StepCard, type Track } from '../index';
 
 const ROOT = path.resolve(__dirname, '../../..');
 const SOURCE_PATH = path.join(ROOT, 'content/sources/crud-4-frameworks.md');
@@ -70,6 +70,8 @@ describe('Requirement: Identidade, variantes e colunas da trilha', () => {
     const track = loadTrack();
     expect(track.id).toBe('crud-4-frameworks');
     expect(track.title).toBe('O mesmo CRUD em quatro frameworks');
+    expect(track.areas).toEqual(['backend']);
+    expect(placementOf(track)).toEqual({ kind: 'comparison' });
   });
 
   it('Ordem de variantes e colunas', () => {

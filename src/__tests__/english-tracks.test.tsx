@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
+import AreaScreen from '../app/area/[areaId]/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import { useSettingsStore } from '../i18n';
@@ -17,6 +18,7 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
+  'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
 };
@@ -32,9 +34,13 @@ beforeEach(() => resetStudyStore());
 describe('Requirement: Tradução completa para inglês', () => {
   beforeEach(() => useSettingsStore.setState({ language: 'en' }));
 
-  it('Home com os dois trilhas em inglês', async () => {
-    await open('/');
+  it('trilha CRUD em inglês na área Backend', async () => {
+    await open('/area/backend');
     expect(screen.getByText('The same CRUD in four frameworks')).toBeOnTheScreen();
+  });
+
+  it('trilha Fundamentos web em inglês na área Fundamentos', async () => {
+    await open('/area/fundamentos');
     expect(screen.getByText('Web fundamentals')).toBeOnTheScreen();
   });
 

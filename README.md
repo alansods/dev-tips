@@ -2,11 +2,12 @@
 
 A mobile study app with cards that reinforce fullstack development concepts that come up in job interviews.
 
-Pick a **track**, open a **deck** and study the **cards** as flashcards: flip the card, answer "I knew it" or "I didn't know", and the app schedules the next review. It works offline and without an account. Google sign-in is optional and is used to sync your progress across devices.
+Pick an **area** (Fundamentals, Frontend, Backend), open a **track** and a **deck** and study the **cards** as flashcards: flip the card, answer "I knew it" or "I didn't know", and the app schedules the next review. It works offline and without an account. Google sign-in is optional and is used to sync your progress across devices.
 
 ## Features
 
-- **Tracks and decks**: "The same CRUD in four frameworks" (Express, Spring Boot, NestJS, FastAPI) and "Web fundamentals" (HTTP, REST, browser and security, interview questions).
+- **Areas, languages and frameworks**: tracks are grouped by area, then by language and framework. Tracks that build the same thing in several stacks live under **Comparisons**. Today: "The same CRUD in four frameworks" (Express, Spring Boot, NestJS, FastAPI) in Backend › Comparisons and "Web fundamentals" (HTTP, REST, browser and security, interview questions) in Fundamentals.
+- **Seniority per card**: every card shows whether the topic is usually asked of Junior, Mid-level or Senior developers.
 - **Flashcards** with a flip animation, code with tabs per variant, and a summary at the end of each session.
 - **Spaced repetition** with boxes, plus a daily review.
 - **Glossary** with search; terms mentioned in cards open their definition in a bottom sheet.
@@ -43,6 +44,7 @@ src/
 content/
   sources/      original editorial material (Markdown)
   tracks/       content used by the app (track.json + translations/)
+  taxonomy.json languages and frameworks used to place tracks
 api/            API (Cloudflare Workers + D1)
 openspec/       specs (source of truth) and changes
 docs/           decisions, design backlog and legal pages
@@ -110,6 +112,7 @@ Content is kept separate from the code:
 
 - `content/sources/*.md` is the original editorial material.
 - `content/tracks/<track-id>/track.json` is what the app loads, validated by the Zod schema from the `content-model` capability. Translations live in `translations/en.json`.
+- Each track declares its `areas` and, optionally, a `language` and a `framework` from `content/taxonomy.json`; tracks with `variants` are comparisons. Every card has a `level` (`junior`, `pleno` or `senior`).
 
 Gaps in the original material are filled with cards marked as supplements (`origin: "supplement"`), so they're never mistaken for the original. Keys are in English; displayed text is in Brazilian Portuguese (and English through translations).
 
@@ -125,7 +128,7 @@ The specs in [`openspec/specs/`](openspec/specs/) are the source of truth. No be
 
 Bugs follow the same path: first a spec scenario that reproduces the bug, then the fix.
 
-Current capabilities: `api-server`, `app-polish`, `app-shell`, `auth`, `content-model`, `crud-theme-content`, `glossary`, `localization`, `progress`, `reminders`, `spaced-repetition`, `study-flow`, `sync` and `web-fundamentals-content`.
+Current capabilities: `api-server`, `app-polish`, `app-shell`, `auth`, `catalog-navigation`, `content-model`, `crud-theme-content`, `glossary`, `localization`, `progress`, `reminders`, `spaced-repetition`, `study-flow`, `sync` and `web-fundamentals-content`.
 
 > Specs, changes and project docs are written in Brazilian Portuguese.
 

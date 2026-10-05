@@ -2,6 +2,9 @@
   "id": "fundamentos-web",
   "title": "Fundamentos web",
   "description": "Os conceitos da web por trás de toda API: HTTP, REST, regras do navegador e segurança.",
+  "areas": [
+    "fundamentos"
+  ],
   "decks": [
     {
       "id": "http",
@@ -11,6 +14,7 @@
         {
           "type": "concept",
           "id": "http",
+          "level": "junior",
           "term": "HTTP",
           "definition": "O protocolo que o navegador e a API usam para conversar. Cada conversa é uma requisição (método, URL, cabeçalhos e corpo) seguida de uma resposta (código de status, cabeçalhos e corpo).",
           "relatedTerms": [
@@ -22,6 +26,7 @@
         {
           "type": "concept",
           "id": "metodo-http",
+          "level": "junior",
           "term": "Método HTTP",
           "definition": "O verbo da requisição, que diz o que se quer fazer com o recurso: GET busca, POST cria, PUT substitui, PATCH altera em parte e DELETE apaga. Um GET nunca deve alterar dados.",
           "relatedTerms": [
@@ -32,6 +37,7 @@
         {
           "type": "concept",
           "id": "codigo-de-status",
+          "level": "junior",
           "term": "Código de status",
           "definition": "Número de três dígitos que resume o resultado da requisição: 2xx deu certo (200, 201, 204), 3xx é redirecionamento ou cache (301, 302, 304), 4xx é erro de quem pediu (400, 401, 403, 404, 409, 422) e 5xx é erro do servidor (500, 503).",
           "relatedTerms": [
@@ -42,6 +48,7 @@
         {
           "type": "concept",
           "id": "cabecalho",
+          "level": "junior",
           "term": "Cabeçalho (header)",
           "definition": "Par nome: valor enviado junto com a requisição ou a resposta, com informações sobre ela. Exemplos: Content-Type (formato do corpo), Authorization (credencial), Cache-Control (regras de cache) e Set-Cookie (grava um cookie no navegador).",
           "relatedTerms": [
@@ -53,6 +60,7 @@
         {
           "type": "concept",
           "id": "corpo",
+          "level": "junior",
           "term": "Corpo (body)",
           "definition": "O conteúdo enviado na requisição ou na resposta, como o JSON de um produto. O cabeçalho Content-Type diz em que formato ele está. Um GET normalmente não tem corpo: os parâmetros vão na URL.",
           "relatedTerms": [
@@ -63,6 +71,7 @@
         {
           "type": "concept",
           "id": "https",
+          "level": "junior",
           "term": "HTTPS",
           "definition": "HTTP dentro de uma conexão criptografada (TLS). Impede que alguém no meio do caminho leia ou altere os dados e prova, pelo certificado, que o site é quem diz ser. Cookies com o atributo Secure só trafegam por HTTPS.",
           "relatedTerms": [
@@ -73,6 +82,7 @@
         {
           "type": "concept",
           "id": "cache-http",
+          "level": "pleno",
           "term": "Cache HTTP",
           "definition": "Guardar uma resposta para reaproveitar depois, sem pedir de novo ao servidor. O servidor controla isso com cabeçalhos: Cache-Control diz por quanto tempo a cópia vale, e o ETag é uma \"impressão digital\" da versão, usada para perguntar se algo mudou e receber 304 Not Modified quando não mudou.",
           "relatedTerms": [
@@ -90,6 +100,7 @@
         {
           "type": "concept",
           "id": "rest",
+          "level": "junior",
           "term": "REST",
           "definition": "Um estilo de criar APIs em que cada coisa é um recurso com uma URL (/products/1) e as ações usam os métodos HTTP. As respostas trazem uma representação do recurso, normalmente em JSON, e o servidor não guarda o estado da conversa entre uma requisição e outra.",
           "relatedTerms": [
@@ -101,6 +112,7 @@
         {
           "type": "concept",
           "id": "recurso",
+          "level": "junior",
           "term": "Recurso",
           "definition": "A \"coisa\" que a API expõe, identificada por uma URL: uma coleção (/products) ou um item (/products/1). Por convenção, usa-se substantivo no plural e o método diz a ação, em vez de URLs como /criarProduto.",
           "relatedTerms": [
@@ -111,6 +123,7 @@
         {
           "type": "concept",
           "id": "stateless",
+          "level": "pleno",
           "term": "Stateless (sem estado)",
           "definition": "Cada requisição traz tudo o que o servidor precisa para atendê-la, como o token de acesso; o servidor não lembra das requisições anteriores. Isso facilita rodar várias cópias da API atrás de um balanceador de carga.",
           "relatedTerms": [
@@ -121,6 +134,7 @@
         {
           "type": "concept",
           "id": "path-param",
+          "level": "junior",
           "term": "Path param",
           "definition": "Parte variável do caminho da URL que identifica um recurso: em /products/42, o 42 é o id do produto. Use para dizer qual recurso você quer.",
           "relatedTerms": [
@@ -131,6 +145,7 @@
         {
           "type": "concept",
           "id": "query-string",
+          "level": "junior",
           "term": "Query string",
           "definition": "Os parâmetros que vêm depois do ? na URL, no formato chave=valor e separados por &, como ?page=0&size=10. Use para filtrar, ordenar e paginar uma coleção, não para identificar um recurso.",
           "relatedTerms": [
@@ -141,6 +156,7 @@
         {
           "type": "concept",
           "id": "versionamento",
+          "level": "pleno",
           "term": "Versionamento de API",
           "definition": "Forma de mudar a API sem quebrar quem já a usa: a versão vai na URL (/v1/products), num cabeçalho ou no tipo de mídia. Mudanças que quebram o contrato, como remover um campo ou mudar um formato, vão para uma nova versão.",
           "relatedTerms": [
@@ -158,6 +174,7 @@
         {
           "type": "concept",
           "id": "mesma-origem",
+          "level": "pleno",
           "term": "Política de mesma origem",
           "definition": "Regra do navegador que impede um site de ler respostas vindas de outra origem. Origem é a combinação de protocolo, domínio e porta: http://localhost:5173 e http://localhost:8080 são origens diferentes. O CORS é a forma de o servidor liberar exceções a essa regra.",
           "relatedTerms": [
@@ -167,6 +184,7 @@
         {
           "type": "concept",
           "id": "preflight",
+          "level": "pleno",
           "term": "Preflight",
           "definition": "Requisição OPTIONS que o navegador envia antes da requisição de verdade quando ela vai para outra origem e não é \"simples\", por exemplo um PUT, um DELETE ou um corpo com Content-Type: application/json. O servidor responde com os cabeçalhos Access-Control-Allow-* dizendo o que permite.",
           "relatedTerms": [
@@ -178,6 +196,7 @@
         {
           "type": "concept",
           "id": "cookie",
+          "level": "junior",
           "term": "Cookie",
           "definition": "Pequeno dado que o servidor grava no navegador com o cabeçalho Set-Cookie e que o navegador reenvia automaticamente em cada requisição para aquele site. Atributos importantes: HttpOnly (o JavaScript não consegue ler), Secure (só por HTTPS) e SameSite (limita o envio a partir de outros sites).",
           "relatedTerms": [
@@ -189,6 +208,7 @@
         {
           "type": "concept",
           "id": "local-storage",
+          "level": "junior",
           "term": "localStorage",
           "definition": "Armazenamento chave-valor do navegador, acessível pelo JavaScript da página e que não expira sozinho. Não é enviado ao servidor automaticamente. Como qualquer script da página consegue lê-lo, fica exposto a XSS. O sessionStorage funciona do mesmo jeito, mas é apagado ao fechar a aba.",
           "relatedTerms": [
@@ -199,6 +219,7 @@
         {
           "type": "concept",
           "id": "sessao",
+          "level": "junior",
           "term": "Sessão",
           "definition": "Forma de lembrar quem é o usuário: o servidor guarda os dados do login e entrega ao navegador só um id de sessão, normalmente num cookie. Diferente do token de acesso, a informação fica no servidor, que pode encerrar a sessão quando quiser.",
           "relatedTerms": [
@@ -209,6 +230,7 @@
         {
           "type": "concept",
           "id": "xss",
+          "level": "pleno",
           "term": "XSS (Cross-Site Scripting)",
           "definition": "Ataque em que alguém consegue fazer o seu site executar um script dele, por exemplo salvando um <script> num comentário que depois é exibido sem tratamento. O script roda com os poderes da página e pode ler o localStorage. Defesas: escapar o que vem do usuário ao exibir (o React já faz isso por padrão) e usar Content-Security-Policy.",
           "relatedTerms": [
@@ -219,6 +241,7 @@
         {
           "type": "concept",
           "id": "csrf",
+          "level": "senior",
           "term": "CSRF (Cross-Site Request Forgery)",
           "definition": "Ataque em que outro site faz o navegador da vítima enviar uma requisição para o seu, aproveitando que os cookies vão junto automaticamente. Defesas: cookies com SameSite, um token anti-CSRF nos formulários e nunca alterar dados com GET.",
           "relatedTerms": [
@@ -229,6 +252,7 @@
         {
           "type": "concept",
           "id": "token-de-acesso",
+          "level": "pleno",
           "term": "Token de acesso",
           "definition": "Credencial que o cliente envia em cada requisição, normalmente no cabeçalho Authorization: Bearer <token>. Pode ser um JWT, que carrega dados assinados, ou um valor opaco que o servidor consulta. Deve expirar em pouco tempo.",
           "relatedTerms": [
@@ -247,6 +271,7 @@
         {
           "type": "question",
           "id": "url-no-navegador",
+          "level": "pleno",
           "question": "O que acontece quando você digita uma URL e aperta Enter?",
           "answer": "O navegador descobre o IP do domínio pelo DNS (usando cache quando pode), abre uma conexão TCP com o servidor e, se for HTTPS, negocia a criptografia (TLS). Depois envia a requisição HTTP (um GET) e recebe a resposta com o HTML. Então monta a página: lê o HTML, baixa o CSS, o JavaScript e as imagens que ele referencia (outras requisições), monta a árvore da página, calcula o layout e desenha na tela.",
           "relatedTerms": [
@@ -258,6 +283,7 @@
         {
           "type": "question",
           "id": "cookie-ou-localstorage",
+          "level": "senior",
           "question": "Onde guardar o token de login: cookie ou localStorage?",
           "answer": "Um cookie HttpOnly, Secure e SameSite costuma ser mais seguro: o JavaScript não consegue lê-lo, então um ataque XSS não rouba o token. Em troca, como o cookie vai junto automaticamente, é preciso se proteger de CSRF (SameSite e token anti-CSRF). O localStorage é simples e não sofre CSRF, mas qualquer script da página lê o token, então um XSS o vaza.",
           "relatedTerms": [
@@ -270,6 +296,7 @@
         {
           "type": "question",
           "id": "preflight-options",
+          "level": "pleno",
           "question": "Por que o navegador faz uma requisição OPTIONS antes do meu PUT?",
           "answer": "É o preflight do CORS. Para requisições a outra origem que não são \"simples\", como PUT, DELETE ou JSON no corpo, o navegador primeiro pergunta ao servidor se ele aceita aquela origem, método e cabeçalhos. Se a resposta não trouxer os cabeçalhos Access-Control-Allow-* certos, o navegador bloqueia a requisição de verdade e mostra o erro de CORS no console. Por isso o erro aparece mesmo com a API funcionando: quem bloqueia é o navegador.",
           "snippet": {
@@ -286,6 +313,7 @@
         {
           "type": "question",
           "id": "xss-vs-csrf",
+          "level": "senior",
           "question": "Qual a diferença entre XSS e CSRF?",
           "answer": "No XSS, o atacante faz o seu site executar o script dele, que roda com os poderes da página e pode ler dados e agir como o usuário. No CSRF, o atacante não executa nada no seu site: ele faz o navegador da vítima enviar uma requisição para a sua API a partir de outro site, aproveitando os cookies que vão junto. Contra XSS: escapar a saída e usar Content-Security-Policy. Contra CSRF: SameSite nos cookies e token anti-CSRF.",
           "relatedTerms": [
@@ -297,6 +325,7 @@
         {
           "type": "question",
           "id": "cache-304",
+          "level": "pleno",
           "question": "Como funciona o 304 Not Modified?",
           "answer": "Na primeira resposta, o servidor manda um ETag (identificador da versão) ou um Last-Modified. Quando o navegador precisa do recurso de novo, envia If-None-Match com aquele ETag. Se nada mudou, o servidor responde 304 sem corpo e o navegador usa a cópia em cache, economizando banda. Se mudou, responde 200 com o conteúdo novo e um ETag novo.",
           "snippet": {
@@ -313,6 +342,7 @@
         {
           "type": "question",
           "id": "rest-vs-graphql",
+          "level": "senior",
           "question": "Quando usar REST e quando usar GraphQL?",
           "answer": "No REST, cada recurso tem sua URL e o servidor decide o formato da resposta: é simples, aproveita o cache HTTP e combina com CRUD. No GraphQL há um endpoint único e o cliente descreve exatamente os campos que quer, inclusive de vários recursos numa consulta só: evita buscar dados demais ou fazer várias requisições, mas complica o cache, o controle do custo das consultas e o tratamento de erros. REST costuma bastar para APIs de CRUD; GraphQL ajuda quando muitos clientes precisam de dados diferentes.",
           "relatedTerms": [
