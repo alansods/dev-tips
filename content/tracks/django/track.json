@@ -1,0 +1,322 @@
+{
+  "id": "django",
+  "title": "Django",
+  "description": "O framework web \"com baterias incluídas\": ORM e migrations, views e URLs, admin e Django REST Framework.",
+  "areas": [
+    "backend"
+  ],
+  "language": "python",
+  "framework": "django",
+  "decks": [
+    {
+      "id": "orm-e-migrations",
+      "title": "ORM e migrations",
+      "description": "Models, QuerySets e a evolução do banco.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "model-django",
+          "level": "junior",
+          "term": "Model",
+          "definition": "Classe que herda de models.Model e representa uma tabela: cada atributo é uma coluna (CharField, DecimalField, ForeignKey). O Django cria a chave primária, gera as consultas e oferece o acesso pelo manager objects.",
+          "relatedTerms": [
+            "queryset",
+            "migrations"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "queryset",
+          "level": "pleno",
+          "term": "QuerySet",
+          "definition": "Consulta preguiçosa ao banco: Product.objects.filter(price__gt=10).order_by(\"name\") não executa nada até ser percorrida, fatiada ou convertida em lista. Filtros encadeados viram um único SQL. Depois de avaliado, o resultado fica em cache naquele QuerySet.",
+          "relatedTerms": [
+            "select-related",
+            "model-django"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "migrations",
+          "level": "junior",
+          "term": "Migrations",
+          "definition": "Arquivos que descrevem mudanças no esquema do banco, gerados com makemigrations a partir das alterações nos models e aplicados com migrate. Vão para o repositório e são aplicados em cada ambiente, mantendo o banco em sincronia com o código.",
+          "relatedTerms": [
+            "model-django"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "select-related",
+          "level": "senior",
+          "term": "select_related e prefetch_related",
+          "definition": "Ferramentas contra o problema N+1. select_related faz JOIN para relações de um (ForeignKey, OneToOne) e traz tudo numa consulta. prefetch_related faz uma consulta extra para relações de muitos (ManyToMany, reversas) e junta em Python.",
+          "relatedTerms": [
+            "queryset"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "model-exemplo",
+          "level": "junior",
+          "title": "Model com relacionamento",
+          "body": "Cada pedido pertence a um cliente; on_delete diz o que fazer se o cliente for apagado. Depois de alterar o model, rode makemigrations e migrate.",
+          "snippet": {
+            "file": "models.py",
+            "language": "python",
+            "code": "from django.db import models\n\nclass Customer(models.Model):\n    name = models.CharField(max_length=120)\n    email = models.EmailField(unique=True)\n\nclass Order(models.Model):\n    customer = models.ForeignKey(Customer, on_delete=models.PROTECT, related_name=\"orders\")\n    total = models.DecimalField(max_digits=10, decimal_places=2)\n    created_at = models.DateTimeField(auto_now_add=True)\n\n# terminal: python manage.py makemigrations && python manage.py migrate"
+          },
+          "relatedTerms": [
+            "model-django",
+            "migrations"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "n-mais-1-django",
+          "level": "senior",
+          "title": "Evitando N+1",
+          "body": "Sem select_related, cada order.customer faz uma consulta. Com ele, uma só consulta com JOIN traz os pedidos e os clientes.",
+          "snippet": {
+            "file": "views.py",
+            "language": "python",
+            "code": "# N+1: 1 consulta de pedidos + 1 por cliente\nfor order in Order.objects.all():\n    print(order.customer.name)\n\n# 1 consulta com JOIN\nfor order in Order.objects.select_related(\"customer\"):\n    print(order.customer.name)\n\n# relação de muitos: 2 consultas no total\ncustomers = Customer.objects.prefetch_related(\"orders\")"
+          },
+          "relatedTerms": [
+            "select-related",
+            "queryset"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "views-e-urls",
+      "title": "Views e URLs",
+      "description": "O ciclo de uma requisição no Django.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "mtv",
+          "level": "junior",
+          "term": "MTV (Model, Template, View)",
+          "definition": "A divisão do Django: o Model cuida dos dados, a View recebe a requisição e decide a resposta, e o Template monta o HTML. Corresponde ao MVC, com a view fazendo o papel de controller.",
+          "relatedTerms": [
+            "view-django",
+            "urlconf"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "view-django",
+          "level": "junior",
+          "term": "View",
+          "definition": "Função ou classe que recebe um HttpRequest e devolve um HttpResponse. Class-based views genéricas (ListView, DetailView, CreateView) resolvem os casos comuns com pouco código; function-based views são mais explícitas.",
+          "relatedTerms": [
+            "mtv",
+            "urlconf"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "urlconf",
+          "level": "junior",
+          "term": "URLconf",
+          "definition": "Lista urlpatterns que liga caminhos a views com path(\"products/<int:pk>/\", view, name=\"product-detail\"). Os conversores (int, slug) validam e convertem os parâmetros, e o name permite gerar a URL com reverse() sem escrevê-la à mão.",
+          "relatedTerms": [
+            "view-django"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "middleware-django",
+          "level": "pleno",
+          "term": "Middleware",
+          "definition": "Camadas que envolvem todas as requisições e respostas, na ordem da lista MIDDLEWARE em settings: sessão, autenticação, CSRF, segurança. Um middleware próprio é uma classe que recebe get_response e pode agir antes e depois da view.",
+          "relatedTerms": [
+            "view-django"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "view-e-url",
+          "level": "junior",
+          "title": "View e rota",
+          "body": "get_object_or_404 busca o produto ou responde 404. A URL usa o conversor int e um nome para ser referenciada.",
+          "snippet": {
+            "file": "views.py",
+            "language": "python",
+            "code": "# views.py\nfrom django.shortcuts import get_object_or_404, render\n\ndef product_detail(request, pk: int):\n    product = get_object_or_404(Product, pk=pk)\n    return render(request, \"products/detail.html\", {\"product\": product})\n\n# urls.py\nfrom django.urls import path\n\nurlpatterns = [\n    path(\"products/<int:pk>/\", product_detail, name=\"product-detail\"),\n]"
+          },
+          "relatedTerms": [
+            "view-django",
+            "urlconf"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "middleware-exemplo",
+          "level": "pleno",
+          "title": "Middleware de tempo de resposta",
+          "body": "O código antes de get_response roda na ida; o de depois, na volta. Registre a classe na lista MIDDLEWARE.",
+          "snippet": {
+            "file": "middleware.py",
+            "language": "python",
+            "code": "import time\n\nclass TimingMiddleware:\n    def __init__(self, get_response):\n        self.get_response = get_response\n\n    def __call__(self, request):\n        start = time.perf_counter()\n        response = self.get_response(request)\n        response[\"X-Response-Time\"] = f\"{time.perf_counter() - start:.3f}s\"\n        return response"
+          },
+          "relatedTerms": [
+            "middleware-django"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drf-e-admin",
+      "title": "Django REST Framework e admin",
+      "description": "APIs com DRF e o painel administrativo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "drf",
+          "level": "junior",
+          "term": "Django REST Framework (DRF)",
+          "definition": "Biblioteca para construir APIs REST com Django: serializers convertem e validam dados, views e viewsets expõem os endpoints, routers geram as URLs, e há autenticação, permissões, paginação e uma API navegável prontas.",
+          "relatedTerms": [
+            "serializer",
+            "viewset"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "serializer",
+          "level": "pleno",
+          "term": "Serializer",
+          "definition": "Converte models em JSON e valida os dados recebidos antes de salvar. ModelSerializer gera os campos a partir do model; validate_<campo> e validate adicionam regras. read_only_fields protege campos que o cliente não pode alterar.",
+          "relatedTerms": [
+            "drf"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "viewset",
+          "level": "pleno",
+          "term": "ViewSet e router",
+          "definition": "ModelViewSet junta numa classe as ações de listar, detalhar, criar, atualizar e apagar. Registrado num router, gera todas as rotas REST do recurso. Permissões (IsAuthenticated, permissões próprias) e filtros ficam na própria classe.",
+          "relatedTerms": [
+            "drf",
+            "serializer"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "django-admin",
+          "level": "junior",
+          "term": "Django admin",
+          "definition": "Painel administrativo gerado a partir dos models: basta registrar o model para ter listagem, busca, filtros e formulários de edição, com controle de acesso por usuário. Ótimo para back-office interno, não para a interface dos clientes.",
+          "relatedTerms": [
+            "drf"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "drf-exemplo",
+          "level": "pleno",
+          "title": "API de produtos com DRF",
+          "body": "O serializer valida o preço; o viewset expõe o CRUD completo; o router cria /products/ e /products/<id>/.",
+          "snippet": {
+            "file": "api.py",
+            "language": "python",
+            "code": "from rest_framework import permissions, routers, serializers, viewsets\n\nclass ProductSerializer(serializers.ModelSerializer):\n    class Meta:\n        model = Product\n        fields = [\"id\", \"name\", \"price\"]\n\n    def validate_price(self, value):\n        if value <= 0:\n            raise serializers.ValidationError(\"O preço deve ser positivo.\")\n        return value\n\nclass ProductViewSet(viewsets.ModelViewSet):\n    queryset = Product.objects.all()\n    serializer_class = ProductSerializer\n    permission_classes = [permissions.IsAuthenticated]\n\nrouter = routers.DefaultRouter()\nrouter.register(\"products\", ProductViewSet)"
+          },
+          "relatedTerms": [
+            "serializer",
+            "viewset"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "admin-exemplo",
+          "level": "junior",
+          "title": "Registrando no admin",
+          "body": "list_display escolhe as colunas, search_fields liga a busca e list_filter cria os filtros laterais.",
+          "snippet": {
+            "file": "admin.py",
+            "language": "python",
+            "code": "from django.contrib import admin\n\n@admin.register(Order)\nclass OrderAdmin(admin.ModelAdmin):\n    list_display = [\"id\", \"customer\", \"total\", \"created_at\"]\n    search_fields = [\"customer__name\", \"customer__email\"]\n    list_filter = [\"created_at\"]"
+          },
+          "relatedTerms": [
+            "django-admin"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Django que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "django-vs-fastapi",
+          "level": "pleno",
+          "question": "Quando escolher Django e quando FastAPI?",
+          "answer": "Django quando o projeto se beneficia do pacote completo: ORM, migrations, admin, autenticação, formulários e templates, como um sistema com back-office ou um produto web tradicional. FastAPI quando é uma API enxuta, com foco em async, tipagem e documentação automática, montando ORM e o resto à escolha. Os dois servem bem para APIs; o Django REST Framework compensa o lado de API do Django.",
+          "relatedTerms": [
+            "drf",
+            "mtv"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "queryset-lazy",
+          "level": "pleno",
+          "question": "O que significa dizer que QuerySets são preguiçosos?",
+          "answer": "Criar e encadear um QuerySet não acessa o banco; a consulta só roda quando o resultado é usado: num for, em list(), len(), fatiamento com passo ou acesso a um item. Isso permite montar filtros em etapas e gera um único SQL. Cuidado: percorrer duas vezes um QuerySet novo consulta duas vezes; reaproveite o mesmo objeto avaliado.",
+          "relatedTerms": [
+            "queryset"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "n-mais-1-django-pergunta",
+          "level": "senior",
+          "question": "Como você identifica e resolve N+1 no Django?",
+          "answer": "Identifico com o Django Debug Toolbar, logs de SQL ou contando consultas nos testes (assertNumQueries). Resolvo com select_related para ForeignKey e OneToOne (JOIN) e prefetch_related para relações de muitos (uma consulta extra). No DRF, o problema costuma vir de serializers aninhados, então ajusto o queryset do viewset.",
+          "relatedTerms": [
+            "select-related",
+            "queryset"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "migrations-conflito",
+          "level": "pleno",
+          "question": "Como lidar com migrations em equipe?",
+          "answer": "Migrations vão para o repositório e nunca são editadas depois de aplicadas em outro ambiente. Se dois branches criam migrations no mesmo app, o Django detecta o conflito e makemigrations --merge cria uma migration de junção. Mudanças arriscadas (renomear ou apagar coluna) vão em etapas, compatíveis com a versão anterior do código durante o deploy.",
+          "relatedTerms": [
+            "migrations"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "csrf-django",
+          "level": "pleno",
+          "question": "Como o Django protege contra CSRF?",
+          "answer": "O CsrfViewMiddleware exige, em requisições que alteram dados (POST, PUT, DELETE), um token secreto que o atacante não consegue ler: vem num cookie e precisa ser reenviado no formulário ({% csrf_token %}) ou num cabeçalho. Em APIs com token no cabeçalho Authorization, o risco é menor, e o DRF só aplica CSRF na autenticação por sessão.",
+          "relatedTerms": [
+            "middleware-django"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "admin-producao",
+          "level": "junior",
+          "question": "Para que serve o Django admin?",
+          "answer": "Para ter, quase de graça, uma interface de gestão dos dados a partir dos models: listar, buscar, filtrar e editar, com permissões por usuário. É ideal para a equipe interna (suporte, operação). Não é feito para a interface dos clientes; em produção, vale mudar a URL padrão e exigir autenticação forte.",
+          "relatedTerms": [
+            "django-admin"
+          ]
+        }
+      ]
+    }
+  ]
+}

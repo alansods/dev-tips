@@ -19,6 +19,9 @@ import nestjsEn from '../../content/tracks/nestjs/translations/en.json';
 import javaEssencialEn from '../../content/tracks/java-essencial/translations/en.json';
 import javaColecoesEConcorrenciaEn from '../../content/tracks/java-colecoes-e-concorrencia/translations/en.json';
 import springBootEn from '../../content/tracks/spring-boot/translations/en.json';
+import pythonEssencialEn from '../../content/tracks/python-essencial/translations/en.json';
+import fastapiEn from '../../content/tracks/fastapi/translations/en.json';
+import djangoEn from '../../content/tracks/django/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -38,4 +41,7 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'java-essencial': { en: javaEssencialEn },
   'java-colecoes-e-concorrencia': { en: javaColecoesEConcorrenciaEn },
   'spring-boot': { en: springBootEn },
+  'python-essencial': { en: pythonEssencialEn },
+  fastapi: { en: fastapiEn },
+  django: { en: djangoEn },
 };

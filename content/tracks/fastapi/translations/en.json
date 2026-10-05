@@ -1,0 +1,120 @@
+{
+  "title": "FastAPI",
+  "description": "Python's modern API framework: typed routes, Pydantic, dependencies, async, errors, security and testing.",
+  "decks": {
+    "rotas-e-pydantic": {
+      "title": "Routes and Pydantic",
+      "description": "Typed routes, validation and automatic documentation."
+    },
+    "dependencias-e-async": {
+      "title": "Dependencies and async",
+      "description": "Dependency injection and when to use async."
+    },
+    "erros-seguranca-e-testes": {
+      "title": "Errors, security and testing",
+      "description": "Error handling, authentication and TestClient."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "FastAPI questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "rota-fastapi": {
+      "term": "Typed route",
+      "definition": "A function decorated with @app.get, @app.post and so on. The parameter type hints tell FastAPI where each piece of data comes from: parameters in the path are path params, simple types outside the path become query params and Pydantic models become the body. FastAPI converts and validates everything."
+    },
+    "pydantic": {
+      "term": "Pydantic",
+      "definition": "A validation library based on classes with type hints (BaseModel). It converts and validates input data, producing detailed errors, and serializes output with model_dump. FastAPI automatically responds 422 when the body does not match the model."
+    },
+    "response-model": {
+      "term": "response_model",
+      "definition": "Defines the response shape: FastAPI filters and validates what the function returns. It lets you have an input model (with a password) and an output model (without it), ensuring sensitive fields do not leak even if the function returns the whole object."
+    },
+    "openapi": {
+      "term": "OpenAPI and /docs",
+      "definition": "FastAPI generates the OpenAPI specification from the routes and models, and serves interactive docs at /docs (Swagger UI) and /redoc. The docs never fall out of date, because they come from the code itself."
+    },
+    "modelos-entrada-saida": {
+      "title": "Input and output models",
+      "body": "Field adds rules (length, greater than zero). response_model guarantees the response only has public fields; status_code sets the 201."
+    },
+    "path-e-query": {
+      "title": "Path and query params",
+      "body": "product_id is in the path, so it is a path param and converted to int. page and limit are not, so they are query params with defaults and limits."
+    },
+    "depends": {
+      "term": "Depends",
+      "definition": "FastAPI's dependency injection system: a parameter with Depends(function) makes FastAPI call that function and pass the result. It is used for the database session, the authenticated user, pagination and configuration. Dependencies can depend on others and are easy to swap in tests."
+    },
+    "dependencia-yield": {
+      "term": "Dependency with yield",
+      "definition": "A dependency that uses yield hands over the resource and resumes after the response to release it: open the database session, hand it over and close it at the end (with commit or rollback). It works like a context manager tied to the request lifecycle."
+    },
+    "async-vs-def": {
+      "term": "async def or def",
+      "definition": "async def routes run on the event loop and must only use async libraries (httpx, asyncpg); a blocking call there freezes every request. Plain def routes run in a thread pool, so blocking code (requests, sync drivers) is safe in them."
+    },
+    "background-tasks": {
+      "term": "BackgroundTasks",
+      "definition": "Runs a function after sending the response, in the same process: sending a welcome email, writing an audit log. Good for short tasks; for long tasks or ones that must not be lost, use a queue (Celery, RQ, ARQ)."
+    },
+    "sessao-banco": {
+      "title": "Database session as a dependency",
+      "body": "get_db opens the session, hands it to the route and closes it at the end. Annotated makes the type reusable across every route."
+    },
+    "async-correto": {
+      "title": "External call without blocking the loop",
+      "body": "Inside async def, use an async client and await. With requests.get, the route would block the event loop during the call."
+    },
+    "http-exception": {
+      "term": "HTTPException",
+      "definition": "An exception that ends the request with a status and a message (detail). It can be raised from any function called by the route, including dependencies. For domain errors, custom exception handlers translate exceptions into standard responses."
+    },
+    "oauth2-jwt": {
+      "term": "Authentication with OAuth2 and JWT",
+      "definition": "FastAPI ships security utilities: OAuth2PasswordBearer reads the token from the Authorization header. A get_current_user dependency validates the JWT and returns the user, or responds 401. Protected routes just declare that dependency."
+    },
+    "cors-fastapi": {
+      "term": "CORSMiddleware",
+      "definition": "Middleware that allows calls from other origins, such as a frontend on another domain. Set the allowed origins explicitly; allow_origins=[\"*\"] together with credentials is not accepted by browsers and opens the API too much."
+    },
+    "testclient": {
+      "term": "TestClient and dependency_overrides",
+      "definition": "TestClient makes requests to the app inside the test, without starting a server. app.dependency_overrides swaps a dependency (database, logged-in user) for another only in tests, which allows testing protected routes and isolating the database."
+    },
+    "usuario-atual": {
+      "title": "Current user dependency",
+      "body": "The /me route just declares CurrentUser; token validation and the 401 live in one place."
+    },
+    "teste-rota": {
+      "title": "Testing a protected route",
+      "body": "The override replaces the authenticated user with a fixed one, and the test calls the route directly."
+    },
+    "por-que-fastapi": {
+      "question": "What makes FastAPI stand out?",
+      "answer": "It uses Python type hints to validate input, serialize output and generate OpenAPI docs automatically, with Pydantic underneath. It supports async natively, has simple dependency injection and good performance. The result is less repeated code and documentation that never goes stale."
+    },
+    "async-def-quando": {
+      "question": "When should you declare a route with async def?",
+      "answer": "When all of its I/O is asynchronous (httpx, an async database driver). If I use blocking libraries, I declare a plain def: FastAPI runs it in a thread pool and the event loop stays free. The classic mistake is async def with requests or a sync driver, which blocks every request in the process."
+    },
+    "depends-pergunta": {
+      "question": "What is Depends for?",
+      "answer": "To inject dependencies into routes: the database session, the authenticated user, settings, common parameters. It centralizes logic (validating the token in one place), allows composition (the user depends on the token, which depends on the header) and eases testing with dependency_overrides."
+    },
+    "erro-422": {
+      "question": "Why did the API respond 422?",
+      "answer": "Because the request failed Pydantic validation: a missing required field, a wrong type or a violated rule (min_length, gt). The response body lists each error with its location and reason. If the client sends JSON without the right Content-Type, the body is not recognized either."
+    },
+    "proteger-campos": {
+      "question": "How do you keep the user's password out of the response?",
+      "answer": "With separate models: UserCreate (with password) for input and UserOut (without password) as the response_model. FastAPI filters the response through the output model, so even returning the whole entity, the password does not show up. On top of that, I only store the password hash."
+    },
+    "tarefa-longa-fastapi": {
+      "question": "How do you handle a slow task triggered by a route?",
+      "answer": "If it is short and can be lost (an email), BackgroundTasks. If it is long, needs retries or must not be lost, I send it to a queue (Celery, RQ, ARQ) processed by workers, and the route responds 202 with an id to check the status. That way the request is not held up and the work survives restarts."
+    }
+  }
+}

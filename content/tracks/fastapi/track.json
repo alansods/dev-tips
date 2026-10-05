@@ -1,0 +1,321 @@
+{
+  "id": "fastapi",
+  "title": "FastAPI",
+  "description": "O framework de APIs moderno do Python: rotas tipadas, Pydantic, dependências, async, erros, segurança e testes.",
+  "areas": [
+    "backend"
+  ],
+  "language": "python",
+  "framework": "fastapi",
+  "decks": [
+    {
+      "id": "rotas-e-pydantic",
+      "title": "Rotas e Pydantic",
+      "description": "Rotas tipadas, validação e documentação automática.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rota-fastapi",
+          "level": "junior",
+          "term": "Rota tipada",
+          "definition": "Função decorada com @app.get, @app.post etc. Os type hints dos parâmetros dizem ao FastAPI de onde vem cada dado: parâmetros que aparecem no caminho são path params, tipos simples fora do caminho viram query params e modelos Pydantic viram o corpo. O FastAPI converte e valida tudo.",
+          "relatedTerms": [
+            "pydantic",
+            "openapi"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pydantic",
+          "level": "junior",
+          "term": "Pydantic",
+          "definition": "Biblioteca de validação por classes com type hints (BaseModel). Converte e valida os dados de entrada, gerando erros detalhados, e serializa a saída com model_dump. O FastAPI responde 422 automaticamente quando o corpo não bate com o modelo.",
+          "relatedTerms": [
+            "rota-fastapi",
+            "response-model"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "response-model",
+          "level": "pleno",
+          "term": "response_model",
+          "definition": "Define o formato da resposta: o FastAPI filtra e valida o que a função devolve. Permite ter um modelo de entrada (com senha) e outro de saída (sem senha), garantindo que campos sensíveis não vazem mesmo se a função devolver o objeto inteiro.",
+          "relatedTerms": [
+            "pydantic"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "openapi",
+          "level": "junior",
+          "term": "OpenAPI e /docs",
+          "definition": "O FastAPI gera a especificação OpenAPI a partir das rotas e dos modelos, e serve a documentação interativa em /docs (Swagger UI) e /redoc. A doc nunca fica desatualizada, porque vem do próprio código.",
+          "relatedTerms": [
+            "rota-fastapi"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "modelos-entrada-saida",
+          "level": "junior",
+          "title": "Modelos de entrada e saída",
+          "body": "Field adiciona regras (tamanho, maior que zero). O response_model garante que a resposta tenha só os campos públicos; status_code define o 201.",
+          "snippet": {
+            "file": "main.py",
+            "language": "python",
+            "code": "from fastapi import FastAPI\nfrom pydantic import BaseModel, Field\n\napp = FastAPI()\n\nclass ProductIn(BaseModel):\n    name: str = Field(min_length=1)\n    price: float = Field(gt=0)\n\nclass ProductOut(BaseModel):\n    id: int\n    name: str\n    price: float\n\n@app.post(\"/products\", response_model=ProductOut, status_code=201)\ndef create_product(data: ProductIn) -> ProductOut:\n    return repository.create(data)"
+          },
+          "relatedTerms": [
+            "pydantic",
+            "response-model"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "path-e-query",
+          "level": "junior",
+          "title": "Path e query params",
+          "body": "product_id está no caminho, então é path param e é convertido para int. page e limit não estão, então são query params com padrão e limites.",
+          "snippet": {
+            "file": "main.py",
+            "language": "python",
+            "code": "from typing import Annotated\nfrom fastapi import HTTPException, Query\n\n@app.get(\"/products/{product_id}\")\ndef get_product(product_id: int):\n    product = repository.find(product_id)\n    if product is None:\n        raise HTTPException(status_code=404, detail=\"Produto não encontrado\")\n    return product\n\n@app.get(\"/products\")\ndef list_products(page: int = 1, limit: Annotated[int, Query(le=100)] = 20):\n    return repository.list(page=page, limit=limit)"
+          },
+          "relatedTerms": [
+            "rota-fastapi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dependencias-e-async",
+      "title": "Dependências e async",
+      "description": "Injeção de dependências e quando usar async.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "depends",
+          "level": "pleno",
+          "term": "Depends",
+          "definition": "Sistema de injeção de dependências do FastAPI: um parâmetro com Depends(funcao) faz o FastAPI chamar essa função e passar o resultado. Serve para sessão do banco, usuário autenticado, paginação e configuração. Dependências podem depender de outras e são trocadas facilmente em testes.",
+          "relatedTerms": [
+            "dependencia-yield",
+            "async-vs-def"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "dependencia-yield",
+          "level": "pleno",
+          "term": "Dependência com yield",
+          "definition": "Uma dependência que usa yield entrega o recurso e retoma depois da resposta, para liberá-lo: abrir a sessão do banco, entregar, e fechá-la no fim (com commit ou rollback). Funciona como um context manager ligado ao ciclo da requisição.",
+          "relatedTerms": [
+            "depends"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "async-vs-def",
+          "level": "senior",
+          "term": "async def ou def",
+          "definition": "Rotas async def rodam no event loop e devem usar só bibliotecas assíncronas (httpx, asyncpg); uma chamada bloqueante ali trava todas as requisições. Rotas def comuns rodam num pool de threads, então código bloqueante (requests, drivers síncronos) é seguro nelas.",
+          "relatedTerms": [
+            "depends",
+            "background-tasks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "background-tasks",
+          "level": "pleno",
+          "term": "BackgroundTasks",
+          "definition": "Executa uma função depois de enviar a resposta, no mesmo processo: enviar e-mail de boas-vindas, registrar auditoria. Bom para tarefas curtas; para tarefas longas ou que não podem se perder, use uma fila (Celery, RQ, ARQ).",
+          "relatedTerms": [
+            "async-vs-def"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "sessao-banco",
+          "level": "pleno",
+          "title": "Sessão do banco como dependência",
+          "body": "get_db abre a sessão, entrega para a rota e fecha no final. Annotated deixa o tipo reutilizável em todas as rotas.",
+          "snippet": {
+            "file": "main.py",
+            "language": "python",
+            "code": "from typing import Annotated\nfrom fastapi import Depends\nfrom sqlalchemy.orm import Session\n\ndef get_db():\n    db = SessionLocal()\n    try:\n        yield db\n    finally:\n        db.close()\n\nDb = Annotated[Session, Depends(get_db)]\n\n@app.get(\"/orders\")\ndef list_orders(db: Db):\n    return db.query(Order).all()"
+          },
+          "relatedTerms": [
+            "dependencia-yield",
+            "depends"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "async-correto",
+          "level": "senior",
+          "title": "Chamada externa sem travar o loop",
+          "body": "Dentro de async def, use um cliente assíncrono e await. Com requests.get, a rota travaria o event loop durante a chamada.",
+          "snippet": {
+            "file": "main.py",
+            "language": "python",
+            "code": "import httpx\n\n@app.get(\"/rates\")\nasync def get_rates():\n    async with httpx.AsyncClient(timeout=5) as client:\n        response = await client.get(\"https://api.example.com/rates\")\n    response.raise_for_status()\n    return response.json()\n\n# evite dentro de async def:\n# requests.get(...)  -> bloqueia todas as requisições"
+          },
+          "relatedTerms": [
+            "async-vs-def"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "erros-seguranca-e-testes",
+      "title": "Erros, segurança e testes",
+      "description": "Tratamento de erros, autenticação e TestClient.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "http-exception",
+          "level": "junior",
+          "term": "HTTPException",
+          "definition": "Exceção que encerra a requisição com um status e uma mensagem (detail). Pode ser lançada de qualquer função chamada pela rota, inclusive dependências. Para erros de domínio, exception handlers próprios traduzem exceções em respostas padronizadas.",
+          "relatedTerms": [
+            "oauth2-jwt"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "oauth2-jwt",
+          "level": "pleno",
+          "term": "Autenticação com OAuth2 e JWT",
+          "definition": "O FastAPI traz utilitários de segurança: OAuth2PasswordBearer lê o token do cabeçalho Authorization. Uma dependência get_current_user valida o JWT e devolve o usuário, ou responde 401. As rotas protegidas só declaram essa dependência.",
+          "relatedTerms": [
+            "http-exception",
+            "cors-fastapi"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cors-fastapi",
+          "level": "junior",
+          "term": "CORSMiddleware",
+          "definition": "Middleware que libera chamadas vindas de outras origens, como o frontend em outro domínio. Defina as origens permitidas explicitamente; allow_origins=[\"*\"] junto com credenciais não é aceito pelos navegadores e abre a API demais.",
+          "relatedTerms": [
+            "oauth2-jwt"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "testclient",
+          "level": "pleno",
+          "term": "TestClient e dependency_overrides",
+          "definition": "TestClient faz requisições à aplicação dentro do teste, sem subir servidor. app.dependency_overrides troca uma dependência (banco, usuário logado) por outra só nos testes, o que permite testar rotas protegidas e isolar o banco.",
+          "relatedTerms": [
+            "oauth2-jwt"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "usuario-atual",
+          "level": "pleno",
+          "title": "Dependência do usuário atual",
+          "body": "A rota /me só declara CurrentUser; a validação do token e o 401 ficam num lugar só.",
+          "snippet": {
+            "file": "main.py",
+            "language": "python",
+            "code": "from typing import Annotated\nfrom fastapi import Depends, HTTPException\nfrom fastapi.security import OAuth2PasswordBearer\n\noauth2 = OAuth2PasswordBearer(tokenUrl=\"/auth/token\")\n\ndef get_current_user(token: Annotated[str, Depends(oauth2)]) -> User:\n    user = decode_jwt(token)  # None se inválido ou expirado\n    if user is None:\n        raise HTTPException(status_code=401, detail=\"Não autenticado\")\n    return user\n\nCurrentUser = Annotated[User, Depends(get_current_user)]\n\n@app.get(\"/me\")\ndef me(user: CurrentUser):\n    return user"
+          },
+          "relatedTerms": [
+            "oauth2-jwt",
+            "http-exception"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "teste-rota",
+          "level": "pleno",
+          "title": "Testando uma rota protegida",
+          "body": "O override troca o usuário autenticado por um fixo, e o teste chama a rota direto.",
+          "snippet": {
+            "file": "test_me.py",
+            "language": "python",
+            "code": "from fastapi.testclient import TestClient\n\ndef test_me_returns_current_user():\n    app.dependency_overrides[get_current_user] = lambda: User(id=1, name=\"Ana\")\n    client = TestClient(app)\n\n    response = client.get(\"/me\")\n\n    assert response.status_code == 200\n    assert response.json()[\"name\"] == \"Ana\"\n    app.dependency_overrides.clear()"
+          },
+          "relatedTerms": [
+            "testclient"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de FastAPI que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "por-que-fastapi",
+          "level": "junior",
+          "question": "O que faz o FastAPI se destacar?",
+          "answer": "Usa os type hints do Python para validar entradas, serializar saídas e gerar a documentação OpenAPI automaticamente, com Pydantic por baixo. Suporta async nativamente, tem injeção de dependências simples e bom desempenho. O resultado é menos código repetido e uma documentação que nunca desatualiza.",
+          "relatedTerms": [
+            "pydantic",
+            "openapi"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "async-def-quando",
+          "level": "senior",
+          "question": "Quando declarar uma rota com async def?",
+          "answer": "Quando todo o I/O dela é assíncrono (httpx, driver async do banco). Se uso bibliotecas bloqueantes, declaro def comum: o FastAPI a roda num pool de threads e o event loop continua livre. O erro clássico é async def com requests ou um driver síncrono, que trava todas as requisições do processo.",
+          "relatedTerms": [
+            "async-vs-def"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "depends-pergunta",
+          "level": "pleno",
+          "question": "Para que serve o Depends?",
+          "answer": "Para injetar dependências nas rotas: sessão do banco, usuário autenticado, configurações, parâmetros comuns. Centraliza a lógica (validar o token num lugar só), permite composição (o usuário depende do token, que depende do cabeçalho) e facilita testes com dependency_overrides.",
+          "relatedTerms": [
+            "depends",
+            "testclient"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "erro-422",
+          "level": "junior",
+          "question": "Por que a API respondeu 422?",
+          "answer": "Porque a requisição não passou na validação do Pydantic: campo obrigatório faltando, tipo errado ou regra violada (min_length, gt). O corpo da resposta lista cada erro com o local e o motivo. Se o cliente manda JSON sem o Content-Type certo, o corpo também não é reconhecido.",
+          "relatedTerms": [
+            "pydantic"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "proteger-campos",
+          "level": "pleno",
+          "question": "Como evitar que a senha do usuário apareça na resposta?",
+          "answer": "Com modelos separados: UserCreate (com senha) para entrada e UserOut (sem senha) como response_model. O FastAPI filtra a resposta pelo modelo de saída, então mesmo devolvendo a entidade inteira a senha não aparece. Além disso, guardo só o hash da senha.",
+          "relatedTerms": [
+            "response-model",
+            "pydantic"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tarefa-longa-fastapi",
+          "level": "senior",
+          "question": "Como lidar com uma tarefa demorada disparada por uma rota?",
+          "answer": "Se é curta e pode se perder (um e-mail), BackgroundTasks. Se é longa, precisa de retry ou não pode se perder, mando para uma fila (Celery, RQ, ARQ) processada por workers, e a rota responde 202 com um id para consultar o status. Assim a requisição não fica presa e o trabalho sobrevive a reinícios.",
+          "relatedTerms": [
+            "background-tasks"
+          ]
+        }
+      ]
+    }
+  ]
+}

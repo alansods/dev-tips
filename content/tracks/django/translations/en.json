@@ -1,0 +1,120 @@
+{
+  "title": "Django",
+  "description": "The \"batteries included\" web framework: ORM and migrations, views and URLs, admin and Django REST Framework.",
+  "decks": {
+    "orm-e-migrations": {
+      "title": "ORM and migrations",
+      "description": "Models, QuerySets and evolving the database."
+    },
+    "views-e-urls": {
+      "title": "Views and URLs",
+      "description": "The lifecycle of a request in Django."
+    },
+    "drf-e-admin": {
+      "title": "Django REST Framework and admin",
+      "description": "APIs with DRF and the admin panel."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Django questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "model-django": {
+      "term": "Model",
+      "definition": "A class that inherits from models.Model and represents a table: each attribute is a column (CharField, DecimalField, ForeignKey). Django creates the primary key, generates the queries and offers access through the objects manager."
+    },
+    "queryset": {
+      "term": "QuerySet",
+      "definition": "A lazy database query: Product.objects.filter(price__gt=10).order_by(\"name\") runs nothing until it is iterated, sliced or turned into a list. Chained filters become a single SQL statement. Once evaluated, the result is cached in that QuerySet."
+    },
+    "migrations": {
+      "term": "Migrations",
+      "definition": "Files that describe changes to the database schema, generated with makemigrations from changes to the models and applied with migrate. They go into the repository and are applied in every environment, keeping the database in sync with the code."
+    },
+    "select-related": {
+      "term": "select_related and prefetch_related",
+      "definition": "Tools against the N+1 problem. select_related does a JOIN for single-valued relations (ForeignKey, OneToOne) and fetches everything in one query. prefetch_related runs one extra query for many-valued relations (ManyToMany, reverse) and joins them in Python."
+    },
+    "model-exemplo": {
+      "title": "Model with a relationship",
+      "body": "Each order belongs to a customer; on_delete says what to do if the customer is deleted. After changing the model, run makemigrations and migrate."
+    },
+    "n-mais-1-django": {
+      "title": "Avoiding N+1",
+      "body": "Without select_related, each order.customer runs a query. With it, a single query with a JOIN brings orders and customers."
+    },
+    "mtv": {
+      "term": "MTV (Model, Template, View)",
+      "definition": "Django's split: the Model handles data, the View receives the request and decides the response, and the Template builds the HTML. It maps to MVC, with the view playing the controller role."
+    },
+    "view-django": {
+      "term": "View",
+      "definition": "A function or class that receives an HttpRequest and returns an HttpResponse. Generic class-based views (ListView, DetailView, CreateView) solve common cases with little code; function-based views are more explicit."
+    },
+    "urlconf": {
+      "term": "URLconf",
+      "definition": "The urlpatterns list that ties paths to views with path(\"products/<int:pk>/\", view, name=\"product-detail\"). Converters (int, slug) validate and convert parameters, and the name lets you build the URL with reverse() without hard-coding it."
+    },
+    "middleware-django": {
+      "term": "Middleware",
+      "definition": "Layers that wrap every request and response, in the order of the MIDDLEWARE list in settings: session, authentication, CSRF, security. A custom middleware is a class that receives get_response and can act before and after the view."
+    },
+    "view-e-url": {
+      "title": "View and route",
+      "body": "get_object_or_404 fetches the product or responds 404. The URL uses the int converter and a name to be referenced."
+    },
+    "middleware-exemplo": {
+      "title": "Response time middleware",
+      "body": "The code before get_response runs on the way in; the code after it, on the way out. Register the class in the MIDDLEWARE list."
+    },
+    "drf": {
+      "term": "Django REST Framework (DRF)",
+      "definition": "A library to build REST APIs with Django: serializers convert and validate data, views and viewsets expose the endpoints, routers generate the URLs, and authentication, permissions, pagination and a browsable API come ready."
+    },
+    "serializer": {
+      "term": "Serializer",
+      "definition": "Converts models into JSON and validates incoming data before saving. ModelSerializer generates the fields from the model; validate_<field> and validate add rules. read_only_fields protects fields the client cannot change."
+    },
+    "viewset": {
+      "term": "ViewSet and router",
+      "definition": "ModelViewSet bundles list, retrieve, create, update and delete actions into one class. Registered on a router, it generates all the REST routes for the resource. Permissions (IsAuthenticated, custom ones) and filters live in the class itself."
+    },
+    "django-admin": {
+      "term": "Django admin",
+      "definition": "An admin panel generated from the models: registering a model is enough to get listing, search, filters and edit forms, with per-user access control. Great for internal back-office, not for the customer-facing UI."
+    },
+    "drf-exemplo": {
+      "title": "Products API with DRF",
+      "body": "The serializer validates the price; the viewset exposes the full CRUD; the router creates /products/ and /products/<id>/."
+    },
+    "admin-exemplo": {
+      "title": "Registering in the admin",
+      "body": "list_display picks the columns, search_fields enables search and list_filter creates the side filters."
+    },
+    "django-vs-fastapi": {
+      "question": "When should you choose Django and when FastAPI?",
+      "answer": "Django when the project benefits from the full package: ORM, migrations, admin, authentication, forms and templates, such as a system with a back-office or a traditional web product. FastAPI when it is a lean API focused on async, typing and automatic docs, picking the ORM and the rest yourself. Both work well for APIs; Django REST Framework covers Django's API side."
+    },
+    "queryset-lazy": {
+      "question": "What does it mean that QuerySets are lazy?",
+      "answer": "Creating and chaining a QuerySet does not touch the database; the query only runs when the result is used: in a for loop, in list(), len(), slicing with a step or item access. This lets you build filters in stages and produces a single SQL statement. Careful: iterating a fresh QuerySet twice queries twice; reuse the same evaluated object."
+    },
+    "n-mais-1-django-pergunta": {
+      "question": "How do you spot and fix N+1 in Django?",
+      "answer": "I spot it with Django Debug Toolbar, SQL logs or by counting queries in tests (assertNumQueries). I fix it with select_related for ForeignKey and OneToOne (JOIN) and prefetch_related for many-valued relations (one extra query). In DRF the problem usually comes from nested serializers, so I tune the viewset's queryset."
+    },
+    "migrations-conflito": {
+      "question": "How do you handle migrations in a team?",
+      "answer": "Migrations go into the repository and are never edited after being applied in another environment. If two branches create migrations in the same app, Django detects the conflict and makemigrations --merge creates a merge migration. Risky changes (renaming or dropping a column) are done in steps, compatible with the previous code version during the deploy."
+    },
+    "csrf-django": {
+      "question": "How does Django protect against CSRF?",
+      "answer": "CsrfViewMiddleware requires, on requests that change data (POST, PUT, DELETE), a secret token the attacker cannot read: it comes in a cookie and must be sent back in the form ({% csrf_token %}) or in a header. In APIs with a token in the Authorization header, the risk is lower, and DRF only enforces CSRF for session authentication."
+    },
+    "admin-producao": {
+      "question": "What is the Django admin for?",
+      "answer": "To get, almost for free, a data management interface built from the models: list, search, filter and edit, with per-user permissions. It is ideal for the internal team (support, operations). It is not meant for the customer-facing UI; in production, it is worth changing the default URL and requiring strong authentication."
+    }
+  }
+}

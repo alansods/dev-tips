@@ -1,0 +1,120 @@
+{
+  "title": "Python essentials",
+  "description": "The Python basics: types, mutability, collections, functions, decorators, generators and environment.",
+  "decks": {
+    "tipos-e-colecoes": {
+      "title": "Types and collections",
+      "description": "Data types and everyday structures."
+    },
+    "funcoes-e-decorators": {
+      "title": "Functions and decorators",
+      "description": "Parameters, scope, closures and decorators."
+    },
+    "generators-e-ambiente": {
+      "title": "Generators and environment",
+      "description": "Lazy iteration, context, the GIL and dependencies."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Python questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "tipagem-dinamica": {
+      "term": "Dynamic and strong typing",
+      "definition": "In Python, the type belongs to the value, not the variable: the same variable can point to an int and later to a str (dynamic). But Python does not convert types on its own in mixed operations: \"1\" + 1 raises TypeError (strong). Type hints document types and are checked by tools such as mypy, not at runtime."
+    },
+    "mutabilidade": {
+      "term": "Mutable and immutable",
+      "definition": "int, float, str, tuple and frozenset are immutable: \"changing\" them creates a new object. list, dict and set are mutable: they change in place, and every variable pointing to them sees the change. Only immutable (hashable) values can be dict keys or set items."
+    },
+    "list-tuple": {
+      "term": "list and tuple",
+      "definition": "Ordered sequences. list is mutable and fits collections that grow; tuple is immutable, lighter, and fits fixed records (coordinates, multiple return values) and dict keys. Unpacking x, y = point works with both."
+    },
+    "dict-set": {
+      "term": "dict and set",
+      "definition": "dict maps keys to values and keeps insertion order (since 3.7); set holds unique items with no order. Both use a hash table: in, insertion and lookup in constant time on average. dict.get(key, default) avoids KeyError."
+    },
+    "comprehension": {
+      "term": "Comprehension",
+      "definition": "A short syntax to build collections from others, with an optional filter: [x * 2 for x in nums if x > 0]. It exists for list, dict ({k: v ...}) and set ({x ...}). With parentheses, it becomes a generator expression, which does not build the list in memory."
+    },
+    "referencia-compartilhada": {
+      "title": "Shared reference",
+      "body": "b = a does not copy the list: both variables point to the same object. copy makes a shallow copy and deepcopy also copies nested items."
+    },
+    "args-kwargs": {
+      "term": "*args and **kwargs",
+      "definition": "*args collects extra positional arguments into a tuple and **kwargs extra keyword arguments into a dict. They also forward arguments: f(*items, **options). Used in wrappers and functions that accept flexible configuration."
+    },
+    "argumento-padrao-mutavel": {
+      "term": "Mutable default argument",
+      "definition": "A parameter's default value is created only once, when the function is defined. With def add(item, items=[]), the same list is reused across calls and keeps accumulating items. The correct pattern is items=None and creating the list inside the function."
+    },
+    "decorator": {
+      "term": "Decorator",
+      "definition": "A function that takes a function and returns another one wrapping it, adding behavior: logging, caching, authentication, timing. @decorator above the definition is the same as f = decorator(f). functools.wraps preserves the original's name and docstring."
+    },
+    "closure-python": {
+      "term": "Closure and scope (LEGB)",
+      "definition": "Python looks names up in the order Local, Enclosing (outer functions), Global and Built-in. An inner function that uses variables from the outer one forms a closure. To reassign those variables, you need nonlocal (or global for the module)."
+    },
+    "decorator-tempo": {
+      "title": "Timing decorator",
+      "body": "The wrapper accepts any signature with *args and **kwargs, times the execution and returns the original result."
+    },
+    "padrao-mutavel-exemplo": {
+      "title": "The mutable default bug",
+      "body": "The second call \"remembers\" the item from the first. With None as the default, each call gets a new list."
+    },
+    "generator": {
+      "term": "Generator",
+      "definition": "A function with yield that produces values one at a time, on demand, pausing between them. It uses constant memory even for huge or infinite sequences (lines of a giant file, pages of an API). It can only be iterated once."
+    },
+    "context-manager": {
+      "term": "Context manager (with)",
+      "definition": "An object used with with that sets up and releases a resource automatically, even on error: files, connections, locks, transactions. It implements __enter__ and __exit__, or is created with @contextmanager from a generator."
+    },
+    "gil": {
+      "term": "GIL",
+      "definition": "Global Interpreter Lock: in CPython, only one thread runs Python bytecode at a time. Threads still help with I/O (the GIL is released while waiting), but they do not parallelize CPU work; for that you use multiprocessing or C libraries. Python 3.13 introduced an experimental build without the GIL."
+    },
+    "asyncio": {
+      "term": "asyncio",
+      "definition": "Concurrency with one thread and an event loop: async def functions pause at await while waiting for I/O, and the loop runs others. Ideal for many simultaneous connections. A blocking call (requests, time.sleep) inside async freezes the whole loop."
+    },
+    "venv": {
+      "term": "Virtual environment (venv)",
+      "definition": "An isolated folder with an interpreter and a project's packages, so each project has its own versions without conflicting with others or with the system. Created with python -m venv .venv; dependencies live in requirements.txt or pyproject.toml (with tools such as uv or Poetry)."
+    },
+    "generator-arquivo": {
+      "title": "Reading a huge file",
+      "body": "with closes the file; the generator yields one line at a time, so memory does not grow with the file size."
+    },
+    "list-vs-tuple-pergunta": {
+      "question": "What is the difference between list and tuple?",
+      "answer": "list is mutable: you can add, remove and change items. tuple is immutable, uses less memory and can be a dict key or a set item. I use tuple for fixed-size records and data that must not change, and list for collections that grow."
+    },
+    "is-vs-igual": {
+      "question": "What is the difference between is and ==?",
+      "answer": "== compares values (it calls __eq__); is compares identity, whether it is the same object in memory. is is for None (x is None) and for sentinels. Comparing numbers or strings with is may even work because of internal caches, but it is a bug waiting to happen."
+    },
+    "o-que-e-decorator": {
+      "question": "What is a decorator and where would you use one?",
+      "answer": "It is a function that takes another function and returns a wrapped version, adding behavior without touching the original code. I use it for logging, timing, retry, caching (functools.lru_cache), permission checks and route registration, like FastAPI's @app.get. Always with functools.wraps to preserve the function name."
+    },
+    "generator-pergunta": {
+      "question": "When should you use a generator instead of a list?",
+      "answer": "When the data is large, infinite or arrives gradually, and I only need to go through it once: reading a giant file, paginating an API, processing in a pipeline. The generator computes each item on demand and uses constant memory. If I need index access or several passes, I use a list."
+    },
+    "gil-pergunta": {
+      "question": "What is the GIL and how does it affect concurrency?",
+      "answer": "It is CPython's lock that lets only one thread run bytecode at a time. For I/O it barely matters, because the GIL is released while waiting; there I use threads or asyncio. For CPU, threads give no real parallelism; I use multiprocessing or ProcessPoolExecutor, or libraries like NumPy that work outside the GIL."
+    },
+    "padrao-mutavel-pergunta": {
+      "question": "What is wrong with def f(items=[])?",
+      "answer": "The default value is evaluated once, when the function is defined, so the same list is shared across every call and accumulates items. The right way is to use None as the default and create the list inside the function. The same applies to any mutable default, such as dict and set."
+    }
+  }
+}
