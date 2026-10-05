@@ -34,6 +34,11 @@ import mysql from '../../content/tracks/mysql/track.json';
 import mongodb from '../../content/tracks/mongodb/track.json';
 import redis from '../../content/tracks/redis/track.json';
 import nosql from '../../content/tracks/nosql/track.json';
+import reactNative from '../../content/tracks/react-native/track.json';
+import ciCdEssencial from '../../content/tracks/ci-cd-essencial/track.json';
+import githubActions from '../../content/tracks/github-actions/track.json';
+import awsEssencial from '../../content/tracks/aws-essencial/track.json';
+import deployNaAws from '../../content/tracks/deploy-na-aws/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -68,6 +73,11 @@ const registry: unknown[] = [
   mongodb,
   redis,
   nosql,
+  reactNative,
+  ciCdEssencial,
+  githubActions,
+  awsEssencial,
+  deployNaAws,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

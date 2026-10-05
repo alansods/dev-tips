@@ -1,0 +1,120 @@
+{
+  "title": "Deploying on AWS",
+  "description": "How to ship applications on AWS: containers with ECS and Fargate, Lambda, CloudFront and infrastructure as code.",
+  "decks": {
+    "containers-na-aws": {
+      "title": "Containers on AWS",
+      "description": "Images in ECR and services running on ECS with Fargate."
+    },
+    "serverless-e-borda": {
+      "title": "Serverless and edge",
+      "description": "On-demand functions, APIs and content delivery close to users."
+    },
+    "iac-e-pipeline": {
+      "title": "Infrastructure as code and pipeline",
+      "description": "Describing infrastructure in code and automating deployment."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "AWS deployment questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "ecr": {
+      "term": "ECR",
+      "definition": "AWS's private container image registry, like a Docker Hub inside the account. The pipeline builds the image, authenticates with the AWS CLI and pushes it; ECS, EKS and Lambda pull from it using IAM. It offers vulnerability scanning, optional immutable tags and lifecycle rules to delete old images."
+    },
+    "ecs-e-fargate": {
+      "term": "ECS and Fargate",
+      "definition": "ECS is AWS's container orchestrator. A cluster runs services, and each service keeps N copies of a task (one or more containers), wired to the load balancer and replaced when they fail. With Fargate, there are no servers to manage: you set CPU and memory per task and pay for that. With EC2 as capacity, you manage the machines and can save at scale."
+    },
+    "task-definition": {
+      "term": "Task definition",
+      "definition": "The task's versioned recipe: image, CPU and memory, ports, environment variables, secrets (read from Secrets Manager or Parameter Store), logs and two roles. The execution role lets ECS pull the image and read the secrets; the task role is the application's identity for calling other services. Each deploy registers a new revision, and going back means pointing to the previous one."
+    },
+    "ecs-vs-eks": {
+      "term": "ECS or EKS",
+      "definition": "ECS is simpler and integrated with AWS, with little to operate. EKS is managed Kubernetes: it brings the ecosystem (Helm, operators, portability across clouds), but requires more knowledge and operations, such as version upgrades, add-ons and networking. For a small AWS-only team, ECS with Fargate is usually enough; EKS pays off when the team already knows Kubernetes or needs its tooling."
+    },
+    "dockerfile-multistage": {
+      "title": "Multi-stage Dockerfile",
+      "body": "The first stage compiles; the final image only carries the output and production dependencies, and runs as non-root."
+    },
+    "push-para-ecr": {
+      "title": "Push the image to ECR",
+      "body": "Log in to the registry, build with the commit tag and push."
+    },
+    "lambda": {
+      "term": "Lambda",
+      "definition": "Functions that run in response to events (an HTTP request, a file in S3, a queue message, a schedule) with no server to manage. It scales on its own, including down to zero, and charges per invocation and execution time. Limits: up to 15 minutes per run, configurable memory and no guaranteed state between calls."
+    },
+    "cold-start": {
+      "term": "Cold start",
+      "definition": "When no environment is ready, Lambda has to create one: download the code, start the runtime and run initialization. That adds tens of milliseconds to a few seconds to the first call. Package size, the runtime, what runs outside the handler and VPC networking all weigh in. To reduce it: a lean package, light initialization, SnapStart (Java, Python, .NET) or provisioned concurrency."
+    },
+    "api-gateway": {
+      "term": "API Gateway",
+      "definition": "A managed front door for APIs: it receives HTTP requests, applies authentication (JWT, Cognito, IAM), rate limits and CORS, and forwards to Lambda or other services. HTTP APIs are simpler and cheaper; REST APIs have more features, such as validation, API keys and usage plans. For a simple Lambda, a Function URL also works."
+    },
+    "cloudfront": {
+      "term": "CloudFront",
+      "definition": "AWS's CDN: it keeps copies of content at edge locations close to users, reducing latency and load on the origin. The origin can be an S3 bucket (private, accessed via OAC), a load balancer or an API. It terminates HTTPS with an ACM certificate and can have WAF in front. After a deploy, an invalidation removes changed files from the cache."
+    },
+    "handler-lambda": {
+      "title": "An HTTP Lambda handler",
+      "body": "Clients created outside the handler are reused across invocations of the same environment."
+    },
+    "deploy-site-estatico": {
+      "title": "Deploying a static site",
+      "body": "Uploads the build to S3 and invalidates the CloudFront cache so users get the new version."
+    },
+    "infraestrutura-como-codigo": {
+      "term": "Infrastructure as code (IaC)",
+      "definition": "Describing networks, databases, queues and permissions in versioned files instead of creating them in the console. The tool compares the code with what exists and applies the difference. You gain PR review, history, identical environments (dev, staging and production) and the ability to recreate everything from scratch. Examples: CloudFormation, AWS CDK, Terraform/OpenTofu and Pulumi."
+    },
+    "cloudformation-e-cdk": {
+      "term": "CloudFormation and CDK",
+      "definition": "CloudFormation is AWS's native IaC: YAML or JSON templates become stacks, and AWS creates, updates and, if something fails, rolls back the changes. Change sets show what will change before applying. The AWS CDK lets you write infrastructure in TypeScript, Python and other languages, with high-level components, and generates the CloudFormation template (cdk synth, cdk diff, cdk deploy)."
+    },
+    "drift": {
+      "term": "Drift and state",
+      "definition": "Drift is the difference between what the code describes and what actually exists, caused by manual changes in the console. The IaC tool must know what it manages: CloudFormation keeps it in the stack, and Terraform in a state file, which should be remote (S3), with a lock against simultaneous runs. The rule is to change things only through code and detect drift often."
+    },
+    "codepipeline": {
+      "term": "CodePipeline and CodeBuild",
+      "definition": "AWS's own CI/CD services. CodePipeline orchestrates stages (source, build, approval, deploy), CodeBuild runs builds in containers and CodeDeploy deploys to EC2, ECS (including blue/green) and Lambda. They run inside the account, with IAM roles. Many teams use GitHub Actions with OIDC instead; the choice depends on where the team already is."
+    },
+    "stack-cdk-fargate": {
+      "title": "Fargate service with CDK",
+      "body": "A high-level construct creates the VPC, cluster, load balancer, service and roles in a few lines."
+    },
+    "atualizar-servico-ecs": {
+      "title": "Update the ECS service",
+      "body": "Points the service to the new task definition revision and waits until it is stable; rolling back means using the previous revision."
+    },
+    "site-react-na-aws": {
+      "question": "How do you publish a React app (SPA) on AWS?",
+      "answer": "I build it and upload the files to a private S3 bucket. In front, a CloudFront distribution with OAC to read the bucket, an ACM certificate for HTTPS and the domain in Route 53. I configure CloudFront to return index.html for app routes, hashed assets with long caching and index.html with short caching. In the pipeline: build, sync and invalidation."
+    },
+    "ec2-ecs-ou-lambda": {
+      "question": "How do you choose between EC2, ECS with Fargate and Lambda for an API?",
+      "answer": "Lambda for spiky or low traffic, event-driven tasks and when I want no servers and zero cost when idle, within the 15 minutes and cold start. ECS with Fargate for long-running containerized services, steady traffic, persistent connections or processes that do not fit the Lambda model. EC2 when I need OS control, specific hardware or lower cost at scale, accepting that I operate the machines."
+    },
+    "reduzir-cold-start": {
+      "question": "A Lambda API has high latency on the first call. What do you do?",
+      "answer": "I confirm in the logs (Init Duration) that it is a cold start. Then: shrink the package and dependencies, move heavy work out of initialization or make it lazy, raise memory (more CPU comes with it), avoid a VPC if not needed and pick a light runtime. If that is not enough, I use SnapStart where available, or provisioned concurrency on critical routes, weighing the cost."
+    },
+    "por-que-iac": {
+      "question": "Why use infrastructure as code instead of creating resources in the console?",
+      "answer": "Code is reviewed in a PR, kept in history and repeatable: environments stay the same and everything can be recreated after an incident. Manual changes leave no trace, diverge between environments and depend on whoever remembers the clicks. With IaC, the pipeline itself applies infrastructure changes."
+    },
+    "rollback-no-ecs": {
+      "question": "An ECS deploy went out with a bug. How do you roll back?",
+      "answer": "I update the service to the previous task definition revision, which points to the previous image, still in ECR. To automate it, I enable the deployment circuit breaker with rollback, which reverts on its own if new tasks do not become healthy, plus CloudWatch alarms. With CodeDeploy blue/green, rollback means switching traffic back to the old group."
+    },
+    "segredos-da-aplicacao": {
+      "question": "Where do you store the application's database password and API keys on AWS?",
+      "answer": "In Secrets Manager (with automatic rotation, great for database credentials) or in Systems Manager Parameter Store (SecureString, cheaper). The task definition or the Lambda references the secret and the execution role is allowed only to read it; the value never sits in the image, the repository or as plain text in the task definition's variables."
+    }
+  }
+}

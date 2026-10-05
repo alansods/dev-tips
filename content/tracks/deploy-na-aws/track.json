@@ -1,0 +1,318 @@
+{
+  "id": "deploy-na-aws",
+  "title": "Deploy na AWS",
+  "description": "Como colocar aplicações no ar na AWS: containers com ECS e Fargate, Lambda, CloudFront e infraestrutura como código.",
+  "areas": [
+    "devops"
+  ],
+  "section": "aws",
+  "decks": [
+    {
+      "id": "containers-na-aws",
+      "title": "Containers na AWS",
+      "description": "Imagens no ECR e serviços rodando no ECS com Fargate.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "ecr",
+          "level": "junior",
+          "term": "ECR",
+          "definition": "Registro privado de imagens de container da AWS, como um Docker Hub dentro da conta. O pipeline faz o build, autentica com a AWS CLI e envia a imagem; ECS, EKS e Lambda puxam de lá usando IAM. Tem varredura de vulnerabilidades, tags imutáveis opcionais e regras de ciclo de vida para apagar imagens antigas.",
+          "relatedTerms": [
+            "ecs-e-fargate"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ecs-e-fargate",
+          "level": "pleno",
+          "term": "ECS e Fargate",
+          "definition": "ECS é o orquestrador de containers da AWS. Um cluster roda services, e cada service mantém N cópias de uma task (um ou mais containers), integradas ao load balancer e substituídas quando falham. Com Fargate, não há servidores para gerenciar: você define CPU e memória por task e paga por isso. Com EC2 como capacidade, você gerencia as máquinas e pode economizar em escala.",
+          "relatedTerms": [
+            "task-definition",
+            "ecr"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "task-definition",
+          "level": "pleno",
+          "term": "Task definition",
+          "definition": "Receita versionada da task: imagem, CPU e memória, portas, variáveis de ambiente, segredos (lidos do Secrets Manager ou do Parameter Store), logs e duas roles. A execution role permite ao ECS puxar a imagem e ler os segredos; a task role é a identidade da aplicação para chamar outros serviços. Cada deploy registra uma revisão nova, e voltar é apontar para a anterior.",
+          "relatedTerms": [
+            "ecs-e-fargate"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ecs-vs-eks",
+          "level": "senior",
+          "term": "ECS ou EKS",
+          "definition": "ECS é mais simples e integrado à AWS, com pouca coisa para operar. EKS é Kubernetes gerenciado: traz o ecossistema (Helm, operators, portabilidade entre nuvens), mas exige mais conhecimento e operação, como upgrades de versão, add-ons e rede. Para um time pequeno só na AWS, ECS com Fargate costuma bastar; EKS compensa quando o time já domina Kubernetes ou precisa das ferramentas dele.",
+          "relatedTerms": [
+            "ecs-e-fargate"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "dockerfile-multistage",
+          "level": "pleno",
+          "title": "Dockerfile multi-stage",
+          "body": "O primeiro estágio compila; a imagem final só leva o resultado e as dependências de produção, e roda sem root.",
+          "snippet": {
+            "file": "Dockerfile",
+            "language": "text",
+            "code": "FROM node:24-alpine AS build\nWORKDIR /app\nCOPY package*.json ./\nRUN npm ci\nCOPY . .\nRUN npm run build\n\nFROM node:24-alpine\nWORKDIR /app\nENV NODE_ENV=production\nCOPY package*.json ./\nRUN npm ci --omit=dev\nCOPY --from=build /app/dist ./dist\nUSER node\nEXPOSE 3000\nCMD [\"node\", \"dist/main.js\"]"
+          },
+          "relatedTerms": [
+            "ecr"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "push-para-ecr",
+          "level": "pleno",
+          "title": "Enviar a imagem ao ECR",
+          "body": "Login no registro, build com a tag do commit e push.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "REGISTRY=123456789012.dkr.ecr.us-east-1.amazonaws.com\nSHA=$(git rev-parse --short HEAD)\n\naws ecr get-login-password --region us-east-1 \\\n  | docker login --username AWS --password-stdin $REGISTRY\ndocker build -t $REGISTRY/api:$SHA .\ndocker push $REGISTRY/api:$SHA"
+          },
+          "relatedTerms": [
+            "ecr"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "serverless-e-borda",
+      "title": "Serverless e borda",
+      "description": "Funções sob demanda, APIs e entrega de conteúdo perto do usuário.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "lambda",
+          "level": "junior",
+          "term": "Lambda",
+          "definition": "Funções que rodam em resposta a eventos (requisição HTTP, arquivo no S3, mensagem na fila, horário) sem servidor para gerenciar. Escala sozinha, inclusive até zero, e cobra por invocação e por tempo de execução. Limites: até 15 minutos por execução, memória configurável e nenhum estado garantido entre chamadas.",
+          "relatedTerms": [
+            "cold-start",
+            "api-gateway"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cold-start",
+          "level": "senior",
+          "term": "Cold start",
+          "definition": "Quando não há ambiente pronto, a Lambda precisa criá-lo: baixar o código, iniciar o runtime e rodar a inicialização. Isso soma de dezenas de milissegundos a alguns segundos à primeira chamada. Pesam o tamanho do pacote, o runtime, o que roda fora do handler e a rede na VPC. Para reduzir: pacote enxuto, inicialização leve, SnapStart (Java, Python, .NET) ou provisioned concurrency.",
+          "relatedTerms": [
+            "lambda"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "api-gateway",
+          "level": "pleno",
+          "term": "API Gateway",
+          "definition": "Porta de entrada gerenciada para APIs: recebe as requisições HTTP, aplica autenticação (JWT, Cognito, IAM), limites de taxa e CORS, e encaminha para Lambda ou outros serviços. HTTP APIs são mais simples e baratas; REST APIs têm mais recursos, como validação, chaves de API e planos de uso. Para uma Lambda simples, uma Function URL também serve.",
+          "relatedTerms": [
+            "lambda"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cloudfront",
+          "level": "pleno",
+          "term": "CloudFront",
+          "definition": "CDN da AWS: guarda cópias do conteúdo em pontos de presença perto dos usuários, reduzindo latência e carga na origem. A origem pode ser um bucket S3 (privado, acessado via OAC), um load balancer ou uma API. Termina o HTTPS com certificado do ACM e pode ter o WAF na frente. Depois de um deploy, uma invalidação remove do cache os arquivos que mudaram.",
+          "relatedTerms": [
+            "lambda"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "handler-lambda",
+          "level": "junior",
+          "title": "Handler de uma Lambda HTTP",
+          "body": "Clientes criados fora do handler são reaproveitados entre invocações do mesmo ambiente.",
+          "snippet": {
+            "file": "handler.ts",
+            "language": "ts",
+            "code": "import type { APIGatewayProxyHandlerV2 } from 'aws-lambda';\nimport { DynamoDBClient } from '@aws-sdk/client-dynamodb';\n\nconst db = new DynamoDBClient({}); // inicializado uma vez por ambiente\n\nexport const handler: APIGatewayProxyHandlerV2 = async (event) => {\n  const id = event.pathParameters?.id;\n  if (!id) return { statusCode: 400, body: 'id obrigatório' };\n  // ... busca no DynamoDB com db\n  return { statusCode: 200, body: JSON.stringify({ id }) };\n};"
+          },
+          "relatedTerms": [
+            "lambda",
+            "cold-start"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "deploy-site-estatico",
+          "level": "pleno",
+          "title": "Deploy de um site estático",
+          "body": "Envia o build para o S3 e invalida o cache do CloudFront para que os usuários recebam a versão nova.",
+          "snippet": {
+            "file": "deploy.sh",
+            "language": "bash",
+            "code": "set -euo pipefail\nnpm run build\naws s3 sync ./dist s3://meu-site --delete\naws cloudfront create-invalidation \\\n  --distribution-id E1ABCDEF2GHIJK \\\n  --paths \"/index.html\""
+          },
+          "relatedTerms": [
+            "cloudfront"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iac-e-pipeline",
+      "title": "Infraestrutura como código e pipeline",
+      "description": "Descrever a infraestrutura em código e automatizar o deploy.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "infraestrutura-como-codigo",
+          "level": "junior",
+          "term": "Infraestrutura como código (IaC)",
+          "definition": "Descrever redes, bancos, filas e permissões em arquivos versionados, em vez de criar no console. A ferramenta compara o código com o que existe e aplica a diferença. Ganha-se revisão por PR, histórico, ambientes idênticos (dev, homologação e produção) e a capacidade de recriar tudo do zero. Exemplos: CloudFormation, AWS CDK, Terraform/OpenTofu e Pulumi.",
+          "relatedTerms": [
+            "cloudformation-e-cdk",
+            "drift"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cloudformation-e-cdk",
+          "level": "pleno",
+          "term": "CloudFormation e CDK",
+          "definition": "CloudFormation é a IaC nativa da AWS: templates YAML ou JSON viram stacks, e a AWS cria, atualiza e, se algo falhar, desfaz as mudanças. Change sets mostram o que vai mudar antes de aplicar. O AWS CDK permite escrever a infraestrutura em TypeScript, Python e outras linguagens, com componentes de alto nível, e gera o template do CloudFormation (cdk synth, cdk diff, cdk deploy).",
+          "relatedTerms": [
+            "infraestrutura-como-codigo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "drift",
+          "level": "senior",
+          "term": "Drift e estado",
+          "definition": "Drift é a diferença entre o que o código descreve e o que de fato existe, causada por mudanças feitas à mão no console. A ferramenta de IaC precisa saber o que gerencia: o CloudFormation guarda isso na stack, e o Terraform num arquivo de estado, que deve ficar remoto (S3), com trava contra execuções simultâneas. A regra é mudar só pelo código e detectar drift com frequência.",
+          "relatedTerms": [
+            "infraestrutura-como-codigo",
+            "cloudformation-e-cdk"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "codepipeline",
+          "level": "pleno",
+          "term": "CodePipeline e CodeBuild",
+          "definition": "Serviços de CI/CD da própria AWS. CodePipeline orquestra as etapas (origem, build, aprovação, deploy), CodeBuild executa os builds em containers e CodeDeploy faz deploys em EC2, ECS (inclusive blue/green) e Lambda. Rodam dentro da conta, com roles do IAM. Muitas equipes usam GitHub Actions com OIDC no lugar deles; a escolha depende de onde o time já está.",
+          "relatedTerms": [
+            "infraestrutura-como-codigo"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "stack-cdk-fargate",
+          "level": "pleno",
+          "title": "Serviço Fargate com CDK",
+          "body": "Um construto de alto nível cria VPC, cluster, load balancer, service e roles com poucas linhas.",
+          "snippet": {
+            "file": "lib/api-stack.ts",
+            "language": "ts",
+            "code": "import { Stack, type StackProps } from 'aws-cdk-lib';\nimport * as ec2 from 'aws-cdk-lib/aws-ec2';\nimport * as ecs from 'aws-cdk-lib/aws-ecs';\nimport * as patterns from 'aws-cdk-lib/aws-ecs-patterns';\nimport type { Construct } from 'constructs';\n\nexport class ApiStack extends Stack {\n  constructor(scope: Construct, id: string, props?: StackProps) {\n    super(scope, id, props);\n    const vpc = new ec2.Vpc(this, 'Vpc', { maxAzs: 2 });\n    new patterns.ApplicationLoadBalancedFargateService(this, 'Api', {\n      cluster: new ecs.Cluster(this, 'Cluster', { vpc }),\n      cpu: 512,\n      memoryLimitMiB: 1024,\n      desiredCount: 2,\n      taskImageOptions: { image: ecs.ContainerImage.fromAsset('.'), containerPort: 3000 },\n    });\n  }\n}"
+          },
+          "relatedTerms": [
+            "cloudformation-e-cdk"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "atualizar-servico-ecs",
+          "level": "pleno",
+          "title": "Atualizar o service do ECS",
+          "body": "Aponta o service para a revisão nova da task definition e espera ficar estável; voltar é usar a revisão anterior.",
+          "snippet": {
+            "file": "deploy.sh",
+            "language": "bash",
+            "code": "aws ecs update-service \\\n  --cluster producao --service api \\\n  --task-definition api:42\n\naws ecs wait services-stable --cluster producao --services api\n\n# rollback: aws ecs update-service --cluster producao --service api --task-definition api:41"
+          },
+          "relatedTerms": [
+            "codepipeline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de deploy na AWS que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "site-react-na-aws",
+          "level": "junior",
+          "question": "Como publicar um app React (SPA) na AWS?",
+          "answer": "Faço o build e envio os arquivos para um bucket S3 privado. Na frente, um CloudFront com OAC para ler o bucket, certificado do ACM para HTTPS e o domínio no Route 53. Configuro o CloudFront para devolver o index.html nas rotas do app, assets com hash e cache longo e o index.html com cache curto. No pipeline: build, sync e invalidação.",
+          "relatedTerms": [
+            "cloudfront"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "ec2-ecs-ou-lambda",
+          "level": "pleno",
+          "question": "Como escolher entre EC2, ECS com Fargate e Lambda para uma API?",
+          "answer": "Lambda para tráfego irregular ou baixo, tarefas orientadas a eventos e quando quero zero servidor e custo zero parado, respeitando os 15 minutos e o cold start. ECS com Fargate para serviços de longa duração em container, tráfego constante, conexões persistentes ou processos que não cabem no modelo da Lambda. EC2 quando preciso de controle do sistema, hardware específico ou custo menor em escala, aceitando operar as máquinas.",
+          "relatedTerms": [
+            "lambda",
+            "ecs-e-fargate"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "reduzir-cold-start",
+          "level": "senior",
+          "question": "Uma API em Lambda está com latência alta na primeira chamada. O que fazer?",
+          "answer": "Confirmo nos logs (Init Duration) que é cold start. Depois: diminuo o pacote e as dependências, tiro trabalho pesado da inicialização ou o faço sob demanda, aumento a memória (vem junto mais CPU), evito VPC se não for necessária e escolho um runtime leve. Se ainda não bastar, uso SnapStart, onde existe, ou provisioned concurrency nas rotas críticas, pesando o custo.",
+          "relatedTerms": [
+            "cold-start",
+            "lambda"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-iac",
+          "level": "junior",
+          "question": "Por que usar infraestrutura como código em vez de criar os recursos no console?",
+          "answer": "O código é revisado em PR, fica no histórico e pode ser repetido: os ambientes ficam iguais e dá para recriar tudo depois de um incidente. Mudanças feitas à mão não deixam rastro, divergem entre ambientes e dependem de quem lembra os cliques. Com IaC, o próprio pipeline aplica as mudanças de infraestrutura.",
+          "relatedTerms": [
+            "infraestrutura-como-codigo",
+            "drift"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "rollback-no-ecs",
+          "level": "pleno",
+          "question": "Um deploy no ECS subiu com erro. Como voltar?",
+          "answer": "Atualizo o service para a revisão anterior da task definition, que aponta para a imagem anterior, ainda no ECR. Para automatizar, ligo o deployment circuit breaker com rollback, que volta sozinho se as tasks novas não ficam saudáveis, e alarmes do CloudWatch. Com CodeDeploy em blue/green, o rollback é trocar o tráfego de volta para o grupo antigo.",
+          "relatedTerms": [
+            "task-definition",
+            "ecs-e-fargate"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "segredos-da-aplicacao",
+          "level": "pleno",
+          "question": "Onde guardar a senha do banco e as chaves de API da aplicação na AWS?",
+          "answer": "No Secrets Manager (com rotação automática, ótimo para credenciais de banco) ou no Systems Manager Parameter Store (SecureString, mais barato). A task definition ou a Lambda referencia o segredo e a execution role tem permissão só para lê-lo; o valor nunca fica na imagem, no repositório nem em texto puro nas variáveis da task definition.",
+          "relatedTerms": [
+            "task-definition"
+          ]
+        }
+      ]
+    }
+  ]
+}

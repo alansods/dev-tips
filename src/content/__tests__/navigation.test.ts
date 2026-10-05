@@ -39,9 +39,21 @@ describe('Requirement: Home por áreas', () => {
     ]);
   });
 
-  it('Banco de dados por último', () => {
-    const all = [...catalog(), make('sql', { areas: ['banco-de-dados'] })];
-    expect(areasWithTracks(all).map((a) => a.area)).toEqual(['fundamentos', 'frontend', 'backend', 'banco-de-dados']);
+  it('Mobile e DevOps e Cloud no fim', () => {
+    const all = [
+      make('ci', { areas: ['devops'] }),
+      make('rn', { areas: ['mobile'] }),
+      ...catalog(),
+      make('sql', { areas: ['banco-de-dados'] }),
+    ];
+    expect(areasWithTracks(all).map((a) => a.area)).toEqual([
+      'fundamentos',
+      'frontend',
+      'backend',
+      'banco-de-dados',
+      'mobile',
+      'devops',
+    ]);
   });
 
   it('Trilha em duas áreas', () => {
@@ -127,6 +139,18 @@ describe('Requirement: Tela da área (seções)', () => {
     expect(sections.grouped.map((g) => [g.section, ids(g.tracks)])).toEqual([
       ['relacionais', ['sql', 'pg']],
       ['nao-relacionais', ['nosql']],
+    ]);
+  });
+
+  it('Seções CI/CD e AWS', () => {
+    const devops = [
+      make('aws-base', { areas: ['devops'], section: 'aws' }),
+      make('ci', { areas: ['devops'], section: 'ci-cd' }),
+      make('aws-deploy', { areas: ['devops'], section: 'aws' }),
+    ];
+    expect(areaSections(devops, taxonomy(), 'devops').grouped.map((g) => [g.section, ids(g.tracks)])).toEqual([
+      ['ci-cd', ['ci']],
+      ['aws', ['aws-base', 'aws-deploy']],
     ]);
   });
 

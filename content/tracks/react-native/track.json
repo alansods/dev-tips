@@ -1,0 +1,315 @@
+{
+  "id": "react-native",
+  "title": "React Native",
+  "description": "Apps nativos para iOS e Android com React: componentes nativos, estilo, Expo, navegação, performance e publicação.",
+  "areas": [
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react-native",
+  "decks": [
+    {
+      "id": "componentes-e-estilo",
+      "title": "Componentes e estilo",
+      "description": "Os blocos de interface do React Native e como estilizar sem CSS.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "react-native",
+          "level": "junior",
+          "term": "React Native",
+          "definition": "Framework para criar apps iOS e Android com React. O código JavaScript descreve a interface com componentes, e o React Native desenha componentes nativos de verdade (UIView no iOS, View no Android), não uma página web dentro do app. A lógica é compartilhada entre as plataformas, e o que for específico de cada uma pode ser separado.",
+          "relatedTerms": [
+            "componentes-nativos",
+            "expo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "componentes-nativos",
+          "level": "junior",
+          "term": "Componentes nativos",
+          "definition": "Não há DOM nem tags HTML. A interface usa componentes como View (container, o \"div\"), Text (todo texto precisa estar dentro de um Text), Image, TextInput, ScrollView e Pressable (área tocável com estados de pressionado). Eventos são de toque, como onPress, e não de mouse.",
+          "relatedTerms": [
+            "react-native",
+            "stylesheet-e-flexbox"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "stylesheet-e-flexbox",
+          "level": "junior",
+          "term": "StyleSheet e flexbox",
+          "definition": "Estilo é um objeto JavaScript com nomes em camelCase (backgroundColor), criado com StyleSheet.create. Não há cascata nem seletores: cada componente recebe o próprio style. O layout é flexbox, mas com flexDirection padrão \"column\", e os números são pontos independentes de densidade, sem \"px\".",
+          "relatedTerms": [
+            "componentes-nativos",
+            "plataforma"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "plataforma",
+          "level": "pleno",
+          "term": "Código por plataforma",
+          "definition": "Quando iOS e Android precisam de comportamento diferente: Platform.OS para um if, Platform.select para escolher valores, ou arquivos com sufixo (Button.ios.tsx e Button.android.tsx), que o bundler escolhe sozinho. Áreas como o notch e a barra de status pedem safe area (react-native-safe-area-context) para o conteúdo não ficar escondido.",
+          "relatedTerms": [
+            "stylesheet-e-flexbox"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "card-tocavel",
+          "level": "junior",
+          "title": "Card tocável com StyleSheet",
+          "body": "Pressable entrega o estado \"pressed\" para dar feedback visual; o estilo vem de StyleSheet.create.",
+          "snippet": {
+            "file": "ProductCard.tsx",
+            "language": "ts",
+            "code": "import { Pressable, StyleSheet, Text } from 'react-native';\n\ntype Props = { name: string; onPress: () => void };\n\nexport function ProductCard({ name, onPress }: Props) {\n  return (\n    <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>\n      <Text style={styles.name}>{name}</Text>\n    </Pressable>\n  );\n}\n\nconst styles = StyleSheet.create({\n  card: { padding: 16, borderRadius: 12, backgroundColor: '#fff' },\n  pressed: { opacity: 0.7 },\n  name: { fontSize: 16, fontWeight: '600' },\n});"
+          },
+          "relatedTerms": [
+            "componentes-nativos",
+            "stylesheet-e-flexbox"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "sombra-por-plataforma",
+          "level": "pleno",
+          "title": "Sombra em cada plataforma",
+          "body": "iOS usa as propriedades shadow*, Android usa elevation. Platform.select escolhe o objeto certo.",
+          "snippet": {
+            "file": "styles.ts",
+            "language": "ts",
+            "code": "import { Platform, StyleSheet } from 'react-native';\n\nexport const styles = StyleSheet.create({\n  card: {\n    borderRadius: 12,\n    ...Platform.select({\n      ios: { shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } },\n      android: { elevation: 4 },\n    }),\n  },\n});"
+          },
+          "relatedTerms": [
+            "plataforma",
+            "stylesheet-e-flexbox"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "navegacao-e-expo",
+      "title": "Navegação e Expo",
+      "description": "Expo, rotas por arquivo e o ciclo de build e atualização.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "expo",
+          "level": "junior",
+          "term": "Expo",
+          "definition": "Framework e plataforma em cima do React Native, recomendado pela própria documentação do React Native. Traz o Expo SDK (câmera, notificações, armazenamento seguro e outros módulos), o Expo Router para navegação e os serviços EAS para build, envio às lojas e atualizações. O Expo Go é um app pronto para testar projetos sem compilar nada.",
+          "relatedTerms": [
+            "react-native",
+            "development-build",
+            "eas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "expo-router",
+          "level": "junior",
+          "term": "Expo Router",
+          "definition": "Navegação por arquivos: cada arquivo em src/app vira uma tela, e a URL segue o caminho (src/app/product/[id].tsx atende /product/42). Arquivos _layout.tsx definem o navegador da pasta (Stack, Tabs). Link e router fazem a navegação, e useLocalSearchParams lê os parâmetros. Como toda tela tem URL, deep links funcionam sem configuração extra.",
+          "relatedTerms": [
+            "expo"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "development-build",
+          "level": "pleno",
+          "term": "Development build",
+          "definition": "Versão de desenvolvimento do seu próprio app, com as bibliotecas nativas que ele usa. É necessária quando o projeto tem código nativo que o Expo Go não traz. As pastas ios/ e android/ são geradas a partir do app.json e dos config plugins (Continuous Native Generation), então a configuração nativa fica no código, e não em arquivos editados à mão.",
+          "relatedTerms": [
+            "expo",
+            "eas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "eas",
+          "level": "pleno",
+          "term": "EAS (Build, Submit e Update)",
+          "definition": "Serviços na nuvem da Expo. EAS Build compila e assina o app sem Xcode ou Android Studio local, com perfis no eas.json (development, preview, production). EAS Submit envia o binário às lojas. EAS Update publica atualizações over-the-air (OTA) do JavaScript e dos assets em canais, sem passar pela revisão da loja.",
+          "relatedTerms": [
+            "development-build",
+            "runtime-version"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "runtime-version",
+          "level": "senior",
+          "term": "Runtime version",
+          "definition": "Identifica com qual camada nativa um bundle JavaScript é compatível. Um build só recebe updates OTA com a mesma runtime version, o que impede que um JS novo chame um módulo nativo que o binário não tem. A política \"fingerprint\" calcula um hash do que define o build nativo e muda a versão sozinha quando algo nativo muda.",
+          "relatedTerms": [
+            "eas"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "rota-dinamica",
+          "level": "junior",
+          "title": "Rota dinâmica com Expo Router",
+          "body": "O nome do arquivo entre colchetes vira parâmetro; a tela de lista navega com Link.",
+          "snippet": {
+            "file": "src/app/product/[id].tsx",
+            "language": "ts",
+            "code": "import { Link, useLocalSearchParams } from 'expo-router';\nimport { Text, View } from 'react-native';\n\nexport default function ProductScreen() {\n  const { id } = useLocalSearchParams<{ id: string }>();\n  return (\n    <View>\n      <Text>Produto {id}</Text>\n      <Link href=\"/\">Voltar para a lista</Link>\n    </View>\n  );\n}\n\n// Na lista: <Link href={`/product/${product.id}`}>{product.name}</Link>"
+          },
+          "relatedTerms": [
+            "expo-router"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "performance-e-publicacao",
+      "title": "Performance e publicação",
+      "description": "Listas, threads, armazenamento e o caminho até as lojas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "nova-arquitetura",
+          "level": "senior",
+          "term": "Nova Arquitetura",
+          "definition": "A forma atual de o JavaScript conversar com o nativo. A antiga bridge serializava mensagens em JSON de forma assíncrona. A Nova Arquitetura usa JSI, que permite ao JS chamar funções nativas direto, o Fabric (novo renderizador, com suporte a recursos concorrentes do React) e TurboModules (módulos nativos carregados sob demanda). O motor de JS padrão é o Hermes, otimizado para mobile.",
+          "relatedTerms": [
+            "thread-de-ui"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "thread-de-ui",
+          "level": "senior",
+          "term": "Thread de JS e thread de UI",
+          "definition": "O código React roda na thread de JavaScript, e a tela é desenhada na thread principal (UI). Se o JS fica ocupado, por exemplo com um cálculo pesado ou muitos re-renders, toques e animações controladas pelo JS travam e o app perde quadros (o alvo é 60 fps ou mais). Bibliotecas como Reanimated rodam animações na thread de UI para que elas não dependam do JS livre.",
+          "relatedTerms": [
+            "nova-arquitetura",
+            "listas-virtualizadas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "listas-virtualizadas",
+          "level": "pleno",
+          "term": "Listas virtualizadas",
+          "definition": "FlatList e SectionList só montam os itens perto da área visível e reciclam o resto, enquanto ScrollView monta tudo de uma vez. Para listas longas: keyExtractor estável, item memoizado (React.memo), callbacks estáveis e getItemLayout quando a altura é fixa. FlashList (Shopify) recicla as views nativas e costuma ser mais rápida em listas grandes.",
+          "relatedTerms": [
+            "thread-de-ui"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "armazenamento-local",
+          "level": "pleno",
+          "term": "Armazenamento local",
+          "definition": "AsyncStorage guarda chave-valor em texto, sem criptografia: serve para preferências e cache. Tokens e segredos vão no expo-secure-store, que usa o Keychain do iOS e o Keystore do Android. Para dados estruturados ou volume grande, SQLite (expo-sqlite); para leituras síncronas muito rápidas, MMKV.",
+          "relatedTerms": [
+            "publicacao-nas-lojas"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "publicacao-nas-lojas",
+          "level": "pleno",
+          "term": "Publicação nas lojas",
+          "definition": "Cada envio à App Store ou ao Google Play precisa de um binário assinado e de um número de build maior que o anterior (buildNumber no iOS, versionCode no Android), além da versão exibida ao usuário. As lojas revisam o app, com prazo variável. Updates OTA podem corrigir JavaScript e assets, mas mudar o propósito do app ou o código nativo exige um novo envio.",
+          "relatedTerms": [
+            "armazenamento-local"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "flatlist-otimizada",
+          "level": "pleno",
+          "title": "FlatList otimizada",
+          "body": "Item memoizado, chave estável, callback estável e altura fixa informada com getItemLayout.",
+          "snippet": {
+            "file": "ProductList.tsx",
+            "language": "ts",
+            "code": "const ITEM_HEIGHT = 72;\nconst Row = memo(function Row({ item, onPress }: RowProps) {\n  return <ProductCard name={item.name} onPress={() => onPress(item.id)} />;\n});\n\nexport function ProductList({ products }: { products: Product[] }) {\n  const onPress = useCallback((id: string) => router.push(`/product/${id}`), []);\n  return (\n    <FlatList\n      data={products}\n      keyExtractor={(item) => item.id}\n      renderItem={({ item }) => <Row item={item} onPress={onPress} />}\n      getItemLayout={(_, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })}\n    />\n  );\n}"
+          },
+          "relatedTerms": [
+            "listas-virtualizadas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de React Native que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "rn-vs-web",
+          "level": "junior",
+          "question": "O que muda entre React para web e React Native?",
+          "answer": "O modelo é o mesmo: componentes, props, estado e hooks. Muda o alvo. Em vez de DOM e HTML, há componentes nativos (View, Text, Image); em vez de CSS, objetos de estilo com flexbox e sem cascata; em vez de cliques, toques (onPress). Navegação, armazenamento e acesso a recursos do aparelho usam bibliotecas próprias, e o app passa por build e lojas.",
+          "relatedTerms": [
+            "react-native",
+            "componentes-nativos"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "expo-go-ou-dev-build",
+          "level": "pleno",
+          "question": "Quando o Expo Go não é suficiente?",
+          "answer": "Quando o app usa uma biblioteca com código nativo que não vem no Expo Go, precisa de configuração nativa própria (ícones, permissões, push com credenciais próprias) ou vai testar algo próximo da produção. Nesses casos, gera-se um development build do próprio app, local ou pelo EAS Build. O Expo Go continua útil para protótipos e aprendizado.",
+          "relatedTerms": [
+            "development-build",
+            "expo"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "lista-travando",
+          "level": "pleno",
+          "question": "Uma lista com milhares de itens está travando ao rolar. O que você faz?",
+          "answer": "Primeiro confirmo que é uma FlatList, e não um map dentro de ScrollView. Depois: keyExtractor estável, item com React.memo, callbacks com useCallback para não re-renderizar todos os itens, getItemLayout se a altura é fixa, imagens no tamanho certo e com cache. Meço com o Perf Monitor e o React DevTools Profiler. Se ainda não basta, troco por FlashList.",
+          "relatedTerms": [
+            "listas-virtualizadas",
+            "thread-de-ui"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "onde-guardar-token",
+          "level": "pleno",
+          "question": "Onde guardar o token de autenticação no app?",
+          "answer": "No armazenamento seguro do sistema: expo-secure-store, que usa o Keychain no iOS e o Keystore no Android. AsyncStorage não é criptografado e pode ser lido num aparelho comprometido ou num backup. O ideal é um access token de vida curta mais um refresh token, que é apagado no logout.",
+          "relatedTerms": [
+            "armazenamento-local"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "limites-do-ota",
+          "level": "senior",
+          "question": "O que pode e o que não pode ser entregue por update OTA?",
+          "answer": "Pode: JavaScript, estilos, textos e imagens, ou seja, tudo o que está no bundle. Não pode: código nativo, novas bibliotecas nativas, permissões ou mudanças no app.json que afetam o binário. Isso exige build novo e, em produção, envio à loja. A runtime version garante que um update só chegue aos binários compatíveis. Também é preciso respeitar as regras das lojas, que proíbem mudar o propósito do app por OTA, e ter rollback para um update ruim.",
+          "relatedTerms": [
+            "runtime-version",
+            "eas"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-mudou-na-arquitetura",
+          "level": "senior",
+          "question": "O que a Nova Arquitetura do React Native resolveu?",
+          "answer": "A bridge antiga era assíncrona e serializava tudo em JSON, o que gerava gargalo em listas, gestos e chamadas frequentes, e impedia leituras síncronas de layout. Com JSI, o JS chama o nativo diretamente; o Fabric renderiza com suporte a recursos concorrentes do React e medição síncrona; e os TurboModules carregam módulos nativos sob demanda, reduzindo o tempo de abertura.",
+          "relatedTerms": [
+            "nova-arquitetura",
+            "thread-de-ui"
+          ]
+        }
+      ]
+    }
+  ]
+}

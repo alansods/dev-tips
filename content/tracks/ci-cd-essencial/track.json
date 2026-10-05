@@ -1,0 +1,320 @@
+{
+  "id": "ci-cd-essencial",
+  "title": "CI/CD essencial",
+  "description": "Do commit à produção: integração contínua, pipelines, testes, artefatos e estratégias de deploy.",
+  "areas": [
+    "devops"
+  ],
+  "section": "ci-cd",
+  "decks": [
+    {
+      "id": "pipeline-e-etapas",
+      "title": "Pipeline e etapas",
+      "description": "O que é CI, o que é CD e como um pipeline se organiza.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "integracao-continua",
+          "level": "junior",
+          "term": "Integração contínua (CI)",
+          "definition": "Prática de integrar o código de todos na branch principal com frequência, várias vezes por dia, e validar cada integração automaticamente: build, lint e testes. O objetivo é descobrir conflitos e bugs minutos depois de criados, quando são baratos de corrigir, em vez de no fim de uma longa branch isolada.",
+          "relatedTerms": [
+            "pipeline",
+            "entrega-continua"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "entrega-continua",
+          "level": "junior",
+          "term": "Entrega contínua e deploy contínuo (CD)",
+          "definition": "Entrega contínua: todo commit que passa no pipeline gera uma versão pronta para produção, e o deploy é um clique. Deploy contínuo vai além: essa versão vai para produção sozinha, sem aprovação manual. Os dois exigem testes automatizados confiáveis e deploys pequenos e frequentes.",
+          "relatedTerms": [
+            "integracao-continua",
+            "pipeline"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pipeline",
+          "level": "junior",
+          "term": "Pipeline",
+          "definition": "Sequência automatizada de etapas que leva um commit até o deploy, por exemplo: instalar dependências, lint, testes, build, publicar o artefato e fazer o deploy. Etapas independentes rodam em paralelo, e uma falha interrompe as seguintes. As etapas rápidas vêm primeiro, para o desenvolvedor ter retorno cedo (fail fast).",
+          "relatedTerms": [
+            "integracao-continua",
+            "trunk-based"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "trunk-based",
+          "level": "pleno",
+          "term": "Trunk-based development",
+          "definition": "Modelo de branches em que todos integram numa branch principal (trunk) com branches curtas, de horas ou poucos dias. Funcionalidades incompletas entram escondidas atrás de feature flags. Combina com CI/CD porque evita merges grandes e mantém a main sempre pronta para deploy. É o oposto de branches de longa duração, como no GitFlow.",
+          "relatedTerms": [
+            "pipeline",
+            "integracao-continua"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "pipeline-com-etapas",
+          "level": "junior",
+          "title": "Pipeline com etapas dependentes",
+          "body": "Lint e testes rodam em paralelo; o build só começa se os dois passarem (needs).",
+          "snippet": {
+            "file": ".github/workflows/ci.yml",
+            "language": "yaml",
+            "code": "on: [push]\njobs:\n  lint:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - run: npm ci && npm run lint\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - run: npm ci && npm test\n  build:\n    needs: [lint, test]\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - run: npm ci && npm run build"
+          },
+          "relatedTerms": [
+            "pipeline"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "script-que-falha-cedo",
+          "level": "pleno",
+          "title": "Script que falha cedo",
+          "body": "Sem set -e, um comando que falha no meio do script passa despercebido e a etapa fica verde.",
+          "snippet": {
+            "file": "scripts/release.sh",
+            "language": "bash",
+            "code": "#!/usr/bin/env bash\n# -e: para no primeiro erro; -u: variável indefinida é erro;\n# -o pipefail: erro em qualquer parte de um pipe conta\nset -euo pipefail\n\nnpm ci\nnpm test\nnpm run build | tee build.log"
+          },
+          "relatedTerms": [
+            "pipeline"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testes-e-artefatos",
+      "title": "Testes, artefatos e versões",
+      "description": "O que testar no pipeline e como garantir que o testado é o que vai para produção.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "piramide-de-testes",
+          "level": "junior",
+          "term": "Pirâmide de testes",
+          "definition": "Muitos testes de unidade (rápidos e baratos), menos testes de integração (componentes juntos, banco real) e poucos testes ponta a ponta (lentos e frágeis). No pipeline, a pirâmide define a ordem: unidade primeiro, para dar retorno em segundos, e E2E no fim ou num ambiente de homologação.",
+          "relatedTerms": [
+            "testes-instaveis",
+            "artefato-imutavel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "artefato-imutavel",
+          "level": "pleno",
+          "term": "Artefato imutável",
+          "definition": "O resultado do build (imagem Docker, pacote, bundle) é gerado uma vez, identificado pela versão ou pelo hash do commit, e promovido sem mudanças entre ambientes: homologação e depois produção. O que muda entre ambientes é só a configuração, passada por variáveis. Assim, o que foi testado é exatamente o que vai para produção (\"build once, deploy many\").",
+          "relatedTerms": [
+            "versionamento-semantico",
+            "piramide-de-testes"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "versionamento-semantico",
+          "level": "junior",
+          "term": "Versionamento semântico",
+          "definition": "Versão no formato MAJOR.MINOR.PATCH. MAJOR sobe quando há quebra de compatibilidade, MINOR quando entra funcionalidade compatível, PATCH quando há só correção. Ferramentas de release podem calcular a versão a partir das mensagens de commit (Conventional Commits, como \"feat:\" e \"fix:\") e gerar o changelog.",
+          "relatedTerms": [
+            "artefato-imutavel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "testes-instaveis",
+          "level": "pleno",
+          "term": "Testes instáveis (flaky)",
+          "definition": "Testes que passam e falham sem mudança no código, por causa de tempo, ordem de execução, rede ou estado compartilhado. São perigosos porque ensinam o time a ignorar o vermelho e a rodar de novo até passar. O tratamento é colocar em quarentena, corrigir a causa (esperas por condição, dados isolados, relógio controlado) e medir a taxa de falhas.",
+          "relatedTerms": [
+            "piramide-de-testes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "imagem-por-commit",
+          "level": "pleno",
+          "title": "Imagem identificada pelo commit",
+          "body": "A tag é o hash do commit, não \"latest\": dá para saber exatamente o que está rodando e voltar a uma versão anterior.",
+          "snippet": {
+            "file": "build.sh",
+            "language": "bash",
+            "code": "SHA=$(git rev-parse --short HEAD)\ndocker build -t registry.example.com/api:$SHA .\ndocker push registry.example.com/api:$SHA\n\n# homologação e produção usam a mesma imagem\ndeploy staging registry.example.com/api:$SHA\ndeploy production registry.example.com/api:$SHA"
+          },
+          "relatedTerms": [
+            "artefato-imutavel"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "cobertura-minima",
+          "level": "junior",
+          "title": "Cobertura mínima como portão",
+          "body": "Se a cobertura cair abaixo do limite, o Jest falha e o pipeline para. É um piso, não uma meta.",
+          "snippet": {
+            "file": "jest.config.json",
+            "language": "json",
+            "code": "{\n  \"collectCoverage\": true,\n  \"coverageThreshold\": {\n    \"global\": { \"branches\": 70, \"functions\": 80, \"lines\": 80 }\n  }\n}"
+          },
+          "relatedTerms": [
+            "piramide-de-testes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "estrategias-de-deploy",
+      "title": "Estratégias de deploy",
+      "description": "Como trocar a versão em produção sem derrubar o sistema e como voltar atrás.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rolling-update",
+          "level": "pleno",
+          "term": "Rolling update",
+          "definition": "Substitui as instâncias da versão antiga pela nova aos poucos, algumas por vez, enquanto o restante continua atendendo. Não exige infraestrutura extra, mas, durante a troca, as duas versões atendem ao mesmo tempo, então a API e o banco precisam ser compatíveis com ambas. Um health check decide se cada nova instância pode receber tráfego.",
+          "relatedTerms": [
+            "blue-green",
+            "expand-contract"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "blue-green",
+          "level": "pleno",
+          "term": "Blue/green",
+          "definition": "Dois ambientes completos: o azul atende produção e o verde recebe a nova versão. Depois de validar o verde, o balanceador ou o DNS troca todo o tráfego de uma vez. O rollback é trocar de volta, em segundos. O custo é manter infraestrutura dobrada durante o deploy e cuidar do banco, que costuma ser compartilhado.",
+          "relatedTerms": [
+            "canary",
+            "rolling-update"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "canary",
+          "level": "senior",
+          "term": "Canary",
+          "definition": "A nova versão recebe primeiro uma fração pequena do tráfego (1%, depois 10%, 50%) enquanto métricas de erro e latência são comparadas com a versão estável. Se piorar, o tráfego volta, de preferência de forma automática. Limita o impacto de um bug a poucos usuários, mas exige boa observabilidade e roteamento por porcentagem.",
+          "relatedTerms": [
+            "blue-green",
+            "feature-flags"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "feature-flags",
+          "level": "pleno",
+          "term": "Feature flags",
+          "definition": "Chaves de configuração que ligam ou desligam uma funcionalidade em tempo de execução, sem novo deploy. Separam o deploy (o código chega a produção) do release (o usuário vê). Permitem ligar só para parte dos usuários e desligar na hora se der problema. Flags antigas viram dívida técnica e precisam ser removidas.",
+          "relatedTerms": [
+            "canary"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "expand-contract",
+          "level": "senior",
+          "term": "Expand/contract (migração sem downtime)",
+          "definition": "Forma de mudar o banco quando versões antiga e nova do código convivem. Expand: adiciona a estrutura nova sem remover a antiga (nova coluna, aceita nulo). Migra: o código grava nas duas e os dados antigos são copiados. Contract: só depois que nenhuma versão usa a estrutura antiga, ela é removida. Cada passo é um deploy separado e reversível.",
+          "relatedTerms": [
+            "rolling-update",
+            "blue-green"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "smoke-test",
+          "level": "pleno",
+          "title": "Smoke test depois do deploy",
+          "body": "Uma checagem rápida da versão nova; se falhar, o pipeline aciona o rollback.",
+          "snippet": {
+            "file": "smoke.sh",
+            "language": "bash",
+            "code": "set -euo pipefail\nfor i in $(seq 1 10); do\n  if curl -fsS https://api.example.com/health > /dev/null; then\n    echo \"saudável\"; exit 0\n  fi\n  sleep 6\ndone\necho \"health check falhou, fazendo rollback\"\n./rollback.sh\nexit 1"
+          },
+          "relatedTerms": [
+            "blue-green",
+            "rolling-update"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de CI/CD que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "ci-vs-cd",
+          "level": "junior",
+          "question": "Qual a diferença entre CI, entrega contínua e deploy contínuo?",
+          "answer": "CI é integrar código com frequência e validar cada integração automaticamente com build e testes. Entrega contínua garante que todo commit aprovado gera uma versão pronta para produção, com o deploy por decisão humana. Deploy contínuo leva essa versão para produção automaticamente, sem aprovação manual.",
+          "relatedTerms": [
+            "integracao-continua",
+            "entrega-continua"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pipeline-lento",
+          "level": "pleno",
+          "question": "O pipeline leva 40 minutos. Como você o deixaria mais rápido?",
+          "answer": "Primeiro meço quanto tempo cada etapa leva. Depois: cache de dependências e de build, jobs independentes em paralelo, testes divididos em várias máquinas (sharding), etapas rápidas primeiro para falhar cedo, rodar só o que foi afetado num monorepo e deixar os E2E pesados para o merge ou para um job noturno. Também removo etapas duplicadas e uso imagens de runner com as ferramentas já instaladas.",
+          "relatedTerms": [
+            "pipeline",
+            "piramide-de-testes"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "teste-flaky",
+          "level": "pleno",
+          "question": "Um teste falha de vez em quando no CI e passa quando roda de novo. O que fazer?",
+          "answer": "Não normalizar o \"roda de novo\". Coloco o teste em quarentena para não bloquear o time, registro numa issue e procuro a causa: dependência de tempo ou de ordem, esperas fixas (sleep), dados compartilhados entre testes, rede externa. Corrijo com esperas por condição, dados isolados e mocks de relógio e rede, e acompanho a taxa de testes instáveis.",
+          "relatedTerms": [
+            "testes-instaveis"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testado-e-o-que-sobe",
+          "level": "pleno",
+          "question": "Como garantir que o que foi testado em homologação é exatamente o que vai para produção?",
+          "answer": "Fazendo o build uma vez só e promovendo o mesmo artefato, identificado pelo hash do commit ou por um digest, de homologação para produção. Nada é recompilado por ambiente; só a configuração muda, por variáveis e segredos. Isso também deixa o rollback simples: basta reimplantar o artefato anterior.",
+          "relatedTerms": [
+            "artefato-imutavel"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "migracao-sem-downtime",
+          "level": "senior",
+          "question": "Como renomear uma coluna usada pela aplicação sem tirar o sistema do ar?",
+          "answer": "Com expand/contract, em deploys separados. 1) Adiciono a coluna nova. 2) O código passa a gravar nas duas e a ler da nova com fallback para a antiga; os dados antigos são copiados em lotes. 3) O código passa a usar só a nova. 4) Removo a coluna antiga. Em cada passo, as versões nova e antiga do código funcionam com o banco, então rolling update e rollback continuam seguros.",
+          "relatedTerms": [
+            "expand-contract",
+            "rolling-update"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "blue-green-ou-canary",
+          "level": "senior",
+          "question": "Quando escolher blue/green e quando escolher canary?",
+          "answer": "Blue/green quando quero troca e rollback instantâneos e posso pagar por um ambiente duplicado durante o deploy; serve bem para mudanças que precisam ser tudo ou nada. Canary quando quero limitar o risco expondo a versão nova a poucos usuários e decidir por métricas reais; exige roteamento por porcentagem e boa observabilidade. Os dois podem ser combinados com feature flags.",
+          "relatedTerms": [
+            "blue-green",
+            "canary",
+            "feature-flags"
+          ]
+        }
+      ]
+    }
+  ]
+}

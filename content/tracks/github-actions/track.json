@@ -1,0 +1,326 @@
+{
+  "id": "github-actions",
+  "title": "GitHub Actions",
+  "description": "A ferramenta de CI/CD do GitHub: workflows, jobs, segredos, cache, matriz e deploy com OIDC.",
+  "areas": [
+    "devops"
+  ],
+  "section": "ci-cd",
+  "decks": [
+    {
+      "id": "workflows-e-jobs",
+      "title": "Workflows e jobs",
+      "description": "Como um workflow é disparado e como os jobs se organizam.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "workflow",
+          "level": "junior",
+          "term": "Workflow",
+          "definition": "Arquivo YAML em .github/workflows/ que descreve uma automação. A chave \"on\" define os eventos que o disparam: push, pull_request, um horário (schedule), um disparo manual (workflow_dispatch) ou outro workflow. Um repositório pode ter vários workflows, como CI, deploy e release.",
+          "relatedTerms": [
+            "job-e-step",
+            "runner"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "job-e-step",
+          "level": "junior",
+          "term": "Job e step",
+          "definition": "Um workflow tem jobs, e cada job roda numa máquina própria (runner), em paralelo por padrão. \"needs\" cria dependência entre jobs. Cada job tem steps, executados em ordem na mesma máquina: \"run\" executa um comando de shell e \"uses\" executa uma action. Jobs não compartilham arquivos; para isso, usam artifacts ou outputs.",
+          "relatedTerms": [
+            "workflow",
+            "action"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "action",
+          "level": "junior",
+          "term": "Action",
+          "definition": "Passo reutilizável, publicado num repositório e referenciado com \"uses: dono/nome@versão\", como actions/checkout ou actions/setup-node. Recebe parâmetros em \"with\". Por ser código de terceiros rodando com acesso ao seu repositório e aos seus segredos, deve vir de fontes confiáveis e ter a versão fixada.",
+          "relatedTerms": [
+            "job-e-step",
+            "permissoes-do-token"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "runner",
+          "level": "pleno",
+          "term": "Runner",
+          "definition": "Máquina que executa os jobs. Os runners hospedados pelo GitHub (ubuntu-latest, windows-latest, macos-latest) são criados limpos para cada job e descartados depois. Runners self-hosted rodam na sua infraestrutura, úteis para hardware específico ou rede privada, mas exigem manutenção e não devem atender repositórios públicos, porque um PR poderia executar código na sua máquina.",
+          "relatedTerms": [
+            "workflow",
+            "job-e-step"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "workflow-de-ci",
+          "level": "junior",
+          "title": "Workflow de CI para Node",
+          "body": "Roda em todo PR e em push na main: checkout, Node com cache do npm, instalação, lint e testes.",
+          "snippet": {
+            "file": ".github/workflows/ci.yml",
+            "language": "yaml",
+            "code": "name: CI\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: 24\n          cache: npm\n      - run: npm ci\n      - run: npm run lint\n      - run: npm test"
+          },
+          "relatedTerms": [
+            "workflow",
+            "job-e-step"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "gatilhos",
+          "level": "pleno",
+          "title": "Gatilhos com filtro",
+          "body": "O workflow só roda quando arquivos da API mudam, todo dia às 6h (UTC) ou quando alguém dispara manualmente.",
+          "snippet": {
+            "file": ".github/workflows/api.yml",
+            "language": "yaml",
+            "code": "on:\n  push:\n    branches: [main]\n    paths: ['api/**', '.github/workflows/api.yml']\n  schedule:\n    - cron: '0 6 * * *'\n  workflow_dispatch:\n    inputs:\n      environment:\n        type: choice\n        options: [staging, production]"
+          },
+          "relatedTerms": [
+            "workflow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "segredos-cache-e-matriz",
+      "title": "Segredos, cache e matriz",
+      "description": "Credenciais, workflows mais rápidos e testes em várias versões.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "secrets-e-variaveis",
+          "level": "junior",
+          "term": "Secrets e variáveis",
+          "definition": "Secrets guardam valores sensíveis (tokens, senhas) criptografados, no nível do repositório, da organização ou de um environment, e aparecem mascarados nos logs. São lidos com ${{ secrets.NOME }}. Variáveis (vars) guardam configuração não sensível. Workflows disparados por PRs de forks não recebem os secrets.",
+          "relatedTerms": [
+            "permissoes-do-token"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cache-de-dependencias",
+          "level": "pleno",
+          "term": "Cache de dependências",
+          "definition": "Reaproveita arquivos entre execuções, como o cache do npm, para não baixar tudo de novo. A chave inclui o hash do lockfile: quando ele muda, o cache é refeito. actions/setup-node faz isso com \"cache: npm\"; actions/cache serve para qualquer pasta. Guarde o cache do gerenciador, não o node_modules, e nunca guarde segredos no cache.",
+          "relatedTerms": [
+            "matriz"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "matriz",
+          "level": "pleno",
+          "term": "Matriz (strategy.matrix)",
+          "definition": "Gera vários jobs a partir de combinações de valores, por exemplo versões do Node e sistemas operacionais, cada um rodando em paralelo. \"include\" e \"exclude\" ajustam combinações, \"fail-fast\" decide se uma falha cancela as outras e \"max-parallel\" limita quantas rodam juntas.",
+          "relatedTerms": [
+            "cache-de-dependencias"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "permissoes-do-token",
+          "level": "senior",
+          "term": "Permissões do GITHUB_TOKEN",
+          "definition": "Cada execução recebe um GITHUB_TOKEN temporário para acessar o próprio repositório. A chave \"permissions\" define o que ele pode fazer; o seguro é começar com contents: read e liberar só o necessário por job. Um token com escrita e uma action comprometida podem alterar código e releases. O evento pull_request_target roda com segredos e escrita, então nunca deve executar código vindo do PR.",
+          "relatedTerms": [
+            "secrets-e-variaveis"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "matriz-com-cache",
+          "level": "pleno",
+          "title": "Matriz com cache",
+          "body": "Seis jobs em paralelo (2 versões × 3 sistemas), cada um com o cache do npm.",
+          "snippet": {
+            "file": ".github/workflows/test.yml",
+            "language": "yaml",
+            "code": "jobs:\n  test:\n    runs-on: ${{ matrix.os }}\n    strategy:\n      fail-fast: false\n      matrix:\n        os: [ubuntu-latest, windows-latest, macos-latest]\n        node: [22, 24]\n    steps:\n      - uses: actions/checkout@v6\n      - uses: actions/setup-node@v7\n        with:\n          node-version: ${{ matrix.node }}\n          cache: npm\n      - run: npm ci\n      - run: npm test"
+          },
+          "relatedTerms": [
+            "matriz",
+            "cache-de-dependencias"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "permissoes-minimas",
+          "level": "pleno",
+          "title": "Permissões mínimas",
+          "body": "Leitura no workflow inteiro; só o job de release pode escrever, e só em contents.",
+          "snippet": {
+            "file": ".github/workflows/release.yml",
+            "language": "yaml",
+            "code": "permissions:\n  contents: read\n\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v6\n      - run: npm ci && npm test\n  release:\n    needs: test\n    runs-on: ubuntu-latest\n    permissions:\n      contents: write\n    steps:\n      - run: gh release create \"$GITHUB_REF_NAME\" --generate-notes\n        env:\n          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
+          },
+          "relatedTerms": [
+            "permissoes-do-token"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deploy-e-ambientes",
+      "title": "Deploy, OIDC e ambientes",
+      "description": "Como fazer deploy com segurança: credenciais temporárias, aprovações e um deploy por vez.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "oidc",
+          "level": "pleno",
+          "term": "OIDC (credenciais sem chave fixa)",
+          "definition": "O GitHub emite para cada job um token de identidade assinado, dizendo qual repositório, branch e environment estão rodando. O provedor de nuvem confia nesse emissor e troca o token por credenciais temporárias de uma role. Assim, nenhuma chave de acesso de longa duração fica guardada em secrets. O job precisa da permissão id-token: write.",
+          "relatedTerms": [
+            "environments"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "environments",
+          "level": "pleno",
+          "term": "Environments",
+          "definition": "Ambientes nomeados, como staging e production, com regras de proteção: revisores obrigatórios, tempo de espera e quais branches podem fazer deploy. Têm secrets e variáveis próprios, liberados só para jobs que declaram \"environment\". O histórico de deploys de cada ambiente aparece no repositório.",
+          "relatedTerms": [
+            "oidc",
+            "concurrency"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "concurrency",
+          "level": "pleno",
+          "term": "Concurrency",
+          "definition": "Agrupa execuções por uma chave e garante que só uma de cada grupo rode por vez. Num deploy, evita que dois pushes seguidos façam deploys simultâneos e cheguem fora de ordem. Com cancel-in-progress: true, a execução nova cancela a anterior, o que é bom para CI de PR. Em produção, costuma-se deixar a anterior terminar.",
+          "relatedTerms": [
+            "environments"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "workflows-reutilizaveis",
+          "level": "senior",
+          "term": "Workflows reutilizáveis e composite actions",
+          "definition": "Para não copiar YAML entre repositórios. Um workflow reutilizável declara on: workflow_call, recebe inputs e secrets e é chamado como um job inteiro. Uma composite action agrupa vários steps num só \"uses\". Com isso, a plataforma mantém um pipeline padrão, e uma correção vale para todos os times.",
+          "relatedTerms": [
+            "environments"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "deploy-com-oidc",
+          "level": "pleno",
+          "title": "Deploy na AWS com OIDC",
+          "body": "Sem chave guardada: o job pede o token OIDC, assume a role e recebe credenciais temporárias.",
+          "snippet": {
+            "file": ".github/workflows/deploy.yml",
+            "language": "yaml",
+            "code": "on:\n  push:\n    branches: [main]\npermissions:\n  id-token: write\n  contents: read\nconcurrency:\n  group: deploy-production\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    environment: production\n    steps:\n      - uses: actions/checkout@v6\n      - uses: aws-actions/configure-aws-credentials@v6\n        with:\n          role-to-assume: arn:aws:iam::123456789012:role/github-deploy\n          aws-region: us-east-1\n      - run: aws s3 sync ./dist s3://meu-site --delete"
+          },
+          "relatedTerms": [
+            "oidc",
+            "environments",
+            "concurrency"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "trust-policy-oidc",
+          "level": "senior",
+          "title": "Trust policy da role",
+          "body": "Só o environment production deste repositório pode assumir a role. O formato do \"sub\" muda conforme o repositório (os criados a partir de julho de 2026 incluem ids numéricos); confira o claim emitido.",
+          "snippet": {
+            "file": "trust-policy.json",
+            "language": "json",
+            "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": {\n      \"Federated\": \"arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com\"\n    },\n    \"Action\": \"sts:AssumeRoleWithWebIdentity\",\n    \"Condition\": {\n      \"StringEquals\": {\n        \"token.actions.githubusercontent.com:aud\": \"sts.amazonaws.com\",\n        \"token.actions.githubusercontent.com:sub\": \"repo:minha-org/meu-app:environment:production\"\n      }\n    }\n  }]\n}"
+          },
+          "relatedTerms": [
+            "oidc",
+            "environments"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de GitHub Actions que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "job-vs-step",
+          "level": "junior",
+          "question": "Qual a diferença entre job e step num workflow?",
+          "answer": "Jobs rodam em runners separados e, por padrão, em paralelo; \"needs\" define a ordem entre eles. Steps ficam dentro de um job, rodam em sequência na mesma máquina e compartilham o sistema de arquivos. Para passar dados entre jobs, uso outputs ou artifacts.",
+          "relatedTerms": [
+            "job-e-step",
+            "runner"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "acesso-a-nuvem-sem-chave",
+          "level": "pleno",
+          "question": "Como um workflow faz deploy na AWS sem guardar access key nos secrets?",
+          "answer": "Com OIDC. Cadastro o GitHub como provedor de identidade na AWS e crio uma role cuja trust policy aceita só tokens do meu repositório e do environment certo. O job declara id-token: write e usa configure-aws-credentials com role-to-assume. As credenciais duram minutos, não há chave para vazar ou rotacionar, e as permissões da role ficam no mínimo necessário.",
+          "relatedTerms": [
+            "oidc",
+            "permissoes-do-token"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "workflow-lento-actions",
+          "level": "pleno",
+          "question": "Como deixar um workflow do GitHub Actions mais rápido?",
+          "answer": "Cache de dependências (setup-node com cache: npm ou actions/cache), jobs independentes em paralelo, filtros de paths para não rodar o que não mudou, concurrency com cancel-in-progress nos PRs para descartar execuções obsoletas, testes divididos com matriz e runners maiores quando o gargalo é CPU.",
+          "relatedTerms": [
+            "cache-de-dependencias",
+            "matriz",
+            "concurrency"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "fixar-por-sha",
+          "level": "senior",
+          "question": "Por que fixar actions de terceiros pelo SHA do commit, e não pela tag?",
+          "answer": "Tags podem ser movidas: se o repositório da action for comprometido, a tag v1 passa a apontar para código malicioso, que rodará com acesso aos seus segredos e ao token. Um SHA completo é imutável. Combino isso com permissões mínimas no GITHUB_TOKEN, revisão das atualizações por um bot de dependências e preferência por actions oficiais ou verificadas. Os exemplos desta trilha usam tags para facilitar a leitura; em produção, o ideal é o SHA, com a tag num comentário.",
+          "relatedTerms": [
+            "action",
+            "permissoes-do-token"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "dois-deploys-juntos",
+          "level": "pleno",
+          "question": "Dois merges seguidos dispararam dois deploys ao mesmo tempo. Como evitar?",
+          "answer": "Com concurrency no job ou no workflow de deploy, usando uma chave por ambiente (por exemplo, deploy-production). Assim só um deploy roda por vez e o seguinte espera na fila. Para produção, deixo cancel-in-progress desligado, para não interromper um deploy no meio. O environment com revisores também ajuda a controlar o que sobe.",
+          "relatedTerms": [
+            "concurrency",
+            "environments"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pull-request-target",
+          "level": "senior",
+          "question": "Qual o risco do evento pull_request_target?",
+          "answer": "Ele roda no contexto da branch base, com acesso aos secrets e a um token com escrita, mesmo para PRs de forks. Se o workflow fizer checkout do código do PR e executá-lo (npm install, testes, scripts), um atacante roda código com esses privilégios. Uso pull_request para testar código externo e reservo pull_request_target para tarefas que não executam o código do PR, como colocar labels.",
+          "relatedTerms": [
+            "permissoes-do-token",
+            "secrets-e-variaveis"
+          ]
+        }
+      ]
+    }
+  ]
+}

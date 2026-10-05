@@ -38,45 +38,40 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const TRACKS = [
-  'SQL essencial',
-  'Modelagem de dados',
-  'Transações e performance',
-  'PostgreSQL',
-  'MySQL',
-  'MongoDB',
-  'Redis',
-  'NoSQL: modelos e quando usar',
-];
 const headers = () => screen.getAllByRole('header').map((h) => String(h.props.children));
 
-describe('Requirement: Trilhas de banco de dados no catálogo', () => {
-  it('Área Banco de dados', async () => {
-    await open('/area/banco-de-dados');
-    expect(headers()).toEqual(expect.arrayContaining(['Banco de dados', 'Relacionais', 'Não relacionais']));
-    expect(headers().indexOf('Relacionais')).toBeLessThan(headers().indexOf('Não relacionais'));
-    for (const absent of ['Trilhas', 'Linguagens', 'Comparativos']) expect(headers()).not.toContain(absent);
-    expect(buttons(TRACKS)).toEqual(TRACKS);
+describe('Requirement: Trilha de React Native no catálogo', () => {
+  it('Área Mobile', async () => {
+    await open('/area/mobile');
+    expect(headers()).toContain('Linguagens');
+    for (const absent of ['Trilhas', 'Comparativos']) expect(headers()).not.toContain(absent);
+    expect(buttons(['JavaScript'])).toEqual(['JavaScript']);
+    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('1 trilha')).toBeOnTheScreen();
   });
 
-  it('a Home mostra Banco de dados com as 8 trilhas', async () => {
-    await open('/');
-    expect(within(screen.getByRole('button', { name: /^Banco de dados,/ })).getByText('8 trilhas')).toBeOnTheScreen();
+  it('JavaScript no Mobile', async () => {
+    await open('/area/mobile/javascript');
+    expect(headers()).toContain('Frameworks');
+    expect(headers()).not.toContain('Linguagem pura');
+    expect(buttons(['React Native', 'React', 'Angular'])).toEqual(['React Native']);
+    expect(within(screen.getByRole('button', { name: /^React Native,/ })).getByText('1 trilha')).toBeOnTheScreen();
+  });
+
+  it('Framework React Native', async () => {
+    await open('/area/mobile/javascript/react-native');
+    expect(screen.getByRole('button', { name: /^React Native,/ })).toBeOnTheScreen();
+  });
+
+  it('React Native fora do Frontend', async () => {
+    await open('/area/frontend/javascript');
+    expect(screen.queryByRole('button', { name: /^React Native,/ })).toBeNull();
   });
 });
 
-describe('Requirement: Tradução das trilhas de banco de dados', () => {
+describe('Requirement: Tradução da trilha de React Native', () => {
   it('Área em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/');
-    expect(screen.getByRole('button', { name: /^Databases,/ })).toBeOnTheScreen();
-  });
-});
-
-describe('Requirement: Textos da navegação (seções)', () => {
-  it('seções em inglês', async () => {
-    useSettingsStore.setState({ language: 'en' });
-    await open('/area/banco-de-dados');
-    expect(headers()).toEqual(expect.arrayContaining(['Relational', 'Non-relational']));
+    expect(screen.getByRole('button', { name: /^Mobile,/ })).toBeOnTheScreen();
   });
 });

@@ -1,0 +1,326 @@
+{
+  "id": "aws-essencial",
+  "title": "AWS essencial",
+  "description": "Os serviços básicos da AWS que aparecem em entrevista: IAM, regiões, EC2, VPC, S3, RDS e DynamoDB.",
+  "areas": [
+    "devops"
+  ],
+  "section": "aws",
+  "decks": [
+    {
+      "id": "iam-e-conta",
+      "title": "IAM e conta",
+      "description": "Quem pode fazer o quê, e onde os recursos ficam.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "iam",
+          "level": "junior",
+          "term": "IAM",
+          "definition": "Serviço que controla quem pode fazer o quê na conta. Identidades: usuários (pessoas ou sistemas com credenciais próprias), grupos (conjuntos de usuários) e roles (identidades assumidas temporariamente). Permissões são policies em JSON com Effect, Action, Resource e, opcionalmente, Condition. Tudo é negado por padrão, e um Deny explícito vence qualquer Allow.",
+          "relatedTerms": [
+            "menor-privilegio",
+            "role-e-sts"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "menor-privilegio",
+          "level": "junior",
+          "term": "Princípio do menor privilégio",
+          "definition": "Cada identidade recebe só as permissões necessárias para a sua tarefa, nos recursos específicos, e nada além. Evita \"Action\": \"*\" e \"Resource\": \"*\". Se uma credencial vazar, o estrago fica limitado. Na prática: começar restrito, ampliar quando faltar algo e revisar com o IAM Access Analyzer.",
+          "relatedTerms": [
+            "iam"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "role-e-sts",
+          "level": "pleno",
+          "term": "Role e credenciais temporárias",
+          "definition": "Uma role não tem senha nem chave fixa: quem tem permissão a assume e recebe do STS credenciais que expiram em minutos ou horas. Uma EC2 usa role pelo instance profile, uma Lambda pela execution role, um pipeline por OIDC e uma pessoa por SSO (IAM Identity Center). É a forma recomendada de dar acesso, no lugar de access keys de longa duração.",
+          "relatedTerms": [
+            "iam",
+            "menor-privilegio"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "regioes-e-zonas",
+          "level": "junior",
+          "term": "Regiões e zonas de disponibilidade",
+          "definition": "Uma região (us-east-1, sa-east-1) é uma área geográfica independente, com preços e serviços próprios; os dados não saem dela sozinhos. Cada região tem várias zonas de disponibilidade (AZs), data centers separados e ligados por rede rápida. Espalhar a aplicação em duas ou mais AZs protege contra a queda de uma delas. A região é escolhida por latência, custo e lei de dados.",
+          "relatedTerms": [
+            "iam"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "politica-iam",
+          "level": "pleno",
+          "title": "Policy de leitura num prefixo do S3",
+          "body": "Permite só ler objetos da pasta uploads/ de um bucket, e nada mais.",
+          "snippet": {
+            "file": "policy.json",
+            "language": "json",
+            "code": "{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [\n    {\n      \"Effect\": \"Allow\",\n      \"Action\": [\"s3:GetObject\"],\n      \"Resource\": \"arn:aws:s3:::meu-app-arquivos/uploads/*\"\n    }\n  ]\n}"
+          },
+          "relatedTerms": [
+            "iam",
+            "menor-privilegio"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "aws-cli-sso",
+          "level": "junior",
+          "title": "AWS CLI com SSO",
+          "body": "Login pelo IAM Identity Center, sem guardar access key no computador, e conferência de quem está autenticado.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "aws configure sso            # cria o perfil \"dev\" uma vez\naws sso login --profile dev\naws sts get-caller-identity --profile dev\naws s3 ls --profile dev --region us-east-1"
+          },
+          "relatedTerms": [
+            "role-e-sts",
+            "regioes-e-zonas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "computacao-e-rede",
+      "title": "Computação e rede",
+      "description": "Máquinas virtuais, rede privada, firewall e escala.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "ec2",
+          "level": "junior",
+          "term": "EC2",
+          "definition": "Máquinas virtuais na AWS. Você escolhe a imagem (AMI), o tipo da instância (CPU e memória, como t3.micro ou m7g.large), o disco (EBS) e a rede. Paga pelo tempo ligado. Opções de preço: sob demanda, Savings Plans/instâncias reservadas (compromisso de uso, mais barato) e Spot (capacidade ociosa, muito mais barata, mas pode ser interrompida).",
+          "relatedTerms": [
+            "vpc",
+            "auto-scaling-e-elb"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "vpc",
+          "level": "pleno",
+          "term": "VPC e sub-redes",
+          "definition": "Rede privada e isolada da sua conta, dividida em sub-redes, cada uma numa AZ. Sub-rede pública tem rota para o Internet Gateway e recebe o balanceador. Sub-rede privada não é acessível da internet e recebe aplicação e banco; para sair (baixar pacotes, chamar APIs), usa um NAT Gateway. Route tables definem para onde vai o tráfego.",
+          "relatedTerms": [
+            "security-group",
+            "ec2"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "security-group",
+          "level": "pleno",
+          "term": "Security group",
+          "definition": "Firewall virtual ligado a uma instância, banco ou balanceador. Só tem regras de permissão (o resto é bloqueado) e é stateful: se a entrada foi permitida, a resposta sai automaticamente. Uma regra pode apontar para outro security group, por exemplo \"o banco aceita a porta 5432 só do SG da aplicação\". As Network ACLs são outra camada, na sub-rede, stateless e com regras de negação.",
+          "relatedTerms": [
+            "vpc"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "auto-scaling-e-elb",
+          "level": "pleno",
+          "term": "Load balancer e Auto Scaling",
+          "definition": "O Application Load Balancer (ALB) recebe o tráfego HTTP(S), termina o TLS e distribui entre as instâncias saudáveis, conferidas por health check, em várias AZs. O Auto Scaling Group mantém um número mínimo de instâncias, substitui as que falham e aumenta ou diminui a quantidade conforme uma métrica, como CPU ou requisições por alvo.",
+          "relatedTerms": [
+            "ec2",
+            "vpc"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "user-data",
+          "level": "junior",
+          "title": "User data na EC2",
+          "body": "Script executado uma vez quando a instância sobe pela primeira vez: instala e inicia o serviço.",
+          "snippet": {
+            "file": "user-data.sh",
+            "language": "bash",
+            "code": "#!/bin/bash\ndnf install -y nginx\nsystemctl enable --now nginx\necho \"ok $(hostname)\" > /usr/share/nginx/html/health"
+          },
+          "relatedTerms": [
+            "ec2"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "regra-por-security-group",
+          "level": "pleno",
+          "title": "Banco acessível só pela aplicação",
+          "body": "A origem da regra é o security group da aplicação, não um IP: novas instâncias da aplicação já têm acesso.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "aws ec2 authorize-security-group-ingress \\\n  --group-id sg-0db0000000000000a \\\n  --protocol tcp --port 5432 \\\n  --source-group sg-0app000000000000b"
+          },
+          "relatedTerms": [
+            "security-group"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "armazenamento-e-dados",
+      "title": "Armazenamento e dados",
+      "description": "Arquivos no S3 e bancos gerenciados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "s3",
+          "level": "junior",
+          "term": "S3",
+          "definition": "Armazenamento de objetos: arquivos guardados em buckets e acessados por chave (uploads/foto.jpg), por API HTTP. Projetado para durabilidade de 99,999999999% e capacidade praticamente ilimitada. Usado para uploads, backups, logs e sites estáticos. Buckets são privados por padrão, com o Block Public Access ligado; o acesso é dado por policies ou URLs pré-assinadas.",
+          "relatedTerms": [
+            "classes-e-ciclo-de-vida",
+            "rds"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "classes-e-ciclo-de-vida",
+          "level": "pleno",
+          "term": "Classes de armazenamento e ciclo de vida",
+          "definition": "Cada objeto do S3 tem uma classe: Standard (acesso frequente), Standard-IA (acesso raro, cobra pela leitura), Glacier (arquivo, leitura em minutos ou horas) e Intelligent-Tiering (move sozinho conforme o uso). Regras de ciclo de vida movem objetos para classes mais baratas ou os apagam depois de N dias, por exemplo logs antigos.",
+          "relatedTerms": [
+            "s3"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "rds",
+          "level": "pleno",
+          "term": "RDS",
+          "definition": "Banco relacional gerenciado (PostgreSQL, MySQL, MariaDB e outros; Aurora é a versão da própria AWS). A AWS cuida de instalação, patches, backups automáticos e restauração para um ponto no tempo. Multi-AZ mantém uma réplica síncrona em outra AZ para failover automático. Read replicas são cópias assíncronas para escalar leituras.",
+          "relatedTerms": [
+            "dynamodb",
+            "s3"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "dynamodb",
+          "level": "pleno",
+          "term": "DynamoDB",
+          "definition": "Banco chave-valor e de documentos, serverless, com latência de milissegundos em qualquer escala. Cada item é localizado pela chave de partição (e, opcionalmente, pela chave de ordenação). As consultas precisam seguir as chaves e os índices secundários, então o modelo parte dos padrões de acesso. Cobra por leitura e escrita (on-demand) ou por capacidade provisionada.",
+          "relatedTerms": [
+            "rds"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "url-pre-assinada",
+          "level": "pleno",
+          "title": "Upload direto com URL pré-assinada",
+          "body": "A API gera uma URL temporária e o app envia o arquivo direto ao S3, sem passar pelo servidor.",
+          "snippet": {
+            "file": "upload.ts",
+            "language": "ts",
+            "code": "import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';\nimport { getSignedUrl } from '@aws-sdk/s3-request-presigner';\n\nconst s3 = new S3Client({ region: 'us-east-1' });\n\nexport async function uploadUrl(userId: string, fileName: string) {\n  const command = new PutObjectCommand({\n    Bucket: 'meu-app-arquivos',\n    Key: `uploads/${userId}/${fileName}`,\n    ContentType: 'image/jpeg',\n  });\n  return getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutos\n}"
+          },
+          "relatedTerms": [
+            "s3"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "s3-pela-cli",
+          "level": "junior",
+          "title": "S3 pela linha de comando",
+          "body": "Criar bucket, enviar uma pasta e listar o conteúdo.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "aws s3 mb s3://meu-app-backups --region us-east-1\naws s3 sync ./backups s3://meu-app-backups/2026-10-05/\naws s3 ls s3://meu-app-backups/ --recursive --human-readable"
+          },
+          "relatedTerms": [
+            "s3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de AWS que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "responsabilidade-compartilhada",
+          "level": "junior",
+          "question": "O que é o modelo de responsabilidade compartilhada?",
+          "answer": "A AWS cuida da segurança da nuvem: data centers, hardware, rede física e a camada de virtualização. O cliente cuida da segurança na nuvem: IAM, configuração de rede e security groups, criptografia, patches do sistema operacional numa EC2 e os próprios dados. Quanto mais gerenciado o serviço (Lambda, RDS, S3), mais responsabilidade fica com a AWS.",
+          "relatedTerms": [
+            "iam",
+            "menor-privilegio"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "app-acessar-s3-sem-chave",
+          "level": "pleno",
+          "question": "Como uma aplicação rodando na AWS acessa o S3 sem access key no código?",
+          "answer": "Com uma role. Na EC2, pelo instance profile; no ECS, pela task role; na Lambda, pela execution role. O SDK busca credenciais temporárias sozinho e as renova antes de expirar. A policy da role dá só as ações e os buckets necessários. Chaves no código ou em variáveis de ambiente podem vazar pelo repositório e por logs.",
+          "relatedTerms": [
+            "role-e-sts",
+            "menor-privilegio"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "sg-vs-nacl",
+          "level": "pleno",
+          "question": "Qual a diferença entre security group e Network ACL?",
+          "answer": "O security group fica no recurso (instância, banco, balanceador), só tem regras de permissão e é stateful: a resposta de um tráfego permitido volta sozinha. A Network ACL fica na sub-rede, aceita regras de permissão e de negação avaliadas em ordem e é stateless: entrada e saída precisam ser liberadas. No dia a dia, o controle fino é feito com security groups.",
+          "relatedTerms": [
+            "security-group",
+            "vpc"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "multi-az-vs-replica",
+          "level": "pleno",
+          "question": "Qual a diferença entre RDS Multi-AZ e read replica?",
+          "answer": "Multi-AZ é para disponibilidade: uma réplica síncrona em outra AZ que assume automaticamente se a principal falhar, sem perda de dados confirmados. Na forma clássica, não atende leituras. Read replica é para escala de leitura: uma cópia assíncrona, que pode ter atraso e até ficar em outra região, e que pode ser promovida manualmente. Muitas vezes se usam os dois juntos.",
+          "relatedTerms": [
+            "rds",
+            "regioes-e-zonas"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "bucket-vazado",
+          "level": "pleno",
+          "question": "Como evitar que um bucket S3 exponha dados por engano?",
+          "answer": "Manter o Block Public Access ligado na conta e nos buckets, dar acesso por policies com menor privilégio, servir conteúdo público pelo CloudFront com OAC em vez de deixar o bucket público, usar URLs pré-assinadas de curta duração para uploads e downloads, ligar a criptografia e acompanhar alertas do IAM Access Analyzer e do AWS Config.",
+          "relatedTerms": [
+            "s3",
+            "menor-privilegio"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "alta-disponibilidade",
+          "level": "senior",
+          "question": "Como você desenharia uma aplicação web de alta disponibilidade numa região da AWS?",
+          "answer": "VPC com sub-redes públicas e privadas em pelo menos duas AZs. ALB nas públicas, com health check. Aplicação sem estado em Auto Scaling Group ou ECS nas privadas, espalhada pelas AZs. Banco RDS Multi-AZ, sessões e cache fora das instâncias (ElastiCache ou DynamoDB) e arquivos no S3. Alarmes no CloudWatch, backups testados e infraestrutura como código para recriar tudo. Para tolerar a perda da região inteira, aí entra uma estratégia multi-região.",
+          "relatedTerms": [
+            "auto-scaling-e-elb",
+            "vpc",
+            "rds",
+            "regioes-e-zonas"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -88,7 +88,14 @@ export const en: Messages = {
     dueBadge: (n) => `${n} to review today`,
   },
   nav: {
-    areas: { fundamentos: 'Fundamentals', frontend: 'Frontend', backend: 'Backend', 'banco-de-dados': 'Databases' },
+    areas: {
+      fundamentos: 'Fundamentals',
+      frontend: 'Frontend',
+      backend: 'Backend',
+      'banco-de-dados': 'Databases',
+      mobile: 'Mobile',
+      devops: 'DevOps & Cloud',
+    },
     areaKicker: 'Area',
     sections: {
       tracks: 'Tracks',
@@ -98,6 +105,8 @@ export const en: Messages = {
       frameworks: 'Frameworks',
       relacionais: 'Relational',
       'nao-relacionais': 'Non-relational',
+      'ci-cd': 'CI/CD',
+      aws: 'AWS',
     },
     trackCount: (n) => `${n} ${plural(n, 'track', 'tracks')}`,
     areaLabel: (area, tracks, known, total) => `${area}, ${tracks}, ${known} of ${total} cards you know`,
