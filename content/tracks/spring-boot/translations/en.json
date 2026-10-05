@@ -1,0 +1,120 @@
+{
+  "title": "Spring Boot",
+  "description": "How Spring Boot works inside: IoC and beans, auto-configuration, Spring Data JPA, transactions, Web and Security.",
+  "decks": {
+    "ioc-e-configuracao": {
+      "title": "IoC and configuration",
+      "description": "The Spring container, beans and auto-configuration."
+    },
+    "dados-e-transacoes": {
+      "title": "Data and transactions",
+      "description": "JPA, repositories, queries and @Transactional."
+    },
+    "web-e-seguranca": {
+      "title": "Web and security",
+      "description": "REST controllers, errors, validation and Spring Security."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Spring Boot questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "ioc": {
+      "term": "Inversion of control (IoC)",
+      "definition": "Instead of each class creating its dependencies, the Spring container (ApplicationContext) creates the objects, wires them together and controls their lifecycle. Dependency injection is how it hands those dependencies over."
+    },
+    "bean": {
+      "term": "Bean",
+      "definition": "An object managed by the container. A class annotated with @Component (or @Service, @Repository, @Controller) found by component scanning becomes a bean, as does the return value of a @Bean method in a @Configuration class. The default scope is singleton."
+    },
+    "injecao-construtor": {
+      "term": "Constructor injection",
+      "definition": "The recommended way: dependencies arrive through the constructor and are kept in final fields. The class is immutable, testable without Spring and makes its dependencies explicit. With a single constructor, @Autowired is optional. Field injection hides dependencies and makes testing harder."
+    },
+    "auto-configuracao": {
+      "term": "Auto-configuration and starters",
+      "definition": "Starters (spring-boot-starter-web, -data-jpa) bring a feature's dependencies. Auto-configuration creates beans based on what is on the classpath and in the properties, with conditions such as @ConditionalOnClass and @ConditionalOnMissingBean: if you define your own bean, the default steps aside."
+    },
+    "escopo-bean": {
+      "term": "Scopes and proxies",
+      "definition": "Beans can be singleton (default), prototype (a new one per injection), request or session. Many Spring features (@Transactional, @Async, @Cacheable) work through proxies that wrap the bean; that is why a call from one method to another inside the same class skips the proxy and ignores the annotation."
+    },
+    "profiles": {
+      "term": "Profiles and external configuration",
+      "definition": "Settings live in application.yml (or .properties) and can be overridden by environment variables. Profiles (dev, test, prod) activate different files and beans. @ConfigurationProperties binds a group of properties to a typed, validated class."
+    },
+    "spring-data-jpa": {
+      "term": "Spring Data JPA",
+      "definition": "A layer that generates repository implementations: an interface extending JpaRepository<Entity, Id> is enough to get save, findById, findAll and delete. Methods named like findByEmail become queries automatically; @Query writes JPQL or SQL."
+    },
+    "entidade-jpa": {
+      "term": "JPA entity",
+      "definition": "A class mapped to a table with @Entity, with the key in @Id and relationships such as @ManyToOne and @OneToMany. Hibernate, the default JPA implementation, generates the SQL and tracks changes to loaded entities (dirty checking) to write them on commit."
+    },
+    "transactional": {
+      "term": "@Transactional",
+      "definition": "Opens a transaction before the method and commits at the end, or rolls back if a RuntimeException is thrown (checked exceptions do not roll back by default). It usually sits on the service. Being a proxy, it only applies to calls coming from outside the bean and to public methods."
+    },
+    "lazy-eager": {
+      "term": "Lazy and eager loading",
+      "definition": "LAZY loads the relationship only when it is accessed; EAGER loads it along, always. Collections are LAZY by default and @ManyToOne is EAGER. Accessing a LAZY one outside the transaction throws LazyInitializationException. The safest approach is to keep everything LAZY and fetch what you need in the query."
+    },
+    "n-mais-1-jpa": {
+      "term": "N+1 in JPA",
+      "definition": "One query fetches N orders and, while iterating, each order.getCustomer() fires another query: N+1 round trips to the database. It is solved with JOIN FETCH in the query, @EntityGraph on the repository, or projections (DTOs) that bring only the needed fields."
+    },
+    "repositorio-entity-graph": {
+      "title": "Repository without N+1",
+      "body": "The derived method filters by status; @EntityGraph brings the customer in the same query, avoiding one database trip per order."
+    },
+    "rest-controller": {
+      "term": "@RestController",
+      "definition": "A class that handles HTTP requests and returns the body directly as JSON (via Jackson). It maps routes with @GetMapping, @PostMapping and so on, reads data with @PathVariable, @RequestParam and @RequestBody, and controls the status with ResponseEntity or @ResponseStatus."
+    },
+    "controller-advice": {
+      "term": "@RestControllerAdvice",
+      "definition": "A class that centralizes exception handling for all controllers, with @ExceptionHandler methods per error type. It standardizes responses, ideally in the Problem Details format (RFC 9457), which Spring Boot 3 already supports."
+    },
+    "bean-validation": {
+      "term": "Bean Validation",
+      "definition": "Annotations such as @NotBlank, @Email, @Positive and @Size on the DTO fields, activated with @Valid on the controller parameter. If validation fails, Spring throws MethodArgumentNotValidException and responds 400."
+    },
+    "spring-security": {
+      "term": "Spring Security",
+      "definition": "An authentication and authorization framework based on a chain of filters that runs before the controllers. It is configured with a SecurityFilterChain bean: which routes are public, how to authenticate (session, JWT via resource server, OAuth2) and role-based access rules, including on methods with @PreAuthorize."
+    },
+    "controller-exemplo-spring": {
+      "title": "Controller with validation",
+      "body": "The DTO record carries the rules; @Valid triggers validation; ResponseEntity.created returns 201 with the Location."
+    },
+    "security-filter-chain": {
+      "title": "SecurityFilterChain with JWT",
+      "body": "Public routes are open, admin requires a role, the rest requires authentication. The API validates the JWT as a resource server and keeps no session."
+    },
+    "spring-vs-boot": {
+      "question": "What is the difference between Spring and Spring Boot?",
+      "answer": "Spring is the framework: the IoC container, Web MVC, Data, Security. Spring Boot is a layer on top that removes manual configuration: starters with compatible dependencies, auto-configuration, an embedded server (the app becomes an executable jar) and Actuator for metrics and health checks."
+    },
+    "por-que-construtor": {
+      "question": "Why prefer constructor injection over @Autowired on a field?",
+      "answer": "Fields can be final, the class never exists in an incomplete state, it can be tested with new and mocks without starting Spring, and too many dependencies become visible in the constructor, signalling the class does too much. It also avoids silent circular dependencies."
+    },
+    "transactional-nao-funciona": {
+      "question": "Why does @Transactional sometimes not work?",
+      "answer": "The classic cases: the method is called from inside the same class (the call skips the proxy); the method is not public; the exception is checked (by default there is no rollback, unless rollbackFor is set); or the exception is caught inside the method and never reaches the proxy. The fix is to move the method to another bean or adjust the annotation settings."
+    },
+    "lazy-initialization": {
+      "question": "What causes LazyInitializationException and how do you fix it?",
+      "answer": "Accessing a LAZY relationship after the transaction and the Hibernate session have closed, common when serializing the entity in the controller. I fix it by fetching what I need inside the transaction (JOIN FETCH, @EntityGraph) and returning DTOs instead of entities. Switching to EAGER or turning on open-in-view only hides the problem and usually causes N+1."
+    },
+    "tratamento-erros-spring": {
+      "question": "How do you standardize error responses in a Spring API?",
+      "answer": "With a @RestControllerAdvice that maps domain exceptions (NotFound, Conflict) and validation exceptions (MethodArgumentNotValidException) to a consistent status and body, ideally in the ProblemDetail format. Unexpected errors become a generic 500, with the details only in the log and a correlation id in the response."
+    },
+    "beans-mesmo-tipo": {
+      "question": "What do you do when there are two beans of the same type?",
+      "answer": "Spring does not know which one to inject and fails at startup. I mark one with @Primary as the default, or pick at the injection point with @Qualifier(\"name\"). If I need all of them, I inject a List<Type> or a Map<String, Type>, useful for strategies."
+    }
+  }
+}

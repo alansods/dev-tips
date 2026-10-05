@@ -1,0 +1,316 @@
+{
+  "id": "java-colecoes-e-concorrencia",
+  "title": "Java: coleções, streams e concorrência",
+  "description": "As estruturas de dados do dia a dia, a programação funcional com streams e o trabalho com threads.",
+  "areas": [
+    "backend"
+  ],
+  "language": "java",
+  "decks": [
+    {
+      "id": "colecoes",
+      "title": "Coleções",
+      "description": "List, Set, Map e como cada uma funciona.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "list",
+          "level": "junior",
+          "term": "List",
+          "definition": "Coleção ordenada que aceita repetidos e acesso por índice. ArrayList usa um array por baixo: leitura por índice é rápida e inserir no meio é lento. LinkedList raramente compensa. List.of cria uma lista imutável.",
+          "relatedTerms": [
+            "set",
+            "map"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "set",
+          "level": "junior",
+          "term": "Set",
+          "definition": "Coleção sem repetidos. HashSet não garante ordem e checa contains em tempo constante; LinkedHashSet mantém a ordem de inserção; TreeSet mantém os itens ordenados. A unicidade depende de equals e hashCode.",
+          "relatedTerms": [
+            "list",
+            "map"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "map",
+          "level": "junior",
+          "term": "Map",
+          "definition": "Associa chaves únicas a valores. HashMap é o mais usado (sem ordem); LinkedHashMap mantém a ordem de inserção; TreeMap ordena pelas chaves. Métodos como getOrDefault, putIfAbsent, computeIfAbsent e merge evitam muito código de checagem.",
+          "relatedTerms": [
+            "hashmap-interno",
+            "set"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hashmap-interno",
+          "level": "senior",
+          "term": "Como o HashMap funciona",
+          "definition": "Um array de buckets: o hashCode da chave escolhe o bucket e equals acha a chave dentro dele. Colisões viram uma lista, que vira árvore quando passa de 8 itens. Ao passar de 75% de ocupação, o array dobra e tudo é redistribuído. Chave mutável que muda o hash depois de inserida se perde.",
+          "relatedTerms": [
+            "map"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "contagem-com-map",
+          "level": "junior",
+          "title": "Contando ocorrências com Map",
+          "body": "merge soma 1 se a chave existe ou insere 1 se não existe, numa linha.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "var words = List.of(\"java\", \"spring\", \"java\", \"jpa\", \"java\");\nvar counts = new HashMap<String, Integer>();\n\nfor (String word : words) {\n    counts.merge(word, 1, Integer::sum);\n}\n// {java=3, spring=1, jpa=1}"
+          },
+          "relatedTerms": [
+            "map"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "concurrent-modification",
+          "level": "pleno",
+          "title": "Remover durante a iteração",
+          "body": "Alterar a lista dentro de um for-each lança ConcurrentModificationException. Use removeIf ou um Iterator.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "var orders = new ArrayList<>(List.of(order1, order2, order3));\n\n// erro: ConcurrentModificationException\nfor (Order o : orders) {\n    if (o.isCancelled()) orders.remove(o);\n}\n\n// certo\norders.removeIf(Order::isCancelled);"
+          },
+          "relatedTerms": [
+            "list"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "streams-e-lambdas",
+      "title": "Streams e lambdas",
+      "description": "Processar coleções de forma declarativa.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "lambda",
+          "level": "junior",
+          "term": "Lambda e interface funcional",
+          "definition": "Lambda é uma função anônima curta: (a, b) -> a + b. Ela implementa uma interface funcional, que tem um único método abstrato: Function, Predicate, Consumer, Supplier. Method reference (String::length) é um atalho para lambdas que só chamam um método.",
+          "relatedTerms": [
+            "stream"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "stream",
+          "level": "pleno",
+          "term": "Stream",
+          "definition": "Sequência de operações sobre dados: uma fonte, operações intermediárias preguiçosas (filter, map, sorted) e uma operação terminal que dispara tudo (collect, count, forEach). Não altera a coleção de origem e só pode ser consumido uma vez.",
+          "relatedTerms": [
+            "lambda",
+            "collectors"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "collectors",
+          "level": "pleno",
+          "term": "Collectors",
+          "definition": "Receitas para juntar o resultado de um stream: toList, toSet, toMap, joining (texto), groupingBy (agrupar em mapa) e partitioningBy (dividir em verdadeiro e falso). Combinam com outros coletores, como counting e summingInt.",
+          "relatedTerms": [
+            "stream"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "optional",
+          "level": "pleno",
+          "term": "Optional",
+          "definition": "Contêiner que pode ter ou não um valor, usado como retorno de métodos que podem não achar nada (findById). Obriga quem chama a decidir: orElse, orElseThrow, map, ifPresent. Não é para campos nem parâmetros, e get() sem checar perde o sentido.",
+          "relatedTerms": [
+            "stream"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "stream-pipeline",
+          "level": "pleno",
+          "title": "Filtrar, transformar e agrupar",
+          "body": "Total vendido por categoria, só de pedidos pagos, em um único pipeline.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "Map<String, BigDecimal> totalByCategory = orders.stream()\n    .filter(Order::isPaid)\n    .collect(Collectors.groupingBy(\n        Order::category,\n        Collectors.reducing(BigDecimal.ZERO, Order::total, BigDecimal::add)\n    ));\n\nList<String> topNames = products.stream()\n    .sorted(Comparator.comparing(Product::sales).reversed())\n    .limit(3)\n    .map(Product::name)\n    .toList();"
+          },
+          "relatedTerms": [
+            "stream",
+            "collectors"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "optional-uso",
+          "level": "junior",
+          "title": "Usando Optional",
+          "body": "Em vez de checar null, o Optional encadeia a transformação e define o que fazer se faltar o valor.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "String city = userRepository.findById(id)\n    .map(User::address)\n    .map(Address::city)\n    .orElse(\"Desconhecida\");\n\nUser user = userRepository.findById(id)\n    .orElseThrow(() -> new NotFoundException(\"usuário \" + id));"
+          },
+          "relatedTerms": [
+            "optional",
+            "lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "concorrencia",
+      "title": "Concorrência",
+      "description": "Threads, pools, sincronização e virtual threads.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "thread",
+          "level": "junior",
+          "term": "Thread",
+          "definition": "Linha de execução independente dentro do processo, que compartilha o heap com as outras. Várias threads permitem fazer coisas ao mesmo tempo, mas o acesso a dados compartilhados precisa de coordenação para não corromper o estado.",
+          "relatedTerms": [
+            "executor-service",
+            "race-condition"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "executor-service",
+          "level": "pleno",
+          "term": "ExecutorService",
+          "definition": "Pool de threads que executa tarefas enviadas com submit, devolvendo um Future. Evita criar uma thread por tarefa, que é caro. Deve ser encerrado (shutdown ou try-with-resources a partir do Java 19).",
+          "relatedTerms": [
+            "thread",
+            "completable-future"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "race-condition",
+          "level": "pleno",
+          "term": "Condição de corrida e sincronização",
+          "definition": "Erro em que o resultado depende da ordem em que threads acessam um dado compartilhado; count++ não é atômico. Soluções: synchronized ou locks para exclusão mútua, classes atômicas (AtomicInteger), coleções concorrentes (ConcurrentHashMap) ou, melhor, não compartilhar estado mutável.",
+          "relatedTerms": [
+            "thread"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "virtual-threads",
+          "level": "senior",
+          "term": "Virtual threads",
+          "definition": "Threads leves gerenciadas pela JVM (Java 21), não pelo sistema operacional. Quando uma bloqueia em I/O, libera a thread real para outra. Permitem uma thread por requisição com milhões de threads, mantendo código bloqueante simples. Não aceleram trabalho de CPU.",
+          "relatedTerms": [
+            "thread",
+            "executor-service"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "completable-future",
+          "level": "senior",
+          "term": "CompletableFuture",
+          "definition": "Representa um resultado assíncrono que pode ser encadeado (thenApply, thenCompose), combinado (thenCombine, allOf) e tratado (exceptionally), sem bloquear com get(). É o equivalente Java de uma Promise.",
+          "relatedTerms": [
+            "executor-service"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "atomic-counter",
+          "level": "pleno",
+          "title": "Contador seguro entre threads",
+          "body": "Com int e count++, mil tarefas raramente chegam a 1000. AtomicInteger faz o incremento de forma atômica. O executor de virtual threads cria uma por tarefa.",
+          "snippet": {
+            "file": "Exemplo.java",
+            "language": "java",
+            "code": "var count = new AtomicInteger();\n\ntry (var executor = Executors.newVirtualThreadPerTaskExecutor()) {\n    for (int i = 0; i < 1000; i++) {\n        executor.submit(count::incrementAndGet);\n    }\n} // espera todas as tarefas\n\nSystem.out.println(count.get()); // 1000"
+          },
+          "relatedTerms": [
+            "race-condition",
+            "virtual-threads"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre coleções, streams e concorrência em Java que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "arraylist-vs-linkedlist",
+          "level": "junior",
+          "question": "ArrayList ou LinkedList?",
+          "answer": "Quase sempre ArrayList: acesso por índice em tempo constante e uso de memória contíguo, amigável ao cache do processador. LinkedList só ganha em inserções e remoções no meio quando já se tem a posição pelo iterador, o que é raro; para fila, ArrayDeque é melhor.",
+          "relatedTerms": [
+            "list"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "hashmap-colisao",
+          "level": "senior",
+          "question": "O que acontece numa colisão no HashMap?",
+          "answer": "Duas chaves caem no mesmo bucket. Elas ficam numa lista ligada nesse bucket, e a busca usa equals para achar a certa. Se a lista passa de 8 itens (e a tabela tem pelo menos 64 posições), vira uma árvore balanceada, e a busca no pior caso cai de O(n) para O(log n). Um hashCode ruim, que concentra chaves, derruba o desempenho.",
+          "relatedTerms": [
+            "hashmap-interno"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "stream-lazy",
+          "level": "pleno",
+          "question": "Por que se diz que streams são preguiçosos?",
+          "answer": "Porque as operações intermediárias só montam o pipeline; nada roda até a operação terminal. Então cada elemento passa por todas as etapas de uma vez, e operações como findFirst e limit param cedo, sem processar o resto. Por isso um stream sem operação terminal não faz nada.",
+          "relatedTerms": [
+            "stream"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "parallel-stream",
+          "level": "senior",
+          "question": "Vale a pena usar parallelStream?",
+          "answer": "Raramente num servidor. Ele usa o ForkJoinPool comum, compartilhado com o resto da aplicação, e só compensa com muitos dados, trabalho de CPU por elemento e operações sem estado. Para I/O piora, e lambdas com efeito colateral viram condição de corrida. Meço antes de usar.",
+          "relatedTerms": [
+            "stream",
+            "race-condition"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "synchronized-vs-concurrent",
+          "level": "pleno",
+          "question": "Como deixar um mapa seguro entre threads?",
+          "answer": "Uso ConcurrentHashMap, que permite leituras sem bloqueio e travas finas por bucket, e oferece operações atômicas como computeIfAbsent e merge. Collections.synchronizedMap trava o mapa inteiro a cada acesso, e checar e depois inserir em dois passos continua sendo uma condição de corrida em qualquer um deles.",
+          "relatedTerms": [
+            "race-condition",
+            "map"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "virtual-threads-pergunta",
+          "level": "senior",
+          "question": "O que mudam as virtual threads do Java 21?",
+          "answer": "Permitem o modelo simples de uma thread por requisição com código bloqueante, mas escalando como código assíncrono: quando a virtual thread espera I/O, a thread do sistema fica livre para outra. Para aplicações de I/O, reduzem a necessidade de programação reativa. Cuidados: não ajudam em CPU, não devem ficar em pools e blocos synchronized longos podem prendê-las (melhorado no Java 24).",
+          "relatedTerms": [
+            "virtual-threads"
+          ]
+        }
+      ]
+    }
+  ]
+}

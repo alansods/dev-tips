@@ -38,28 +38,21 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const CORE = ['TypeScript essencial', 'TypeScript avançado'];
-const FRAMEWORKS = ['Angular', 'NestJS'];
+const CORE = ['Java essencial', 'Java: coleções, streams e concorrência'];
 
-describe('Requirement: Trilhas de TypeScript no catálogo', () => {
-  it('TypeScript no Frontend', async () => {
-    await open('/area/frontend/typescript');
+describe('Requirement: Trilhas de Java no catálogo', () => {
+  it('Java no Backend', async () => {
+    await open('/area/backend/java');
     expect(buttons(CORE)).toEqual(CORE);
-    expect(buttons(FRAMEWORKS)).toEqual(['Angular']);
-    expect(within(screen.getByRole('button', { name: /^Angular,/ })).getByText('1 trilha')).toBeOnTheScreen();
-  });
-
-  it('TypeScript no Backend', async () => {
-    await open('/area/backend/typescript');
-    expect(buttons(CORE)).toEqual(CORE);
-    expect(buttons(FRAMEWORKS)).toEqual(['NestJS']);
+    expect(buttons(['Spring Boot'])).toEqual(['Spring Boot']);
+    expect(within(screen.getByRole('button', { name: /^Spring Boot,/ })).getByText('1 trilha')).toBeOnTheScreen();
   });
 });
 
-describe('Requirement: Tradução das trilhas de TypeScript', () => {
+describe('Requirement: Tradução das trilhas de Java', () => {
   it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/area/frontend/typescript');
-    expect(screen.getByRole('button', { name: /^TypeScript essentials,/ })).toBeOnTheScreen();
+    await open('/area/backend/java');
+    expect(screen.getByRole('button', { name: /^Java essentials,/ })).toBeOnTheScreen();
   });
 });

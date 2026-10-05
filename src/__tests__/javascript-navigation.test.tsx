@@ -32,8 +32,9 @@ async function open(url: string) {
 const buttons = (names: string[]) =>
   screen
     .getAllByRole('button')
-    .map((b) => String(b.props.accessibilityLabel ?? '').split(',')[0])
-    .filter((label) => names.includes(label));
+    .map((b) => String(b.props.accessibilityLabel ?? ''))
+    .map((label) => names.find((name) => label.startsWith(`${name},`)))
+    .filter((name): name is string => name !== undefined);
 
 beforeEach(() => resetStudyStore());
 

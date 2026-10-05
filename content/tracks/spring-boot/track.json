@@ -1,0 +1,312 @@
+{
+  "id": "spring-boot",
+  "title": "Spring Boot",
+  "description": "Como o Spring Boot funciona por dentro: IoC e beans, auto-configuração, Spring Data JPA, transações, Web e Security.",
+  "areas": [
+    "backend"
+  ],
+  "language": "java",
+  "framework": "spring",
+  "decks": [
+    {
+      "id": "ioc-e-configuracao",
+      "title": "IoC e configuração",
+      "description": "O contêiner do Spring, beans e auto-configuração.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "ioc",
+          "level": "junior",
+          "term": "Inversão de controle (IoC)",
+          "definition": "Em vez de cada classe criar suas dependências, o contêiner do Spring (ApplicationContext) cria os objetos, liga uns aos outros e controla o ciclo de vida. A injeção de dependência é a forma como ele entrega essas dependências.",
+          "relatedTerms": [
+            "bean",
+            "injecao-construtor"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "bean",
+          "level": "junior",
+          "term": "Bean",
+          "definition": "Objeto gerenciado pelo contêiner. Vira bean uma classe com @Component (ou @Service, @Repository, @Controller) achada pelo component scan, ou o retorno de um método @Bean numa classe @Configuration. O escopo padrão é singleton.",
+          "relatedTerms": [
+            "ioc",
+            "escopo-bean"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "injecao-construtor",
+          "level": "pleno",
+          "term": "Injeção por construtor",
+          "definition": "A forma recomendada: as dependências chegam pelo construtor e ficam em campos final. A classe fica imutável, testável sem Spring e deixa claro do que depende. Com um único construtor, @Autowired é opcional. Injeção em campo esconde dependências e dificulta testes.",
+          "relatedTerms": [
+            "ioc",
+            "bean"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "auto-configuracao",
+          "level": "pleno",
+          "term": "Auto-configuração e starters",
+          "definition": "Starters (spring-boot-starter-web, -data-jpa) trazem as dependências de uma funcionalidade. A auto-configuração cria beans conforme o que está no classpath e nas propriedades, com condições como @ConditionalOnClass e @ConditionalOnMissingBean: se você define o seu bean, o padrão sai do caminho.",
+          "relatedTerms": [
+            "bean",
+            "profiles"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "escopo-bean",
+          "level": "senior",
+          "term": "Escopos e proxies",
+          "definition": "Beans podem ser singleton (padrão), prototype (um novo a cada injeção), request ou session. Muitos recursos do Spring (@Transactional, @Async, @Cacheable) funcionam com proxies que envolvem o bean; por isso uma chamada de um método para outro dentro da mesma classe não passa pelo proxy e ignora a anotação.",
+          "relatedTerms": [
+            "bean"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "profiles",
+          "level": "pleno",
+          "term": "Profiles e configuração externa",
+          "definition": "Configurações ficam em application.yml (ou .properties) e podem ser sobrescritas por variáveis de ambiente. Profiles (dev, test, prod) ativam arquivos e beans diferentes. @ConfigurationProperties liga um grupo de propriedades a uma classe tipada e validada.",
+          "relatedTerms": [
+            "auto-configuracao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dados-e-transacoes",
+      "title": "Dados e transações",
+      "description": "JPA, repositórios, consultas e @Transactional.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "spring-data-jpa",
+          "level": "junior",
+          "term": "Spring Data JPA",
+          "definition": "Camada que gera a implementação de repositórios: basta uma interface que estende JpaRepository<Entidade, Id> para ter save, findById, findAll e delete. Métodos com nomes como findByEmail viram consultas automaticamente; @Query escreve JPQL ou SQL.",
+          "relatedTerms": [
+            "entidade-jpa",
+            "n-mais-1-jpa"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "entidade-jpa",
+          "level": "junior",
+          "term": "Entidade JPA",
+          "definition": "Classe mapeada para uma tabela com @Entity, com chave em @Id e relacionamentos como @ManyToOne e @OneToMany. O Hibernate, implementação padrão do JPA, gera o SQL e acompanha as mudanças das entidades carregadas (dirty checking) para gravá-las no commit.",
+          "relatedTerms": [
+            "spring-data-jpa",
+            "lazy-eager"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "transactional",
+          "level": "pleno",
+          "term": "@Transactional",
+          "definition": "Abre uma transação antes do método e faz commit no fim, ou rollback se sair uma RuntimeException (checked não causa rollback por padrão). Fica normalmente no service. Por ser proxy, só vale em chamadas vindas de fora do bean e em métodos públicos.",
+          "relatedTerms": [
+            "entidade-jpa",
+            "n-mais-1-jpa"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "lazy-eager",
+          "level": "pleno",
+          "term": "Carregamento lazy e eager",
+          "definition": "LAZY carrega o relacionamento só quando ele é acessado; EAGER carrega junto, sempre. Coleções são LAZY por padrão e @ManyToOne é EAGER. Acessar um LAZY fora da transação dá LazyInitializationException. O mais seguro é deixar tudo LAZY e buscar o que precisa na consulta.",
+          "relatedTerms": [
+            "entidade-jpa",
+            "n-mais-1-jpa"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "n-mais-1-jpa",
+          "level": "senior",
+          "term": "N+1 no JPA",
+          "definition": "Uma consulta busca N pedidos e, ao percorrer, cada pedido.getCliente() dispara mais uma consulta: N+1 idas ao banco. Resolve com JOIN FETCH na consulta, @EntityGraph no repositório ou projeções (DTOs) que já trazem só os campos necessários.",
+          "relatedTerms": [
+            "lazy-eager",
+            "spring-data-jpa"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "repositorio-entity-graph",
+          "level": "pleno",
+          "title": "Repositório sem N+1",
+          "body": "O método derivado busca por status; o @EntityGraph traz o cliente na mesma consulta, evitando uma ida ao banco por pedido.",
+          "snippet": {
+            "file": "OrderRepository.java",
+            "language": "java",
+            "code": "public interface OrderRepository extends JpaRepository<Order, Long> {\n\n    @EntityGraph(attributePaths = \"customer\")\n    List<Order> findByStatus(OrderStatus status);\n\n    @Query(\"select o from Order o join fetch o.items where o.id = :id\")\n    Optional<Order> findWithItems(@Param(\"id\") Long id);\n}"
+          },
+          "relatedTerms": [
+            "n-mais-1-jpa",
+            "spring-data-jpa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web-e-seguranca",
+      "title": "Web e segurança",
+      "description": "Controllers REST, erros, validação e Spring Security.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rest-controller",
+          "level": "junior",
+          "term": "@RestController",
+          "definition": "Classe que atende requisições HTTP e devolve o corpo direto como JSON (via Jackson). Mapeia rotas com @GetMapping, @PostMapping etc., lê dados com @PathVariable, @RequestParam e @RequestBody, e controla o status com ResponseEntity ou @ResponseStatus.",
+          "relatedTerms": [
+            "controller-advice",
+            "bean-validation"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "controller-advice",
+          "level": "pleno",
+          "term": "@RestControllerAdvice",
+          "definition": "Classe que centraliza o tratamento de exceções de todos os controllers, com métodos @ExceptionHandler por tipo de erro. Padroniza as respostas, de preferência no formato Problem Details (RFC 9457), que o Spring Boot 3 já suporta.",
+          "relatedTerms": [
+            "rest-controller"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "bean-validation",
+          "level": "junior",
+          "term": "Bean Validation",
+          "definition": "Anotações como @NotBlank, @Email, @Positive e @Size nos campos do DTO, ativadas com @Valid no parâmetro do controller. Se a validação falha, o Spring lança MethodArgumentNotValidException e responde 400.",
+          "relatedTerms": [
+            "rest-controller"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "spring-security",
+          "level": "senior",
+          "term": "Spring Security",
+          "definition": "Framework de autenticação e autorização baseado numa cadeia de filtros que roda antes dos controllers. Configura-se com um bean SecurityFilterChain: quais rotas são públicas, como autenticar (sessão, JWT via resource server, OAuth2) e regras de acesso por papel, inclusive em métodos com @PreAuthorize.",
+          "relatedTerms": [
+            "rest-controller"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "controller-exemplo-spring",
+          "level": "junior",
+          "title": "Controller com validação",
+          "body": "O record do DTO carrega as regras; @Valid dispara a validação; ResponseEntity.created devolve 201 com o Location.",
+          "snippet": {
+            "file": "ProductController.java",
+            "language": "java",
+            "code": "public record CreateProductRequest(@NotBlank String name, @Positive BigDecimal price) {}\n\n@RestController\n@RequestMapping(\"/products\")\nclass ProductController {\n    private final ProductService service;\n    ProductController(ProductService service) { this.service = service; }\n\n    @PostMapping\n    ResponseEntity<Product> create(@Valid @RequestBody CreateProductRequest request) {\n        Product created = service.create(request);\n        return ResponseEntity.created(URI.create(\"/products/\" + created.id())).body(created);\n    }\n}"
+          },
+          "relatedTerms": [
+            "rest-controller",
+            "bean-validation"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "security-filter-chain",
+          "level": "senior",
+          "title": "SecurityFilterChain com JWT",
+          "body": "Rotas públicas liberadas, admin exige papel, o resto exige autenticação. A API valida o JWT como resource server e não guarda sessão.",
+          "snippet": {
+            "file": "SecurityConfig.java",
+            "language": "java",
+            "code": "@Configuration\nclass SecurityConfig {\n    @Bean\n    SecurityFilterChain security(HttpSecurity http) throws Exception {\n        return http\n            .csrf(csrf -> csrf.disable())\n            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))\n            .authorizeHttpRequests(auth -> auth\n                .requestMatchers(\"/auth/**\", \"/actuator/health\").permitAll()\n                .requestMatchers(\"/admin/**\").hasRole(\"ADMIN\")\n                .anyRequest().authenticated())\n            .oauth2ResourceServer(o -> o.jwt(Customizer.withDefaults()))\n            .build();\n    }\n}"
+          },
+          "relatedTerms": [
+            "spring-security"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Spring Boot que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "spring-vs-boot",
+          "level": "junior",
+          "question": "Qual a diferença entre Spring e Spring Boot?",
+          "answer": "Spring é o framework: contêiner de IoC, Web MVC, Data, Security. Spring Boot é uma camada por cima que elimina a configuração manual: starters com dependências compatíveis, auto-configuração, servidor embutido (o app vira um jar executável) e Actuator para métricas e health checks.",
+          "relatedTerms": [
+            "auto-configuracao",
+            "ioc"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-construtor",
+          "level": "pleno",
+          "question": "Por que preferir injeção por construtor a @Autowired no campo?",
+          "answer": "Os campos podem ser final, a classe nunca existe em estado incompleto, dá para testar com new e mocks sem subir o Spring, e dependências demais ficam visíveis no construtor, sinalizando que a classe faz coisa demais. Também evita dependências circulares silenciosas.",
+          "relatedTerms": [
+            "injecao-construtor"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "transactional-nao-funciona",
+          "level": "senior",
+          "question": "Por que um @Transactional às vezes não funciona?",
+          "answer": "Os casos clássicos: o método é chamado de dentro da mesma classe (a chamada não passa pelo proxy); o método não é público; a exceção é checked (por padrão não há rollback, a não ser com rollbackFor); ou a exceção é capturada dentro do método e não chega ao proxy. A solução é mover o método para outro bean ou ajustar a configuração da anotação.",
+          "relatedTerms": [
+            "transactional",
+            "escopo-bean"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "lazy-initialization",
+          "level": "pleno",
+          "question": "O que causa LazyInitializationException e como resolver?",
+          "answer": "Acessar um relacionamento LAZY depois que a transação e a sessão do Hibernate fecharam, comum ao serializar a entidade no controller. Resolvo buscando o que preciso dentro da transação (JOIN FETCH, @EntityGraph) e devolvendo DTOs em vez de entidades. Mudar para EAGER ou ligar open-in-view só esconde o problema e costuma gerar N+1.",
+          "relatedTerms": [
+            "lazy-eager",
+            "n-mais-1-jpa"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tratamento-erros-spring",
+          "level": "pleno",
+          "question": "Como você padroniza as respostas de erro numa API Spring?",
+          "answer": "Com um @RestControllerAdvice que mapeia exceções de domínio (NotFound, Conflict) e de validação (MethodArgumentNotValidException) para status e corpo consistentes, de preferência no formato ProblemDetail. Erros inesperados viram 500 genérico, com o detalhe só no log e um id de correlação na resposta.",
+          "relatedTerms": [
+            "controller-advice",
+            "bean-validation"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "beans-mesmo-tipo",
+          "level": "pleno",
+          "question": "O que fazer quando há dois beans do mesmo tipo?",
+          "answer": "O Spring não sabe qual injetar e falha na inicialização. Marco um deles com @Primary para ser o padrão, ou escolho no ponto de injeção com @Qualifier(\"nome\"). Se preciso de todos, injeto uma List<Tipo> ou um Map<String, Tipo>, útil para estratégias.",
+          "relatedTerms": [
+            "bean",
+            "injecao-construtor"
+          ]
+        }
+      ]
+    }
+  ]
+}

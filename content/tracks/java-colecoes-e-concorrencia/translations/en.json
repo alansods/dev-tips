@@ -1,0 +1,120 @@
+{
+  "title": "Java: collections, streams and concurrency",
+  "description": "Everyday data structures, functional programming with streams and working with threads.",
+  "decks": {
+    "colecoes": {
+      "title": "Collections",
+      "description": "List, Set, Map and how each one works."
+    },
+    "streams-e-lambdas": {
+      "title": "Streams and lambdas",
+      "description": "Processing collections declaratively."
+    },
+    "concorrencia": {
+      "title": "Concurrency",
+      "description": "Threads, pools, synchronization and virtual threads."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about Java collections, streams and concurrency that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "list": {
+      "term": "List",
+      "definition": "An ordered collection that allows duplicates and index access. ArrayList uses an array underneath: index reads are fast and inserting in the middle is slow. LinkedList rarely pays off. List.of creates an immutable list."
+    },
+    "set": {
+      "term": "Set",
+      "definition": "A collection without duplicates. HashSet does not guarantee order and checks contains in constant time; LinkedHashSet keeps insertion order; TreeSet keeps items sorted. Uniqueness depends on equals and hashCode."
+    },
+    "map": {
+      "term": "Map",
+      "definition": "Maps unique keys to values. HashMap is the most used (no order); LinkedHashMap keeps insertion order; TreeMap sorts by key. Methods such as getOrDefault, putIfAbsent, computeIfAbsent and merge avoid a lot of checking code."
+    },
+    "hashmap-interno": {
+      "term": "How HashMap works",
+      "definition": "An array of buckets: the key's hashCode picks the bucket and equals finds the key inside it. Collisions become a list, which turns into a tree past 8 items. Above 75% occupancy, the array doubles and everything is redistributed. A mutable key whose hash changes after insertion gets lost."
+    },
+    "contagem-com-map": {
+      "title": "Counting occurrences with a Map",
+      "body": "merge adds 1 if the key exists or inserts 1 if it does not, in one line."
+    },
+    "concurrent-modification": {
+      "title": "Removing while iterating",
+      "body": "Changing the list inside a for-each throws ConcurrentModificationException. Use removeIf or an Iterator."
+    },
+    "lambda": {
+      "term": "Lambda and functional interface",
+      "definition": "A lambda is a short anonymous function: (a, b) -> a + b. It implements a functional interface, which has a single abstract method: Function, Predicate, Consumer, Supplier. A method reference (String::length) is a shortcut for lambdas that just call a method."
+    },
+    "stream": {
+      "term": "Stream",
+      "definition": "A sequence of operations over data: a source, lazy intermediate operations (filter, map, sorted) and a terminal operation that triggers everything (collect, count, forEach). It does not change the source collection and can only be consumed once."
+    },
+    "collectors": {
+      "term": "Collectors",
+      "definition": "Recipes to gather a stream's result: toList, toSet, toMap, joining (text), groupingBy (group into a map) and partitioningBy (split into true and false). They combine with other collectors, such as counting and summingInt."
+    },
+    "optional": {
+      "term": "Optional",
+      "definition": "A container that may or may not hold a value, used as the return of methods that might find nothing (findById). It forces the caller to decide: orElse, orElseThrow, map, ifPresent. It is not for fields or parameters, and calling get() without checking defeats the purpose."
+    },
+    "stream-pipeline": {
+      "title": "Filter, transform and group",
+      "body": "Total sold per category, only for paid orders, in a single pipeline."
+    },
+    "optional-uso": {
+      "title": "Using Optional",
+      "body": "Instead of checking for null, Optional chains the transformation and defines what to do if the value is missing."
+    },
+    "thread": {
+      "term": "Thread",
+      "definition": "An independent line of execution inside the process, which shares the heap with the others. Several threads let you do things at the same time, but access to shared data needs coordination so state does not get corrupted."
+    },
+    "executor-service": {
+      "term": "ExecutorService",
+      "definition": "A thread pool that runs tasks sent with submit, returning a Future. It avoids creating one thread per task, which is expensive. It must be shut down (shutdown, or try-with-resources since Java 19)."
+    },
+    "race-condition": {
+      "term": "Race condition and synchronization",
+      "definition": "A bug in which the result depends on the order threads access shared data; count++ is not atomic. Solutions: synchronized or locks for mutual exclusion, atomic classes (AtomicInteger), concurrent collections (ConcurrentHashMap) or, better, not sharing mutable state."
+    },
+    "virtual-threads": {
+      "term": "Virtual threads",
+      "definition": "Lightweight threads managed by the JVM (Java 21), not by the operating system. When one blocks on I/O, it frees the real thread for another. They allow one thread per request with millions of threads while keeping simple blocking code. They do not speed up CPU work."
+    },
+    "completable-future": {
+      "term": "CompletableFuture",
+      "definition": "Represents an asynchronous result that can be chained (thenApply, thenCompose), combined (thenCombine, allOf) and handled (exceptionally), without blocking with get(). It is Java's equivalent of a Promise."
+    },
+    "atomic-counter": {
+      "title": "Thread-safe counter",
+      "body": "With int and count++, a thousand tasks rarely reach 1000. AtomicInteger increments atomically. The virtual thread executor creates one per task."
+    },
+    "arraylist-vs-linkedlist": {
+      "question": "ArrayList or LinkedList?",
+      "answer": "Almost always ArrayList: constant-time index access and contiguous memory, friendly to the CPU cache. LinkedList only wins on insertions and removals in the middle when you already hold the position via an iterator, which is rare; for a queue, ArrayDeque is better."
+    },
+    "hashmap-colisao": {
+      "question": "What happens on a HashMap collision?",
+      "answer": "Two keys land in the same bucket. They are kept in a linked list in that bucket, and lookup uses equals to find the right one. If the list grows past 8 items (and the table has at least 64 slots), it becomes a balanced tree, and the worst-case lookup drops from O(n) to O(log n). A poor hashCode that clusters keys ruins performance."
+    },
+    "stream-lazy": {
+      "question": "Why are streams said to be lazy?",
+      "answer": "Because intermediate operations only build the pipeline; nothing runs until the terminal operation. Then each element goes through all the steps at once, and operations such as findFirst and limit stop early, without processing the rest. That is why a stream without a terminal operation does nothing."
+    },
+    "parallel-stream": {
+      "question": "Is parallelStream worth using?",
+      "answer": "Rarely on a server. It uses the common ForkJoinPool, shared with the rest of the application, and only pays off with lots of data, CPU work per element and stateless operations. For I/O it gets worse, and lambdas with side effects become race conditions. I measure before using it."
+    },
+    "synchronized-vs-concurrent": {
+      "question": "How do you make a map thread-safe?",
+      "answer": "I use ConcurrentHashMap, which allows lock-free reads and fine-grained per-bucket locking, and offers atomic operations such as computeIfAbsent and merge. Collections.synchronizedMap locks the whole map on every access, and check-then-insert in two steps is still a race condition with either of them."
+    },
+    "virtual-threads-pergunta": {
+      "question": "What do Java 21 virtual threads change?",
+      "answer": "They allow the simple one-thread-per-request model with blocking code while scaling like async code: when a virtual thread waits on I/O, the OS thread is free for another. For I/O-bound applications, they reduce the need for reactive programming. Caveats: they do not help with CPU, should not be pooled, and long synchronized blocks can pin them (improved in Java 24)."
+    }
+  }
+}

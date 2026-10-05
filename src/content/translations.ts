@@ -16,6 +16,9 @@ import typescriptEssencialEn from '../../content/tracks/typescript-essencial/tra
 import typescriptAvancadoEn from '../../content/tracks/typescript-avancado/translations/en.json';
 import angularEn from '../../content/tracks/angular/translations/en.json';
 import nestjsEn from '../../content/tracks/nestjs/translations/en.json';
+import javaEssencialEn from '../../content/tracks/java-essencial/translations/en.json';
+import javaColecoesEConcorrenciaEn from '../../content/tracks/java-colecoes-e-concorrencia/translations/en.json';
+import springBootEn from '../../content/tracks/spring-boot/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -32,4 +35,7 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'typescript-avancado': { en: typescriptAvancadoEn },
   angular: { en: angularEn },
   nestjs: { en: nestjsEn },
+  'java-essencial': { en: javaEssencialEn },
+  'java-colecoes-e-concorrencia': { en: javaColecoesEConcorrenciaEn },
+  'spring-boot': { en: springBootEn },
 };
