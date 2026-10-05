@@ -154,7 +154,7 @@
         {
           "type": "code",
           "id": "async-correto",
-          "level": "senior",
+          "level": "pleno",
           "title": "Chamada externa sem travar o loop",
           "body": "Dentro de async def, use um cliente assíncrono e await. Com requests.get, a rota travaria o event loop durante a chamada.",
           "snippet": {

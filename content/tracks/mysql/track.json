@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "relacionais",
   "decks": [
     {
       "id": "innodb",
@@ -182,7 +183,7 @@
         {
           "type": "concept",
           "id": "charset",
-          "level": "pleno",
+          "level": "junior",
           "term": "utf8mb4 e collation",
           "definition": "O \"utf8\" antigo do MySQL guarda só até 3 bytes por caractere e não aceita emojis; o certo é utf8mb4. A collation define como textos são comparados e ordenados: _ai_ci ignora acentos e maiúsculas, o que afeta buscas e índices únicos (\"José\" e \"jose\" viram iguais).",
           "relatedTerms": [
@@ -227,7 +228,7 @@
         {
           "type": "code",
           "id": "emoji-utf8mb4",
-          "level": "pleno",
+          "level": "junior",
           "title": "Convertendo para utf8mb4",
           "body": "Com o charset antigo, salvar um emoji falha ou vira \"?\". A conversão da tabela e da conexão resolve.",
           "snippet": {
@@ -270,7 +271,7 @@
         {
           "type": "question",
           "id": "utf8-emoji",
-          "level": "pleno",
+          "level": "junior",
           "question": "Por que o MySQL não salva emojis?",
           "answer": "Porque a tabela ou a conexão usa o charset utf8 antigo do MySQL, que é limitado a 3 bytes por caractere, e emojis precisam de 4. A solução é usar utf8mb4 nas tabelas, colunas e na conexão da aplicação, com uma collation moderna como utf8mb4_0900_ai_ci.",
           "relatedTerms": [

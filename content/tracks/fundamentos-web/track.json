@@ -241,7 +241,7 @@
         {
           "type": "concept",
           "id": "csrf",
-          "level": "senior",
+          "level": "pleno",
           "term": "CSRF (Cross-Site Request Forgery)",
           "definition": "Ataque em que outro site faz o navegador da vítima enviar uma requisição para o seu, aproveitando que os cookies vão junto automaticamente. Defesas: cookies com SameSite, um token anti-CSRF nos formulários e nunca alterar dados com GET.",
           "relatedTerms": [
@@ -283,7 +283,7 @@
         {
           "type": "question",
           "id": "cookie-ou-localstorage",
-          "level": "senior",
+          "level": "pleno",
           "question": "Onde guardar o token de login: cookie ou localStorage?",
           "answer": "Um cookie HttpOnly, Secure e SameSite costuma ser mais seguro: o JavaScript não consegue lê-lo, então um ataque XSS não rouba o token. Em troca, como o cookie vai junto automaticamente, é preciso se proteger de CSRF (SameSite e token anti-CSRF). O localStorage é simples e não sofre CSRF, mas qualquer script da página lê o token, então um XSS o vaza.",
           "relatedTerms": [
@@ -313,7 +313,7 @@
         {
           "type": "question",
           "id": "xss-vs-csrf",
-          "level": "senior",
+          "level": "pleno",
           "question": "Qual a diferença entre XSS e CSRF?",
           "answer": "No XSS, o atacante faz o seu site executar o script dele, que roda com os poderes da página e pode ler dados e agir como o usuário. No CSRF, o atacante não executa nada no seu site: ele faz o navegador da vítima enviar uma requisição para a sua API a partir de outro site, aproveitando os cookies que vão junto. Contra XSS: escapar a saída e usar Content-Security-Policy. Contra CSRF: SameSite nos cookies e token anti-CSRF.",
           "relatedTerms": [

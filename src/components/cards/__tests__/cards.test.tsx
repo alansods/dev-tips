@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 import type { Card, StepCard } from '../../../content';
 import { ptBR } from '../../../i18n/pt-BR';
-import { cardById, crudTrack, renderWithTheme } from '../../../test-utils';
+import { cardById, crudTrack, renderWithTheme, webTrack } from '../../../test-utils';
 import { CardFace } from '../CardFace';
 
 const FRONT_PROMPT = ptBR.card.frontPrompt;
@@ -149,7 +149,8 @@ describe('Requirement: Nível no card', () => {
   });
 
   it('Nível no verso', () => {
-    show('transacoes', 'back'); // level: senior
+    const card = cardById('rest-vs-graphql', webTrack); // level: senior
+    renderWithTheme(<CardFace card={card} track={webTrack} side="back" variantId="" onSelectVariant={() => {}} />);
     expect(screen.getByText('Sênior')).toBeOnTheScreen();
   });
 

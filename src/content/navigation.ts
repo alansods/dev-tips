@@ -2,12 +2,15 @@
 // linguagens, comparativos) → linguagem → (linguagem pura, frameworks) →
 // framework. Funções puras sobre o catálogo e o cadastro; as telas só desenham.
 
-import { AREAS, type Area, type Track } from './schema';
+import { AREAS, SECTIONS, type Area, type Section, type Track } from './schema';
 import { placementOf, type Framework, type Language, type Taxonomy } from './taxonomy';
 
 export type AreaEntry = { area: Area; tracks: Track[] };
 export type AreaSections = {
+  /** Trilhas diretas sem seção. */
   direct: Track[];
+  /** Trilhas diretas com seção, agrupadas na ordem de SECTIONS (só as seções com trilhas). */
+  grouped: { section: Section; tracks: Track[] }[];
   languages: { language: Language; count: number }[];
   comparisons: Track[];
 };
@@ -36,8 +39,12 @@ const tracksOfLanguage = (catalog: readonly Track[], area: Area, languageId: str
 
 export function areaSections(catalog: readonly Track[], taxonomy: Taxonomy, area: Area): AreaSections {
   const tracks = tracksInArea(catalog, area);
+  const direct = tracks.filter((t) => placementOf(t).kind === 'direct');
   return {
-    direct: tracks.filter((t) => placementOf(t).kind === 'direct'),
+    direct: direct.filter((t) => t.section === undefined),
+    grouped: SECTIONS.map((section) => ({ section, tracks: direct.filter((t) => t.section === section) })).filter(
+      (g) => g.tracks.length > 0,
+    ),
     languages: taxonomy.languages
       .map((language) => ({ language, count: tracksOfLanguage(catalog, area, language.id).length }))
       .filter((l) => l.count > 0),

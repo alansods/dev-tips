@@ -15,7 +15,9 @@ export default function AreaScreen() {
   const id = String(areaId);
   const area = isArea(id) ? id : undefined;
   const sections = area ? areaSections(catalog, repoTaxonomy, area) : undefined;
-  const found = !!sections && sections.direct.length + sections.languages.length + sections.comparisons.length > 0;
+  const found =
+    !!sections &&
+    sections.direct.length + sections.grouped.length + sections.languages.length + sections.comparisons.length > 0;
 
   return (
     <FullScreen kicker={t.nav.areaKicker} title={found && area ? t.nav.areas[area] : undefined} missing={t.nav.areaNotFound}>
@@ -26,6 +28,13 @@ export default function AreaScreen() {
               <TrackCard key={track.id} track={track} />
             ))}
           </Section>
+          {sections.grouped.map(({ section, tracks }) => (
+            <Section key={section} title={t.nav.sections[section]}>
+              {tracks.map((track) => (
+                <TrackCard key={track.id} track={track} />
+              ))}
+            </Section>
+          ))}
           <Section title={t.nav.sections.languages}>
             {sections.languages.map(({ language, count }) => (
               <NavRow

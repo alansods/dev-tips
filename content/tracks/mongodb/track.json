@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "nao-relacionais",
   "decks": [
     {
       "id": "documentos",
@@ -45,7 +46,7 @@
         {
           "type": "concept",
           "id": "transacoes-mongo",
-          "level": "senior",
+          "level": "pleno",
           "term": "Atomicidade e transações",
           "definition": "Operações num único documento são atômicas, inclusive com arrays e subdocumentos; por isso a modelagem embutida reduz a necessidade de transações. Desde a versão 4.0 há transações com vários documentos (em replica set), mas são mais caras e devem ser exceção.",
           "relatedTerms": [
@@ -230,7 +231,7 @@
         {
           "type": "code",
           "id": "indice-esr",
-          "level": "senior",
+          "level": "pleno",
           "title": "Índice composto pela regra ESR",
           "body": "Para filtrar por status (igualdade), ordenar por data (ordenação) e limitar por preço (intervalo), o índice segue essa ordem. O explain confirma o IXSCAN.",
           "snippet": {
@@ -296,7 +297,7 @@
         {
           "type": "question",
           "id": "transacao-mongo-pergunta",
-          "level": "senior",
+          "level": "pleno",
           "question": "O MongoDB tem transações?",
           "answer": "Sim. Operações num único documento são sempre atômicas, e desde a 4.0 há transações ACID com vários documentos em replica sets (e em clusters com sharding desde a 4.2). Mas elas custam mais e têm limite de tempo, então modelo para que a maioria das operações atômicas caiba num documento só, embutindo o que muda junto.",
           "relatedTerms": [

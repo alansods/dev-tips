@@ -96,6 +96,8 @@ export const en: Messages = {
       comparisons: 'Comparisons',
       core: 'Core language',
       frameworks: 'Frameworks',
+      relacionais: 'Relational',
+      'nao-relacionais': 'Non-relational',
     },
     trackCount: (n) => `${n} ${plural(n, 'track', 'tracks')}`,
     areaLabel: (area, tracks, known, total) => `${area}, ${tracks}, ${known} of ${total} cards you know`,

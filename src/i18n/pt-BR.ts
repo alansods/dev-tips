@@ -95,6 +95,8 @@ export const ptBR = {
       comparisons: 'Comparativos',
       core: 'Linguagem pura',
       frameworks: 'Frameworks',
+      relacionais: 'Relacionais',
+      'nao-relacionais': 'Não relacionais',
     },
     trackCount: (n: number) => `${n} ${plural(n, 'trilha', 'trilhas')}`,
     areaLabel: (area: string, tracks: string, known: number, total: number) =>

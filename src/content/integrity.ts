@@ -75,6 +75,10 @@ function checkPosition(input: Obj, push: Push) {
   } else if (hasFramework && !hasLanguage) {
     push(['language'], 'uma trilha com framework precisa declarar a linguagem');
   }
+
+  if (input.section !== undefined && (input.variants !== undefined || hasLanguage || hasFramework)) {
+    push(['section'], 'só trilhas diretas na área (sem linguagem, framework nem variants) podem declarar seção');
+  }
 }
 
 function checkUniqueIds(value: unknown, key: string, label: string, push: Push) {

@@ -53,9 +53,9 @@ const headers = () => screen.getAllByRole('header').map((h) => String(h.props.ch
 describe('Requirement: Trilhas de banco de dados no catálogo', () => {
   it('Área Banco de dados', async () => {
     await open('/area/banco-de-dados');
-    expect(headers()).toEqual(expect.arrayContaining(['Banco de dados', 'Trilhas']));
-    expect(headers()).not.toContain('Linguagens');
-    expect(headers()).not.toContain('Comparativos');
+    expect(headers()).toEqual(expect.arrayContaining(['Banco de dados', 'Relacionais', 'Não relacionais']));
+    expect(headers().indexOf('Relacionais')).toBeLessThan(headers().indexOf('Não relacionais'));
+    for (const absent of ['Trilhas', 'Linguagens', 'Comparativos']) expect(headers()).not.toContain(absent);
     expect(buttons(TRACKS)).toEqual(TRACKS);
   });
 
@@ -75,5 +75,13 @@ describe('Requirement: Tradução das trilhas de banco de dados', () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/');
     expect(screen.getByRole('button', { name: /^Databases,/ })).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Textos da navegação (seções)', () => {
+  it('seções em inglês', async () => {
+    useSettingsStore.setState({ language: 'en' });
+    await open('/area/banco-de-dados');
+    expect(headers()).toEqual(expect.arrayContaining(['Relational', 'Non-relational']));
   });
 });

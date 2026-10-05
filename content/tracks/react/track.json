@@ -108,7 +108,7 @@
         {
           "type": "concept",
           "id": "use-effect",
-          "level": "pleno",
+          "level": "junior",
           "term": "useEffect",
           "definition": "Hook para sincronizar o componente com algo de fora do React: assinaturas, timers, APIs do navegador. Roda depois da renderização, de novo quando uma dependência muda, e pode devolver uma função de limpeza. Não é o lugar para calcular dados derivados: isso se faz direto na renderização.",
           "relatedTerms": [
@@ -119,7 +119,7 @@
         {
           "type": "concept",
           "id": "regras-dos-hooks",
-          "level": "pleno",
+          "level": "junior",
           "term": "Regras dos hooks",
           "definition": "Hooks só podem ser chamados no topo de um componente ou de outro hook, nunca dentro de if, laço ou função interna. O React identifica cada hook pela ordem de chamada; mudar a ordem entre renderizações mistura os estados.",
           "relatedTerms": [
@@ -190,7 +190,7 @@
         {
           "type": "concept",
           "id": "reconciliacao",
-          "level": "senior",
+          "level": "pleno",
           "term": "Reconciliação",
           "definition": "O processo em que o React compara a nova árvore de elementos com a anterior e aplica no DOM só as diferenças. Elementos de tipo diferente na mesma posição são recriados do zero (perdendo o estado); em listas, a key diz quais itens são os mesmos.",
           "relatedTerms": [
@@ -201,7 +201,7 @@
         {
           "type": "concept",
           "id": "memoizacao",
-          "level": "senior",
+          "level": "pleno",
           "term": "memo, useMemo e useCallback",
           "definition": "Ferramentas para pular trabalho: memo evita renderizar um componente se as props não mudaram; useMemo guarda um cálculo caro; useCallback guarda a mesma função entre renderizações. Só ajudam com medição; o React Compiler pode aplicar isso automaticamente.",
           "relatedTerms": [
@@ -238,7 +238,7 @@
         {
           "type": "code",
           "id": "memo-callback",
-          "level": "senior",
+          "level": "pleno",
           "title": "memo com useCallback",
           "body": "Sem useCallback, handleSelect seria uma função nova a cada renderização do pai, e o memo do filho nunca pularia nada.",
           "snippet": {

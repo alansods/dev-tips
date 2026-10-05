@@ -1319,7 +1319,7 @@
         {
           "type": "concept",
           "id": "pool-de-conexoes",
-          "level": "senior",
+          "level": "pleno",
           "term": "Pool de conexões",
           "definition": "Um grupo de conexões com o banco abertas e reaproveitadas. Abrir uma conexão nova a cada pedido seria lento.",
           "relatedTerms": [
@@ -1396,7 +1396,7 @@
         {
           "type": "question",
           "id": "paginacao-offset-cursor",
-          "level": "senior",
+          "level": "pleno",
           "origin": "supplement",
           "question": "Paginação por offset ou por cursor: qual a diferença?",
           "answer": "Offset (LIMIT/OFFSET, usado no Passo 8) pula N linhas. É simples e permite ir direto para a página 5, mas fica lento em tabelas grandes, porque o banco lê e descarta as linhas puladas, e pode repetir ou pular itens se alguém inserir ou apagar no meio. Cursor usa o último item visto (\"os produtos com id maior que 120\"): é rápido com índice e estável com inserções, mas não permite pular para uma página específica.",
@@ -1426,7 +1426,7 @@
         {
           "type": "question",
           "id": "transacoes",
-          "level": "senior",
+          "level": "pleno",
           "origin": "supplement",
           "question": "O que é uma transação e quando usar?",
           "answer": "É um grupo de operações no banco que acontece por inteiro ou não acontece: se uma falhar, todas são desfeitas (rollback). Use quando várias gravações precisam ficar consistentes juntas, como baixar o estoque e registrar o pedido. Nos frameworks do tema: @Transactional no Spring, dataSource.transaction no TypeORM, commit e rollback na Session do SQLAlchemy (o Passo 7 já usa db.commit()) e BEGIN/COMMIT com o pg no Express.",

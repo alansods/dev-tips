@@ -34,9 +34,10 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 
 ### Requirement: Tela da área
 Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas, com botão de voltar e o nome da área como título. A tela SHALL mostrar, nesta ordem, as seções:
-1. **Trilhas**: as trilhas da área diretas na área (sem linguagem e não comparativas);
-2. **Linguagens**: as linguagens que têm pelo menos uma trilha nessa área, na ordem do cadastro, cada uma com o nome e a quantidade de trilhas da linguagem nessa área (somando linguagem pura e frameworks);
-3. **Comparativos**: as trilhas comparativas da área.
+1. **Trilhas**: as trilhas da área diretas na área (sem linguagem e não comparativas) que não declaram seção;
+2. uma seção para cada seção declarada pelas trilhas diretas da área, na ordem fixa das seções (**Relacionais**, depois **Não relacionais**), com essas trilhas;
+3. **Linguagens**: as linguagens que têm pelo menos uma trilha nessa área, na ordem do cadastro, cada uma com o nome e a quantidade de trilhas da linguagem nessa área (somando linguagem pura e frameworks);
+4. **Comparativos**: as trilhas comparativas da área.
 
 Seções sem itens MUST NOT aparecer. As trilhas SHALL aparecer na ordem do catálogo, como cards tocáveis com título, descrição, barra de progresso, "sei/total" e, quando houver, "N para revisar hoje". Tocar numa trilha SHALL abrir a tela da trilha, e tocar numa linguagem SHALL abrir a tela da linguagem nessa área. Uma área inexistente ou sem trilhas SHALL mostrar "Área não encontrada.".
 
@@ -59,6 +60,10 @@ Seções sem itens MUST NOT aparecer. As trilhas SHALL aparecer na ordem do cat�
 #### Scenario: Área não encontrada
 - **WHEN** o app abre a área `mobile`
 - **THEN** a tela mostra "Área não encontrada." e o botão de voltar
+
+#### Scenario: Trilhas diretas em seções
+- **WHEN** a área tem trilhas diretas com `section: "relacionais"` e outras com `section: "nao-relacionais"`
+- **THEN** a tela mostra a seção "Relacionais" e depois a seção "Não relacionais", cada uma com as suas trilhas, e não mostra a seção "Trilhas"
 
 ### Requirement: Tela da linguagem
 Tocar numa linguagem SHALL abrir a tela da linguagem, com o nome da linguagem como título e o nome da área acima dele. A tela SHALL mostrar, nesta ordem, as seções:
@@ -89,6 +94,7 @@ Os textos da navegação SHALL seguir o idioma do app:
 |---|---|
 | Fundamentos, Frontend, Backend, Banco de dados | Fundamentals, Frontend, Backend, Databases |
 | Trilhas, Linguagens, Comparativos | Tracks, Languages, Comparisons |
+| Relacionais, Não relacionais | Relational, Non-relational |
 | Linguagem pura, Frameworks | Core language, Frameworks |
 | "1 trilha", "N trilhas" | "1 track", "N tracks" |
 | Área não encontrada., Linguagem não encontrada., Framework não encontrado. | Area not found., Language not found., Framework not found. |

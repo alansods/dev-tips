@@ -4,7 +4,7 @@
 Define as trilhas de banco de dados, relacionais e não relacionais, da área "Banco de dados": quais são, como os decks são organizados e as regras de qualidade do conteúdo.
 ## Requirements
 ### Requirement: Trilhas de banco de dados no catálogo
-O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das trilhas de Python, cada uma em `content/tracks/<id>/track.json`, todas com `areas: ["banco-de-dados"]` e diretas na área (sem `language`, `framework` nem `variants`):
+O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das trilhas de Python, cada uma em `content/tracks/<id>/track.json`, todas com `areas: ["banco-de-dados"]`, diretas na área (sem `language`, `framework` nem `variants`) e com a seção indicada na coluna Tipo (`section: "relacionais"` ou `section: "nao-relacionais"`):
 
 | id | Título | Tipo |
 |---|---|---|
@@ -23,7 +23,7 @@ O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das tril
 
 #### Scenario: Área Banco de dados
 - **WHEN** o usuário abre a área Banco de dados
-- **THEN** a seção "Trilhas" mostra as 8 trilhas na ordem da tabela, e as seções "Linguagens" e "Comparativos" não aparecem
+- **THEN** a seção "Relacionais" mostra SQL essencial, Modelagem de dados, Transações e performance, PostgreSQL e MySQL, a seção "Não relacionais" mostra MongoDB, Redis e "NoSQL: modelos e quando usar", e as seções "Trilhas", "Linguagens" e "Comparativos" não aparecem
 
 ### Requirement: Decks das trilhas de banco de dados
 Cada trilha SHALL ter exatamente 4 decks, nesta ordem: três decks de conteúdo com 6 cards cada (tipos `concept` ou `code`, com pelo menos 2 `concept` por deck) e o deck `perguntas-de-entrevista` ("Perguntas de entrevista"), com 6 cards `question`. São 24 cards por trilha. Os decks de conteúdo SHALL ser:

@@ -5,6 +5,7 @@
   "areas": [
     "banco-de-dados"
   ],
+  "section": "relacionais",
   "decks": [
     {
       "id": "chaves-e-relacionamentos",
@@ -125,7 +126,7 @@
         {
           "type": "concept",
           "id": "desnormalizacao",
-          "level": "senior",
+          "level": "pleno",
           "term": "Desnormalização",
           "definition": "Duplicar dados de propósito para ler mais rápido: guardar o total no pedido, o contador de comentários no post, uma tabela de relatório pronta. O preço é manter as cópias em sincronia (transação, trigger ou processo assíncrono). Deve ser uma decisão medida, não o ponto de partida.",
           "relatedTerms": [
@@ -152,7 +153,7 @@
         {
           "type": "code",
           "id": "contador-desnormalizado",
-          "level": "senior",
+          "level": "pleno",
           "title": "Contador mantido na mesma transação",
           "body": "O contador evita um COUNT(*) a cada leitura do post. Atualizado junto com o insert, na mesma transação, nunca fica divergente.",
           "snippet": {

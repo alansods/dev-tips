@@ -16,7 +16,7 @@
         {
           "type": "concept",
           "id": "generic",
-          "level": "pleno",
+          "level": "junior",
           "term": "Generic",
           "definition": "Parâmetro de tipo (como <T>) que deixa uma função, classe ou tipo funcionar com vários tipos sem perder a informação. Uma função first<T>(list: T[]): T devolve string para string[] e User para User[], em vez de any.",
           "relatedTerms": [
@@ -74,7 +74,7 @@
         {
           "type": "code",
           "id": "repositorio-generico",
-          "level": "senior",
+          "level": "pleno",
           "title": "Interface genérica",
           "body": "Um contrato de repositório que serve para qualquer entidade com id. O tipo de criação omite o id, que o banco gera.",
           "snippet": {
@@ -296,7 +296,7 @@
         {
           "type": "question",
           "id": "satisfies-vs-anotacao",
-          "level": "senior",
+          "level": "pleno",
           "question": "Qual a diferença entre anotar o tipo e usar satisfies?",
           "answer": "Anotar (const config: Config = ...) faz a variável ter exatamente o tipo Config, perdendo detalhes: uma propriedade string | number vira o tipo amplo. satisfies Config checa a compatibilidade mas mantém o tipo inferido, mais preciso. Uso satisfies em objetos de configuração e mapas, onde quero a checagem e os literais.",
           "relatedTerms": [
