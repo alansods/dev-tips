@@ -1,0 +1,324 @@
+{
+  "id": "typescript-essencial",
+  "title": "TypeScript essencial",
+  "description": "O sistema de tipos no dia a dia: tipos básicos, interfaces, unions, narrowing e tsconfig.",
+  "areas": [
+    "frontend",
+    "backend"
+  ],
+  "language": "typescript",
+  "decks": [
+    {
+      "id": "tipos-basicos",
+      "title": "Tipos básicos",
+      "description": "O que o TypeScript adiciona ao JavaScript e os tipos mais usados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "typescript",
+          "level": "junior",
+          "term": "TypeScript",
+          "definition": "Superconjunto do JavaScript que adiciona tipos estáticos. O compilador (tsc) checa os tipos e gera JavaScript comum: os tipos somem em tempo de execução. O ganho é achar erros antes de rodar e ter autocompletar e refatoração confiáveis no editor.",
+          "relatedTerms": [
+            "inferencia",
+            "tsconfig"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "inferencia",
+          "level": "junior",
+          "term": "Inferência de tipos",
+          "definition": "O TypeScript deduz o tipo pelo valor: const total = 10 já é number, sem anotação. Anote parâmetros de função e tipos de retorno públicos; no resto, deixe a inferência trabalhar.",
+          "relatedTerms": [
+            "typescript"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "any-unknown-never",
+          "level": "pleno",
+          "term": "any, unknown e never",
+          "definition": "any desliga a checagem: aceita e permite tudo, e \"contamina\" o que toca. unknown também aceita qualquer valor, mas obriga a checar o tipo antes de usar: é o certo para dados de fora. never é o tipo sem valores possíveis: função que nunca retorna ou caso impossível de um switch.",
+          "relatedTerms": [
+            "narrowing",
+            "typescript"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tsconfig",
+          "level": "pleno",
+          "term": "tsconfig e modo strict",
+          "definition": "O tsconfig.json configura o compilador: alvo, módulos, pastas e regras. \"strict\": true liga as checagens importantes, como strictNullChecks (null e undefined deixam de caber em qualquer tipo) e noImplicitAny. Projeto novo deve começar em strict.",
+          "relatedTerms": [
+            "typescript"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "anotacoes",
+          "level": "junior",
+          "title": "Anotando funções",
+          "body": "Parâmetros sempre anotados; o retorno pode ser inferido, mas anotá-lo em funções públicas evita mudanças acidentais. Parâmetro opcional usa ?, e valor padrão já define o tipo.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "function formatPrice(value: number, currency = \"BRL\"): string {\n  return new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency }).format(value);\n}\n\nfunction greet(name?: string) {\n  return `Olá, ${name ?? \"visitante\"}`;\n}\n\nformatPrice(\"10\"); // erro: string não é number"
+          },
+          "relatedTerms": [
+            "inferencia",
+            "typescript"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "tsconfig-strict",
+          "level": "pleno",
+          "title": "Um tsconfig moderno",
+          "body": "strict liga as checagens principais; noUncheckedIndexedAccess faz arr[0] ser possivelmente undefined. noEmit é comum quando outra ferramenta (Vite, esbuild) gera o JavaScript.",
+          "snippet": {
+            "file": "tsconfig.json",
+            "language": "json",
+            "code": "{\n  \"compilerOptions\": {\n    \"target\": \"ES2022\",\n    \"module\": \"ESNext\",\n    \"moduleResolution\": \"Bundler\",\n    \"strict\": true,\n    \"noUncheckedIndexedAccess\": true,\n    \"noEmit\": true\n  },\n  \"include\": [\"src\"]\n}"
+          },
+          "relatedTerms": [
+            "tsconfig"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "objetos-e-interfaces",
+      "title": "Objetos e interfaces",
+      "description": "Como descrever o formato de objetos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "interface",
+          "level": "junior",
+          "term": "Interface",
+          "definition": "Descreve o formato de um objeto: quais propriedades ele tem e de que tipo. Pode ser estendida com extends e implementada por classes. Duas interfaces com o mesmo nome se fundem (declaration merging).",
+          "relatedTerms": [
+            "type-alias",
+            "tipagem-estrutural"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "type-alias",
+          "level": "junior",
+          "term": "Type alias",
+          "definition": "Dá nome a qualquer tipo com type: objetos, unions, tuplas, funções, tipos derivados. Para objetos, faz quase o mesmo que interface; para unions e tipos calculados, só type serve.",
+          "relatedTerms": [
+            "interface"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipagem-estrutural",
+          "level": "pleno",
+          "term": "Tipagem estrutural",
+          "definition": "O TypeScript compara tipos pelo formato, não pelo nome: um objeto serve onde se espera um tipo se tiver as propriedades exigidas, mesmo sem declarar nada. É o \"duck typing\" checado em tempo de compilação.",
+          "relatedTerms": [
+            "interface"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "readonly-e-opcional",
+          "level": "junior",
+          "term": "Propriedades opcionais e readonly",
+          "definition": "name?: string marca uma propriedade como opcional (pode faltar, e então é undefined). readonly impede reatribuir a propriedade depois de criada. readonly só existe na compilação: não congela o objeto em tempo de execução.",
+          "relatedTerms": [
+            "interface"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "interface-vs-type",
+          "level": "pleno",
+          "title": "interface e type lado a lado",
+          "body": "Para objetos, os dois funcionam. interface se estende com extends; type combina com & e é o único que expressa unions.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "interface User {\n  id: number;\n  name: string;\n}\ninterface Admin extends User {\n  permissions: string[];\n}\n\ntype Product = { id: number; price: number };\ntype OnSale = Product & { discount: number };\ntype Status = \"draft\" | \"published\"; // só com type"
+          },
+          "relatedTerms": [
+            "interface",
+            "type-alias"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "estrutural-exemplo",
+          "level": "pleno",
+          "title": "Compatível pelo formato",
+          "body": "O objeto point nunca declarou ser Point2D, mas tem x e y, então é aceito. Um literal passado direto com propriedade a mais dá erro (excess property check), porque provavelmente é engano.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "interface Point2D { x: number; y: number }\nfunction draw(p: Point2D) {}\n\nconst point = { x: 1, y: 2, z: 3 };\ndraw(point);               // ok: tem x e y\ndraw({ x: 1, y: 2, z: 3 }); // erro: z não existe em Point2D"
+          },
+          "relatedTerms": [
+            "tipagem-estrutural"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unions-e-narrowing",
+      "title": "Unions e narrowing",
+      "description": "Valores de um entre vários tipos e como estreitar.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "union",
+          "level": "junior",
+          "term": "Union type",
+          "definition": "Tipo que aceita um entre vários: string | number. Unions de literais modelam conjuntos fechados de valores, como \"GET\" | \"POST\" | \"PUT\", e substituem muitos usos de enum.",
+          "relatedTerms": [
+            "narrowing",
+            "union-discriminada"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "narrowing",
+          "level": "pleno",
+          "term": "Narrowing",
+          "definition": "O estreitamento que o compilador faz de um tipo amplo para um específico dentro de um trecho, a partir de checagens: typeof, instanceof, in, comparação com literal, checagem de null. Depois de if (typeof x === \"string\"), x é string ali dentro.",
+          "relatedTerms": [
+            "union",
+            "any-unknown-never"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "union-discriminada",
+          "level": "pleno",
+          "term": "Union discriminada",
+          "definition": "Union de objetos que compartilham uma propriedade literal (o discriminante, como type ou status). Checar essa propriedade estreita o objeto inteiro. É a forma idiomática de modelar estados: carregando, sucesso com dado, erro com mensagem.",
+          "relatedTerms": [
+            "union",
+            "narrowing"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "enum",
+          "level": "pleno",
+          "term": "enum",
+          "definition": "Conjunto nomeado de constantes que, ao contrário de tipos, gera código JavaScript. Muitos times preferem union de literais ou um objeto as const, que não geram código extra e funcionam melhor com ferramentas que só removem tipos.",
+          "relatedTerms": [
+            "union"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "estados-discriminados",
+          "level": "pleno",
+          "title": "Modelando estados de uma requisição",
+          "body": "Com o status como discriminante, data só existe no sucesso e error só no erro: não há como ler data enquanto carrega.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "type RequestState<T> =\n  | { status: \"loading\" }\n  | { status: \"success\"; data: T }\n  | { status: \"error\"; error: string };\n\nfunction render(state: RequestState<string[]>) {\n  switch (state.status) {\n    case \"loading\": return \"Carregando...\";\n    case \"success\": return state.data.join(\", \");\n    case \"error\": return `Falhou: ${state.error}`;\n  }\n}"
+          },
+          "relatedTerms": [
+            "union-discriminada",
+            "narrowing"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "exhaustive-check",
+          "level": "senior",
+          "title": "Checagem exaustiva com never",
+          "body": "Se alguém adicionar um novo status à union e esquecer o case, a atribuição a never falha na compilação, apontando o lugar exato a corrigir.",
+          "snippet": {
+            "file": "exemplo.ts",
+            "language": "ts",
+            "code": "type Shape = { kind: \"circle\"; r: number } | { kind: \"square\"; side: number };\n\nfunction area(shape: Shape): number {\n  switch (shape.kind) {\n    case \"circle\": return Math.PI * shape.r ** 2;\n    case \"square\": return shape.side ** 2;\n    default: {\n      const unreachable: never = shape; // erro se faltar um caso\n      return unreachable;\n    }\n  }\n}"
+          },
+          "relatedTerms": [
+            "union-discriminada",
+            "any-unknown-never"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de TypeScript que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "por-que-typescript",
+          "level": "junior",
+          "question": "Por que usar TypeScript em vez de JavaScript?",
+          "answer": "Para pegar erros de tipo antes de rodar (propriedade que não existe, null esquecido, argumento errado), ter autocompletar e refatoração seguros e documentar contratos no próprio código. O custo é a etapa de compilação e aprender o sistema de tipos. Os tipos não existem em tempo de execução, então dados de fora ainda precisam de validação.",
+          "relatedTerms": [
+            "typescript"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "interface-ou-type",
+          "level": "junior",
+          "question": "Quando usar interface e quando usar type?",
+          "answer": "Para formato de objeto, os dois servem; muitos times usam interface para objetos e contratos públicos (estende com extends, aceita declaration merging) e type para o resto. Unions, tuplas, tipos de função e tipos derivados (mapped, conditional) só existem com type. O mais importante é o time ser consistente.",
+          "relatedTerms": [
+            "interface",
+            "type-alias"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "any-vs-unknown",
+          "level": "pleno",
+          "question": "Qual a diferença entre any e unknown?",
+          "answer": "Os dois aceitam qualquer valor. any desliga a checagem e deixa fazer qualquer coisa, espalhando a falta de tipos. unknown obriga a provar o tipo (typeof, instanceof, validação com Zod) antes de usar. Para resposta de API, JSON.parse e catch de erro, uso unknown.",
+          "relatedTerms": [
+            "any-unknown-never",
+            "narrowing"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tipos-em-runtime",
+          "level": "pleno",
+          "question": "Os tipos do TypeScript protegem contra dados errados vindos da API?",
+          "answer": "Não. Os tipos são apagados na compilação; se eu digo que a resposta é User, o compilador acredita, mesmo que chegue outra coisa. Para fronteiras (API, formulário, localStorage), valido em tempo de execução com uma biblioteca como Zod e derivo o tipo do esquema (z.infer), mantendo uma fonte só.",
+          "relatedTerms": [
+            "typescript",
+            "any-unknown-never"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tipagem-estrutural-pergunta",
+          "level": "pleno",
+          "question": "O que é tipagem estrutural?",
+          "answer": "É comparar tipos pelo formato. Se um objeto tem todas as propriedades que o tipo pede, ele é compatível, mesmo sem declarar. Em Java ou C#, a compatibilidade é nominal: precisa implementar a interface explicitamente. Isso torna o TypeScript flexível, mas dois tipos com o mesmo formato e significados diferentes (UserId e OrderId como number) se misturam; para separar, uso branded types.",
+          "relatedTerms": [
+            "tipagem-estrutural"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "modelar-estados",
+          "level": "senior",
+          "question": "Como você modela os estados de uma tela com TypeScript?",
+          "answer": "Com uma union discriminada em vez de vários booleanos (isLoading, hasError, data?). Cada estado carrega só os dados que fazem sentido nele, estados impossíveis deixam de ser representáveis, e um switch com checagem exaustiva via never garante que todo estado novo seja tratado.",
+          "relatedTerms": [
+            "union-discriminada",
+            "any-unknown-never"
+          ]
+        }
+      ]
+    }
+  ]
+}

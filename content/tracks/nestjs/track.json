@@ -1,0 +1,326 @@
+{
+  "id": "nestjs",
+  "title": "NestJS",
+  "description": "O framework Node.js com arquitetura de módulos e injeção de dependência: controllers, providers, pipes, guards e interceptors.",
+  "areas": [
+    "backend"
+  ],
+  "language": "typescript",
+  "framework": "nest",
+  "decks": [
+    {
+      "id": "modulos-e-providers",
+      "title": "Módulos e providers",
+      "description": "Como uma aplicação Nest é organizada e montada.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "modulo-nest",
+          "level": "junior",
+          "term": "Módulo",
+          "definition": "Classe com @Module que agrupa uma funcionalidade: seus controllers, seus providers, o que importa de outros módulos e o que exporta para eles. A aplicação é uma árvore de módulos a partir do AppModule.",
+          "relatedTerms": [
+            "provider",
+            "di-nest"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "provider",
+          "level": "junior",
+          "term": "Provider",
+          "definition": "Qualquer classe (ou valor) que o Nest sabe criar e injetar: services, repositories, clientes de API. Marcada com @Injectable e registrada em providers de um módulo. Por padrão é singleton dentro da aplicação.",
+          "relatedTerms": [
+            "modulo-nest",
+            "di-nest"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "di-nest",
+          "level": "pleno",
+          "term": "Injeção de dependência no Nest",
+          "definition": "O contêiner do Nest lê os tipos dos parâmetros do construtor e entrega as instâncias. Um provider só é visível fora do seu módulo se for exportado e o outro módulo importar esse módulo. Permite trocar implementações com useClass, useValue ou useFactory.",
+          "relatedTerms": [
+            "provider",
+            "escopo-provider"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "escopo-provider",
+          "level": "senior",
+          "term": "Escopo de providers",
+          "definition": "Providers podem ser DEFAULT (singleton), REQUEST (uma instância por requisição) ou TRANSIENT (uma por injeção). REQUEST permite guardar dados da requisição, mas propaga o escopo para quem depende dele e custa desempenho; prefira passar o contexto como parâmetro.",
+          "relatedTerms": [
+            "di-nest"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "modulo-exemplo",
+          "level": "junior",
+          "title": "Módulo de produtos",
+          "body": "O módulo declara o controller e o service; exportar o service permite que outros módulos o usem.",
+          "snippet": {
+            "file": "products.module.ts",
+            "language": "ts",
+            "code": "import { Module } from \"@nestjs/common\";\n\n@Module({\n  controllers: [ProductsController],\n  providers: [ProductsService],\n  exports: [ProductsService],\n})\nexport class ProductsModule {}\n\n@Module({ imports: [ProductsModule, OrdersModule] })\nexport class AppModule {}"
+          },
+          "relatedTerms": [
+            "modulo-nest",
+            "provider"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "custom-provider",
+          "level": "pleno",
+          "title": "Provider customizado",
+          "body": "Com um token e useFactory, o Nest injeta uma interface com a implementação escolhida pela configuração; no teste, basta trocar por useValue.",
+          "snippet": {
+            "file": "payments.module.ts",
+            "language": "ts",
+            "code": "export const PAYMENT_GATEWAY = Symbol(\"PAYMENT_GATEWAY\");\n\n@Module({\n  providers: [\n    {\n      provide: PAYMENT_GATEWAY,\n      useFactory: (config: ConfigService) =>\n        config.get(\"PAYMENTS\") === \"fake\" ? new FakeGateway() : new StripeGateway(),\n      inject: [ConfigService],\n    },\n  ],\n})\nexport class PaymentsModule {}\n\n// uso: constructor(@Inject(PAYMENT_GATEWAY) private gateway: PaymentGateway) {}"
+          },
+          "relatedTerms": [
+            "di-nest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "controllers-e-pipes",
+      "title": "Controllers e pipes",
+      "description": "Rotas, parâmetros e validação de entrada.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "controller-nest",
+          "level": "junior",
+          "term": "Controller",
+          "definition": "Classe com @Controller(\"rota\") cujos métodos, marcados com @Get, @Post, @Patch, @Delete, atendem as requisições. Lê dados com @Param, @Query e @Body, e o que o método retorna vira o corpo da resposta (201 por padrão no POST).",
+          "relatedTerms": [
+            "pipe",
+            "dto-nest"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pipe",
+          "level": "pleno",
+          "term": "Pipe",
+          "definition": "Transforma ou valida os dados de entrada antes de chegarem ao método. ParseIntPipe converte o :id em número (ou responde 400) e ValidationPipe valida o corpo com as regras do DTO.",
+          "relatedTerms": [
+            "dto-nest",
+            "controller-nest"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "dto-nest",
+          "level": "junior",
+          "term": "DTO com class-validator",
+          "definition": "Classe que descreve o corpo esperado, com decorators de validação (@IsString, @IsPositive, @IsOptional). O ValidationPipe usa essas regras; com whitelist: true, remove campos que não estão no DTO.",
+          "relatedTerms": [
+            "pipe"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "excecoes-http",
+          "level": "junior",
+          "term": "Exceções HTTP",
+          "definition": "Classes prontas como NotFoundException, BadRequestException e ForbiddenException. Lançá-las de qualquer camada faz o Nest responder com o status e a mensagem certos, sem montar a resposta à mão.",
+          "relatedTerms": [
+            "controller-nest"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "controller-exemplo",
+          "level": "junior",
+          "title": "Controller de produtos",
+          "body": "O controller só traduz HTTP: o service tem a regra. ParseIntPipe garante que id é número.",
+          "snippet": {
+            "file": "products.controller.ts",
+            "language": "ts",
+            "code": "@Controller(\"products\")\nexport class ProductsController {\n  constructor(private readonly products: ProductsService) {}\n\n  @Get(\":id\")\n  findOne(@Param(\"id\", ParseIntPipe) id: number) {\n    return this.products.findOne(id); // lança NotFoundException se não existir\n  }\n\n  @Post()\n  create(@Body() dto: CreateProductDto) {\n    return this.products.create(dto);\n  }\n}"
+          },
+          "relatedTerms": [
+            "controller-nest",
+            "pipe"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "validation-pipe",
+          "level": "pleno",
+          "title": "DTO e ValidationPipe global",
+          "body": "O pipe global valida todo corpo; transform converte para a classe do DTO e forbidNonWhitelisted responde 400 se vier campo desconhecido.",
+          "snippet": {
+            "file": "create-product.dto.ts",
+            "language": "ts",
+            "code": "export class CreateProductDto {\n  @IsString() @IsNotEmpty()\n  name: string;\n\n  @IsNumber() @IsPositive()\n  price: number;\n}\n\n// main.ts\napp.useGlobalPipes(\n  new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),\n);"
+          },
+          "relatedTerms": [
+            "dto-nest",
+            "pipe"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guards-e-interceptors",
+      "title": "Guards, interceptors e filtros",
+      "description": "O que roda antes e depois do controller.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "guard",
+          "level": "pleno",
+          "term": "Guard",
+          "definition": "Classe com canActivate que decide se a requisição pode seguir: autenticação (o token é válido?) e autorização (o usuário tem o papel exigido?). Retornar false responde 403. Aplicado com @UseGuards no controller, no método ou globalmente.",
+          "relatedTerms": [
+            "ciclo-de-vida",
+            "interceptor-nest"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "interceptor-nest",
+          "level": "pleno",
+          "term": "Interceptor",
+          "definition": "Envolve a execução do método: pode agir antes e depois dele, transformar a resposta, medir tempo, aplicar cache ou timeout. Trabalha com o Observable que representa a resposta (next.handle()).",
+          "relatedTerms": [
+            "ciclo-de-vida"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "exception-filter",
+          "level": "pleno",
+          "term": "Exception filter",
+          "definition": "Captura exceções e monta a resposta de erro. O filtro padrão já trata HttpException; filtros próprios traduzem erros de domínio ou do banco (ex.: violação de chave única vira 409) num formato padronizado.",
+          "relatedTerms": [
+            "ciclo-de-vida"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ciclo-de-vida",
+          "level": "senior",
+          "term": "Ciclo de uma requisição",
+          "definition": "A ordem no Nest: middlewares, guards, interceptors (antes), pipes, o método do controller, interceptors (depois) e, se algo lançar, os exception filters. Saber a ordem diz onde cada responsabilidade deve ficar.",
+          "relatedTerms": [
+            "guard",
+            "interceptor-nest"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "roles-guard",
+          "level": "pleno",
+          "title": "Guard de papéis",
+          "body": "O decorator @Roles grava os papéis exigidos como metadado; o guard lê com o Reflector e compara com o usuário autenticado.",
+          "snippet": {
+            "file": "roles.guard.ts",
+            "language": "ts",
+            "code": "export const Roles = (...roles: string[]) => SetMetadata(\"roles\", roles);\n\n@Injectable()\nexport class RolesGuard implements CanActivate {\n  constructor(private reflector: Reflector) {}\n\n  canActivate(context: ExecutionContext): boolean {\n    const roles = this.reflector.get<string[]>(\"roles\", context.getHandler());\n    if (!roles) return true;\n    const { user } = context.switchToHttp().getRequest();\n    return roles.some((role) => user?.roles?.includes(role));\n  }\n}\n\n// @Roles(\"admin\") @UseGuards(AuthGuard, RolesGuard) @Delete(\":id\") remove() {}"
+          },
+          "relatedTerms": [
+            "guard"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "logging-interceptor",
+          "level": "senior",
+          "title": "Interceptor de tempo de resposta",
+          "body": "Marca o início antes do handler e, quando o Observable da resposta emite, registra quanto levou.",
+          "snippet": {
+            "file": "timing.interceptor.ts",
+            "language": "ts",
+            "code": "@Injectable()\nexport class TimingInterceptor implements NestInterceptor {\n  intercept(context: ExecutionContext, next: CallHandler) {\n    const start = Date.now();\n    const { method, url } = context.switchToHttp().getRequest();\n    return next.handle().pipe(\n      tap(() => console.log(`${method} ${url} ${Date.now() - start}ms`)),\n    );\n  }\n}"
+          },
+          "relatedTerms": [
+            "interceptor-nest",
+            "ciclo-de-vida"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de NestJS que costumam cair em entrevista, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "nest-vs-express",
+          "level": "junior",
+          "question": "O que o NestJS traz em relação ao Express?",
+          "answer": "Estrutura: módulos, injeção de dependência, decorators para rotas e validação, e pontos claros para autenticação, transformação e erros (guards, pipes, interceptors, filters). Por baixo ele usa Express (ou Fastify). O ganho é padronizar projetos grandes e times; o custo é mais conceitos e mais código cerimonial.",
+          "relatedTerms": [
+            "modulo-nest",
+            "di-nest"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "guard-vs-middleware",
+          "level": "pleno",
+          "question": "Qual a diferença entre middleware e guard?",
+          "answer": "O middleware roda antes de o Nest saber qual handler vai atender, então não tem acesso ao contexto da rota; serve para coisas genéricas, como log e CORS. O guard roda depois, recebe o ExecutionContext (sabe o controller, o método e os metadados como @Roles) e por isso é o lugar certo para autorização.",
+          "relatedTerms": [
+            "guard",
+            "ciclo-de-vida"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "validacao-nest",
+          "level": "junior",
+          "question": "Como validar o corpo de uma requisição no NestJS?",
+          "answer": "Com um DTO anotado com class-validator e o ValidationPipe, normalmente global. Uso whitelist para remover campos extras, forbidNonWhitelisted para recusar campos desconhecidos e transform para receber a instância do DTO e converter tipos. Se a validação falha, o Nest responde 400 com os erros.",
+          "relatedTerms": [
+            "dto-nest",
+            "pipe"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "ordem-execucao-nest",
+          "level": "senior",
+          "question": "Em que ordem rodam middleware, guard, interceptor, pipe e filter?",
+          "answer": "Middleware, guards, interceptors (parte de antes), pipes, o handler, interceptors (parte de depois) e, se houver exceção em qualquer ponto, os exception filters. Dentro de cada tipo, primeiro os globais, depois os do controller e por último os do método.",
+          "relatedTerms": [
+            "ciclo-de-vida"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "dependencia-circular",
+          "level": "senior",
+          "question": "Como resolver dependência circular no NestJS?",
+          "answer": "O primeiro passo é repensar o desenho: geralmente a lógica comum deve ir para um terceiro módulo ou service que os dois usam, ou a comunicação vira evento. Se a dependência for mesmo necessária, forwardRef(() => OutroModulo) nos imports e no @Inject resolve, mas é um sinal de acoplamento.",
+          "relatedTerms": [
+            "di-nest",
+            "modulo-nest"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testar-nest",
+          "level": "pleno",
+          "question": "Como testar um service NestJS que depende de um repositório?",
+          "answer": "Com Test.createTestingModule, registrando o service real e um mock do repositório via useValue (ou overrideProvider). Assim testo a regra de negócio sem banco. Para testes de ponta a ponta, subo a aplicação com o módulo real e uso supertest contra as rotas, com um banco de teste.",
+          "relatedTerms": [
+            "provider",
+            "di-nest"
+          ]
+        }
+      ]
+    }
+  ]
+}

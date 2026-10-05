@@ -16,6 +16,10 @@ import react from '../../content/tracks/react/track.json';
 import vue from '../../content/tracks/vue/track.json';
 import nextjs from '../../content/tracks/nextjs/track.json';
 import express from '../../content/tracks/express/track.json';
+import typescriptEssencial from '../../content/tracks/typescript-essencial/track.json';
+import typescriptAvancado from '../../content/tracks/typescript-avancado/track.json';
+import angular from '../../content/tracks/angular/track.json';
+import nestjs from '../../content/tracks/nestjs/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -32,6 +36,10 @@ const registry: unknown[] = [
   vue,
   nextjs,
   express,
+  typescriptEssencial,
+  typescriptAvancado,
+  angular,
+  nestjs,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

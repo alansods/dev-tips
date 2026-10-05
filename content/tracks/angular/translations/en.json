@@ -1,0 +1,120 @@
+{
+  "title": "Angular",
+  "description": "Google's full framework: standalone components, dependency injection, RxJS and signals.",
+  "decks": {
+    "componentes-e-templates": {
+      "title": "Components and templates",
+      "description": "The UI building block and the template syntax."
+    },
+    "di-e-servicos": {
+      "title": "Dependency injection and services",
+      "description": "How Angular creates and shares objects."
+    },
+    "rxjs-e-signals": {
+      "title": "RxJS and signals",
+      "description": "Event streams and reactive state."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Angular questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "componente-angular": {
+      "term": "Component",
+      "definition": "A class with the @Component decorator, which ties together a selector (the tag), a template and styles. Since Angular 17 the default is standalone: the component declares what it imports directly, without an NgModule."
+    },
+    "binding": {
+      "term": "Data binding",
+      "definition": "The ways to bind the template to the class: interpolation {{ name }} for text, [property]=\"value\" for properties and inputs, (event)=\"method()\" for events, and [(ngModel)] for two-way binding in forms."
+    },
+    "controle-de-fluxo": {
+      "term": "Control flow (@if, @for)",
+      "definition": "The template block syntax: @if/@else for conditions, @for with a required track for lists, and @switch. It replaces the *ngIf and *ngFor directives from older versions, with better performance and type checking."
+    },
+    "input-output": {
+      "term": "Inputs and outputs",
+      "definition": "How components talk: input() receives data from the parent (like props) and output() emits events to the parent. In current versions they are signal-based functions; in older ones, the @Input and @Output decorators."
+    },
+    "componente-standalone": {
+      "title": "Standalone component",
+      "body": "It receives the list through an input, shows it with @for and notifies the parent through the output. track uses the id so Angular reuses the right elements."
+    },
+    "formulario-reativo": {
+      "title": "Reactive form",
+      "body": "The form is defined in the class, with validators; the template just binds to it. It makes complex rules easier to test and validate."
+    },
+    "servico": {
+      "term": "Service",
+      "definition": "A class with @Injectable that holds logic and state outside components: HTTP calls, rules, cache. With providedIn: \"root\", there is a single instance for the whole app."
+    },
+    "injecao-angular": {
+      "term": "Dependency injection",
+      "definition": "Angular creates dependencies and hands them to whoever asks, instead of each class creating its own. You ask with inject(Service) or through the constructor. This decouples classes and lets you swap implementations in tests."
+    },
+    "injector": {
+      "term": "Injector hierarchy",
+      "definition": "Providers form a tree: the root injector (providedIn: \"root\"), route injectors and component injectors. A component that declares providers gets its own instance for itself and its children; whoever asks for a service gets the one from the nearest injector."
+    },
+    "httpclient": {
+      "term": "HttpClient",
+      "definition": "Angular's service for HTTP requests. It returns Observables, types the response, converts JSON automatically and supports interceptors to add a token or handle errors on every call."
+    },
+    "servico-http": {
+      "title": "Service with HttpClient",
+      "body": "The service centralizes API access; components just call its methods."
+    },
+    "interceptor": {
+      "title": "Authentication interceptor",
+      "body": "A functional interceptor adds the token to every request, without repeating the code in each service. It is registered in provideHttpClient(withInterceptors([...]))."
+    },
+    "observable": {
+      "term": "Observable",
+      "definition": "A stream of values over time, from the RxJS library. Nothing happens until someone subscribes, and the stream can emit many values, complete or error. Operators (map, filter, switchMap, debounceTime) transform and combine streams."
+    },
+    "signal": {
+      "term": "Signal",
+      "definition": "A synchronous reactive value: signal(0) creates it, count() reads it and set/update change it. computed() derives values and effect() runs side effects. Angular knows exactly which parts of the template read each signal and updates only those."
+    },
+    "async-pipe": {
+      "term": "async pipe and subscription leaks",
+      "definition": "Every manual subscription to an endless Observable must be cancelled when the component is destroyed, or it stays alive (memory leak). The async pipe in the template, toSignal() and takeUntilDestroyed() do this automatically."
+    },
+    "change-detection": {
+      "term": "Change detection",
+      "definition": "The mechanism that decides when to update the DOM. Traditionally Zone.js told Angular after any async event, and the whole tree was checked. With ChangeDetectionStrategy.OnPush and signals, only the affected components are checked; zoneless mode removes Zone.js altogether."
+    },
+    "signals-exemplo": {
+      "title": "State with signals",
+      "body": "The total is derived with computed and only recalculates when the items change. update creates a new array instead of changing the current one."
+    },
+    "busca-switchmap": {
+      "title": "Search with debounce and switchMap",
+      "body": "debounceTime waits for the user to stop typing, distinctUntilChanged ignores repeated terms and switchMap cancels the previous search when a new term arrives, avoiding out-of-order responses."
+    },
+    "observable-vs-promise": {
+      "question": "What is the difference between an Observable and a Promise?",
+      "answer": "A Promise represents a single future value and starts running immediately. An Observable can emit many values, is lazy (it only runs when someone subscribes), can be cancelled by unsubscribing and has operators to combine and transform streams. For a single HTTP call it hardly matters; for events, searches and WebSockets, Observables shine."
+    },
+    "signals-vs-rxjs": {
+      "question": "Do signals replace RxJS?",
+      "answer": "Not completely. Signals are great for synchronous screen state: values, derived values and what the template reads. RxJS is still better for asynchronous streams and events over time: debounce, cancellation with switchMap, combining sources, retry. toSignal and toObservable bridge the two."
+    },
+    "onpush": {
+      "question": "What does the OnPush strategy do?",
+      "answer": "It makes Angular check the component only when an input changes reference, when an event happens in it, when a signal it reads changes or when an async pipe emits. It cuts a lot of work on large screens, but it requires treating data as immutable: changing an object in place does not trigger an update."
+    },
+    "por-que-di": {
+      "question": "Why does Angular use dependency injection?",
+      "answer": "So that classes do not create their own dependencies. The component asks for a ProductService and Angular hands over the right instance, shared or not depending on the provider. This makes it easy to swap implementations (a mock in tests, another API in another environment) and keeps components focused on the screen."
+    },
+    "memory-leak-angular": {
+      "question": "How do you avoid memory leaks with Observables in Angular?",
+      "answer": "By avoiding manual subscribe where possible: I use the async pipe in the template or toSignal(), which unsubscribe on their own. When I need to subscribe in code, I use takeUntilDestroyed() to cancel on component destruction. Observables that complete on their own, like an HttpClient call, do not leak."
+    },
+    "standalone-vs-ngmodule": {
+      "question": "What are standalone components?",
+      "answer": "Components that declare their own dependencies in the @Component imports, without needing an NgModule. They simplify the structure, make per-route lazy loading easier and have been the default since Angular 17. NgModules still work and appear in legacy projects."
+    }
+  }
+}

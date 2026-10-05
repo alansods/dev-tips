@@ -1,0 +1,120 @@
+{
+  "title": "NestJS",
+  "description": "The Node.js framework with a module architecture and dependency injection: controllers, providers, pipes, guards and interceptors.",
+  "decks": {
+    "modulos-e-providers": {
+      "title": "Modules and providers",
+      "description": "How a Nest application is organized and wired."
+    },
+    "controllers-e-pipes": {
+      "title": "Controllers and pipes",
+      "description": "Routes, parameters and input validation."
+    },
+    "guards-e-interceptors": {
+      "title": "Guards, interceptors and filters",
+      "description": "What runs before and after the controller."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "NestJS questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "modulo-nest": {
+      "term": "Module",
+      "definition": "A class with @Module that groups a feature: its controllers, its providers, what it imports from other modules and what it exports to them. The application is a tree of modules starting from AppModule."
+    },
+    "provider": {
+      "term": "Provider",
+      "definition": "Any class (or value) that Nest knows how to create and inject: services, repositories, API clients. Marked with @Injectable and registered in a module's providers. By default it is a singleton within the application."
+    },
+    "di-nest": {
+      "term": "Dependency injection in Nest",
+      "definition": "Nest's container reads the constructor parameter types and hands over the instances. A provider is only visible outside its module if it is exported and the other module imports that module. It lets you swap implementations with useClass, useValue or useFactory."
+    },
+    "escopo-provider": {
+      "term": "Provider scope",
+      "definition": "Providers can be DEFAULT (singleton), REQUEST (one instance per request) or TRANSIENT (one per injection). REQUEST lets you keep request data, but it propagates the scope to its dependents and costs performance; prefer passing the context as a parameter."
+    },
+    "modulo-exemplo": {
+      "title": "Products module",
+      "body": "The module declares the controller and the service; exporting the service lets other modules use it."
+    },
+    "custom-provider": {
+      "title": "Custom provider",
+      "body": "With a token and useFactory, Nest injects an interface with the implementation chosen by configuration; in tests, just swap it for useValue."
+    },
+    "controller-nest": {
+      "term": "Controller",
+      "definition": "A class with @Controller(\"route\") whose methods, marked with @Get, @Post, @Patch, @Delete, handle requests. It reads data with @Param, @Query and @Body, and whatever the method returns becomes the response body (201 by default on POST)."
+    },
+    "pipe": {
+      "term": "Pipe",
+      "definition": "Transforms or validates input data before it reaches the method. ParseIntPipe converts :id into a number (or responds 400) and ValidationPipe validates the body against the DTO rules."
+    },
+    "dto-nest": {
+      "term": "DTO with class-validator",
+      "definition": "A class that describes the expected body, with validation decorators (@IsString, @IsPositive, @IsOptional). ValidationPipe uses these rules; with whitelist: true, it strips fields not in the DTO."
+    },
+    "excecoes-http": {
+      "term": "HTTP exceptions",
+      "definition": "Built-in classes such as NotFoundException, BadRequestException and ForbiddenException. Throwing them from any layer makes Nest respond with the right status and message, without building the response by hand."
+    },
+    "controller-exemplo": {
+      "title": "Products controller",
+      "body": "The controller only translates HTTP: the service holds the rules. ParseIntPipe ensures id is a number."
+    },
+    "validation-pipe": {
+      "title": "DTO and global ValidationPipe",
+      "body": "The global pipe validates every body; transform converts it into the DTO class and forbidNonWhitelisted responds 400 if an unknown field arrives."
+    },
+    "guard": {
+      "term": "Guard",
+      "definition": "A class with canActivate that decides whether the request may proceed: authentication (is the token valid?) and authorization (does the user have the required role?). Returning false responds 403. Applied with @UseGuards on the controller, the method or globally."
+    },
+    "interceptor-nest": {
+      "term": "Interceptor",
+      "definition": "Wraps the method execution: it can act before and after it, transform the response, measure time, apply caching or timeouts. It works with the Observable that represents the response (next.handle())."
+    },
+    "exception-filter": {
+      "term": "Exception filter",
+      "definition": "Catches exceptions and builds the error response. The default filter already handles HttpException; your own filters translate domain or database errors (e.g. a unique key violation becomes 409) into a standard format."
+    },
+    "ciclo-de-vida": {
+      "term": "Request lifecycle",
+      "definition": "The order in Nest: middleware, guards, interceptors (before), pipes, the controller method, interceptors (after) and, if anything throws, the exception filters. Knowing the order tells you where each responsibility belongs."
+    },
+    "roles-guard": {
+      "title": "Roles guard",
+      "body": "The @Roles decorator stores the required roles as metadata; the guard reads them with the Reflector and compares with the authenticated user."
+    },
+    "logging-interceptor": {
+      "title": "Response time interceptor",
+      "body": "Marks the start before the handler and, when the response Observable emits, logs how long it took."
+    },
+    "nest-vs-express": {
+      "question": "What does NestJS bring compared to Express?",
+      "answer": "Structure: modules, dependency injection, decorators for routes and validation, and clear places for authentication, transformation and errors (guards, pipes, interceptors, filters). Underneath it uses Express (or Fastify). The gain is standardizing large projects and teams; the cost is more concepts and more ceremonial code."
+    },
+    "guard-vs-middleware": {
+      "question": "What is the difference between middleware and a guard?",
+      "answer": "Middleware runs before Nest knows which handler will serve the request, so it has no access to the route context; it fits generic things like logging and CORS. A guard runs later, receives the ExecutionContext (it knows the controller, the method and metadata such as @Roles) and is therefore the right place for authorization."
+    },
+    "validacao-nest": {
+      "question": "How do you validate a request body in NestJS?",
+      "answer": "With a DTO annotated with class-validator and the ValidationPipe, usually global. I use whitelist to strip extra fields, forbidNonWhitelisted to reject unknown fields and transform to receive the DTO instance and convert types. If validation fails, Nest responds 400 with the errors."
+    },
+    "ordem-execucao-nest": {
+      "question": "In what order do middleware, guards, interceptors, pipes and filters run?",
+      "answer": "Middleware, guards, interceptors (the before part), pipes, the handler, interceptors (the after part) and, if an exception is thrown anywhere, the exception filters. Within each kind, global ones first, then controller-level and finally method-level."
+    },
+    "dependencia-circular": {
+      "question": "How do you solve a circular dependency in NestJS?",
+      "answer": "The first step is to rethink the design: usually the shared logic should move to a third module or service both use, or the communication becomes an event. If the dependency really is needed, forwardRef(() => OtherModule) in the imports and in @Inject solves it, but it is a sign of coupling."
+    },
+    "testar-nest": {
+      "question": "How do you test a NestJS service that depends on a repository?",
+      "answer": "With Test.createTestingModule, registering the real service and a repository mock through useValue (or overrideProvider). That way I test the business rules without a database. For end-to-end tests, I start the app with the real module and use supertest against the routes, with a test database."
+    }
+  }
+}

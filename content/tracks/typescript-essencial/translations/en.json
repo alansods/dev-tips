@@ -1,0 +1,120 @@
+{
+  "title": "TypeScript essentials",
+  "description": "The type system day to day: basic types, interfaces, unions, narrowing and tsconfig.",
+  "decks": {
+    "tipos-basicos": {
+      "title": "Basic types",
+      "description": "What TypeScript adds to JavaScript and the most used types."
+    },
+    "objetos-e-interfaces": {
+      "title": "Objects and interfaces",
+      "description": "How to describe the shape of objects."
+    },
+    "unions-e-narrowing": {
+      "title": "Unions and narrowing",
+      "description": "Values of one of several types and how to narrow them."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "TypeScript questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "typescript": {
+      "term": "TypeScript",
+      "definition": "A superset of JavaScript that adds static types. The compiler (tsc) checks the types and emits plain JavaScript: types disappear at runtime. The gain is catching errors before running and having reliable autocomplete and refactoring in the editor."
+    },
+    "inferencia": {
+      "term": "Type inference",
+      "definition": "TypeScript works out the type from the value: const total = 10 is already a number, without an annotation. Annotate function parameters and public return types; elsewhere, let inference do the work."
+    },
+    "any-unknown-never": {
+      "term": "any, unknown and never",
+      "definition": "any turns checking off: it accepts and allows everything, and \"infects\" whatever it touches. unknown also accepts any value, but forces you to check the type before using it: it is right for outside data. never is the type with no possible values: a function that never returns or an impossible switch case."
+    },
+    "tsconfig": {
+      "term": "tsconfig and strict mode",
+      "definition": "tsconfig.json configures the compiler: target, modules, folders and rules. \"strict\": true turns on the important checks, such as strictNullChecks (null and undefined no longer fit into every type) and noImplicitAny. A new project should start in strict mode."
+    },
+    "anotacoes": {
+      "title": "Annotating functions",
+      "body": "Parameters are always annotated; the return type can be inferred, but annotating it on public functions avoids accidental changes. Optional parameters use ?, and a default value already sets the type."
+    },
+    "tsconfig-strict": {
+      "title": "A modern tsconfig",
+      "body": "strict turns on the main checks; noUncheckedIndexedAccess makes arr[0] possibly undefined. noEmit is common when another tool (Vite, esbuild) emits the JavaScript."
+    },
+    "interface": {
+      "term": "Interface",
+      "definition": "Describes the shape of an object: which properties it has and their types. It can be extended with extends and implemented by classes. Two interfaces with the same name merge (declaration merging)."
+    },
+    "type-alias": {
+      "term": "Type alias",
+      "definition": "Gives a name to any type with type: objects, unions, tuples, functions, derived types. For objects it does almost the same as interface; for unions and computed types, only type works."
+    },
+    "tipagem-estrutural": {
+      "term": "Structural typing",
+      "definition": "TypeScript compares types by shape, not by name: an object fits where a type is expected if it has the required properties, even without declaring anything. It is \"duck typing\" checked at compile time."
+    },
+    "readonly-e-opcional": {
+      "term": "Optional and readonly properties",
+      "definition": "name?: string marks a property as optional (it may be missing, and then it is undefined). readonly prevents reassigning the property after creation. readonly only exists at compile time: it does not freeze the object at runtime."
+    },
+    "interface-vs-type": {
+      "title": "interface and type side by side",
+      "body": "For objects, both work. interface extends with extends; type combines with & and is the only one that expresses unions."
+    },
+    "estrutural-exemplo": {
+      "title": "Compatible by shape",
+      "body": "The point object never declared it was a Point2D, but it has x and y, so it is accepted. A literal passed directly with an extra property is an error (excess property check), because it is probably a mistake."
+    },
+    "union": {
+      "term": "Union type",
+      "definition": "A type that accepts one of several: string | number. Unions of literals model closed sets of values, such as \"GET\" | \"POST\" | \"PUT\", and replace many uses of enum."
+    },
+    "narrowing": {
+      "term": "Narrowing",
+      "definition": "The narrowing the compiler does from a broad type to a specific one within a block, based on checks: typeof, instanceof, in, comparison with a literal, null checks. After if (typeof x === \"string\"), x is a string inside."
+    },
+    "union-discriminada": {
+      "term": "Discriminated union",
+      "definition": "A union of objects that share a literal property (the discriminant, such as type or status). Checking that property narrows the whole object. It is the idiomatic way to model states: loading, success with data, error with a message."
+    },
+    "enum": {
+      "term": "enum",
+      "definition": "A named set of constants that, unlike types, emits JavaScript code. Many teams prefer a union of literals or an as const object, which emit no extra code and work better with tools that only strip types."
+    },
+    "estados-discriminados": {
+      "title": "Modeling request states",
+      "body": "With status as the discriminant, data only exists on success and error only on failure: there is no way to read data while loading."
+    },
+    "exhaustive-check": {
+      "title": "Exhaustive check with never",
+      "body": "If someone adds a new status to the union and forgets the case, the assignment to never fails at compile time, pointing at the exact place to fix."
+    },
+    "por-que-typescript": {
+      "question": "Why use TypeScript instead of JavaScript?",
+      "answer": "To catch type errors before running (a missing property, a forgotten null, a wrong argument), get safe autocomplete and refactoring, and document contracts in the code itself. The cost is the compile step and learning the type system. Types do not exist at runtime, so outside data still needs validation."
+    },
+    "interface-ou-type": {
+      "question": "When should you use interface and when type?",
+      "answer": "For object shapes, both work; many teams use interface for objects and public contracts (extends with extends, allows declaration merging) and type for everything else. Unions, tuples, function types and derived types (mapped, conditional) only exist with type. What matters most is that the team is consistent."
+    },
+    "any-vs-unknown": {
+      "question": "What is the difference between any and unknown?",
+      "answer": "Both accept any value. any turns checking off and lets you do anything, spreading the lack of types. unknown forces you to prove the type (typeof, instanceof, validation with Zod) before using it. For API responses, JSON.parse and caught errors, I use unknown."
+    },
+    "tipos-em-runtime": {
+      "question": "Do TypeScript types protect against bad data coming from the API?",
+      "answer": "No. Types are erased at compile time; if I say the response is a User, the compiler believes it, even if something else arrives. At boundaries (API, forms, localStorage), I validate at runtime with a library such as Zod and derive the type from the schema (z.infer), keeping a single source."
+    },
+    "tipagem-estrutural-pergunta": {
+      "question": "What is structural typing?",
+      "answer": "It is comparing types by shape. If an object has every property the type asks for, it is compatible, even without declaring it. In Java or C#, compatibility is nominal: you must implement the interface explicitly. That makes TypeScript flexible, but two types with the same shape and different meanings (UserId and OrderId as number) get mixed up; to separate them, I use branded types."
+    },
+    "modelar-estados": {
+      "question": "How do you model a screen's states with TypeScript?",
+      "answer": "With a discriminated union instead of several booleans (isLoading, hasError, data?). Each state carries only the data that makes sense in it, impossible states can no longer be represented, and a switch with an exhaustive check via never guarantees every new state is handled."
+    }
+  }
+}

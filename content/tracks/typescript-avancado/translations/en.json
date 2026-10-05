@@ -1,0 +1,120 @@
+{
+  "title": "Advanced TypeScript",
+  "description": "Reusable types: generics, utility types, mapped and conditional types, keyof and type guards.",
+  "decks": {
+    "generics": {
+      "title": "Generics",
+      "description": "Types and functions that work with many types."
+    },
+    "utility-types": {
+      "title": "Utility types",
+      "description": "Built-in types that transform other types."
+    },
+    "tipos-mapeados-e-condicionais": {
+      "title": "Mapped and conditional types",
+      "description": "Building types from other types."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Advanced TypeScript questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "generic": {
+      "term": "Generic",
+      "definition": "A type parameter (such as <T>) that lets a function, class or type work with many types without losing information. A function first<T>(list: T[]): T returns a string for string[] and a User for User[], instead of any."
+    },
+    "restricao-generica": {
+      "term": "Constraint (extends)",
+      "definition": "Limits what a type parameter accepts: <T extends { id: number }> requires T to have an id. Inside the function, the compiler knows it can use id. Without the constraint, T could be anything and no property would be guaranteed."
+    },
+    "inferencia-generica": {
+      "term": "Type argument inference",
+      "definition": "Callers rarely write the type: in identity(\"hi\"), TypeScript infers T = string from the arguments. Writing the type explicitly (useState<User | null>(null)) is needed when the initial value does not say it all."
+    },
+    "keyof": {
+      "term": "keyof and typeof",
+      "definition": "keyof T gives the union of a type's keys (\"id\" | \"name\"). typeof, in a type context, takes the type of an existing value. Together they derive types from the code instead of repeating them: keyof typeof config."
+    },
+    "get-property": {
+      "title": "Generic function with keyof",
+      "body": "K only accepts keys of T, and the return type is exactly that property's type: T[K] (indexed access)."
+    },
+    "repositorio-generico": {
+      "title": "Generic interface",
+      "body": "A repository contract that works for any entity with an id. The create type omits the id, which the database generates."
+    },
+    "partial-required": {
+      "term": "Partial and Required",
+      "definition": "Partial<T> makes every property optional (good for a PATCH body); Required<T> makes every property required. Readonly<T> prevents reassigning all of them."
+    },
+    "pick-omit": {
+      "term": "Pick and Omit",
+      "definition": "Pick<T, \"a\" | \"b\"> creates a type with only the chosen keys; Omit<T, \"password\"> creates a type without them. They derive DTOs from the entity without copying fields by hand."
+    },
+    "record": {
+      "term": "Record",
+      "definition": "Record<K, V> describes an object whose keys are of type K and values of type V. With K being a union of literals, it requires an entry for every key: Record<Status, string> needs a label for every status."
+    },
+    "returntype": {
+      "term": "ReturnType, Parameters and Awaited",
+      "definition": "They extract types from existing functions: ReturnType<typeof fn> is the return type, Parameters<typeof fn> the parameter tuple and Awaited<T> the value inside a Promise. Useful to type things from libraries that do not export their types."
+    },
+    "dtos-derivados": {
+      "title": "DTOs derived from the entity",
+      "body": "A single source of truth: if the entity gains a field, the DTOs follow. The output one never exposes the password."
+    },
+    "record-exaustivo": {
+      "title": "Exhaustive Record",
+      "body": "When a new status is added to the union, the object stops compiling until it gets the matching label."
+    },
+    "mapped-type": {
+      "term": "Mapped type",
+      "definition": "A type that iterates over another's keys and transforms each one: { [K in keyof T]: ... }. Partial, Readonly and Record are mapped types. You can change the value type, make it optional (?), add or remove readonly and even rename keys with as."
+    },
+    "conditional-type": {
+      "term": "Conditional type",
+      "definition": "A type with a choice: T extends U ? X : Y. Applied to a union, it is distributed over each member. With infer, it extracts parts of a type, such as an array element or a Promise value."
+    },
+    "type-guard": {
+      "term": "Type guard",
+      "definition": "A function that returns value is Type and, when it returns true, narrows the caller's type. It wraps repeated checks such as \"is this a valid product?\" and is the bridge between unknown and a concrete type."
+    },
+    "satisfies": {
+      "term": "satisfies and as const",
+      "definition": "as const makes everything in the object or array literal and readonly. satisfies Type checks that the value is compatible with the type without widening it: the object keeps each property's precise type. Together they give checked, well-typed configurations."
+    },
+    "mapped-exemplo": {
+      "title": "Mapped type with key renaming",
+      "body": "Generates the getters of any type: getName, getAge. Template literal types and as rename the keys."
+    },
+    "type-guard-exemplo": {
+      "title": "Type guard for outside data",
+      "body": "The JSON arrives as unknown; after the if, the compiler treats data as a Product. For large schemas, Zod generates the guard and the type at once."
+    },
+    "por-que-generics": {
+      "question": "What are generics for? Why not use any?",
+      "answer": "Generics let a function or type work with many types while keeping the link between input and output: if string[] goes in, string comes out. With any, the function accepts everything but the return loses its type, and the error only shows up at runtime. I use constraints (extends) when I need some property of the type."
+    },
+    "partial-pick-omit": {
+      "question": "Name utility types you use day to day.",
+      "answer": "Partial for update bodies, Pick and Omit to derive DTOs from the entity (for example, removing the password from the response), Record for maps with known keys, Readonly for data that must not change, and ReturnType or Awaited to reuse the types of library functions."
+    },
+    "type-guard-pergunta": {
+      "question": "What is a type guard?",
+      "answer": "It is a check that narrows the type. It can be built in (typeof, instanceof, in) or a function of mine that returns value is Type. If it returns true, the compiler treats the value as that type. The catch is that the compiler trusts the function: if the check is wrong, the type lies."
+    },
+    "conditional-infer": {
+      "question": "How does infer work in conditional types?",
+      "answer": "Inside the extends of a conditional type, infer declares a type variable that TypeScript fills with the matching part. type ElementOf<T> = T extends (infer U)[] ? U : never extracts the item type of an array. That is how ReturnType, Parameters and Awaited are implemented."
+    },
+    "satisfies-vs-anotacao": {
+      "question": "What is the difference between annotating a type and using satisfies?",
+      "answer": "Annotating (const config: Config = ...) gives the variable exactly the Config type, losing detail: a string | number property becomes the broad type. satisfies Config checks compatibility but keeps the inferred, more precise type. I use satisfies on configuration objects and maps, where I want both the check and the literals."
+    },
+    "mapped-pergunta": {
+      "question": "How would you implement Partial from scratch?",
+      "answer": "With a mapped type: type MyPartial<T> = { [K in keyof T]?: T[K] }. It iterates over each key of T and declares it optional, keeping the value type. For a deep version, I apply it recursively when T[K] is an object, using a conditional type."
+    }
+  }
+}
