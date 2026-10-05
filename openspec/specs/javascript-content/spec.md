@@ -17,7 +17,7 @@ O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das tril
 | `nextjs` | Next.js | frontend | javascript | nextjs |
 | `express` | Express | backend | javascript | express |
 
-O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na linguagem `javascript`.
+O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na linguagem `javascript`. A linguagem `javascript` SHALL reunir também as trilhas de TypeScript e os frameworks Angular e NestJS (capability `typescript-content`), de modo que a tela da linguagem mostre juntos, sem separar JS de TS, a linguagem pura e todos os frameworks do ecossistema.
 
 #### Scenario: Trilhas registradas
 - **WHEN** o catálogo é carregado
@@ -25,11 +25,15 @@ O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na
 
 #### Scenario: JavaScript no Frontend
 - **WHEN** o usuário abre Frontend › JavaScript
-- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono e JavaScript no navegador, e "Frameworks" mostra React, Vue e Next.js, cada um com "1 trilha"
+- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono, JavaScript no navegador, TypeScript essencial e TypeScript avançado, e "Frameworks" mostra React, Vue, Next.js e Angular, cada um com "1 trilha"
 
 #### Scenario: JavaScript no Backend
 - **WHEN** o usuário abre Backend › JavaScript
-- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono e Node.js, e "Frameworks" mostra Express
+- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono, Node.js, TypeScript essencial e TypeScript avançado, e "Frameworks" mostra Express e NestJS
+
+#### Scenario: Contagem na tela da área
+- **WHEN** o usuário abre a área Frontend
+- **THEN** a seção "Linguagens" mostra "JavaScript" com "9 trilhas" e não mostra "TypeScript"
 
 ### Requirement: Decks das trilhas de JavaScript
 Cada trilha SHALL ter exatamente 4 decks, nesta ordem: três decks de conteúdo com 6 cards cada (tipos `concept` ou `code`, com pelo menos 2 `concept` por deck) e o deck `perguntas-de-entrevista` ("Perguntas de entrevista"), com 6 cards `question`. Cada trilha tem, portanto, 24 cards. Os decks de conteúdo SHALL ser:
