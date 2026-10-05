@@ -1,19 +1,19 @@
-import { validateTheme, type ContentError, type Theme } from '../index';
+import { validateTrack, type ContentError, type Track } from '../index';
 
-/** Valida e devolve os erros; falha o teste se o tema for aceito. */
+/** Valida e devolve os erros; falha o teste se a trilha for aceita. */
 export function errorsOf(input: unknown): ContentError[] {
-  const result = validateTheme(input);
-  if (result.ok) throw new Error('esperava que a validação rejeitasse o tema, mas ela aceitou');
+  const result = validateTrack(input);
+  if (result.ok) throw new Error('esperava que a validação rejeitasse a trilha, mas ela aceitou');
   return result.errors;
 }
 
-/** Valida e devolve o tema; falha o teste mostrando os erros se for rejeitado. */
-export function themeOf(input: unknown): Theme {
-  const result = validateTheme(input);
+/** Valida e devolve a trilha; falha o teste mostrando os erros se for rejeitada. */
+export function trackOf(input: unknown): Track {
+  const result = validateTrack(input);
   if (!result.ok) {
-    throw new Error('esperava tema válido, mas houve erros:\n' + result.errors.map((e) => `${e.path}: ${e.message}`).join('\n'));
+    throw new Error('esperava trilha válida, mas houve erros:\n' + result.errors.map((e) => `${e.path}: ${e.message}`).join('\n'));
   }
-  return result.theme;
+  return result.track;
 }
 
 /** Afirma que existe um erro exatamente no `path` (e, opcionalmente, com um trecho da mensagem). */

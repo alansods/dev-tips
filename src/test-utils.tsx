@@ -2,15 +2,15 @@
 import { render } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 
-import { getTheme } from './content/catalog';
-import type { Card, Theme } from './content';
+import { getTrack } from './content/catalog';
+import type { Card, Track } from './content';
 import { useSettingsStore, type Language } from './i18n';
 import { ThemeProvider } from './theme/ThemeProvider';
 
-export const crudTheme: Theme = getTheme('crud-4-frameworks')!;
+export const crudTrack: Track = getTrack('crud-4-frameworks')!;
 
-export function cardById(id: string, theme: Theme = crudTheme): Card {
-  const card = theme.decks.flatMap((d) => d.cards).find((c) => c.id === id);
+export function cardById(id: string, track: Track = crudTrack): Card {
+  const card = track.decks.flatMap((d) => d.cards).find((c) => c.id === id);
   if (!card) throw new Error(`card ${id} não encontrado`);
   return card;
 }

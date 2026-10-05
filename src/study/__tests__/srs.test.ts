@@ -1,10 +1,10 @@
 import { addDays, today } from '../clock';
 import { progressKey } from '../rules';
 import { dueCardIds, nextSchedule, type Schedule } from '../srs';
-import { crudTheme } from '../../test-utils';
+import { crudTrack } from '../../test-utils';
 
 const DAY = '2026-10-02';
-const key = (id: string) => progressKey(crudTheme.id, id);
+const key = (id: string) => progressKey(crudTrack.id, id);
 
 describe('clock', () => {
   it('addDays atravessa mês e ano', () => {
@@ -53,15 +53,15 @@ describe('Requirement: Cards para revisar hoje', () => {
       [key('endpoint-create')]: { box: 1, due: '2026-10-10' },
       [key('step-01')]: { box: 3, due: '2026-10-11' },
     };
-    expect(dueCardIds(crudTheme, schedule, '2026-10-10')).toEqual(['endpoint-create', 'api']);
+    expect(dueCardIds(crudTrack, schedule, '2026-10-10')).toEqual(['endpoint-create', 'api']);
   });
 
   it('Cards novos não entram', () => {
-    expect(dueCardIds(crudTheme, {}, DAY)).toEqual([]);
+    expect(dueCardIds(crudTrack, {}, DAY)).toEqual([]);
   });
 
-  it('agendamento de outro tema não entra', () => {
+  it('agendamento de outra trilha não entra', () => {
     const schedule: Schedule = { [progressKey('outro', 'api')]: { box: 1, due: DAY } };
-    expect(dueCardIds(crudTheme, schedule, DAY)).toEqual([]);
+    expect(dueCardIds(crudTrack, schedule, DAY)).toEqual([]);
   });
 });

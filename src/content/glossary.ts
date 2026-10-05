@@ -1,6 +1,6 @@
-import type { ConceptCard, Theme } from './schema';
+import type { ConceptCard, Track } from './schema';
 
-/** O glossário de um tema: todos os cards `concept`, na ordem em que aparecem. */
-export function getGlossary(theme: Theme): ConceptCard[] {
-  return theme.decks.flatMap((deck) => deck.cards.filter((card): card is ConceptCard => card.type === 'concept'));
+/** O glossário de uma trilha: todos os cards `concept`, na ordem em que aparecem. */
+export function getGlossary(track: Track): ConceptCard[] {
+  return track.decks.flatMap((deck) => deck.cards.filter((card): card is ConceptCard => card.type === 'concept'));
 }

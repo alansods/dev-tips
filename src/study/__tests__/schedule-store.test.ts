@@ -4,7 +4,7 @@ import * as clock from '../clock';
 import { progressKey } from '../rules';
 import { STUDY_STORAGE_KEY, resetStudyStore, useStudyStore } from '../store';
 
-const THEME = 'crud-4-frameworks';
+const TRACK = 'crud-4-frameworks';
 const store = () => useStudyStore.getState();
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
@@ -27,42 +27,42 @@ afterEach(() => jest.restoreAllMocks());
 
 describe('Requirement: Agendamento salvo no aparelho', () => {
   it('answer atualiza progresso e agendamento', () => {
-    store().answer(THEME, 'api', 'known');
-    store().answer(THEME, 'cors', 'unknown');
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'cors', 'unknown');
     expect(store().schedule).toEqual({
-      [progressKey(THEME, 'api')]: { box: 2, due: '2026-10-05' },
-      [progressKey(THEME, 'cors')]: { box: 1, due: '2026-10-02' },
+      [progressKey(TRACK, 'api')]: { box: 2, due: '2026-10-05' },
+      [progressKey(TRACK, 'cors')]: { box: 1, due: '2026-10-02' },
     });
   });
 
   it('Agendamento mantido ao reabrir', async () => {
-    store().answer(THEME, 'api', 'known');
-    store().answer(THEME, 'api', 'known');
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'api', 'known');
     await flush();
     await reopen();
-    expect(store().schedule[progressKey(THEME, 'api')]).toEqual({ box: 3, due: '2026-10-09' });
+    expect(store().schedule[progressKey(TRACK, 'api')]).toEqual({ box: 3, due: '2026-10-09' });
   });
 
   it('Dados da versão anterior', async () => {
     await AsyncStorage.setItem(
       STUDY_STORAGE_KEY,
       JSON.stringify({
-        state: { progress: { [progressKey(THEME, 'api')]: 'known' }, preferredVariant: { [THEME]: 'nest' } },
+        state: { progress: { [progressKey(TRACK, 'api')]: 'known' }, preferredVariant: { [TRACK]: 'nest' } },
         version: 1,
       }),
     );
     await useStudyStore.persist.rehydrate();
-    expect(store().progress[progressKey(THEME, 'api')]).toBe('known');
-    expect(store().preferredVariant[THEME]).toBe('nest');
+    expect(store().progress[progressKey(TRACK, 'api')]).toBe('known');
+    expect(store().preferredVariant[TRACK]).toBe('nest');
     expect(store().schedule).toEqual({});
   });
 });
 
-describe('Requirement: Zerar progresso de um tema', () => {
-  it('Zerar apaga o agendamento do tema', () => {
-    store().answer(THEME, 'api', 'unknown');
+describe('Requirement: Zerar progresso de uma trilha', () => {
+  it('Zerar apaga o agendamento da trilha', () => {
+    store().answer(TRACK, 'api', 'unknown');
     store().answer('outro', 'api', 'unknown');
-    store().resetTheme(THEME);
+    store().resetTrack(TRACK);
     expect(store().schedule).toEqual({ [progressKey('outro', 'api')]: { box: 1, due: '2026-10-02' } });
   });
 });
@@ -70,7 +70,7 @@ describe('Requirement: Zerar progresso de um tema', () => {
 describe('Requirement: Configuração salva no aparelho (último dia de estudo)', () => {
   it('answer grava o último dia de estudo, que é salvo e restaurado', async () => {
     expect(store().lastStudyDay).toBeNull();
-    store().answer(THEME, 'api', 'known');
+    store().answer(TRACK, 'api', 'known');
     expect(store().lastStudyDay).toBe('2026-10-02');
     await flush();
     await reopen();
@@ -81,12 +81,12 @@ describe('Requirement: Configuração salva no aparelho (último dia de estudo)'
     await AsyncStorage.setItem(
       STUDY_STORAGE_KEY,
       JSON.stringify({
-        state: { progress: { [progressKey(THEME, 'api')]: 'known' }, preferredVariant: {}, schedule: {} },
+        state: { progress: { [progressKey(TRACK, 'api')]: 'known' }, preferredVariant: {}, schedule: {} },
         version: 2,
       }),
     );
     await useStudyStore.persist.rehydrate();
-    expect(store().progress[progressKey(THEME, 'api')]).toBe('known');
+    expect(store().progress[progressKey(TRACK, 'api')]).toBe('known');
     expect(store().lastStudyDay).toBeNull();
   });
 });

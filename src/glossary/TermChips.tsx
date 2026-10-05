@@ -1,30 +1,30 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppText } from '../components/AppText';
-import { getGlossary, type ConceptCard, type Theme } from '../content';
+import { getGlossary, type ConceptCard, type Track } from '../content';
 import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { spacing } from '../theme/tokens';
 
-const cache = new WeakMap<Theme, Map<string, ConceptCard>>();
+const cache = new WeakMap<Track, Map<string, ConceptCard>>();
 
-/** Mapa id → concept do tema (memorizado por tema). */
-export function conceptsOf(theme: Theme): Map<string, ConceptCard> {
-  let map = cache.get(theme);
+/** Mapa id → concept da trilha (memorizado por trilha). */
+export function conceptsOf(track: Track): Map<string, ConceptCard> {
+  let map = cache.get(track);
   if (!map) {
-    map = new Map(getGlossary(theme).map((c) => [c.id, c]));
-    cache.set(theme, map);
+    map = new Map(getGlossary(track).map((c) => [c.id, c]));
+    cache.set(track, map);
   }
   return map;
 }
 
-type Props = { theme: Theme; termIds: string[]; onOpen: (termId: string) => void; title?: string };
+type Props = { track: Track; termIds: string[]; onOpen: (termId: string) => void; title?: string };
 
 /** Um chip-botão por termo relacionado; não renderiza nada sem termos. */
-export function TermChips({ theme, termIds, onOpen, title }: Props) {
+export function TermChips({ track, termIds, onOpen, title }: Props) {
   const { colors } = useTheme();
   const t = useT();
-  const concepts = conceptsOf(theme);
+  const concepts = conceptsOf(track);
   const terms = termIds.map((id) => concepts.get(id)).filter((c): c is ConceptCard => c !== undefined);
   if (terms.length === 0) return null;
   return (

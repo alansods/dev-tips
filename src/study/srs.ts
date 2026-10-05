@@ -1,13 +1,13 @@
 // Repetição espaçada por caixas (Leitner): "não sabia" volta para a caixa 1 e
 // revisa no mesmo dia; "já sabia" sobe uma caixa e revisa depois do intervalo dela.
 
-import type { Theme } from '../content';
+import type { Track } from '../content';
 import { addDays } from './clock';
 import { progressKey, type AnswerResult } from './rules';
 
 export type Box = 1 | 2 | 3 | 4 | 5;
 export type CardSchedule = { box: Box; due: string };
-/** Agendamento por chave `themeId:cardId`. */
+/** Agendamento por chave `trackId:cardId`. */
 export type Schedule = Record<string, CardSchedule>;
 
 export const INTERVAL_DAYS: Record<Exclude<Box, 1>, number> = { 2: 3, 3: 7, 4: 14, 5: 30 };
@@ -18,12 +18,12 @@ export function nextSchedule(prev: CardSchedule | undefined, result: AnswerResul
   return { box, due: addDays(day, INTERVAL_DAYS[box]) };
 }
 
-/** Cards do tema com revisão até `day`, na ordem dos decks e dos cards. */
-export function dueCardIds(theme: Theme, schedule: Schedule, day: string): string[] {
-  return theme.decks
+/** Cards da trilha com revisão até `day`, na ordem dos decks e dos cards. */
+export function dueCardIds(track: Track, schedule: Schedule, day: string): string[] {
+  return track.decks
     .flatMap((deck) => deck.cards)
     .filter((card) => {
-      const entry = schedule[progressKey(theme.id, card.id)];
+      const entry = schedule[progressKey(track.id, card.id)];
       return entry !== undefined && entry.due <= day;
     })
     .map((card) => card.id);

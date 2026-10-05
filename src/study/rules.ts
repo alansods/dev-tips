@@ -1,34 +1,34 @@
-// Regras puras do estudo: progresso por deck/tema, ação do deck, ordem da
+// Regras puras do estudo: progresso por deck/trilha, ação do deck, ordem da
 // sessão e a máquina de estados da sessão (frente → verso → resposta).
 
-import type { Card, Deck, Theme } from '../content';
+import type { Card, Deck, Track } from '../content';
 
 export type AnswerResult = 'known' | 'unknown';
-/** Última resposta de cada card, por chave `themeId:cardId`. */
+/** Última resposta de cada card, por chave `trackId:cardId`. */
 export type Progress = Record<string, AnswerResult>;
 
-export const progressKey = (themeId: string, cardId: string) => `${themeId}:${cardId}`;
+export const progressKey = (trackId: string, cardId: string) => `${trackId}:${cardId}`;
 
 export type Stats = { total: number; known: number; unknown: number; answered: number };
 
-function statsOf(themeId: string, cards: Card[], progress: Progress): Stats {
+function statsOf(trackId: string, cards: Card[], progress: Progress): Stats {
   let known = 0;
   let unknown = 0;
   for (const card of cards) {
-    const result = progress[progressKey(themeId, card.id)];
+    const result = progress[progressKey(trackId, card.id)];
     if (result === 'known') known++;
     else if (result === 'unknown') unknown++;
   }
   return { total: cards.length, known, unknown, answered: known + unknown };
 }
 
-export const deckStats = (themeId: string, deck: Deck, progress: Progress): Stats =>
-  statsOf(themeId, deck.cards, progress);
+export const deckStats = (trackId: string, deck: Deck, progress: Progress): Stats =>
+  statsOf(trackId, deck.cards, progress);
 
-export const themeStats = (theme: Theme, progress: Progress): Stats =>
+export const trackStats = (track: Track, progress: Progress): Stats =>
   statsOf(
-    theme.id,
-    theme.decks.flatMap((d) => d.cards),
+    track.id,
+    track.decks.flatMap((d) => d.cards),
     progress,
   );
 
@@ -41,10 +41,10 @@ export function deckAction(stats: Stats): DeckAction {
 }
 
 /** Cards da sessão aberta pelo botão do deck: todos, ou só os que ainda não estão como "já sabia". */
-export function sessionCardIds(themeId: string, deck: Deck, progress: Progress): string[] {
-  const action = deckAction(deckStats(themeId, deck, progress));
+export function sessionCardIds(trackId: string, deck: Deck, progress: Progress): string[] {
+  const action = deckAction(deckStats(trackId, deck, progress));
   const cards =
-    action === 'continue' ? deck.cards.filter((c) => progress[progressKey(themeId, c.id)] !== 'known') : deck.cards;
+    action === 'continue' ? deck.cards.filter((c) => progress[progressKey(trackId, c.id)] !== 'known') : deck.cards;
   return cards.map((c) => c.id);
 }
 

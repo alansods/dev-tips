@@ -5,20 +5,20 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
-import StudyScreen from '../app/study/[themeId]/[deckId]';
-import ThemeScreen from '../app/theme/[themeId]';
+import StudyScreen from '../app/study/[trackId]/[deckId]';
+import TrackScreen from '../app/track/[trackId]';
 import { useSettingsStore } from '../i18n';
 import { resetStudyStore } from '../study/store';
 
-// Traduções reais de content/themes/*/translations/en.json (sem mock).
+// Traduções reais de content/tracks/*/translations/en.json (sem mock).
 const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
-  'theme/[themeId]': ThemeScreen,
-  'study/[themeId]/[deckId]': StudyScreen,
+  'track/[trackId]': TrackScreen,
+  'study/[trackId]/[deckId]': StudyScreen,
 };
 
 async function open(url: string) {
@@ -32,7 +32,7 @@ beforeEach(() => resetStudyStore());
 describe('Requirement: Tradução completa para inglês', () => {
   beforeEach(() => useSettingsStore.setState({ language: 'en' }));
 
-  it('Home com os dois temas em inglês', async () => {
+  it('Home com os dois trilhas em inglês', async () => {
     await open('/');
     expect(screen.getByText('The same CRUD in four frameworks')).toBeOnTheScreen();
     expect(screen.getByText('Web fundamentals')).toBeOnTheScreen();
@@ -53,7 +53,7 @@ describe('Requirement: Tradução completa para inglês', () => {
   });
 
   it('Card exibido em inglês: concept Cookie e uma pergunta de entrevista', async () => {
-    await open('/theme/fundamentos-web');
+    await open('/track/fundamentos-web');
     expect(screen.getByRole('button', { name: 'Study Interview questions' })).toBeOnTheScreen();
     await open('/glossary');
     fireEvent.changeText(screen.getByLabelText('Search term'), 'Set-Cookie');
@@ -66,7 +66,7 @@ describe('Requirement: Tradução completa para inglês', () => {
 
 describe('Requirement: Tradução completa para inglês (PT-BR intacto)', () => {
   it('PT-BR intacto', async () => {
-    await open('/theme/crud-4-frameworks');
+    await open('/track/crud-4-frameworks');
     expect(screen.getByRole('header', { name: 'O mesmo CRUD em quatro frameworks' })).toBeOnTheScreen();
     await open('/study/crud-4-frameworks/passo-a-passo');
     expect(screen.getByText('Criar o projeto')).toBeOnTheScreen();

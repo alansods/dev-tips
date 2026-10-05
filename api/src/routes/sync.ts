@@ -13,7 +13,7 @@ export const MAX_CARDS_PER_REQUEST = 500;
 
 const id = z.string().min(1).max(100);
 const cardChange = z.object({
-  themeId: id,
+  trackId: id,
   cardId: id,
   result: z.enum(['known', 'unknown']).nullable(),
   box: z.number().int().min(1).max(5).nullable(),

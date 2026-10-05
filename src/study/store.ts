@@ -1,5 +1,5 @@
 // Estado de estudo compartilhado pelo app: progresso de cada card e a aba de
-// framework preferida por tema. Fica salvo no aparelho (AsyncStorage) e é
+// framework preferida por trilha. Fica salvo no aparelho (AsyncStorage) e é
 // restaurado ao abrir; falhas de leitura/escrita ou dados inválidos nunca
 // quebram o app — no pior caso ele começa sem progresso.
 
@@ -18,16 +18,16 @@ export const STUDY_STORAGE_KEY = 'dev-tips:study';
 type StudyData = {
   progress: Progress;
   preferredVariant: Record<string, string>;
-  /** Repetição espaçada: caixa e data de revisão por `themeId:cardId`. */
+  /** Repetição espaçada: caixa e data de revisão por `trackId:cardId`. */
   schedule: Schedule;
   /** Último dia (YYYY-MM-DD) em que algum card foi respondido; usado pelos lembretes. */
   lastStudyDay: string | null;
 };
 
 type StudyState = StudyData & {
-  answer: (themeId: string, cardId: string, result: AnswerResult) => void;
-  setVariant: (themeId: string, variantId: string) => void;
-  resetTheme: (themeId: string) => void;
+  answer: (trackId: string, cardId: string, result: AnswerResult) => void;
+  setVariant: (trackId: string, variantId: string) => void;
+  resetTrack: (trackId: string) => void;
 };
 
 const savedSchema = z.object({
@@ -45,9 +45,9 @@ const savedSchema = z.object({
   lastStudyDay: z.string().nullable().default(null),
 });
 
-/** Remove do registro as chaves do tema (`themeId:...`). */
-function withoutTheme<T>(record: Record<string, T>, themeId: string): Record<string, T> {
-  return Object.fromEntries(Object.entries(record).filter(([key]) => !key.startsWith(`${themeId}:`)));
+/** Remove do registro as chaves da trilha (`trackId:...`). */
+function withoutTrack<T>(record: Record<string, T>, trackId: string): Record<string, T> {
+  return Object.fromEntries(Object.entries(record).filter(([key]) => !key.startsWith(`${trackId}:`)));
 }
 
 const initialData = (): StudyData => ({ progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: null });
@@ -56,9 +56,9 @@ export const useStudyStore = create<StudyState>()(
   persist(
     (set) => ({
       ...initialData(),
-      answer: (themeId, cardId, result) =>
+      answer: (trackId, cardId, result) =>
         set((s) => {
-          const key = progressKey(themeId, cardId);
+          const key = progressKey(trackId, cardId);
           const day = today();
           return {
             progress: { ...s.progress, [key]: result },
@@ -66,12 +66,12 @@ export const useStudyStore = create<StudyState>()(
             lastStudyDay: day,
           };
         }),
-      setVariant: (themeId, variantId) =>
-        set((s) => ({ preferredVariant: { ...s.preferredVariant, [themeId]: variantId } })),
-      resetTheme: (themeId) =>
+      setVariant: (trackId, variantId) =>
+        set((s) => ({ preferredVariant: { ...s.preferredVariant, [trackId]: variantId } })),
+      resetTrack: (trackId) =>
         set((s) => ({
-          progress: withoutTheme(s.progress, themeId),
-          schedule: withoutTheme(s.schedule, themeId),
+          progress: withoutTrack(s.progress, trackId),
+          schedule: withoutTrack(s.schedule, trackId),
         })),
     }),
     {

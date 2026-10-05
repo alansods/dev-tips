@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Screen } from '../../components/Screen';
-import { getGlossary, type Theme } from '../../content';
+import { getGlossary, type Track } from '../../content';
 import { useCatalog } from '../../content/useCatalog';
 import { searchTerms, type GlossaryEntry } from '../../glossary/search';
 import { TermSheet } from '../../glossary/TermSheet';
@@ -14,8 +14,8 @@ import { useFontsReady } from '../../theme/fonts';
 import { useTheme } from '../../theme/ThemeProvider';
 import { fontFamilies, radius, spacing } from '../../theme/tokens';
 
-const allEntries = (catalog: readonly Theme[]): GlossaryEntry[] =>
-  catalog.flatMap((theme) => getGlossary(theme).map((concept) => ({ themeId: theme.id, concept })));
+const allEntries = (catalog: readonly Track[]): GlossaryEntry[] =>
+  catalog.flatMap((track) => getGlossary(track).map((concept) => ({ trackId: track.id, concept })));
 
 const preview = (text: string) => (text.length > 92 ? `${text.slice(0, 90).trimEnd()}…` : text);
 
@@ -27,12 +27,12 @@ export default function GlossaryScreen() {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState<GlossaryEntry | null>(null);
   const catalog = useCatalog();
-  const manyThemes = catalog.length > 1;
-  const themeTitle = (id: string) => catalog.find((theme) => theme.id === id)?.title ?? '';
+  const manyTracks = catalog.length > 1;
+  const trackTitle = (id: string) => catalog.find((track) => track.id === id)?.title ?? '';
 
   const all = useMemo(() => allEntries(catalog), [catalog]);
   const entries = useMemo(() => searchTerms(all, query), [all, query]);
-  const openTheme = open ? catalog.find((t) => t.id === open.themeId) : undefined;
+  const openTrack = open ? catalog.find((t) => t.id === open.trackId) : undefined;
 
   return (
     <>
@@ -61,10 +61,10 @@ export default function GlossaryScreen() {
         ) : (
           <View style={[styles.list, { backgroundColor: colors.surface, borderColor: colors.line }]}>
             {entries.map((entry) => {
-              const status = progress[progressKey(entry.themeId, entry.concept.id)];
+              const status = progress[progressKey(entry.trackId, entry.concept.id)];
               return (
                 <Pressable
-                  key={`${entry.themeId}:${entry.concept.id}`}
+                  key={`${entry.trackId}:${entry.concept.id}`}
                   testID="glossary-item"
                   accessibilityRole="button"
                   accessibilityLabel={entry.concept.term}
@@ -85,9 +85,9 @@ export default function GlossaryScreen() {
                   <AppText size={13} tone="muted">
                     {preview(entry.concept.definition)}
                   </AppText>
-                  {manyThemes && (
+                  {manyTracks && (
                     <AppText font="mono" size={11} tone="muted">
-                      {themeTitle(entry.themeId)}
+                      {trackTitle(entry.trackId)}
                     </AppText>
                   )}
                 </Pressable>
@@ -96,12 +96,12 @@ export default function GlossaryScreen() {
           </View>
         )}
       </Screen>
-      {openTheme && (
+      {openTrack && (
         <TermSheet
-          theme={openTheme}
+          track={openTrack}
           termId={open?.concept.id ?? null}
           onChangeTerm={(id) =>
-            setOpen({ themeId: openTheme.id, concept: getGlossary(openTheme).find((c) => c.id === id)! })
+            setOpen({ trackId: openTrack.id, concept: getGlossary(openTrack).find((c) => c.id === id)! })
           }
           onClose={() => setOpen(null)}
         />

@@ -7,7 +7,7 @@ import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
 import AccountScreen from '../app/account';
 import SettingsScreen from '../app/settings';
-import ThemeScreen from '../app/theme/[themeId]';
+import TrackScreen from '../app/track/[trackId]';
 import { useAccountStore } from '../auth/store';
 import { saveTokens } from '../auth/tokens';
 import { resetStudyStore, useStudyStore } from '../study/store';
@@ -24,7 +24,7 @@ const APP = {
   '(tabs)/progress': ProgressScreen,
   settings: SettingsScreen,
   account: AccountScreen,
-  'theme/[themeId]': ThemeScreen,
+  'track/[trackId]': TrackScreen,
 };
 const ana = { id: 'u1', name: 'Ana Souza', email: 'ana@example.com', photoUrl: null };
 
@@ -63,7 +63,7 @@ describe('Requirement: Aviso de offline', () => {
     // os cards continuam abrindo normalmente
     fireEvent.press(screen.getByRole('button', { name: /^O mesmo CRUD/ }));
     await flush();
-    expect(screen).toHavePathname('/theme/crud-4-frameworks');
+    expect(screen).toHavePathname('/track/crud-4-frameworks');
   });
 
   it('Reconectar', async () => {

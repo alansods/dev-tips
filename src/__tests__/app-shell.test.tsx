@@ -18,14 +18,14 @@ const APP = {
   '(tabs)/progress': ProgressScreen,
 };
 
-const TAB_LABELS = ['Temas', 'Glossário', 'Progresso'];
+const TAB_LABELS = ['Trilhas', 'Glossário', 'Progresso'];
 
 async function renderApp() {
   renderRouter(APP, { initialUrl: '/' });
   await act(async () => {}); // leitura assíncrona da preferência de tema
 }
 
-// No iOS a aba é um botão cujo nome acessível é "Temas, tab, 1 of 3"; em outras plataformas, role "tab".
+// No iOS a aba é um botão cujo nome acessível é "Trilhas, tab, 1 of 3"; em outras plataformas, role "tab".
 const TAB_ROLE = /^(button|tab)$/;
 const tabName = (el: { props: { accessibilityLabel?: string } }) =>
   TAB_LABELS.find((label) => String(el.props.accessibilityLabel ?? '').startsWith(`${label}, tab`));
@@ -39,10 +39,10 @@ beforeEach(() => {
 });
 
 describe('Requirement: Navegação por abas', () => {
-  it('App abre na aba Temas', async () => {
+  it('App abre na aba Trilhas', async () => {
     await renderApp();
     expect(screen).toHavePathname('/');
-    expect(tab('Temas')).toBeSelected();
+    expect(tab('Trilhas')).toBeSelected();
     expect(tab('Glossário')).not.toBeSelected();
   });
 
@@ -51,7 +51,7 @@ describe('Requirement: Navegação por abas', () => {
     fireEvent.press(tab('Glossário'));
     expect(screen).toHavePathname('/glossary');
     expect(tab('Glossário')).toBeSelected();
-    expect(tab('Temas')).not.toBeSelected();
+    expect(tab('Trilhas')).not.toBeSelected();
   });
 
   it('Abas na ordem do design', async () => {
@@ -62,7 +62,7 @@ describe('Requirement: Navegação por abas', () => {
 });
 
 describe('Requirement: Home mínima', () => {
-  it('Lista de temas', async () => {
+  it('Lista de trilhas', async () => {
     await renderApp();
     expect(screen.getByText('O mesmo CRUD em quatro frameworks')).toBeOnTheScreen();
   });
@@ -79,7 +79,7 @@ describe('Requirement: Fontes do design', () => {
     (useFonts as jest.Mock).mockReturnValue([false, new Error('fonte indisponível')]);
     await renderApp();
     expect(SplashScreen.hideAsync).toHaveBeenCalled();
-    expect(tab('Temas')).toBeSelected();
+    expect(tab('Trilhas')).toBeSelected();
     const title = screen.getByText('O mesmo CRUD em quatro frameworks');
     expect(StyleSheet.flatten(title.props.style).fontFamily).toBeUndefined();
   });

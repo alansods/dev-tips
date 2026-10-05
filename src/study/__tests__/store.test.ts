@@ -6,7 +6,7 @@ const store = () => useStudyStore.getState();
 beforeEach(() => resetStudyStore());
 
 describe('Requirement: Progresso enquanto o app está aberto', () => {
-  it('registra a resposta com chave por tema', () => {
+  it('registra a resposta com chave por trilha', () => {
     store().answer('crud-4-frameworks', 'cors', 'known');
     expect(store().progress).toEqual({ [progressKey('crud-4-frameworks', 'cors')]: 'known' });
   });
@@ -17,16 +17,16 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
     expect(store().progress[progressKey('crud-4-frameworks', 'cors')]).toBe('known');
   });
 
-  it('mesmo id em temas diferentes não colide', () => {
-    store().answer('tema-a', 'api', 'known');
-    store().answer('tema-b', 'api', 'unknown');
-    expect(store().progress[progressKey('tema-a', 'api')]).toBe('known');
-    expect(store().progress[progressKey('tema-b', 'api')]).toBe('unknown');
+  it('mesmo id em trilhas diferentes não colide', () => {
+    store().answer('trilha-a', 'api', 'known');
+    store().answer('trilha-b', 'api', 'unknown');
+    expect(store().progress[progressKey('trilha-a', 'api')]).toBe('known');
+    expect(store().progress[progressKey('trilha-b', 'api')]).toBe('unknown');
   });
 });
 
 describe('variante preferida', () => {
-  it('guarda a escolha por tema', () => {
+  it('guarda a escolha por trilha', () => {
     store().setVariant('crud-4-frameworks', 'fastapi');
     expect(store().preferredVariant).toEqual({ 'crud-4-frameworks': 'fastapi' });
   });

@@ -99,16 +99,16 @@ export const deckSchema = z.object({
   cards: z.array(cardSchema).min(1, { error: 'o deck precisa de pelo menos um card' }),
 });
 
-export const themeSchema = z.object({
+export const trackSchema = z.object({
   id: id(),
   title: text(),
   description: text(),
   variants: z.array(variantSchema).optional(),
   compareColumns: z.array(compareColumnSchema).optional(),
-  decks: z.array(deckSchema).min(1, { error: 'o tema precisa de pelo menos um deck' }),
+  decks: z.array(deckSchema).min(1, { error: 'a trilha precisa de pelo menos um deck' }),
 });
 
-export type Theme = z.output<typeof themeSchema>;
+export type Track = z.output<typeof trackSchema>;
 export type Deck = z.output<typeof deckSchema>;
 export type Card = z.output<typeof cardSchema>;
 export type ConceptCard = z.output<typeof conceptCardSchema>;

@@ -1,13 +1,13 @@
-import { fullTheme } from '../__fixtures__/themes';
-import { themeSchema, type Theme } from '../schema';
+import { fullTrack } from '../__fixtures__/tracks';
+import { trackSchema, type Track } from '../schema';
 import { validateTranslation } from '../translation';
 
-const theme = (): Theme => themeSchema.parse(fullTheme());
-const paths = (input: unknown) => validateTranslation(theme(), input).map((e) => e.path);
+const track = (): Track => trackSchema.parse(fullTrack());
+const paths = (input: unknown) => validateTranslation(track(), input).map((e) => e.path);
 
-describe('Requirement: Tradução de um tema', () => {
+describe('Requirement: Tradução de uma trilha', () => {
   it('Tradução válida', () => {
-    expect(validateTranslation(theme(), { title: 'Test CRUD', cards: { cors: { definition: 'Browser rule.' } } })).toEqual([]);
+    expect(validateTranslation(track(), { title: 'Test CRUD', cards: { cors: { definition: 'Browser rule.' } } })).toEqual([]);
   });
 
   it('aceita todos os campos de texto de cada tipo', () => {
@@ -24,7 +24,7 @@ describe('Requirement: Tradução de um tema', () => {
         api: { term: 'API', definition: 'Interface.', frontendAnalogy: 'Like', aliases: ['Web API'] },
       },
     };
-    expect(validateTranslation(theme(), input)).toEqual([]);
+    expect(validateTranslation(track(), input)).toEqual([]);
   });
 
   it('Card inexistente', () => {

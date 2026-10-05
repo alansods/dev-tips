@@ -4,14 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { IconButton } from '../components/IconButton';
 import { CloseIcon } from '../components/icons';
-import type { Theme } from '../content';
+import type { Track } from '../content';
 import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { TermChips, conceptsOf } from './TermChips';
 
 type Props = {
-  theme: Theme;
+  track: Track;
   /** Termo exibido; `null` = gaveta fechada. */
   termId: string | null;
   onChangeTerm: (termId: string) => void;
@@ -19,10 +19,10 @@ type Props = {
 };
 
 /** Gaveta inferior com a definição de um termo e os termos relacionados a ele. */
-export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
+export function TermSheet({ track, termId, onChangeTerm, onClose }: Props) {
   const { colors } = useTheme();
   const t = useT();
-  const concept = termId ? conceptsOf(theme).get(termId) : undefined;
+  const concept = termId ? conceptsOf(track).get(termId) : undefined;
 
   return (
     <Modal visible={!!concept} transparent animationType="slide" onRequestClose={onClose}>
@@ -53,7 +53,7 @@ export function TermSheet({ theme, termId, onChangeTerm, onClose }: Props) {
                   {concept.definition}
                 </AppText>
                 <TermChips
-                  theme={theme}
+                  track={track}
                   termIds={concept.relatedTerms}
                   onOpen={onChangeTerm}
                   title={t.card.relatedTerms}

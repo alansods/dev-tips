@@ -1,8 +1,8 @@
 import { getGlossary } from '../../content';
-import { crudTheme } from '../../test-utils';
+import { crudTrack } from '../../test-utils';
 import { normalize, searchTerms, type GlossaryEntry } from '../search';
 
-const entries: GlossaryEntry[] = getGlossary(crudTheme).map((concept) => ({ themeId: crudTheme.id, concept }));
+const entries: GlossaryEntry[] = getGlossary(crudTrack).map((concept) => ({ trackId: crudTrack.id, concept }));
 const terms = (q: string) => searchTerms(entries, q).map((e) => e.concept.term);
 
 describe('normalize', () => {
@@ -34,7 +34,7 @@ describe('Requirement: Busca no glossário', () => {
 
   it('busca por alias', () => {
     const withAlias: GlossaryEntry[] = [
-      { themeId: 't', concept: { ...entries[0].concept, term: 'Endpoint', aliases: ['Rota HTTP'] } },
+      { trackId: 't', concept: { ...entries[0].concept, term: 'Endpoint', aliases: ['Rota HTTP'] } },
     ];
     expect(searchTerms(withAlias, 'rota').map((e) => e.concept.term)).toEqual(['Endpoint']);
   });

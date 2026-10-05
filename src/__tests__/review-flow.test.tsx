@@ -5,12 +5,12 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
 import ProgressScreen from '../app/(tabs)/progress';
-import ReviewScreen from '../app/review/[themeId]';
-import StudyScreen from '../app/study/[themeId]/[deckId]';
-import ThemeScreen from '../app/theme/[themeId]';
+import ReviewScreen from '../app/review/[trackId]';
+import StudyScreen from '../app/study/[trackId]/[deckId]';
+import TrackScreen from '../app/track/[trackId]';
 import * as clock from '../study/clock';
 import { resetStudyStore, useStudyStore } from '../study/store';
-import { crudTheme } from '../test-utils';
+import { crudTrack } from '../test-utils';
 
 const APP = {
   _layout: RootLayout,
@@ -18,12 +18,12 @@ const APP = {
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/progress': ProgressScreen,
-  'theme/[themeId]': ThemeScreen,
-  'study/[themeId]/[deckId]': StudyScreen,
-  'review/[themeId]': ReviewScreen,
+  'track/[trackId]': TrackScreen,
+  'study/[trackId]/[deckId]': StudyScreen,
+  'review/[trackId]': ReviewScreen,
 };
-const THEME = crudTheme.id;
-const glossaryIds = crudTheme.decks.find((d) => d.id === 'glossario')!.cards.map((c) => c.id);
+const TRACK = crudTrack.id;
+const glossaryIds = crudTrack.decks.find((d) => d.id === 'glossario')!.cards.map((c) => c.id);
 
 async function open(url: string) {
   renderRouter(APP, { initialUrl: url });
@@ -31,7 +31,7 @@ async function open(url: string) {
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const seed = (ids: string[], result: 'known' | 'unknown') =>
-  ids.forEach((id) => useStudyStore.getState().answer(THEME, id, result));
+  ids.forEach((id) => useStudyStore.getState().answer(TRACK, id, result));
 function answer(result: 'Já sabia' | 'Não sabia') {
   press('Mostrar resposta');
   press(result);
@@ -43,17 +43,17 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
-describe('Requirement: Revisão de hoje na tela do tema', () => {
+describe('Requirement: Revisão de hoje na tela da trilha', () => {
   it('Com revisão pendente', async () => {
     seed(glossaryIds.slice(0, 3), 'unknown');
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     expect(screen.getByText('3 cards para revisar hoje')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Revisar agora' })).toBeOnTheScreen();
   });
 
   it('Sem revisão pendente', async () => {
     seed(glossaryIds.slice(0, 3), 'known'); // agendados para daqui a 3 dias
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Revisar agora' })).toBeNull();
   });
@@ -61,7 +61,7 @@ describe('Requirement: Revisão de hoje na tela do tema', () => {
   it('cards vencem com o passar dos dias', async () => {
     seed(glossaryIds.slice(0, 2), 'known');
     (clock.today as jest.Mock).mockReturnValue('2026-10-05');
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     expect(screen.getByText('2 cards para revisar hoje')).toBeOnTheScreen();
   });
 });
@@ -82,41 +82,41 @@ describe('Requirement: Revisão na Home', () => {
 describe('Requirement: Sessão de revisão', () => {
   it('Revisar os cards do dia', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     press('Revisar agora');
-    expect(screen).toHavePathname(`/review/${THEME}`);
+    expect(screen).toHavePathname(`/review/${TRACK}`);
     expect(screen.getByText('Revisão de hoje')).toBeOnTheScreen();
     expect(screen.getByText('1 / 2')).toBeOnTheScreen();
   });
 
   it('Revisão concluída some do dia', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     press('Revisar agora');
     answer('Já sabia');
     answer('Já sabia');
-    press('Voltar ao tema');
+    press('Voltar à trilha');
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });
 
   it('Erro na revisão continua no dia', async () => {
     seed(glossaryIds.slice(0, 1), 'unknown');
-    await open(`/theme/${THEME}`);
+    await open(`/track/${TRACK}`);
     press('Revisar agora');
     answer('Não sabia');
-    press('Voltar ao tema');
+    press('Voltar à trilha');
     expect(screen.getByText('1 card para revisar hoje')).toBeOnTheScreen();
   });
 });
 
-describe('Requirement: Zerar progresso de um tema (agendamento)', () => {
-  it('Zerar apaga o agendamento do tema', async () => {
+describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
+  it('Zerar apaga o agendamento da trilha', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open('/progress');
-    const crud = within(screen.getByTestId(`theme-progress-${THEME}`));
+    const crud = within(screen.getByTestId(`track-progress-${TRACK}`));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
-    fireEvent.press(screen.getByRole('button', { name: /^Temas, tab/ }));
+    fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
     press(/^O mesmo CRUD em quatro frameworks/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });

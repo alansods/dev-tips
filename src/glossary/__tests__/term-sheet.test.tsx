@@ -2,7 +2,7 @@ import { fireEvent, screen, within } from '@testing-library/react-native';
 import { useState } from 'react';
 
 import { CardFace } from '../../components/cards/CardFace';
-import { cardById, crudTheme, renderWithTheme } from '../../test-utils';
+import { cardById, crudTrack, renderWithTheme } from '../../test-utils';
 import { TermSheet } from '../TermSheet';
 
 /** Verso/frente de um card com chips ligados a uma gaveta, como na sessão. */
@@ -12,13 +12,13 @@ function Harness({ cardId, side }: { cardId: string; side: 'front' | 'back' }) {
     <>
       <CardFace
         card={cardById(cardId)}
-        theme={crudTheme}
+        track={crudTrack}
         side={side}
         variantId="express"
         onSelectVariant={() => {}}
         onOpenTerm={setTerm}
       />
-      <TermSheet theme={crudTheme} termId={term} onChangeTerm={setTerm} onClose={() => setTerm(null)} />
+      <TermSheet track={crudTrack} termId={term} onChangeTerm={setTerm} onClose={() => setTerm(null)} />
     </>
   );
 }

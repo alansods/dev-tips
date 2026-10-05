@@ -1,19 +1,19 @@
-// Varredura de content/themes/ para a suíte de testes. Usa `fs`, então só
+// Varredura de content/tracks/ para a suíte de testes. Usa `fs`, então só
 // roda em Node (testes e scripts) — nunca importe isto no app.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { Theme } from '../schema';
-import { validateTranslation, type ThemeTranslation } from '../translation';
-import { validateTheme } from '../validate';
+import type { Track } from '../schema';
+import { validateTranslation, type TrackTranslation } from '../translation';
+import { validateTrack } from '../validate';
 
 export type ScanError = { file: string; path: string; message: string };
 export type ScanResult = {
   ok: boolean;
-  themes: Theme[];
-  /** Traduções válidas por tema e idioma (`{ 'crud-4-frameworks': { en: {...} } }`). */
-  translations: Record<string, Record<string, ThemeTranslation>>;
+  tracks: Track[];
+  /** Traduções válidas por trilha e idioma (`{ 'crud-4-frameworks': { en: {...} } }`). */
+  translations: Record<string, Record<string, TrackTranslation>>;
   errors: ScanError[];
 };
 
@@ -21,14 +21,14 @@ export type ScanResult = {
 export const TRANSLATION_LANGUAGES = ['en'];
 
 /**
- * Valida cada `<dir>/<theme-id>/theme.json`: estrutura, integridade e id igual
+ * Valida cada `<dir>/<track-id>/track.json`: estrutura, integridade e id igual
  * ao nome da pasta. Arquivos soltos (ex.: `.gitkeep`) são ignorados.
  */
-export function scanThemesDirectory(dir: string): ScanResult {
-  const themes: Theme[] = [];
+export function scanTracksDirectory(dir: string): ScanResult {
+  const tracks: Track[] = [];
   const translations: ScanResult['translations'] = {};
   const errors: ScanError[] = [];
-  if (!fs.existsSync(dir)) return { ok: true, themes, translations, errors };
+  if (!fs.existsSync(dir)) return { ok: true, tracks, translations, errors };
 
   const folders = fs
     .readdirSync(dir, { withFileTypes: true })
@@ -37,11 +37,11 @@ export function scanThemesDirectory(dir: string): ScanResult {
     .sort();
 
   for (const folder of folders) {
-    const file = path.join(folder, 'theme.json');
+    const file = path.join(folder, 'track.json');
     const fullPath = path.join(dir, file);
 
     if (!fs.existsSync(fullPath)) {
-      errors.push({ file, path: '', message: 'a pasta do tema não tem theme.json' });
+      errors.push({ file, path: '', message: 'a pasta da trilha não tem track.json' });
       continue;
     }
 
@@ -53,28 +53,28 @@ export function scanThemesDirectory(dir: string): ScanResult {
       continue;
     }
 
-    const result = validateTheme(input);
+    const result = validateTrack(input);
     if (!result.ok) errors.push(...result.errors.map((err) => ({ file, ...err })));
 
-    const themeId = typeof input === 'object' && input !== null ? (input as { id?: unknown }).id : undefined;
-    const idMatches = themeId === folder;
-    if (typeof themeId === 'string' && !idMatches) {
-      errors.push({ file, path: 'id', message: `o id do tema (${themeId}) deve ser igual ao nome da pasta (${folder})` });
+    const trackId = typeof input === 'object' && input !== null ? (input as { id?: unknown }).id : undefined;
+    const idMatches = trackId === folder;
+    if (typeof trackId === 'string' && !idMatches) {
+      errors.push({ file, path: 'id', message: `o id da trilha (${trackId}) deve ser igual ao nome da pasta (${folder})` });
     }
 
     if (result.ok && idMatches) {
-      themes.push(result.theme);
-      const found = scanTranslations(dir, folder, result.theme, errors);
+      tracks.push(result.track);
+      const found = scanTranslations(dir, folder, result.track, errors);
       if (Object.keys(found).length > 0) translations[folder] = found;
     }
   }
 
-  return { ok: errors.length === 0, themes, translations, errors };
+  return { ok: errors.length === 0, tracks, translations, errors };
 }
 
-/** Valida cada `<theme-id>/translations/<idioma>.json` contra o tema já validado. */
-function scanTranslations(dir: string, folder: string, theme: Theme, errors: ScanError[]): Record<string, ThemeTranslation> {
-  const found: Record<string, ThemeTranslation> = {};
+/** Valida cada `<track-id>/translations/<idioma>.json` contra a trilha já validada. */
+function scanTranslations(dir: string, folder: string, track: Track, errors: ScanError[]): Record<string, TrackTranslation> {
+  const found: Record<string, TrackTranslation> = {};
   const translationsDir = path.join(dir, folder, 'translations');
   if (!fs.existsSync(translationsDir)) return found;
 
@@ -92,9 +92,9 @@ function scanTranslations(dir: string, folder: string, theme: Theme, errors: Sca
       errors.push({ file, path: '', message: `JSON inválido: ${(e as Error).message}` });
       continue;
     }
-    const problems = validateTranslation(theme, input);
+    const problems = validateTranslation(track, input);
     if (problems.length > 0) errors.push(...problems.map((err) => ({ file, ...err })));
-    else found[language] = input as ThemeTranslation;
+    else found[language] = input as TrackTranslation;
   }
   return found;
 }

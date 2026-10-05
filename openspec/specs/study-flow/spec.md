@@ -2,21 +2,21 @@
 
 ## Purpose
 
-Define o fluxo de estudo do app: abrir um tema, escolher um deck, estudar os cards como flashcards (frente e verso, "Já sabia"/"Não sabia"), ver o resumo da sessão e acompanhar o progresso.
+Define o fluxo de estudo do app: abrir uma trilha, escolher um deck, estudar os cards como flashcards (frente e verso, "Já sabia"/"Não sabia"), ver o resumo da sessão e acompanhar o progresso.
 ## Requirements
-### Requirement: Tela do tema
-Tocar num tema na aba Temas SHALL abrir a tela do tema em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL mostrar o título e a descrição do tema, os frameworks (variantes) quando o tema tiver, a quantidade de cards que o usuário marcou como "já sabia", o total de cards do tema e a lista de decks na ordem do conteúdo.
+### Requirement: Tela da trilha
+Tocar numa trilha na aba Trilhas SHALL abrir a tela da trilha em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL mostrar o título e a descrição da trilha, os frameworks (variantes) quando a trilha tiver, a quantidade de cards que o usuário marcou como "já sabia", o total de cards da trilha e a lista de decks na ordem do conteúdo.
 
-#### Scenario: Abrir o tema
-- **WHEN** o usuário toca em "O mesmo CRUD em quatro frameworks" na aba Temas
-- **THEN** a tela do tema abre com o título, os 4 frameworks e os 5 decks na ordem O que vamos criar, Passo a passo, Mapa mental, Glossário, Perguntas de entrevista
+#### Scenario: Abrir a trilha
+- **WHEN** o usuário toca em "O mesmo CRUD em quatro frameworks" na aba Trilhas
+- **THEN** a tela da trilha abre com o título, os 4 frameworks e os 5 decks na ordem O que vamos criar, Passo a passo, Mapa mental, Glossário, Perguntas de entrevista
 
-#### Scenario: Voltar para os temas
-- **WHEN** o usuário está na tela do tema e toca em voltar
-- **THEN** volta para a aba Temas
+#### Scenario: Voltar para as trilhas
+- **WHEN** o usuário está na tela da trilha e toca em voltar
+- **THEN** volta para a aba Trilhas
 
 ### Requirement: Deck com progresso e ação
-Cada deck na tela do tema SHALL mostrar o título, a quantidade de cards, quantos estão marcados como "já sabia" (ex.: "3/20"), uma barra de progresso proporcional e um botão de ação:
+Cada deck na tela da trilha SHALL mostrar o título, a quantidade de cards, quantos estão marcados como "já sabia" (ex.: "3/20"), uma barra de progresso proporcional e um botão de ação:
 - **Estudar**, quando nenhum card do deck tem resposta registrada. Abre uma sessão com todos os cards, na ordem do deck;
 - **Continuar**, quando algum card tem resposta, mas nem todos estão como "já sabia". Abre uma sessão com os cards que ainda não estão como "já sabia", na ordem do deck;
 - **Estudar de novo**, quando todos os cards estão como "já sabia". Abre uma sessão com todos os cards.
@@ -42,7 +42,7 @@ A sessão SHALL abrir em tela cheia, sem a barra de abas. O cabeçalho SHALL ter
 
 #### Scenario: Sair no meio
 - **WHEN** o usuário respondeu 3 cards e toca em "Sair da sessão"
-- **THEN** volta para a tela do tema, e as 3 respostas continuam registradas no progresso
+- **THEN** volta para a tela da trilha, e as 3 respostas continuam registradas no progresso
 
 ### Requirement: Virar e responder
 Cada card SHALL começar pela frente. Tocar no card ou no botão "Mostrar resposta" SHALL mostrar o verso. Só com o verso visível SHALL aparecer os botões "Não sabia" e "Já sabia". Tocar em um deles SHALL registrar a resposta para aquele card e avançar para o próximo, que começa pela frente. Depois do último card, a sessão SHALL mostrar o resumo.
@@ -66,7 +66,7 @@ Cada tipo de card SHALL ter frente e verso próprios:
 |---|---|---|
 | endpoint | método e caminho, e a pergunta "Qual operação do CRUD é essa e que status a API devolve?" | operação (ex.: "C · Create"), descrição, status de sucesso e de erro |
 | step | "Passo N", título, "o que é" e a pergunta "Como cada framework faz isso?" | "por que importa", abas de framework e o snippet do framework selecionado |
-| compare | conceito, explicação e a pergunta "Como cada stack resolve isso?" | uma linha por coluna do tema, com rótulo e valor |
+| compare | conceito, explicação e a pergunta "Como cada stack resolve isso?" | uma linha por coluna da trilha, com rótulo e valor |
 | concept | termo e o convite "O que significa?" | definição |
 | code | título e explicação (`body`) | snippet |
 | question | a pergunta e o convite "Responda em voz alta antes de virar." | a pergunta, a resposta modelo e o snippet, quando houver |
@@ -98,7 +98,7 @@ Todo card com `origin: "supplement"` SHALL exibir o selo "Complemento" na frente
 - **THEN** a frente mostra "Qual a diferença entre PUT e PATCH?" e o selo "Complemento", e o verso mostra a resposta modelo e o snippet com os dois comandos `curl`
 
 ### Requirement: Abas de framework
-No verso de um card `step`, as abas SHALL listar as variantes do tema na ordem do tema, e uma delas SHALL estar selecionada (indicada para leitores de tela). Tocar numa aba SHALL trocar o snippet exibido (arquivo, código e nota). A aba escolhida SHALL continuar selecionada nos próximos cards `step`. Na primeira vez, a aba selecionada SHALL ser a primeira variante do tema.
+No verso de um card `step`, as abas SHALL listar as variantes da trilha na ordem da trilha, e uma delas SHALL estar selecionada (indicada para leitores de tela). Tocar numa aba SHALL trocar o snippet exibido (arquivo, código e nota). A aba escolhida SHALL continuar selecionada nos próximos cards `step`. Na primeira vez, a aba selecionada SHALL ser a primeira variante da trilha.
 
 #### Scenario: Trocar de framework
 - **WHEN** o verso do Passo 1 está visível com Express selecionado e o usuário toca em FastAPI
@@ -120,7 +120,7 @@ Ao responder o último card, a sessão SHALL mostrar o resumo:
 - quantos cards foram marcados como "já sabia" e como "não sabia" nesta sessão, com esses rótulos;
 - a lista dos cards marcados como "não sabia", identificados pelo tipo e pelo título;
 - o botão **Revisar os que errei**, só quando houver algum "não sabia", que inicia uma nova sessão apenas com esses cards, na mesma ordem;
-- o botão **Voltar ao tema**.
+- o botão **Voltar à trilha**.
 
 #### Scenario: Resumo com erros
 - **WHEN** numa sessão de 5 cards o usuário marcou 3 "já sabia" e 2 "não sabia"
@@ -131,11 +131,11 @@ Ao responder o último card, a sessão SHALL mostrar o resumo:
 - **THEN** o resumo não mostra o botão "Revisar os que errei" nem a lista para revisar
 
 ### Requirement: Progresso de cada card
-O progresso de cada card SHALL ser a última resposta registrada ("já sabia" ou "não sabia"), ou nenhuma. Ele SHALL valer para todo o app: a tela do tema e a aba Temas refletem cada resposta assim que é registrada. Responder um card de novo SHALL substituir a resposta anterior. A persistência entre aberturas do app é definida pela capability `progress`.
+O progresso de cada card SHALL ser a última resposta registrada ("já sabia" ou "não sabia"), ou nenhuma. Ele SHALL valer para todo o app: a tela da trilha e a aba Trilhas refletem cada resposta assim que é registrada. Responder um card de novo SHALL substituir a resposta anterior. A persistência entre aberturas do app é definida pela capability `progress`.
 
-#### Scenario: Progresso refletido na tela do tema
-- **WHEN** o usuário marca 2 cards do Glossário como "já sabia" e volta para a tela do tema
-- **THEN** o deck Glossário mostra "2/24", e o total de "já sabia" do tema aumentou em 2
+#### Scenario: Progresso refletido na tela da trilha
+- **WHEN** o usuário marca 2 cards do Glossário como "já sabia" e volta para a tela da trilha
+- **THEN** o deck Glossário mostra "2/24", e o total de "já sabia" da trilha aumentou em 2
 
 #### Scenario: Resposta substituída
 - **WHEN** um card marcado como "não sabia" é marcado como "já sabia" numa nova sessão

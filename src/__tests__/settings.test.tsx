@@ -10,7 +10,7 @@ import ProgressScreen from '../app/(tabs)/progress';
 import SettingsScreen from '../app/settings';
 import { useSettingsStore } from '../i18n';
 import { resetStudyStore, useStudyStore } from '../study/store';
-import { crudTheme } from '../test-utils';
+import { crudTrack } from '../test-utils';
 
 const APP = {
   _layout: RootLayout,
@@ -72,20 +72,20 @@ describe('Requirement: Trocar o idioma', () => {
     expect(screen.getByRole('header', { name: 'Settings' })).toBeOnTheScreen();
     expect(useSettingsStore.getState().language).toBe('en');
     press('Back');
-    expect(tabLabels()).toEqual(['Topics', 'Glossary', 'Progress']);
+    expect(tabLabels()).toEqual(['Tracks', 'Glossary', 'Progress']);
   });
 });
 
 describe('Requirement: Trocar o idioma (progresso)', () => {
   it('Progresso preservado', async () => {
     resetStudyStore();
-    const ids = crudTheme.decks
+    const ids = crudTrack.decks
       .flatMap((d) => d.cards)
       .slice(0, 4)
       .map((c) => c.id);
-    ids.forEach((id) => useStudyStore.getState().answer(crudTheme.id, id, 'known'));
+    ids.forEach((id) => useStudyStore.getState().answer(crudTrack.id, id, 'known'));
     await open('/progress');
-    expect(screen.getByTestId(`theme-progress-${crudTheme.id}`)).toBeOnTheScreen();
+    expect(screen.getByTestId(`track-progress-${crudTrack.id}`)).toBeOnTheScreen();
     expect(screen.getAllByLabelText('4 já sabia').length).toBeGreaterThan(0);
     press('Ajustes');
     fireEvent.press(radio('English'));

@@ -4,7 +4,7 @@ import { progressKey } from '../rules';
 import { STUDY_STORAGE_KEY, resetStudyStore, useStudyStore } from '../store';
 
 const store = () => useStudyStore.getState();
-const THEME = 'crud-4-frameworks';
+const TRACK = 'crud-4-frameworks';
 
 /** Espera as gravações assíncronas do persist. */
 const flush = () => new Promise((r) => setTimeout(r, 0));
@@ -29,20 +29,20 @@ beforeEach(async () => {
 
 describe('Requirement: Progresso salvo no aparelho', () => {
   it('Progresso mantido ao reabrir', async () => {
-    store().answer(THEME, 'api', 'known');
-    store().answer(THEME, 'crud', 'known');
-    store().answer(THEME, 'cors', 'known');
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'crud', 'known');
+    store().answer(TRACK, 'cors', 'known');
     await flush();
     await reopen();
     expect(Object.values(store().progress)).toEqual(['known', 'known', 'known']);
-    expect(store().progress[progressKey(THEME, 'cors')]).toBe('known');
+    expect(store().progress[progressKey(TRACK, 'cors')]).toBe('known');
   });
 
   it('Framework preferido mantido ao reabrir', async () => {
-    store().setVariant(THEME, 'fastapi');
+    store().setVariant(TRACK, 'fastapi');
     await flush();
     await reopen();
-    expect(store().preferredVariant[THEME]).toBe('fastapi');
+    expect(store().preferredVariant[TRACK]).toBe('fastapi');
   });
 
   it('Dados salvos inválidos', async () => {
@@ -69,13 +69,13 @@ describe('Requirement: Progresso salvo no aparelho', () => {
 
   it('falha de escrita não quebra', async () => {
     (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error('disco cheio'));
-    expect(() => store().answer(THEME, 'api', 'known')).not.toThrow();
+    expect(() => store().answer(TRACK, 'api', 'known')).not.toThrow();
     await flush();
-    expect(store().progress[progressKey(THEME, 'api')]).toBe('known');
+    expect(store().progress[progressKey(TRACK, 'api')]).toBe('known');
   });
 
   it('só dados são salvos, não funções', async () => {
-    store().answer(THEME, 'api', 'unknown');
+    store().answer(TRACK, 'api', 'unknown');
     await flush();
     const saved = JSON.parse((await AsyncStorage.getItem(STUDY_STORAGE_KEY))!);
     expect(Object.keys(saved.state).sort()).toEqual(['lastStudyDay', 'preferredVariant', 'progress', 'schedule']);
@@ -83,17 +83,17 @@ describe('Requirement: Progresso salvo no aparelho', () => {
   });
 });
 
-describe('Requirement: Zerar progresso de um tema', () => {
-  it('Zerar mantém outros temas e o framework preferido', async () => {
-    store().answer(THEME, 'api', 'known');
-    store().answer(THEME, 'cors', 'unknown');
-    store().answer('outro-tema', 'api', 'known');
-    store().setVariant(THEME, 'fastapi');
-    store().resetTheme(THEME);
-    expect(store().progress).toEqual({ [progressKey('outro-tema', 'api')]: 'known' });
-    expect(store().preferredVariant[THEME]).toBe('fastapi');
+describe('Requirement: Zerar progresso de uma trilha', () => {
+  it('Zerar mantém outras trilhas e o framework preferido', async () => {
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'cors', 'unknown');
+    store().answer('outro-trilha', 'api', 'known');
+    store().setVariant(TRACK, 'fastapi');
+    store().resetTrack(TRACK);
+    expect(store().progress).toEqual({ [progressKey('outro-trilha', 'api')]: 'known' });
+    expect(store().preferredVariant[TRACK]).toBe('fastapi');
     await flush();
     await reopen();
-    expect(store().progress).toEqual({ [progressKey('outro-tema', 'api')]: 'known' });
+    expect(store().progress).toEqual({ [progressKey('outro-trilha', 'api')]: 'known' });
   });
 });

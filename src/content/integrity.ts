@@ -1,4 +1,4 @@
-// Passada de integridade: regras que cruzam partes do tema (unicidade,
+// Passada de integridade: regras que cruzam partes da trilha (unicidade,
 // referências, cobertura de variantes e colunas). Roda sobre o input CRU, de
 // forma defensiva, para reportar esses erros mesmo quando a estrutura também
 // falhou. Nós com formato inesperado são ignorados aqui: a passada estrutural
@@ -31,7 +31,7 @@ export function checkIntegrity(input: unknown): ContentError[] {
   const columns = declaredIds(input.compareColumns);
 
   checkUniqueIds(input.decks, 'decks', 'deck', push);
-  checkCardsAcrossTheme(input.decks, push);
+  checkCardsAcrossTrack(input.decks, push);
 
   list(input.decks).forEach((deck, d) => {
     if (!isObj(deck)) return;
@@ -68,8 +68,8 @@ function checkUniqueIds(value: unknown, key: string, label: string, push: Push) 
   });
 }
 
-/** Unicidade de ids de card e de termos no tema inteiro, e validade de `relatedTerms`. */
-function checkCardsAcrossTheme(decks: unknown, push: Push) {
+/** Unicidade de ids de card e de termos na trilha inteira, e validade de `relatedTerms`. */
+function checkCardsAcrossTrack(decks: unknown, push: Push) {
   const cards: { card: Obj; at: PathSegment[] }[] = [];
   list(decks).forEach((deck, d) => {
     if (!isObj(deck)) return;
@@ -83,13 +83,13 @@ function checkCardsAcrossTheme(decks: unknown, push: Push) {
   for (const { card, at } of cards) {
     const cardId = str(card.id);
     if (cardId !== undefined) {
-      if (typeById.has(cardId)) push([...at, 'id'], `id de card duplicado no tema: ${cardId}`);
+      if (typeById.has(cardId)) push([...at, 'id'], `id de card duplicado na trilha: ${cardId}`);
       else typeById.set(cardId, card.type);
     }
     const term = card.type === 'concept' ? str(card.term) : undefined;
     if (term !== undefined && term.trim()) {
       const key = term.trim().toLowerCase();
-      if (terms.has(key)) push([...at, 'term'], `termo duplicado no tema: ${term}`);
+      if (terms.has(key)) push([...at, 'term'], `termo duplicado na trilha: ${term}`);
       terms.add(key);
     }
   }
@@ -116,19 +116,19 @@ function checkStep(card: Obj, at: PathSegment[], variants: Set<string> | undefin
   }
 }
 
-/** Confere que as chaves de um mapa são exatamente os ids declarados no tema. */
+/** Confere que as chaves de um mapa são exatamente os ids declarados na trilha. */
 function checkKeysCover(
   map: unknown,
   at: PathSegment[],
   declared: Set<string> | undefined,
-  themeKey: string,
+  trackKey: string,
   cardType: string,
   label: string,
   missingLabel: string,
   push: Push,
 ) {
   if (declared === undefined) {
-    push(at.slice(0, -1), `cards ${cardType} exigem ${themeKey} declarado no tema`);
+    push(at.slice(0, -1), `cards ${cardType} exigem ${trackKey} declarado na trilha`);
     return;
   }
   if (!isObj(map)) return;

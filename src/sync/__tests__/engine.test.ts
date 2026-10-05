@@ -11,8 +11,8 @@ import { SYNC_STORAGE_KEY, resetSyncStore, useSyncStore } from '../store';
 import { startSyncTracking } from '../track';
 import { fakeServer } from '../__fixtures__/fakeServer';
 
-const THEME = 'crud-4-frameworks';
-const key = (cardId: string) => progressKey(THEME, cardId);
+const TRACK = 'crud-4-frameworks';
+const key = (cardId: string) => progressKey(TRACK, cardId);
 const study = () => useStudyStore.getState();
 const ana = { id: 'u1', name: 'Ana', email: 'ana@example.com', photoUrl: null };
 
@@ -43,7 +43,7 @@ describe('Requirement: O que sincroniza', () => {
     await signIn();
     await syncNow(); // primeiro login: conta vazia
     server.putCard({
-      themeId: THEME,
+      trackId: TRACK,
       cardId: 'cors',
       result: 'known',
       box: 2,
@@ -59,9 +59,9 @@ describe('Requirement: O que sincroniza', () => {
     await signIn();
     await syncNow();
     useSettingsStore.getState().setLanguage('en');
-    study().setVariant(THEME, 'nest');
+    study().setVariant(TRACK, 'nest');
     await syncNow();
-    expect(server.settings()).toMatchObject({ language: 'en', preferredVariant: { [THEME]: 'nest' } });
+    expect(server.settings()).toMatchObject({ language: 'en', preferredVariant: { [TRACK]: 'nest' } });
   });
 
   it('Lembretes por aparelho', async () => {
@@ -74,7 +74,7 @@ describe('Requirement: O que sincroniza', () => {
   });
 
   it('Sem conta', async () => {
-    study().answer(THEME, 'cors', 'known');
+    study().answer(TRACK, 'cors', 'known');
     await syncNow();
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -86,9 +86,9 @@ describe('Requirement: Quando sincronizar', () => {
     await syncNow();
     jest.useFakeTimers();
     const before = server.calls.length;
-    study().answer(THEME, 'api', 'known');
-    study().answer(THEME, 'crud', 'known');
-    study().answer(THEME, 'cors', 'unknown');
+    study().answer(TRACK, 'api', 'known');
+    study().answer(TRACK, 'crud', 'known');
+    study().answer(TRACK, 'cors', 'unknown');
     jest.advanceTimersByTime(4_999);
     expect(server.calls.length).toBe(before);
     jest.advanceTimersByTime(1);
@@ -97,16 +97,16 @@ describe('Requirement: Quando sincronizar', () => {
     await syncNow(); // espera a sincronização disparada terminar
     const puts = server.calls.slice(before).filter((c) => c === 'PUT /sync');
     expect(puts.length).toBeGreaterThanOrEqual(1);
-    expect(server.card(THEME, 'cors')?.result).toBe('unknown');
+    expect(server.card(TRACK, 'cors')?.result).toBe('unknown');
   });
 
   it('Offline e depois online', async () => {
     await signIn();
     await syncNow();
     server.setOffline(true);
-    study().answer(THEME, 'cors', 'known');
+    study().answer(TRACK, 'cors', 'known');
     await syncNow();
-    expect(server.card(THEME, 'cors')).toBeUndefined();
+    expect(server.card(TRACK, 'cors')).toBeUndefined();
     // "fechar o app": a fila precisa estar salva no aparelho
     await new Promise((r) => setTimeout(r, 0));
     const saved = await AsyncStorage.getItem(SYNC_STORAGE_KEY);
@@ -116,7 +116,7 @@ describe('Requirement: Quando sincronizar', () => {
     await useSyncStore.persist.rehydrate();
     server.setOffline(false);
     await syncNow();
-    expect(server.card(THEME, 'cors')?.result).toBe('known');
+    expect(server.card(TRACK, 'cors')?.result).toBe('known');
   });
 });
 
@@ -126,11 +126,11 @@ describe('Requirement: Conflitos', () => {
     await syncNow();
     const t = Date.now();
     jest.spyOn(Date, 'now').mockReturnValue(t); // aparelho A responde às "10:00"
-    study().answer(THEME, 'cors', 'unknown');
+    study().answer(TRACK, 'cors', 'unknown');
     (Date.now as jest.Mock).mockRestore();
     // aparelho B, às "10:05", já tinha enviado "já sabia"
     server.putCard({
-      themeId: THEME,
+      trackId: TRACK,
       cardId: 'cors',
       result: 'known',
       box: 2,
@@ -139,16 +139,16 @@ describe('Requirement: Conflitos', () => {
     });
     await syncNow();
     expect(study().progress[key('cors')]).toBe('known');
-    expect(server.card(THEME, 'cors')?.result).toBe('known');
+    expect(server.card(TRACK, 'cors')?.result).toBe('known');
   });
 
   it('Cards diferentes', async () => {
     await signIn();
     await syncNow();
     server.setOffline(true);
-    study().answer(THEME, 'api', 'known'); // aparelho A, offline
+    study().answer(TRACK, 'api', 'known'); // aparelho A, offline
     server.putCard({
-      themeId: THEME,
+      trackId: TRACK,
       cardId: 'cors',
       result: 'known',
       box: 2,
@@ -159,13 +159,13 @@ describe('Requirement: Conflitos', () => {
     await syncNow();
     expect(study().progress[key('api')]).toBe('known');
     expect(study().progress[key('cors')]).toBe('known');
-    expect(server.card(THEME, 'api')?.result).toBe('known');
+    expect(server.card(TRACK, 'api')?.result).toBe('known');
   });
 });
 
 describe('Requirement: Primeiro login', () => {
   it('Aparelho com progresso, conta vazia', async () => {
-    for (const id of ['api', 'crud', 'endpoint']) study().answer(THEME, id, 'known');
+    for (const id of ['api', 'crud', 'endpoint']) study().answer(TRACK, id, 'known');
     await signIn();
     await syncNow();
     expect(server.cardCount()).toBe(3);
@@ -173,13 +173,13 @@ describe('Requirement: Primeiro login', () => {
   });
 
   it('Os dois com progresso', async () => {
-    study().answer(THEME, 'api', 'known');
-    server.putCard({ themeId: THEME, cardId: 'cors', result: 'unknown', box: 1, due: '2026-10-02', updatedAt: 50 });
+    study().answer(TRACK, 'api', 'known');
+    server.putCard({ trackId: TRACK, cardId: 'cors', result: 'unknown', box: 1, due: '2026-10-02', updatedAt: 50 });
     await signIn();
     await syncNow();
     expect(study().progress[key('cors')]).toBe('unknown');
     expect(study().progress[key('api')]).toBe('known');
-    expect(server.card(THEME, 'api')?.result).toBe('known');
+    expect(server.card(TRACK, 'api')?.result).toBe('known');
   });
 
   it('a mensagem aparece só no primeiro login', async () => {
@@ -194,19 +194,19 @@ describe('Requirement: Primeiro login', () => {
 describe('Requirement: Zerar sincronizado', () => {
   it('Zerar em um aparelho', async () => {
     await signIn();
-    study().answer(THEME, 'cors', 'known');
+    study().answer(TRACK, 'cors', 'known');
     await syncNow();
-    study().resetTheme(THEME);
+    study().resetTrack(TRACK);
     await syncNow();
-    expect(server.card(THEME, 'cors')).toMatchObject({ result: null, box: null, due: null });
+    expect(server.card(TRACK, 'cors')).toMatchObject({ result: null, box: null, due: null });
   });
 
   it('zerado em outro aparelho chega aqui', async () => {
     await signIn();
-    study().answer(THEME, 'cors', 'known');
+    study().answer(TRACK, 'cors', 'known');
     await syncNow();
     server.putCard({
-      themeId: THEME,
+      trackId: TRACK,
       cardId: 'cors',
       result: null,
       box: null,
@@ -235,7 +235,7 @@ describe('estado e saída', () => {
     await signIn();
     await syncNow();
     server.setOffline(true);
-    study().answer(THEME, 'cors', 'known');
+    study().answer(TRACK, 'cors', 'known');
     useAccountStore.setState({ user: null });
     expect(Object.keys(useSyncStore.getState().pendingCards)).toHaveLength(0);
     expect(useSyncStore.getState().syncedUserId).toBeNull();

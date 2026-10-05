@@ -2,15 +2,15 @@
 
 A mobile study app with cards that reinforce fullstack development concepts that come up in job interviews.
 
-Pick a **theme**, open a **deck** and study the **cards** as flashcards: flip the card, answer "I knew it" or "I didn't know", and the app schedules the next review. It works offline and without an account. Google sign-in is optional and is used to sync your progress across devices.
+Pick a **track**, open a **deck** and study the **cards** as flashcards: flip the card, answer "I knew it" or "I didn't know", and the app schedules the next review. It works offline and without an account. Google sign-in is optional and is used to sync your progress across devices.
 
 ## Features
 
-- **Themes and decks**: "The same CRUD in four frameworks" (Express, Spring Boot, NestJS, FastAPI) and "Web fundamentals" (HTTP, REST, browser and security, interview questions).
+- **Tracks and decks**: "The same CRUD in four frameworks" (Express, Spring Boot, NestJS, FastAPI) and "Web fundamentals" (HTTP, REST, browser and security, interview questions).
 - **Flashcards** with a flip animation, code with tabs per variant, and a summary at the end of each session.
 - **Spaced repetition** with boxes, plus a daily review.
 - **Glossary** with search; terms mentioned in cards open their definition in a bottom sheet.
-- **Progress** per theme and per deck, stored on the device, with an option to reset.
+- **Progress** per track and per deck, stored on the device, with an option to reset.
 - **Daily reminders** (optional), using local notifications.
 - **Languages**: Brazilian Portuguese and English (UI and content).
 - **Light and dark mode.**
@@ -42,7 +42,7 @@ src/
   theme/        colors, fonts and light/dark mode
 content/
   sources/      original editorial material (Markdown)
-  themes/       content used by the app (theme.json + translations/)
+  tracks/       content used by the app (track.json + translations/)
 api/            API (Cloudflare Workers + D1)
 openspec/       specs (source of truth) and changes
 docs/           decisions, design backlog and legal pages
@@ -109,7 +109,7 @@ Routes: `GET /health`, `POST /auth/google`, `POST /auth/refresh`, `POST /auth/lo
 Content is kept separate from the code:
 
 - `content/sources/*.md` is the original editorial material.
-- `content/themes/<theme-id>/theme.json` is what the app loads, validated by the Zod schema from the `content-model` capability. Translations live in `translations/en.json`.
+- `content/tracks/<track-id>/track.json` is what the app loads, validated by the Zod schema from the `content-model` capability. Translations live in `translations/en.json`.
 
 Gaps in the original material are filled with cards marked as supplements (`origin: "supplement"`), so they're never mistaken for the original. Keys are in English; displayed text is in Brazilian Portuguese (and English through translations).
 

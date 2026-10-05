@@ -69,12 +69,12 @@ describe('Requirement: Página não encontrada', () => {
   it('Rota inexistente', async () => {
     await open('/nao-existe');
     expect(screen.getByRole('header', { name: 'Não encontramos esta página' })).toBeOnTheScreen();
-    expect(screen.getByRole('link', { name: 'Ir para Temas' })).toBeOnTheScreen();
+    expect(screen.getByRole('link', { name: 'Ir para Trilhas' })).toBeOnTheScreen();
   });
 
-  it('Ir para Temas', async () => {
+  it('Ir para Trilhas', async () => {
     await open('/nao-existe');
-    fireEvent.press(screen.getByRole('link', { name: 'Ir para Temas' }));
+    fireEvent.press(screen.getByRole('link', { name: 'Ir para Trilhas' }));
     await act(async () => {});
     expect(screen).toHavePathname('/');
   });

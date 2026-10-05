@@ -67,7 +67,7 @@ function apply(pull: Pull) {
   let changed = false;
 
   for (const c of pull.cards) {
-    const key = `${c.themeId}:${c.cardId}`;
+    const key = `${c.trackId}:${c.cardId}`;
     if (c.updatedAt <= (stamps[key] ?? 0)) continue; // a versão local é mais nova (ou igual)
     if (c.result) progress[key] = c.result;
     else delete progress[key];

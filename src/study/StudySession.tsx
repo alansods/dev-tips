@@ -9,7 +9,7 @@ import { CardFace } from '../components/cards/CardFace';
 import { IconButton } from '../components/IconButton';
 import { CloseIcon } from '../components/icons';
 import { ProgressBar } from '../components/ProgressBar';
-import type { Card, Theme } from '../content';
+import type { Card, Track } from '../content';
 import { TermSheet } from '../glossary/TermSheet';
 import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
@@ -19,13 +19,13 @@ import { cardTitle, initialSession, sessionReducer, summary, type SessionState }
 import { useStudyStore } from './store';
 import { useReducedMotion } from './useReducedMotion';
 
-export function leaveToTheme(themeId: string) {
+export function leaveToTrack(trackId: string) {
   if (router.canGoBack()) router.back();
-  else router.replace(`/theme/${themeId}`);
+  else router.replace(`/track/${trackId}`);
 }
 
 type SessionProps = {
-  theme: Theme;
+  track: Track;
   /** Nome exibido no cabeçalho e no resumo (ex.: título do deck ou "Revisão de hoje"). */
   title: string;
   /** Ids dos cards, calculados uma única vez na abertura da sessão. */
@@ -33,16 +33,16 @@ type SessionProps = {
 };
 
 /** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
-export function StudySession({ theme, title, initialIds }: SessionProps) {
+export function StudySession({ track, title, initialIds }: SessionProps) {
   const { colors } = useTheme();
   const t = useT();
   const answerCard = useStudyStore((s) => s.answer);
   const setVariant = useStudyStore((s) => s.setVariant);
-  const variantId = useStudyStore((s) => s.preferredVariant[theme.id]) ?? theme.variants?.[0]?.id ?? '';
+  const variantId = useStudyStore((s) => s.preferredVariant[track.id]) ?? track.variants?.[0]?.id ?? '';
 
   // A ordem é fixada ao abrir a sessão.
   const [state, dispatch] = useReducer(sessionReducer, undefined, () => initialSession(initialIds()));
-  const cardsById = useMemo(() => new Map(theme.decks.flatMap((d) => d.cards).map((c) => [c.id, c])), [theme]);
+  const cardsById = useMemo(() => new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c])), [track]);
   const [openTerm, setOpenTerm] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
   // 0 = de lado (90°, invisível), 1 = de frente. Anima só quando o verso é pedido.
@@ -70,7 +70,7 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
     ],
   };
 
-  const exit = () => leaveToTheme(theme.id);
+  const exit = () => leaveToTrack(track.id);
 
   if (state.finished) {
     return (
@@ -89,7 +89,7 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
   const card = cardsById.get(state.ids[state.index])!;
   const total = state.ids.length;
   const respond = (result: 'known' | 'unknown') => {
-    answerCard(theme.id, card.id, result);
+    answerCard(track.id, card.id, result);
     dispatch({ type: 'answer', result });
   };
 
@@ -116,10 +116,10 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
             <Animated.View style={flipStyle}>
               <CardFace
                 card={card}
-                theme={theme}
+                track={track}
                 side="back"
                 variantId={variantId}
-                onSelectVariant={(id) => setVariant(theme.id, id)}
+                onSelectVariant={(id) => setVariant(track.id, id)}
                 onOpenTerm={setOpenTerm}
               />
             </Animated.View>
@@ -130,7 +130,7 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
               accessibilityHint={t.session.flipHint}
               onPress={() => dispatch({ type: 'reveal' })}
             >
-              <CardFace card={card} theme={theme} side="front" variantId={variantId} onSelectVariant={() => {}} />
+              <CardFace card={card} track={track} side="front" variantId={variantId} onSelectVariant={() => {}} />
               <AppText size={13} tone="accentText" font="medium" style={{ marginTop: spacing.lg }}>
                 {t.session.tapToReveal}
               </AppText>
@@ -149,7 +149,7 @@ export function StudySession({ theme, title, initialIds }: SessionProps) {
           <Button title={t.session.showAnswer} onPress={() => dispatch({ type: 'reveal' })} />
         )}
       </View>
-      <TermSheet theme={theme} termId={openTerm} onChangeTerm={setOpenTerm} onClose={() => setOpenTerm(null)} />
+      <TermSheet track={track} termId={openTerm} onChangeTerm={setOpenTerm} onClose={() => setOpenTerm(null)} />
     </SafeAreaView>
   );
 }
@@ -230,7 +230,7 @@ function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: Su
           </View>
         )}
         <View style={{ flexDirection: 'row' }}>
-          <Button title={t.summary.backToTheme} variant="secondary" onPress={onBack} />
+          <Button title={t.summary.backToTrack} variant="secondary" onPress={onBack} />
         </View>
       </View>
     </ScrollView>

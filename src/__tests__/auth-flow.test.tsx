@@ -102,7 +102,7 @@ describe('Requirement: Tela de login', () => {
     expect(useAccountStore.getState().user).toBeNull();
   });
 
-  it('depois de visto, o app abre direto na aba Temas', async () => {
+  it('depois de visto, o app abre direto na aba Trilhas', async () => {
     await open('/');
     expect(screen).toHavePathname('/');
   });

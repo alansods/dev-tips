@@ -1,14 +1,14 @@
-import { fullTheme } from '../__fixtures__/themes';
+import { fullTrack } from '../__fixtures__/tracks';
 import { catalog } from '../catalog';
-import { themeSchema, type Theme } from '../schema';
-import { missingTranslations, themeTranslationSchema } from '../translation';
+import { trackSchema, type Track } from '../schema';
+import { missingTranslations, trackTranslationSchema } from '../translation';
 import { translationRegistry } from '../translations';
 
-const theme = (): Theme => themeSchema.parse(fullTheme());
+const track = (): Track => trackSchema.parse(fullTrack());
 
 describe('missingTranslations', () => {
   it('lista os textos exibidos sem tradução', () => {
-    const missing = missingTranslations(theme(), { title: 'T', cards: { cors: { term: 'CORS' } } });
+    const missing = missingTranslations(track(), { title: 'T', cards: { cors: { term: 'CORS' } } });
     expect(missing).toContain('description');
     expect(missing).toContain('compareColumns.frontend');
     expect(missing).toContain('decks.endpoints.title');
@@ -22,13 +22,13 @@ describe('missingTranslations', () => {
   });
 
   it('só exige campos que existem no original', () => {
-    const missing = missingTranslations(theme(), {});
+    const missing = missingTranslations(track(), {});
     expect(missing).not.toContain('decks.endpoints.description'); // o deck não tem descrição
     expect(missing).not.toContain('cards.api.frontendAnalogy');
   });
 
   it('exige a nota do snippet quando o original tem nota', () => {
-    const t = theme();
+    const t = track();
     const step = t.decks[1].cards[0];
     if (step.type !== 'step') throw new Error('esperava step');
     step.snippets.express.note = 'Uma nota.';
@@ -41,6 +41,6 @@ describe('Requirement: Tradução completa para inglês', () => {
   it.each(catalog.map((t) => [t.id, t] as const))('Cobertura completa: %s', (id, t) => {
     const raw = translationRegistry[id]?.en;
     expect(raw).toBeDefined();
-    expect(missingTranslations(t, themeTranslationSchema.parse(raw))).toEqual([]);
+    expect(missingTranslations(t, trackTranslationSchema.parse(raw))).toEqual([]);
   });
 });

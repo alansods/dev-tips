@@ -4,7 +4,7 @@
 import { API_URL } from '../../auth/config';
 
 export type Card = {
-  themeId: string;
+  trackId: string;
   cardId: string;
   result: 'known' | 'unknown' | null;
   box: number | null;
@@ -50,13 +50,13 @@ export function fakeServer() {
     calls,
     /** Mudança vinda de "outro aparelho". */
     putCard(c: Card) {
-      const key = `${c.themeId}:${c.cardId}`;
+      const key = `${c.trackId}:${c.cardId}`;
       const old = cards.get(key);
       clock += 1; // cada gravação ganha um horário de servidor novo, como na API
       if (!old || c.updatedAt > old.updatedAt) cards.set(key, { ...c, serverAt: clock });
     },
-    card: (themeId: string, cardId: string) => {
-      const c = cards.get(`${themeId}:${cardId}`);
+    card: (trackId: string, cardId: string) => {
+      const c = cards.get(`${trackId}:${cardId}`);
       return c ? (({ serverAt: _s, ...rest }) => rest)(c) : undefined;
     },
     cardCount: () => cards.size,
