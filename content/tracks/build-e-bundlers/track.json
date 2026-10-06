@@ -1,0 +1,332 @@
+{
+  "id": "build-e-bundlers",
+  "title": "Build e bundlers",
+  "description": "Do código-fonte ao que roda no navegador e no aparelho: transpilação, Babel, Vite, Webpack, Metro, Hermes, variáveis de ambiente e perfis do EAS.",
+  "areas": [
+    "frontend",
+    "mobile"
+  ],
+  "language": "javascript",
+  "decks": [
+    {
+      "id": "transpilacao",
+      "title": "Transpilação",
+      "description": "Transformar o código que você escreve no código que o ambiente entende.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "transpilacao",
+          "level": "junior",
+          "term": "Transpilação",
+          "definition": "Converter código de uma forma de JavaScript para outra: TypeScript para JavaScript (removendo os tipos), JSX para chamadas de função e sintaxe nova (optional chaining, class fields) para uma que os ambientes de destino entendem. Diferente da compilação para código de máquina, o resultado continua sendo JavaScript. Transpilar não confere tipos: quem acusa erro de tipo é o tsc --noEmit, que roda à parte, no editor e na CI.",
+          "relatedTerms": [
+            "babel",
+            "alvos-e-polyfills"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "babel",
+          "level": "pleno",
+          "term": "Babel",
+          "definition": "Transpilador de JavaScript configurado por presets (pacotes de regras) e plugins (uma transformação cada). No React Native e no Expo ele roda dentro do Metro, com o babel-preset-expo, que já cuida de JSX, TypeScript e das otimizações da plataforma. Na web, ferramentas escritas em Rust ou Go fazem o mesmo papel muito mais rápido: SWC (Next.js), esbuild e Oxc (Vite). Hoje o Babel aparece mais quando é preciso um plugin específico, como os de worklets do Reanimated.",
+          "relatedTerms": [
+            "transpilacao",
+            "metro"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "alvos-e-polyfills",
+          "level": "pleno",
+          "term": "Alvos e polyfills",
+          "definition": "Os alvos dizem quais navegadores ou motores o build precisa suportar, por exemplo com uma lista browserslist (\"> 0.5%, last 2 versions, not dead\") ou o build.target do Vite. A partir deles, o transpilador reescreve só a sintaxe que falta. Sintaxe é diferente de API: transpilar não cria Array.prototype.at nem structuredClone; para isso existem polyfills (core-js), que adicionam a implementação em tempo de execução. Alvos amplos demais deixam o bundle maior e mais lento para todo mundo.",
+          "relatedTerms": [
+            "transpilacao",
+            "babel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "source-maps",
+          "level": "pleno",
+          "term": "Source maps",
+          "definition": "Arquivos .map que ligam cada trecho do código gerado (transpilado e minificado) à linha original. Com eles, o erro no navegador ou no relatório de crash aponta para Pedido.tsx:42, e não para a linha 1 de um arquivo de 2 MB. Em produção, costuma-se gerar os mapas e enviá-los só para a ferramenta de monitoramento (Sentry, por exemplo), sem publicá-los junto do app, para não expor o código-fonte. No React Native, cada build tem os seus, inclusive para o bytecode do Hermes.",
+          "relatedTerms": [
+            "transpilacao",
+            "bundler"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "babel-config-com-plugin",
+          "level": "pleno",
+          "title": "babel.config.js com plugin",
+          "body": "No Expo, a config parte do babel-preset-expo; o plugin module-resolver cria o alias @ para src. O tsconfig precisa do mesmo alias em paths para o TypeScript entender.",
+          "snippet": {
+            "file": "babel.config.js",
+            "language": "js",
+            "code": "module.exports = function (api) {\n  api.cache(true); // a config não muda entre arquivos: o Babel guarda o resultado\n  return {\n    presets: ['babel-preset-expo'], // JSX, TypeScript, sintaxe moderna e otimizações do Expo\n    plugins: [\n      [\n        'module-resolver',\n        { root: ['./src'], alias: { '@': './src' } }, // import { Button } from '@/ui/Button'\n      ],\n    ],\n  };\n};"
+          },
+          "relatedTerms": [
+            "babel",
+            "transpilacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "alvos-no-package-json",
+          "level": "pleno",
+          "title": "Alvos no package.json",
+          "body": "Uma lista browserslist compartilhada por Babel, Autoprefixer e outras ferramentas que leem os alvos.",
+          "snippet": {
+            "file": "package.json",
+            "language": "json",
+            "code": "{\n  \"name\": \"cardapio-web\",\n  \"browserslist\": [\n    \"> 0.5%\",\n    \"last 2 versions\",\n    \"not dead\",\n    \"not op_mini all\"\n  ],\n  \"scripts\": {\n    \"build\": \"vite build\"\n  }\n}"
+          },
+          "relatedTerms": [
+            "alvos-e-polyfills"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bundlers-na-web",
+      "title": "Bundlers na web",
+      "description": "Juntar, otimizar e dividir o código que vai para o navegador.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "bundler",
+          "level": "junior",
+          "term": "Bundler",
+          "definition": "Ferramenta que parte de um arquivo de entrada, segue os imports e monta o grafo de dependências do app, com o seu código, as bibliotecas, o CSS e as imagens. No build de produção, transforma cada módulo, junta tudo em poucos arquivos, minifica, remove código não usado e coloca um hash no nome (app.3f9a1c.js) para o navegador poder guardar em cache por muito tempo. Em desenvolvimento, serve os arquivos com recarga rápida (HMR).",
+          "relatedTerms": [
+            "vite",
+            "tree-shaking-e-code-splitting"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "vite",
+          "level": "pleno",
+          "term": "Vite",
+          "definition": "Ferramenta de build atual para frontend. Em desenvolvimento, serve o código como módulos ES nativos e transforma cada arquivo sob demanda, então o servidor sobe rápido mesmo em projetos grandes, com HMR instantâneo. No build, gera o bundle otimizado; a partir do Vite 8, um único bundler em Rust, o Rolldown, faz o papel que antes era dividido entre esbuild e Rollup. Só variáveis com prefixo VITE_ vão para o código do cliente, via import.meta.env.",
+          "relatedTerms": [
+            "bundler",
+            "webpack"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "webpack",
+          "level": "pleno",
+          "term": "Webpack",
+          "definition": "Bundler mais antigo e muito configurável, ainda presente em muitos projetos. Tudo passa por loaders (transformam arquivos: babel-loader, css-loader) e plugins (agem no build todo: HtmlWebpackPlugin, definição de variáveis). Monta o bundle inteiro também em desenvolvimento, o que deixa projetos grandes lentos para subir. Tem recursos maduros como Module Federation (microfrontends). Rspack é uma reimplementação em Rust compatível com a maior parte da configuração.",
+          "relatedTerms": [
+            "bundler",
+            "vite"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tree-shaking-e-code-splitting",
+          "level": "senior",
+          "term": "Tree shaking e code splitting",
+          "definition": "Tree shaking remove do bundle os exports que ninguém importa; funciona com import e export estáticos (ESM) e depende de o pacote declarar que não tem efeitos colaterais (sideEffects: false), senão o bundler mantém o módulo por segurança. Code splitting divide o bundle em pedaços (chunks): cada import() dinâmico, como uma rota com lazy, vira um arquivo baixado só quando necessário. Juntos, reduzem o JavaScript da primeira carga, o que mais pesa no tempo até a página responder.",
+          "relatedTerms": [
+            "bundler",
+            "vite"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "vite-config",
+          "level": "pleno",
+          "title": "vite.config.ts",
+          "body": "Plugin do React, alias @ para src, proxy do backend em desenvolvimento e source maps escondidos no build.",
+          "snippet": {
+            "file": "vite.config.ts",
+            "language": "ts",
+            "code": "import { fileURLToPath, URL } from 'node:url';\nimport react from '@vitejs/plugin-react';\nimport { defineConfig } from 'vite';\n\nexport default defineConfig({\n  plugins: [react()],\n  resolve: {\n    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },\n  },\n  server: {\n    // Em desenvolvimento, /api/* vai para o backend local: sem CORS no navegador\n    proxy: { '/api': { target: 'http://localhost:3000', changeOrigin: true } },\n  },\n  build: {\n    sourcemap: 'hidden', // gera os .map para o monitoramento de erros, sem link no bundle\n  },\n});"
+          },
+          "relatedTerms": [
+            "vite",
+            "source-maps"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "rota-sob-demanda",
+          "level": "pleno",
+          "title": "Rota carregada sob demanda",
+          "body": "lazy com import() cria um chunk por página; o Suspense mostra o fallback enquanto o chunk baixa.",
+          "snippet": {
+            "file": "src/AppRoutes.tsx",
+            "language": "ts",
+            "code": "import { lazy, Suspense } from 'react';\nimport { Route, Routes } from 'react-router';\n\n// Cada import() vira um chunk separado, baixado só quando a rota abre\nconst Orders = lazy(() => import('./pages/Orders'));\nconst Reports = lazy(() => import('./pages/Reports')); // gráficos pesados ficam fora do bundle inicial\n\nexport function AppRoutes() {\n  return (\n    <Suspense fallback={<p>Carregando…</p>}>\n      <Routes>\n        <Route path=\"/pedidos\" element={<Orders />} />\n        <Route path=\"/relatorios\" element={<Reports />} />\n      </Routes>\n    </Suspense>\n  );\n}"
+          },
+          "relatedTerms": [
+            "tree-shaking-e-code-splitting"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "metro-e-eas",
+      "title": "Metro e EAS",
+      "description": "O build do JavaScript e do app no React Native com Expo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "metro",
+          "level": "pleno",
+          "term": "Metro",
+          "definition": "Bundler oficial do React Native e do Expo. Em três etapas: o resolver encontra o arquivo de cada import (inclusive as extensões por plataforma, como Botao.ios.tsx), o transformer passa cada arquivo pelo Babel e o serializer junta tudo num bundle por plataforma. Em desenvolvimento, serve o bundle para o app e faz Fast Refresh; em produção, gera o bundle que vai dentro do binário ou num update OTA. Guarda cache das transformações; quando algo estranho acontece depois de mudar a config, npx expo start --clear limpa esse cache.",
+          "relatedTerms": [
+            "hermes",
+            "babel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hermes",
+          "level": "pleno",
+          "term": "Hermes",
+          "definition": "Motor de JavaScript feito para React Native e padrão nos apps Expo. No build de produção, o JavaScript é compilado para bytecode do Hermes, então o aparelho não precisa interpretar o código-fonte ao abrir o app: a inicialização fica mais rápida e o uso de memória menor. Suporta depuração pelas DevTools do React Native. Por isso o tamanho e a quantidade de código executado na abertura continuam importando: menos módulos carregados no início, app mais rápido.",
+          "relatedTerms": [
+            "metro",
+            "perfis-do-eas-build"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "variaveis-de-ambiente-no-expo",
+          "level": "pleno",
+          "term": "Variáveis de ambiente no Expo",
+          "definition": "Variáveis com prefixo EXPO_PUBLIC_ (por exemplo EXPO_PUBLIC_API_URL) são lidas do .env e substituídas pelo valor dentro do bundle, no momento do build; devem ser acessadas por nome fixo (process.env.EXPO_PUBLIC_API_URL). Como ficam no app, qualquer pessoa pode extraí-las: servem para URLs e chaves públicas, nunca para segredos. No EAS, as variáveis ficam no servidor, separadas por ambiente (development, preview, production) e com visibilidade (plain text, sensitive, secret); o perfil do eas.json escolhe o ambiente.",
+          "relatedTerms": [
+            "perfis-do-eas-build",
+            "metro"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "perfis-do-eas-build",
+          "level": "pleno",
+          "term": "Perfis do EAS Build",
+          "definition": "Conjuntos de configuração no eas.json, um por tipo de build. development gera um development build (developmentClient) para a equipe testar com o servidor local; preview gera um app de distribuição interna, para QA instalar por link; production gera o binário das lojas. Cada perfil define o ambiente das variáveis, o canal de updates OTA (channel) e opções como autoIncrement da versão. Assim um único comando, eas build --profile preview, produz sempre o mesmo tipo de app.",
+          "relatedTerms": [
+            "variaveis-de-ambiente-no-expo",
+            "hermes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "eas-json-com-perfis",
+          "level": "pleno",
+          "title": "eas.json com perfis",
+          "body": "Três perfis, cada um com o ambiente das variáveis e o canal de updates; a versão de build fica no servidor do EAS e sobe sozinha em produção.",
+          "snippet": {
+            "file": "eas.json",
+            "language": "json",
+            "code": "{\n  \"cli\": { \"appVersionSource\": \"remote\" },\n  \"build\": {\n    \"development\": {\n      \"developmentClient\": true,\n      \"distribution\": \"internal\",\n      \"environment\": \"development\",\n      \"channel\": \"development\"\n    },\n    \"preview\": {\n      \"distribution\": \"internal\",\n      \"environment\": \"preview\",\n      \"channel\": \"preview\"\n    },\n    \"production\": {\n      \"environment\": \"production\",\n      \"channel\": \"production\",\n      \"autoIncrement\": true\n    }\n  },\n  \"submit\": { \"production\": {} }\n}"
+          },
+          "relatedTerms": [
+            "perfis-do-eas-build",
+            "variaveis-de-ambiente-no-expo"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "metro-config-svg",
+          "level": "senior",
+          "title": "metro.config.js para SVG",
+          "body": "Estender a config padrão do Expo, em vez de substituí-la, para tratar .svg como componente.",
+          "snippet": {
+            "file": "metro.config.js",
+            "language": "js",
+            "code": "const { getDefaultConfig } = require('expo/metro-config');\n\nconst config = getDefaultConfig(__dirname); // parte sempre da config padrão do Expo\n\n// .svg deixa de ser asset (imagem) e passa a ser código, transformado em componente\nconfig.transformer.babelTransformerPath = require.resolve('react-native-svg-transformer/expo');\nconfig.resolver.assetExts = config.resolver.assetExts.filter((ext) => ext !== 'svg');\nconfig.resolver.sourceExts.push('svg');\n\nmodule.exports = config;"
+          },
+          "relatedTerms": [
+            "metro",
+            "babel"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre build, bundlers e configuração que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "o-que-acontece-no-build",
+          "level": "junior",
+          "question": "O que acontece quando você roda o build de um app?",
+          "answer": "O bundler parte do arquivo de entrada e segue os imports para montar o grafo de dependências. Cada arquivo é transformado: TypeScript e JSX viram JavaScript para os alvos definidos. Depois tudo é juntado em poucos arquivos, o código não usado é removido, o resultado é minificado e os nomes ganham hash para cache. Variáveis de ambiente públicas são embutidas. Na web saem arquivos estáticos; no React Native, um bundle por plataforma que vai para dentro do app, em bytecode do Hermes.",
+          "relatedTerms": [
+            "bundler",
+            "transpilacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "vite-ou-webpack",
+          "level": "pleno",
+          "question": "Vite ou Webpack?",
+          "answer": "Num projeto novo, Vite: o servidor de desenvolvimento sobe rápido porque não monta o bundle inteiro, o HMR é instantâneo e a configuração padrão já resolve a maioria dos casos. Webpack continua fazendo sentido em projetos que já o usam com configuração complexa, em recursos maduros como Module Federation ou quando um plugin específico só existe para ele. Migrar um projeto grande precisa de um motivo concreto, como tempo de build ou de desenvolvimento.",
+          "relatedTerms": [
+            "vite",
+            "webpack"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "typescript-precisa-de-babel",
+          "level": "pleno",
+          "question": "Com TypeScript, ainda preciso de Babel?",
+          "answer": "Para gerar o JavaScript, não necessariamente do tsc: Babel, SWC, esbuild e Oxc removem os tipos e transpilam muito mais rápido, arquivo por arquivo. Mas eles não conferem tipos. Por isso o fluxo comum é: a ferramenta do build transpila e o tsc --noEmit roda separado, no editor e na CI, só para checar tipos. No React Native, o Babel continua no caminho porque o Metro o usa com o babel-preset-expo.",
+          "relatedTerms": [
+            "babel",
+            "transpilacao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "segredo-em-variavel-publica",
+          "level": "pleno",
+          "question": "Posso colocar uma chave secreta em VITE_ ou EXPO_PUBLIC_?",
+          "answer": "Não. Essas variáveis são substituídas pelo valor dentro do bundle no build, e qualquer pessoa pode ler o JavaScript de um site ou extrair o de um app. Servem para valores públicos: URL da API, chave pública de analytics. Um segredo (chave de pagamento, de IA, de banco) fica no backend, e o app chama o backend. Se uma chave secreta já foi publicada, ela precisa ser trocada, não só removida do código.",
+          "relatedTerms": [
+            "variaveis-de-ambiente-no-expo",
+            "vite"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "reduzir-bundle-grande",
+          "level": "senior",
+          "question": "Como você reduziria um bundle grande?",
+          "answer": "Primeiro meço: analisador do bundle (rollup-plugin-visualizer, webpack-bundle-analyzer ou Expo Atlas no React Native) para ver o que pesa. Depois: code splitting por rota e lazy em telas e componentes pesados (gráficos, editores); trocar bibliotecas grandes por menores ou importar só o necessário; garantir tree shaking com ESM e sideEffects; remover polyfills e alvos desnecessários; e conferir dependências duplicadas em versões diferentes. Por fim, coloco um limite de tamanho na CI para o problema não voltar.",
+          "relatedTerms": [
+            "tree-shaking-e-code-splitting",
+            "bundler"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "app-react-native-demora-para-abrir",
+          "level": "senior",
+          "question": "O app React Native demora para abrir. O que você olha no bundle?",
+          "answer": "Confirmo que o Hermes está ativo, porque o bytecode pré-compilado evita interpretar o código na abertura. Analiso o bundle com o Expo Atlas para achar bibliotecas grandes carregadas no início. Reduzo o trabalho na inicialização: importar telas e módulos pesados só quando são usados, adiar inicializações (analytics, SDKs) para depois da primeira tela e evitar ler muito do armazenamento antes de mostrar algo. Meço num aparelho Android modesto, em build de produção, não no modo de desenvolvimento.",
+          "relatedTerms": [
+            "hermes",
+            "metro"
+          ]
+        }
+      ]
+    }
+  ]
+}

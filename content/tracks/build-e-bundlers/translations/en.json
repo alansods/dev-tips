@@ -1,0 +1,120 @@
+{
+  "title": "Build tools and bundlers",
+  "description": "From source code to what runs in the browser and on the device: transpilation, Babel, Vite, Webpack, Metro, Hermes, environment variables and EAS profiles.",
+  "decks": {
+    "transpilacao": {
+      "title": "Transpilation",
+      "description": "Turning the code you write into code the environment understands."
+    },
+    "bundlers-na-web": {
+      "title": "Bundlers on the web",
+      "description": "Combining, optimizing and splitting the code that goes to the browser."
+    },
+    "metro-e-eas": {
+      "title": "Metro and EAS",
+      "description": "Building the JavaScript and the app in React Native with Expo."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about builds, bundlers and configuration that come up in interviews."
+    }
+  },
+  "cards": {
+    "transpilacao": {
+      "term": "Transpilation",
+      "definition": "Converting code from one form of JavaScript to another: TypeScript to JavaScript (stripping the types), JSX to function calls and new syntax (optional chaining, class fields) to syntax the target environments understand. Unlike compiling to machine code, the output is still JavaScript. Transpiling does not check types: type errors come from tsc --noEmit, which runs separately, in the editor and in CI."
+    },
+    "babel": {
+      "term": "Babel",
+      "definition": "A JavaScript transpiler configured with presets (bundles of rules) and plugins (one transformation each). In React Native and Expo it runs inside Metro, with babel-preset-expo, which already handles JSX, TypeScript and the platform's optimizations. On the web, tools written in Rust or Go play the same role much faster: SWC (Next.js), esbuild and Oxc (Vite). Today Babel shows up mostly when a specific plugin is needed, such as Reanimated's worklets plugins."
+    },
+    "alvos-e-polyfills": {
+      "term": "Targets and polyfills",
+      "definition": "Targets say which browsers or engines the build must support, for example with a browserslist list (\"> 0.5%, last 2 versions, not dead\") or Vite's build.target. From them, the transpiler rewrites only the syntax that is missing. Syntax is not the same as API: transpiling does not create Array.prototype.at or structuredClone; that is what polyfills (core-js) are for, adding the implementation at runtime. Targets that are too broad make the bundle bigger and slower for everyone."
+    },
+    "source-maps": {
+      "term": "Source maps",
+      "definition": ".map files that link each piece of generated code (transpiled and minified) back to the original line. With them, an error in the browser or in a crash report points to Order.tsx:42, not to line 1 of a 2 MB file. In production, maps are usually generated and sent only to the monitoring tool (Sentry, for example), without being published with the app, so the source code is not exposed. In React Native, each build has its own, including for Hermes bytecode."
+    },
+    "babel-config-com-plugin": {
+      "title": "babel.config.js with a plugin",
+      "body": "In Expo, the config starts from babel-preset-expo; the module-resolver plugin creates the @ alias for src. tsconfig needs the same alias in paths so TypeScript understands it."
+    },
+    "alvos-no-package-json": {
+      "title": "Targets in package.json",
+      "body": "A browserslist list shared by Babel, Autoprefixer and other tools that read targets."
+    },
+    "bundler": {
+      "term": "Bundler",
+      "definition": "A tool that starts from an entry file, follows the imports and builds the app's dependency graph, with your code, libraries, CSS and images. In the production build, it transforms each module, combines everything into a few files, minifies, removes unused code and adds a hash to the name (app.3f9a1c.js) so the browser can cache it for a long time. In development, it serves the files with fast reload (HMR)."
+    },
+    "vite": {
+      "term": "Vite",
+      "definition": "The current build tool for the frontend. In development, it serves code as native ES modules and transforms each file on demand, so the server starts fast even in large projects, with instant HMR. For the build, it generates the optimized bundle; since Vite 8, a single Rust bundler, Rolldown, does the job that used to be split between esbuild and Rollup. Only variables prefixed with VITE_ reach client code, through import.meta.env."
+    },
+    "webpack": {
+      "term": "Webpack",
+      "definition": "An older, highly configurable bundler still present in many projects. Everything goes through loaders (they transform files: babel-loader, css-loader) and plugins (they act on the whole build: HtmlWebpackPlugin, variable definitions). It builds the whole bundle in development too, which makes large projects slow to start. It has mature features such as Module Federation (micro-frontends). Rspack is a Rust reimplementation compatible with most of its configuration."
+    },
+    "tree-shaking-e-code-splitting": {
+      "term": "Tree shaking and code splitting",
+      "definition": "Tree shaking removes exports nobody imports from the bundle; it works with static import and export (ESM) and depends on the package declaring it has no side effects (sideEffects: false), otherwise the bundler keeps the module to be safe. Code splitting divides the bundle into pieces (chunks): each dynamic import(), such as a route with lazy, becomes a file downloaded only when needed. Together they reduce the JavaScript of the first load, which weighs the most on how long the page takes to respond."
+    },
+    "vite-config": {
+      "title": "vite.config.ts",
+      "body": "React plugin, @ alias for src, backend proxy in development and hidden source maps in the build."
+    },
+    "rota-sob-demanda": {
+      "title": "Route loaded on demand",
+      "body": "lazy with import() creates one chunk per page; Suspense shows the fallback while the chunk downloads."
+    },
+    "metro": {
+      "term": "Metro",
+      "definition": "The official bundler for React Native and Expo. In three steps: the resolver finds the file for each import (including platform extensions, such as Button.ios.tsx), the transformer runs each file through Babel and the serializer combines everything into one bundle per platform. In development, it serves the bundle to the app and does Fast Refresh; in production, it generates the bundle that goes inside the binary or into an OTA update. It caches transformations; when something odd happens after changing the config, npx expo start --clear clears that cache."
+    },
+    "hermes": {
+      "term": "Hermes",
+      "definition": "A JavaScript engine built for React Native and the default in Expo apps. In the production build, JavaScript is compiled to Hermes bytecode, so the device does not need to interpret source code when the app opens: startup is faster and memory use lower. It supports debugging through React Native DevTools. That is why the size and amount of code executed at startup still matter: fewer modules loaded at the start, faster app."
+    },
+    "variaveis-de-ambiente-no-expo": {
+      "term": "Environment variables in Expo",
+      "definition": "Variables prefixed with EXPO_PUBLIC_ (for example EXPO_PUBLIC_API_URL) are read from .env and replaced by their value inside the bundle at build time; they must be accessed by a fixed name (process.env.EXPO_PUBLIC_API_URL). Since they live in the app, anyone can extract them: they are for URLs and public keys, never for secrets. In EAS, variables live on the server, separated by environment (development, preview, production) and with a visibility (plain text, sensitive, secret); the eas.json profile picks the environment."
+    },
+    "perfis-do-eas-build": {
+      "term": "EAS Build profiles",
+      "definition": "Sets of configuration in eas.json, one per kind of build. development produces a development build (developmentClient) for the team to test against the local server; preview produces an internally distributed app for QA to install from a link; production produces the store binary. Each profile sets the variables' environment, the OTA update channel and options such as autoIncrement for the version. That way a single command, eas build --profile preview, always produces the same kind of app."
+    },
+    "eas-json-com-perfis": {
+      "title": "eas.json with profiles",
+      "body": "Three profiles, each with its variables' environment and update channel; the build version lives on the EAS server and goes up on its own in production."
+    },
+    "metro-config-svg": {
+      "title": "metro.config.js for SVG",
+      "body": "Extending Expo's default config, instead of replacing it, to treat .svg files as components."
+    },
+    "o-que-acontece-no-build": {
+      "question": "What happens when you run an app's build?",
+      "answer": "The bundler starts from the entry file and follows the imports to build the dependency graph. Each file is transformed: TypeScript and JSX become JavaScript for the configured targets. Then everything is combined into a few files, unused code is removed, the result is minified and file names get a hash for caching. Public environment variables are inlined. On the web the output is static files; in React Native, one bundle per platform that goes inside the app, as Hermes bytecode."
+    },
+    "vite-ou-webpack": {
+      "question": "Vite or Webpack?",
+      "answer": "For a new project, Vite: the dev server starts fast because it does not build the whole bundle, HMR is instant and the default configuration covers most cases. Webpack still makes sense in projects that already use it with complex configuration, for mature features such as Module Federation or when a specific plugin only exists for it. Migrating a large project needs a concrete reason, such as build or development time."
+    },
+    "typescript-precisa-de-babel": {
+      "question": "With TypeScript, do I still need Babel?",
+      "answer": "To produce JavaScript, not necessarily tsc: Babel, SWC, esbuild and Oxc strip types and transpile much faster, file by file. But they do not check types. So the common flow is: the build tool transpiles and tsc --noEmit runs separately, in the editor and in CI, only to check types. In React Native, Babel stays in the pipeline because Metro uses it with babel-preset-expo."
+    },
+    "segredo-em-variavel-publica": {
+      "question": "Can I put a secret key in VITE_ or EXPO_PUBLIC_?",
+      "answer": "No. These variables are replaced by their value inside the bundle at build time, and anyone can read a site's JavaScript or extract an app's. They are for public values: the API URL, a public analytics key. A secret (payment, AI or database key) stays on the backend, and the app calls the backend. If a secret key has already been published, it must be rotated, not just removed from the code."
+    },
+    "reduzir-bundle-grande": {
+      "question": "How would you reduce a large bundle?",
+      "answer": "First I measure: a bundle analyzer (rollup-plugin-visualizer, webpack-bundle-analyzer or Expo Atlas in React Native) to see what weighs the most. Then: code splitting by route and lazy loading of heavy screens and components (charts, editors); swapping large libraries for smaller ones or importing only what is needed; making sure tree shaking works with ESM and sideEffects; removing unneeded polyfills and targets; and checking for duplicate dependencies in different versions. Finally, I add a size budget in CI so the problem does not come back."
+    },
+    "app-react-native-demora-para-abrir": {
+      "question": "The React Native app is slow to open. What do you look at in the bundle?",
+      "answer": "I confirm Hermes is enabled, because precompiled bytecode avoids interpreting code at startup. I analyze the bundle with Expo Atlas to find large libraries loaded at the start. I reduce startup work: importing heavy screens and modules only when they are used, deferring initializations (analytics, SDKs) until after the first screen and avoiding reading a lot from storage before showing something. I measure on a modest Android device, in a production build, not in development mode."
+    }
+  }
+}
