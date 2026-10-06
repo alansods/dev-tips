@@ -56,7 +56,12 @@
       "legal": {
         "privacyUrl": "https://alansods.github.io/dev-tips/privacidade",
         "termsUrl": "https://alansods.github.io/dev-tips/termos"
+      },
+      "router": {},
+      "eas": {
+        "projectId": "4142402a-e2ed-4175-8f89-704df3db5b28"
       }
-    }
+    },
+    "owner": "alansods"
   }
 }
