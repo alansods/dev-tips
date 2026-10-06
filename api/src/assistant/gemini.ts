@@ -13,7 +13,8 @@ export type GeminiClient = {
   ask(request: GeminiRequest, config: GeminiConfig): Promise<GeminiAnswer>;
 };
 
-export const MAX_OUTPUT_TOKENS = 800;
+/** Inclui o raciocínio interno do modelo, que conta no mesmo limite. */
+export const MAX_OUTPUT_TOKENS = 1_500;
 const TIMEOUT_MS = 30_000;
 /** Erros temporários (sobrecarga, limite de taxa, falha interna): vale tentar de novo uma vez. */
 const RETRYABLE = [429, 500, 503];
@@ -45,6 +46,9 @@ export const geminiClient = (fetcher: typeof fetch = fetch, { retryDelayMs = 1_0
             },
             maxOutputTokens: MAX_OUTPUT_TOKENS,
             temperature: 0.4,
+            // O Gemini 3 pensa em nível "high" por padrão e esses tokens contam no limite de
+            // saída: com raciocínio alto, a resposta vinha cortada. "low" basta para um chat.
+            thinkingConfig: { thinkingLevel: 'low' },
           },
         }),
       });

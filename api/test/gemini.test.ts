@@ -45,7 +45,9 @@ describe('Cliente do Gemini', () => {
     expect(body.generationConfig).toMatchObject({
       responseMimeType: 'application/json',
       responseSchema: { type: 'OBJECT', required: ['inScope', 'answer'] },
-      maxOutputTokens: 800,
+      maxOutputTokens: 1500,
+      // Gemini 3 pensa em nível "high" por padrão e esses tokens contam no limite de saída.
+      thinkingConfig: { thinkingLevel: 'low' },
     });
   });
 

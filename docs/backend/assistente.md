@@ -38,6 +38,6 @@ Os limites mantêm o custo de cada pergunta baixo e previsível:
 
 - a pergunta tem até 500 caracteres;
 - o texto do card vai até 8.000 caracteres;
-- a resposta tem no máximo 800 tokens.
+- a resposta tem no máximo 1.500 tokens, contando o raciocínio interno do modelo, que fica em nível `low`.
 
 Com o Gemini Flash, a estimativa foi de ~R$ 0,04 por pergunta, com teto de ~R$ 0,06. Confira a tabela de preços atual em <https://ai.google.dev/gemini-api/docs/pricing>.

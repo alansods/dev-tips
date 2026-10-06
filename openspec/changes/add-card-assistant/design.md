@@ -37,7 +37,7 @@
 - **Conteúdo do pedido:**
   - `systemInstruction`: as regras, o texto do card e o idioma;
   - `contents`: o histórico e a pergunta, com os papéis `user` e `model`;
-  - `generationConfig`: `responseMimeType: application/json`, um schema `{ inScope: boolean, answer: string }`, `maxOutputTokens` de 800 e `temperature` de 0,4.
+  - `generationConfig`: `responseMimeType: application/json`, um schema `{ inScope: boolean, answer: string }`, `maxOutputTokens` de 1.500 e `temperature` de 0,4, com `thinkingConfig.thinkingLevel: "low"`. O Gemini 3 raciocina em nível `high` por padrão, e esses tokens contam no limite de saída: com 800 tokens e raciocínio alto, a resposta vinha cortada (JSON incompleto).
 - **Por que REST e não o SDK `@google/genai`:** sem dependência nova no Worker, e o pedido fica explícito para o teste conferir. O SDK marca `responseSchema` como obsoleto em favor de `response_format`. Na implementação, confiro na documentação atual qual campo a REST v1beta aceita.
 - **Testes:** o cliente entra em `Deps` como `gemini: GeminiClient`. Os testes usam um falso que grava o pedido e devolve a resposta escolhida.
 - **Tempo limite:** `AbortSignal.timeout(30_000)`. Erro, tempo esgotado ou JSON inválido viram `502 assistant_unavailable`.
