@@ -77,6 +77,7 @@ describe('Requirement: Interface traduzida', () => {
 
   it('aba Progresso em inglês', async () => {
     await open('/progress');
+    fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
     expect(screen.getAllByRole('button', { name: 'Reset progress' }).length).toBeGreaterThan(0);
     fireEvent.press(screen.getAllByRole('button', { name: 'Reset progress' })[0]);
     expect(screen.getByRole('button', { name: 'Reset' })).toBeOnTheScreen();

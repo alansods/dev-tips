@@ -115,6 +115,7 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
   it('Zerar apaga o agendamento da trilha', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open('/progress');
+    fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
     const crud = within(screen.getByTestId(`track-progress-${TRACK}`));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
