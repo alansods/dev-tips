@@ -1,0 +1,333 @@
+{
+  "id": "performance-no-nextjs",
+  "title": "Performance no Next.js",
+  "description": "Deixar aplicações Next.js rápidas: rotas estáticas e dinâmicas, Cache Components, pré-renderização parcial, imagens, fontes, JavaScript no cliente e Core Web Vitals.",
+  "areas": [
+    "frontend"
+  ],
+  "language": "javascript",
+  "framework": "nextjs",
+  "decks": [
+    {
+      "id": "estrategias-de-renderizacao",
+      "title": "Estratégias de renderização",
+      "description": "Decidir o que é pré-renderizado, o que fica em cache e o que é feito a cada requisição.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rota-estatica-ou-dinamica",
+          "level": "pleno",
+          "term": "Rota estática ou dinâmica",
+          "definition": "O Next decide, rota por rota, se o HTML pode ser gerado antes (no build, servido do cache ou da CDN) ou precisa ser gerado a cada requisição. O que torna uma rota dinâmica é ler dados da requisição: cookies(), headers(), searchParams ou dados sem cache. No modelo atual (Cache Components), a rota é pré-renderizada por padrão e esses trechos precisam ficar dentro de um Suspense ou de um cache; no modelo antigo, um único acesso desses tornava a página inteira dinâmica. Rotas com parâmetros podem ser pré-geradas com generateStaticParams.",
+          "relatedTerms": [
+            "cache-components",
+            "pre-renderizacao-parcial"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "renderizacao-no-cliente",
+          "level": "pleno",
+          "term": "Renderização no cliente",
+          "definition": "Mesmo no Next, parte da tela pode ser montada só no navegador: um Client Component que busca dados com useEffect, React Query ou SWR depois de carregar. Faz sentido para dados pessoais e muito interativos que não precisam de SEO, como um painel atrás de login que atualiza o tempo todo. O custo: mais JavaScript, uma espera visível com loading e uma requisição a mais depois do carregamento. Na dúvida, buscar no servidor e mandar o HTML pronto costuma ser mais rápido.",
+          "relatedTerms": [
+            "rota-estatica-ou-dinamica",
+            "javascript-no-cliente"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cache-components",
+          "level": "senior",
+          "term": "Cache Components",
+          "definition": "Modelo de cache atual do Next, ligado com cacheComponents: true. Nada é guardado em cache sem pedir: a diretiva 'use cache' no topo de uma função, componente ou página marca o resultado como reutilizável. cacheLife define por quanto tempo ('minutes', 'hours', 'days' ou valores próprios) e cacheTag dá um nome para invalidar depois: updateTag numa Server Action (a próxima leitura já vê o dado novo) ou revalidateTag. Substitui o modelo antigo, em que o cache era configurado em cada fetch com revalidate e cache: 'no-store'.",
+          "relatedTerms": [
+            "rota-estatica-ou-dinamica",
+            "pre-renderizacao-parcial"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pre-renderizacao-parcial",
+          "level": "senior",
+          "term": "Pré-renderização parcial",
+          "definition": "Uma mesma página com partes estáticas e dinâmicas. No build, o Next gera uma casca estática com tudo o que não depende da requisição (layout, cabeçalho, conteúdo em cache), e cada parte que depende da requisição fica dentro de um Suspense, com fallback. Na requisição, a casca sai na hora, de cache ou CDN, e as partes dinâmicas chegam por streaming na mesma resposta. Junta o tempo de resposta de uma página estática com dados personalizados, sem escolher entre SSG e SSR para a página inteira.",
+          "relatedTerms": [
+            "cache-components",
+            "rota-estatica-ou-dinamica"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "casca-estatica-e-parte-dinamica",
+          "level": "senior",
+          "title": "Página com casca estática e parte dinâmica",
+          "body": "Cabeçalho e cardápio em cache formam a casca; o carrinho lê o cookie e chega por streaming dentro do Suspense.",
+          "snippet": {
+            "file": "app/restaurantes/[slug]/page.tsx",
+            "language": "ts",
+            "code": "// next.config.ts: cacheComponents: true\nimport { Suspense } from 'react';\nimport { cookies } from 'next/headers';\n\nexport default function RestaurantePage() {\n  return (\n    <>\n      {/* Casca estática: pré-renderizada no build e servida na hora */}\n      <Cabecalho />\n      <Cardapio /> {/* em cache ('use cache'), também entra na casca */}\n\n      {/* Parte dinâmica: depende do cookie, chega por streaming na mesma resposta */}\n      <Suspense fallback={<p>Carregando seu carrinho…</p>}>\n        <Carrinho />\n      </Suspense>\n    </>\n  );\n}\n\nasync function Carrinho() {\n  const sessao = (await cookies()).get('sessao')?.value; // dado da requisição\n  const itens = await buscarCarrinho(sessao);\n  return <ResumoDoCarrinho itens={itens} />;\n}"
+          },
+          "relatedTerms": [
+            "pre-renderizacao-parcial",
+            "rota-estatica-ou-dinamica"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "dados-em-cache-com-tag",
+          "level": "senior",
+          "title": "Dados em cache com tag",
+          "body": "'use cache' com cacheLife e cacheTag guarda o cardápio; a Server Action que muda o prato expira a tag com updateTag.",
+          "snippet": {
+            "file": "app/restaurantes/[slug]/cardapio.tsx",
+            "language": "ts",
+            "code": "import { cacheLife, cacheTag, updateTag } from 'next/cache';\n\n// Mesmo resultado para todo mundo: guardado em cache por horas\nexport async function Cardapio() {\n  'use cache';\n  cacheLife('hours');\n  cacheTag('cardapio');\n\n  const pratos = await db.prato.findMany({ where: { disponivel: true } });\n  return <ListaDePratos pratos={pratos} />;\n}\n\n// Server Action do painel do restaurante\nexport async function marcarEsgotado(pratoId: string) {\n  'use server';\n  await db.prato.update({ where: { id: pratoId }, data: { disponivel: false } });\n  updateTag('cardapio'); // expira o cache: a próxima visita já vê o prato esgotado\n}"
+          },
+          "relatedTerms": [
+            "cache-components"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "imagens-fontes-e-javascript",
+      "title": "Imagens, fontes e JavaScript",
+      "description": "Mandar menos bytes e na ordem certa.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "next-image",
+          "level": "junior",
+          "term": "next/image",
+          "definition": "Componente de imagem que gera versões em vários tamanhos e formatos modernos (WebP, AVIF), carrega sob demanda (lazy) por padrão e exige dimensões ou proporção, reservando o espaço antes de a imagem chegar. sizes diz qual largura a imagem ocupa em cada tela, para o navegador baixar a versão certa. preload adianta a imagem principal acima da dobra, que costuma ser o LCP; no Next 16 ele substituiu a antiga propriedade priority. Imagens remotas precisam ter o domínio liberado em images.remotePatterns.",
+          "relatedTerms": [
+            "lcp",
+            "cls"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "next-font",
+          "level": "junior",
+          "term": "next/font",
+          "definition": "Carrega fontes do Google ou locais baixando os arquivos no build e servindo do próprio domínio: sem requisição a outro servidor e sem expor o visitante a terceiros. Gera uma fonte de reserva com métricas ajustadas (size-adjust) para o texto não pular quando a fonte real carrega, o que evita CLS. Carregar só os pesos e subconjuntos usados (por exemplo latin) e definir a fonte uma vez no layout mantém os arquivos pequenos.",
+          "relatedTerms": [
+            "cls",
+            "next-image"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "next-dynamic",
+          "level": "pleno",
+          "term": "next/dynamic",
+          "definition": "Carrega um componente sob demanda: o código dele sai do JavaScript inicial e vira um pedaço separado, baixado quando o componente aparece. Serve para partes pesadas que nem todo mundo usa: mapas, gráficos, editores, modais. Aceita um loading para o intervalo e, em Client Components, ssr: false para componentes que dependem do navegador (window). Em Server Components não é necessário para dividir código: eles não mandam o próprio código ao cliente.",
+          "relatedTerms": [
+            "javascript-no-cliente",
+            "inp"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "javascript-no-cliente",
+          "level": "pleno",
+          "term": "JavaScript no cliente",
+          "definition": "Tudo o que um arquivo com \"use client\" importa vai para o JavaScript do navegador, inclusive bibliotecas grandes. Para mandar menos: manter \"use client\" nas folhas (o botão interativo, não a página), passar Server Components como children para dentro de Client Components, fazer formatação e busca de dados no servidor e marcar módulos só de servidor com o pacote server-only. Para enxergar o peso, o Next tem um analisador de bundle (next experimental-analyze no Turbopack). Menos JavaScript melhora hidratação e INP.",
+          "relatedTerms": [
+            "next-dynamic",
+            "inp"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "imagem-principal-com-preload",
+          "level": "pleno",
+          "title": "Imagem principal com preload e sizes",
+          "body": "A capa acima da dobra é pré-carregada; a foto remota reserva o espaço com largura e altura e usa sizes para o celular baixar a versão menor.",
+          "snippet": {
+            "file": "app/restaurantes/[slug]/Destaque.tsx",
+            "language": "ts",
+            "code": "import Image from 'next/image';\nimport capa from './capa-restaurante.jpg'; // import estático: largura, altura e blur automáticos\n\nexport function Destaque({ fotoDoPrato }: { fotoDoPrato: string }) {\n  return (\n    <>\n      {/* Maior elemento acima da dobra: candidato a LCP, então pré-carrega */}\n      <Image src={capa} alt=\"Salão do restaurante\" preload placeholder=\"blur\" sizes=\"100vw\" />\n\n      {/* Imagem remota: largura e altura reservam o espaço (sem CLS); sizes evita baixar a versão grande no celular */}\n      <Image\n        src={fotoDoPrato}\n        alt=\"Pizza margherita\"\n        width={640}\n        height={480}\n        sizes=\"(max-width: 768px) 100vw, 50vw\"\n      />\n    </>\n  );\n}"
+          },
+          "relatedTerms": [
+            "next-image",
+            "lcp"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "componente-pesado-sob-demanda",
+          "level": "pleno",
+          "title": "Componente pesado sob demanda",
+          "body": "O mapa sai do bundle inicial e só é baixado quando a pessoa abre a seção.",
+          "snippet": {
+            "file": "app/restaurantes/[slug]/AreaDeEntrega.tsx",
+            "language": "ts",
+            "code": "'use client';\n\nimport dynamic from 'next/dynamic';\nimport { useState } from 'react';\n\n// O mapa (e a biblioteca dele) só é baixado quando a pessoa abre a seção\nconst MapaDeEntrega = dynamic(() => import('./MapaDeEntrega'), {\n  loading: () => <p>Carregando mapa…</p>,\n  ssr: false, // usa window: só renderiza no navegador (permitido em Client Components)\n});\n\nexport function AreaDeEntrega() {\n  const [aberto, setAberto] = useState(false);\n  return (\n    <section>\n      <button onClick={() => setAberto(true)}>Ver área de entrega</button>\n      {aberto && <MapaDeEntrega />}\n    </section>\n  );\n}"
+          },
+          "relatedTerms": [
+            "next-dynamic",
+            "javascript-no-cliente"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "core-web-vitals",
+      "title": "Core Web Vitals",
+      "description": "As métricas de experiência do Google: o que medem, como medir e como melhorar.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "core-web-vitals",
+          "level": "junior",
+          "term": "Core Web Vitals",
+          "definition": "Três métricas do Google para a experiência de carregamento, resposta e estabilidade: LCP, INP e CLS. São avaliadas no percentil 75 das visitas reais, por tipo de aparelho, e entram no ranqueamento de busca. Há dois tipos de dado: de laboratório (Lighthouse, numa máquina e rede simuladas), bom para depurar, mas que não mede o INP real; e de campo (CrUX, ou as métricas enviadas pelo próprio site), que é o que conta. Uma página só está boa quando os dados de campo estão bons.",
+          "relatedTerms": [
+            "lcp",
+            "inp"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "lcp",
+          "level": "pleno",
+          "term": "LCP",
+          "definition": "Largest Contentful Paint: tempo até aparecer o maior elemento visível da tela, em geral a imagem principal ou um bloco grande de texto. Bom: até 2,5 s. Depende de o HTML chegar rápido (TTFB, cache, casca estática), de o recurso principal começar a baixar cedo (preload na imagem, sem esperar JavaScript), de a imagem ter o tamanho certo para a tela e de nada bloquear a renderização, como CSS e fontes pesados.",
+          "relatedTerms": [
+            "core-web-vitals",
+            "next-image"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "inp",
+          "level": "pleno",
+          "term": "INP",
+          "definition": "Interaction to Next Paint: tempo entre uma interação (toque, clique, tecla) e a próxima atualização da tela, considerando praticamente a pior interação da visita. Bom: até 200 ms. Piora quando a thread principal está ocupada com tarefas longas: hidratação de muito JavaScript, re-renderização de listas grandes, scripts de terceiros. Melhora com menos JavaScript, divisão de tarefas longas, useTransition para atualizações que podem esperar e virtualização de listas.",
+          "relatedTerms": [
+            "core-web-vitals",
+            "javascript-no-cliente"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cls",
+          "level": "pleno",
+          "term": "CLS",
+          "definition": "Cumulative Layout Shift: soma dos saltos inesperados de layout, quando algo aparece e empurra o conteúdo. Bom: até 0,1. Causas comuns: imagens e vídeos sem dimensões, anúncios e banners inseridos acima do conteúdo, fontes que trocam de tamanho ao carregar e conteúdo injetado depois do carregamento. Corrige-se reservando o espaço (width e height, aspect-ratio, skeleton do mesmo tamanho), usando next/font e mostrando conteúdo novo abaixo do que a pessoa está vendo ou como resposta a uma ação dela.",
+          "relatedTerms": [
+            "core-web-vitals",
+            "next-font"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "enviar-metricas-web-vitals",
+          "level": "pleno",
+          "title": "Enviar as métricas com useReportWebVitals",
+          "body": "Um Client Component no layout recebe cada métrica das visitas reais e envia para a API, mesmo quando a aba é fechada.",
+          "snippet": {
+            "file": "app/_components/web-vitals.tsx",
+            "language": "ts",
+            "code": "// app/_components/web-vitals.tsx\n'use client';\n\nimport { useReportWebVitals } from 'next/web-vitals';\n\nconst enviar = (metric: { name: string; value: number; rating: string; id: string }) => {\n  const body = JSON.stringify(metric);\n  // sendBeacon continua funcionando quando a pessoa fecha a aba\n  if (!navigator.sendBeacon?.('/api/vitals', body)) {\n    fetch('/api/vitals', { method: 'POST', body, keepalive: true });\n  }\n};\n\nexport function WebVitals() {\n  useReportWebVitals(enviar); // função estável, fora do componente\n  return null;\n}\n\n// app/layout.tsx: renderize <WebVitals /> dentro do <body>"
+          },
+          "relatedTerms": [
+            "core-web-vitals",
+            "inp"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "use-transition-inp",
+          "level": "senior",
+          "title": "Atualização urgente e não urgente com useTransition",
+          "body": "O campo de busca atualiza na hora; o filtro da lista grande vira uma transição, que o React pode interromper para responder à próxima tecla.",
+          "snippet": {
+            "file": "app/restaurantes/[slug]/BuscaDePratos.tsx",
+            "language": "ts",
+            "code": "'use client';\n\nimport { useState, useTransition } from 'react';\n\nexport function BuscaDePratos({ pratos }: { pratos: Prato[] }) {\n  const [texto, setTexto] = useState('');\n  const [filtro, setFiltro] = useState('');\n  const [pendente, startTransition] = useTransition();\n\n  const visiveis = pratos.filter((p) => p.nome.toLowerCase().includes(filtro));\n\n  return (\n    <>\n      <input\n        value={texto}\n        onChange={(e) => {\n          setTexto(e.target.value); // urgente: o campo responde na hora\n          startTransition(() => setFiltro(e.target.value.toLowerCase())); // pode esperar e ser interrompido\n        }}\n      />\n      <ul style={{ opacity: pendente ? 0.6 : 1 }}>\n        {visiveis.map((p) => <ItemDoCardapio key={p.id} prato={p} />)}\n      </ul>\n    </>\n  );\n}"
+          },
+          "relatedTerms": [
+            "inp"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre performance em Next.js que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "o-que-causa-cls",
+          "level": "junior",
+          "question": "O que causa CLS e como evitar?",
+          "answer": "CLS é o conteúdo pulando enquanto a página carrega. As causas mais comuns são imagens sem dimensões, banners e anúncios que entram em cima do conteúdo, fontes que mudam de tamanho quando carregam e listas que crescem acima de onde a pessoa está. Evito com width e height (ou aspect-ratio) em toda mídia, que o next/image exige, next/font com fonte de reserva ajustada, skeletons do mesmo tamanho do conteúdo final e espaço reservado para o que chega depois.",
+          "relatedTerms": [
+            "cls",
+            "next-font"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "por-que-a-pagina-ficou-dinamica",
+          "level": "pleno",
+          "question": "Por que a minha página do Next ficou dinâmica?",
+          "answer": "Porque algum trecho lê dados da requisição: cookies(), headers(), searchParams, ou busca dados sem cache. No modelo antigo, isso tornava a página inteira dinâmica, e às vezes o acesso estava num componente bem fundo, como um cabeçalho que lê o cookie de sessão. Com Cache Components, a página continua pré-renderizada e esse trecho precisa ficar dentro de um Suspense; o restante entra na casca estática. Eu procuro esses acessos, levo-os para perto de onde são usados e coloco em cache o que é igual para todos.",
+          "relatedTerms": [
+            "rota-estatica-ou-dinamica",
+            "pre-renderizacao-parcial"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "melhorar-lcp-pagina-de-produto",
+          "level": "pleno",
+          "question": "Como você melhoraria o LCP de uma página de produto?",
+          "answer": "Primeiro descubro qual é o elemento LCP, normalmente a foto do produto. Depois: servir o HTML rápido, com a página estática ou a casca pré-renderizada e os dados do produto em cache; pré-carregar a imagem principal com preload no next/image e não deixar lazy loading nela; usar sizes para não baixar uma imagem maior que a tela; e evitar que CSS, fontes ou JavaScript atrasem a renderização. Confiro nos dados de campo, no percentil 75 dos celulares, e não só no Lighthouse.",
+          "relatedTerms": [
+            "lcp",
+            "next-image"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-renderizar-no-cliente",
+          "level": "pleno",
+          "question": "Quando você renderiza no cliente dentro do Next?",
+          "answer": "Quando o dado é pessoal, muda o tempo todo e não precisa de SEO, como um painel atrás de login com atualização em tempo real, ou quando a interação depende de APIs do navegador. Nesses casos, um Client Component com React Query ou SWR faz sentido. Para todo o resto, busco no servidor: o HTML chega pronto, sem cascata de requisições no navegador e com menos JavaScript. Uma combinação comum é carregar os dados iniciais no servidor e deixar as atualizações para o cliente.",
+          "relatedTerms": [
+            "renderizacao-no-cliente",
+            "javascript-no-cliente"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pagina-lenta-por-onde-comecar",
+          "level": "senior",
+          "question": "Uma página do Next está lenta. Por onde você começa?",
+          "answer": "Por medir e separar o problema: os dados de campo dizem qual métrica está ruim (LCP, INP ou CLS) e em qual aparelho. LCP alto: olho o TTFB (a rota ficou dinâmica sem precisar? falta cache?), cascatas de busca no servidor e a imagem principal. INP alto: tamanho do JavaScript no analisador de bundle, \"use client\" alto demais na árvore, listas grandes e scripts de terceiros. CLS: mídia sem dimensões e conteúdo injetado. Corrijo o maior gargalo primeiro e acompanho a métrica depois do deploy.",
+          "relatedTerms": [
+            "core-web-vitals",
+            "rota-estatica-ou-dinamica",
+            "javascript-no-cliente"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-ppr",
+          "level": "senior",
+          "question": "O que é a pré-renderização parcial e quando usar?",
+          "answer": "É gerar no build uma casca estática da página e deixar só as partes que dependem da requisição para a hora do acesso, dentro de Suspense, chegando por streaming na mesma resposta. Uso quando a maior parte da página é igual para todos, mas há pedaços personalizados, como uma página de produto com o carrinho ou o preço do usuário, ou uma home com saudação. Ganho a resposta imediata de uma página estática sem abrir mão do dado personalizado. Se tudo é personalizado, a casca fica pequena e o ganho também.",
+          "relatedTerms": [
+            "pre-renderizacao-parcial",
+            "cache-components"
+          ]
+        }
+      ]
+    }
+  ]
+}
