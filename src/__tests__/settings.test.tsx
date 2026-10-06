@@ -86,6 +86,7 @@ describe('Requirement: Trocar o idioma (progresso)', () => {
     ids.forEach((id) => useStudyStore.getState().answer(crudTrack.id, id, 'known'));
     await open('/progress');
     expect(screen.getByTestId(`track-progress-${crudTrack.id}`)).toBeOnTheScreen();
+    fireEvent.press(screen.getByTestId(`track-progress-header-${crudTrack.id}`));
     expect(screen.getAllByLabelText('4 já sabia').length).toBeGreaterThan(0);
     press('Ajustes');
     fireEvent.press(radio('English'));
