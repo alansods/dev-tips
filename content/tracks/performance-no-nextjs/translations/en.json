@@ -1,0 +1,120 @@
+{
+  "title": "Next.js performance",
+  "description": "Making Next.js applications fast: static and dynamic routes, Cache Components, partial prerendering, images, fonts, client-side JavaScript and Core Web Vitals.",
+  "decks": {
+    "estrategias-de-renderizacao": {
+      "title": "Rendering strategies",
+      "description": "Deciding what is prerendered, what is cached and what runs on every request."
+    },
+    "imagens-fontes-e-javascript": {
+      "title": "Images, fonts and JavaScript",
+      "description": "Sending fewer bytes, in the right order."
+    },
+    "core-web-vitals": {
+      "title": "Core Web Vitals",
+      "description": "Google's experience metrics: what they measure, how to measure them and how to improve them."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about Next.js performance that come up in interviews."
+    }
+  },
+  "cards": {
+    "rota-estatica-ou-dinamica": {
+      "term": "Static or dynamic route",
+      "definition": "Next decides, route by route, whether the HTML can be generated ahead of time (at build time, served from cache or a CDN) or must be generated on every request. What makes a route dynamic is reading request data: cookies(), headers(), searchParams or uncached data. In the current model (Cache Components), the route is prerendered by default and those parts must sit inside a Suspense boundary or a cache; in the old model, a single such access made the whole page dynamic. Routes with parameters can be pre-generated with generateStaticParams."
+    },
+    "renderizacao-no-cliente": {
+      "term": "Client-side rendering",
+      "definition": "Even in Next, part of the screen can be built only in the browser: a Client Component that fetches data with useEffect, React Query or SWR after loading. It makes sense for personal, highly interactive data that does not need SEO, such as a dashboard behind login that updates constantly. The cost: more JavaScript, a visible loading wait and an extra request after the page loads. When in doubt, fetching on the server and sending ready HTML is usually faster."
+    },
+    "cache-components": {
+      "term": "Cache Components",
+      "definition": "Next's current caching model, enabled with cacheComponents: true. Nothing is cached unless you ask: the 'use cache' directive at the top of a function, component or page marks its result as reusable. cacheLife sets for how long ('minutes', 'hours', 'days' or custom values) and cacheTag gives it a name to invalidate later: updateTag in a Server Action (the next read already sees the new data) or revalidateTag. It replaces the old model, where caching was configured on each fetch with revalidate and cache: 'no-store'."
+    },
+    "pre-renderizacao-parcial": {
+      "term": "Partial prerendering",
+      "definition": "A single page with static and dynamic parts. At build time, Next generates a static shell with everything that does not depend on the request (layout, header, cached content), and each part that depends on the request sits inside a Suspense boundary with a fallback. On request, the shell is sent immediately, from cache or a CDN, and the dynamic parts stream in the same response. It combines the response time of a static page with personalized data, without choosing between SSG and SSR for the whole page."
+    },
+    "casca-estatica-e-parte-dinamica": {
+      "title": "Page with a static shell and a dynamic part",
+      "body": "The header and the cached menu form the shell; the cart reads the cookie and streams in inside Suspense."
+    },
+    "dados-em-cache-com-tag": {
+      "title": "Cached data with a tag",
+      "body": "'use cache' with cacheLife and cacheTag stores the menu; the Server Action that changes a dish expires the tag with updateTag."
+    },
+    "next-image": {
+      "term": "next/image",
+      "definition": "An image component that generates versions in several sizes and modern formats (WebP, AVIF), lazy loads by default and requires dimensions or an aspect ratio, reserving the space before the image arrives. sizes says how wide the image is on each screen, so the browser downloads the right version. preload fetches the main above-the-fold image early, which is usually the LCP; in Next 16 it replaced the old priority prop. Remote images need their domain allowed in images.remotePatterns."
+    },
+    "next-font": {
+      "term": "next/font",
+      "definition": "Loads Google or local fonts by downloading the files at build time and serving them from your own domain: no request to another server and no exposing visitors to third parties. It generates a fallback font with adjusted metrics (size-adjust) so text does not jump when the real font loads, which avoids CLS. Loading only the weights and subsets used (for example latin) and setting the font once in the layout keeps the files small."
+    },
+    "next-dynamic": {
+      "term": "next/dynamic",
+      "definition": "Loads a component on demand: its code leaves the initial JavaScript and becomes a separate chunk, downloaded when the component appears. Useful for heavy parts not everyone uses: maps, charts, editors, modals. It accepts a loading placeholder and, in Client Components, ssr: false for components that depend on the browser (window). In Server Components it is not needed to split code: they do not send their own code to the client."
+    },
+    "javascript-no-cliente": {
+      "term": "Client-side JavaScript",
+      "definition": "Everything a \"use client\" file imports goes into the browser's JavaScript, large libraries included. To send less: keep \"use client\" at the leaves (the interactive button, not the page), pass Server Components as children into Client Components, do formatting and data fetching on the server and mark server-only modules with the server-only package. To see the weight, Next has a bundle analyzer (next experimental-analyze with Turbopack). Less JavaScript improves hydration and INP."
+    },
+    "imagem-principal-com-preload": {
+      "title": "Main image with preload and sizes",
+      "body": "The above-the-fold cover is preloaded; the remote photo reserves its space with width and height and uses sizes so phones download the smaller version."
+    },
+    "componente-pesado-sob-demanda": {
+      "title": "Heavy component on demand",
+      "body": "The map leaves the initial bundle and is only downloaded when the person opens the section."
+    },
+    "core-web-vitals": {
+      "term": "Core Web Vitals",
+      "definition": "Three Google metrics for the loading, responsiveness and stability experience: LCP, INP and CLS. They are assessed at the 75th percentile of real visits, per device type, and they factor into search ranking. There are two kinds of data: lab data (Lighthouse, on a simulated machine and network), good for debugging but unable to measure real INP; and field data (CrUX, or metrics sent by the site itself), which is what counts. A page is only good when its field data is good."
+    },
+    "lcp": {
+      "term": "LCP",
+      "definition": "Largest Contentful Paint: the time until the largest visible element on screen appears, usually the main image or a large block of text. Good: up to 2.5 s. It depends on the HTML arriving fast (TTFB, cache, static shell), on the main resource starting to download early (preload on the image, without waiting for JavaScript), on the image being the right size for the screen and on nothing blocking rendering, such as heavy CSS and fonts."
+    },
+    "inp": {
+      "term": "INP",
+      "definition": "Interaction to Next Paint: the time between an interaction (tap, click, key press) and the next screen update, taking roughly the worst interaction of the visit. Good: up to 200 ms. It gets worse when the main thread is busy with long tasks: hydrating lots of JavaScript, re-rendering large lists, third-party scripts. It improves with less JavaScript, breaking up long tasks, useTransition for updates that can wait and list virtualization."
+    },
+    "cls": {
+      "term": "CLS",
+      "definition": "Cumulative Layout Shift: the sum of unexpected layout jumps, when something appears and pushes content around. Good: up to 0.1. Common causes: images and videos without dimensions, ads and banners inserted above the content, fonts that change size when they load and content injected after loading. It is fixed by reserving space (width and height, aspect-ratio, a skeleton of the same size), using next/font and showing new content below what the person is looking at or in response to their action."
+    },
+    "enviar-metricas-web-vitals": {
+      "title": "Sending metrics with useReportWebVitals",
+      "body": "A Client Component in the layout receives each metric from real visits and sends it to the API, even when the tab is closed."
+    },
+    "use-transition-inp": {
+      "title": "Urgent and non-urgent updates with useTransition",
+      "body": "The search field updates immediately; filtering the large list becomes a transition, which React can interrupt to respond to the next key press."
+    },
+    "o-que-causa-cls": {
+      "question": "What causes CLS and how do you avoid it?",
+      "answer": "CLS is content jumping while the page loads. The most common causes are images without dimensions, banners and ads that land on top of the content, fonts that change size when they load and lists that grow above where the person is. I avoid it with width and height (or aspect-ratio) on all media, which next/image requires, next/font with an adjusted fallback font, skeletons the same size as the final content and reserved space for whatever arrives later."
+    },
+    "por-que-a-pagina-ficou-dinamica": {
+      "question": "Why did my Next page become dynamic?",
+      "answer": "Because some part reads request data: cookies(), headers(), searchParams, or fetches uncached data. In the old model, that made the whole page dynamic, and sometimes the access was in a deeply nested component, such as a header that reads the session cookie. With Cache Components, the page stays prerendered and that part must sit inside a Suspense boundary; the rest goes into the static shell. I look for those accesses, move them close to where they are used and cache what is the same for everyone."
+    },
+    "melhorar-lcp-pagina-de-produto": {
+      "question": "How would you improve the LCP of a product page?",
+      "answer": "First I find out which element is the LCP, usually the product photo. Then: serve the HTML fast, with a static page or a prerendered shell and cached product data; preload the main image with preload on next/image and keep lazy loading off it; use sizes so the browser does not download an image larger than the screen; and keep CSS, fonts and JavaScript from delaying rendering. I check field data, at the 75th percentile on phones, not just Lighthouse."
+    },
+    "quando-renderizar-no-cliente": {
+      "question": "When do you render on the client inside Next?",
+      "answer": "When the data is personal, changes all the time and does not need SEO, such as a dashboard behind login with real-time updates, or when the interaction depends on browser APIs. In those cases, a Client Component with React Query or SWR makes sense. For everything else, I fetch on the server: the HTML arrives ready, with no request waterfall in the browser and less JavaScript. A common combination is loading initial data on the server and leaving updates to the client."
+    },
+    "pagina-lenta-por-onde-comecar": {
+      "question": "A Next page is slow. Where do you start?",
+      "answer": "By measuring and narrowing down the problem: field data shows which metric is bad (LCP, INP or CLS) and on which device. High LCP: I look at TTFB (did the route become dynamic needlessly? is caching missing?), data-fetching waterfalls on the server and the main image. High INP: JavaScript size in the bundle analyzer, \"use client\" too high in the tree, large lists and third-party scripts. CLS: media without dimensions and injected content. I fix the biggest bottleneck first and track the metric after the deploy."
+    },
+    "o-que-e-ppr": {
+      "question": "What is partial prerendering and when do you use it?",
+      "answer": "It is generating a static shell of the page at build time and leaving only the parts that depend on the request for request time, inside Suspense, streaming in the same response. I use it when most of the page is the same for everyone but there are personalized pieces, such as a product page with the user's cart or price, or a home page with a greeting. I get the instant response of a static page without giving up personalized data. If everything is personalized, the shell is small and so is the gain."
+    }
+  }
+}

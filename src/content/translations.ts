@@ -41,6 +41,7 @@ import estilizacaoEDesignSystemEn from '../../content/tracks/estilizacao-e-desig
 import buildEBundlersEn from '../../content/tracks/build-e-bundlers/translations/en.json';
 import gitEColaboracaoEn from '../../content/tracks/git-e-colaboracao/translations/en.json';
 import pagamentosNoAppEn from '../../content/tracks/pagamentos-no-app/translations/en.json';
+import performanceNoNextjsEn from '../../content/tracks/performance-no-nextjs/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -82,4 +83,5 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'build-e-bundlers': { en: buildEBundlersEn },
   'git-e-colaboracao': { en: gitEColaboracaoEn },
   'pagamentos-no-app': { en: pagamentosNoAppEn },
+  'performance-no-nextjs': { en: performanceNoNextjsEn },
 };
