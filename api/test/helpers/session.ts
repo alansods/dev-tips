@@ -31,6 +31,8 @@ export async function testApp(overrides: Partial<Deps> = {}) {
 
 export async function clearDatabase() {
   await env.DB.batch(
-    ['card_progress', 'user_settings', 'refresh_tokens', 'users'].map((t) => env.DB.prepare(`DELETE FROM ${t}`)),
+    ['card_progress', 'user_settings', 'subscriptions', 'question_usage', 'refresh_tokens', 'users'].map((t) =>
+      env.DB.prepare(`DELETE FROM ${t}`),
+    ),
   );
 }

@@ -41,11 +41,13 @@ export async function updateProfile(db: D1Database, id: string, profile: Omit<Us
     .run();
 }
 
-/** Apaga o usuário, as sessões e todos os dados sincronizados dele. */
+/** Apaga o usuário, as sessões, os dados sincronizados, a assinatura e o uso de perguntas dele. */
 export async function deleteUser(db: D1Database, id: string): Promise<void> {
   await db.batch([
     db.prepare('DELETE FROM card_progress WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM user_settings WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM subscriptions WHERE user_id = ?').bind(id),
+    db.prepare('DELETE FROM question_usage WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM refresh_tokens WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM users WHERE id = ?').bind(id),
   ]);
