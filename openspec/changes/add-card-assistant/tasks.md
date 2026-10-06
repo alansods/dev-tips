@@ -12,21 +12,21 @@
 
 ## 3. App: base do chat
 
-- [ ] 3.1 Teste falhando: `cardText` gera o texto do card (sem `id` e `relatedTerms`, cortado em 8.000 caracteres)
-- [ ] 3.2 Teste falhando: `ask()` mapeia sucesso, sem conexão, `pro_required`, `quota` e erro; `useCardChat` envia as últimas 6 mensagens, zera ao trocar de card e guarda a última pergunta para "Tentar de novo"
-- [ ] 3.3 Implementação: `src/assistant/cardText.ts`, `api.ts` e `useCardChat.ts`; atualização de `questions` no `useSubscriptionStore`; testes passando
+- [x] 3.1 Teste falhando: `cardText` gera o texto do card (sem `id` e `relatedTerms`, cortado em 8.000 caracteres)
+- [x] 3.2 Teste falhando: `ask()` mapeia sucesso, sem conexão, `pro_required`, `quota` e erro; `useCardChat` envia as últimas 6 mensagens, zera ao trocar de card e guarda a última pergunta para "Tentar de novo"
+- [x] 3.3 Implementação: `src/assistant/cardText.ts`, `api.ts` e `useCardChat.ts`; atualização de `questions` no `useSubscriptionStore`; testes passando
 
 ## 4. App: botão e gaveta
 
-- [ ] 4.1 Teste falhando: cenários de "Botão Perguntar na sessão" (último na frente e no verso, selo PRO e paywall sem conta, chat para assinante, ausente na web)
-- [ ] 4.2 Implementação: `src/assistant/AskButton.tsx` e ligação em `src/study/StudySession.tsx`; testes passando
-- [ ] 4.3 Teste falhando: cenários de "Chat do card" (vazio, recomeça em outro card, reabrir no mesmo card) e "Enviar pergunta no app" (pergunta e resposta, sugestão, bloco de código, fora deste card)
-- [ ] 4.4 Implementação: `ChatSheet.tsx` e `MessageText.tsx` seguindo as telas 3 a 6 do design; textos em PT-BR e EN; testes passando
-- [ ] 4.5 Teste falhando: cenários de "Erros e cota no chat" (sem conexão, tentar de novo, cota esgotada, assinatura expirou)
-- [ ] 4.6 Implementação: estados de erro, rodapé de cota (tela 9) e redirecionamento ao paywall; testes passando
+- [x] 4.1 Teste falhando: cenários de "Botão Perguntar na sessão" (último na frente e no verso, selo PRO e paywall sem conta, chat para assinante, ausente na web)
+- [x] 4.2 Implementação: `src/assistant/AskButton.tsx` e ligação em `src/study/StudySession.tsx`; testes passando
+- [x] 4.3 Teste falhando: cenários de "Chat do card" (vazio, recomeça em outro card, reabrir no mesmo card) e "Enviar pergunta no app" (pergunta e resposta, sugestão, bloco de código, fora deste card)
+- [x] 4.4 Implementação: `ChatSheet.tsx` e `MessageText.tsx` seguindo as telas 3 a 6 do design; textos em PT-BR e EN; testes passando
+- [x] 4.5 Teste falhando: cenários de "Erros e cota no chat" (sem conexão, tentar de novo, cota esgotada, assinatura expirou)
+- [x] 4.6 Implementação: estados de erro, rodapé de cota (tela 9) e redirecionamento ao paywall; testes passando
 
 ## 5. Fechamento
 
-- [ ] 5.1 Documentar em `docs/backend/assinaturas.md` (ou num `docs/backend/assistente.md`) a chave do Gemini, `GEMINI_MODEL` e o deploy
-- [ ] 5.2 Rodar `openspec validate --strict`
-- [ ] 5.3 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit` no app, e `npm test` e `npm run typecheck` em `api/`
+- [x] 5.1 Documentar em `docs/backend/assistente.md` a chave do Gemini, `GEMINI_MODEL` e o deploy
+- [x] 5.2 Rodar `openspec validate --strict`
+- [x] 5.3 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit` no app, e `npm test` e `npm run typecheck` em `api/`
