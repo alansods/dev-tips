@@ -46,9 +46,10 @@ Rode os comandos dentro de `api/`:
 npm run db:migrate                                  # aplica a migration 0004 no D1
 npx wrangler secret put REVENUECAT_WEBHOOK_AUTH     # o mesmo valor do webhook
 npx wrangler secret put REVENUECAT_SECRET_KEY       # a chave sk_ do RevenueCat
+npx wrangler secret put ADMIN_EMAILS                # seu e-mail (vários: separados por vírgula)
 ```
 
-- Em `wrangler.jsonc`, preencha `ADMIN_EMAILS` com o seu e-mail. Para mais de um, separe por vírgula.
+- `ADMIN_EMAILS` é um segredo, e não uma variável do `wrangler.jsonc`, porque o repositório é público e os e-mails não devem ficar expostos.
 - Depois, faça o deploy com `npm run deploy`.
 - Para rodar a API localmente, copie os mesmos nomes para `api/.dev.vars` (veja `api/.dev.vars.example`).
 
