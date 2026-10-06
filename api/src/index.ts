@@ -6,6 +6,7 @@ import { cors } from 'hono/cors';
 
 import { defaultDeps, type Deps } from './deps';
 import { errorBody, handleError } from './errors';
+import { assistantRoutes } from './routes/assistant';
 import { authRoutes } from './routes/auth';
 import { healthRoutes } from './routes/health';
 import { meRoutes } from './routes/me';
@@ -31,6 +32,7 @@ export function createApp(overrides: Partial<Deps> = {}) {
   app.route('/health', healthRoutes);
   app.route('/auth', authRoutes(deps));
   app.route('/me', meRoutes(deps));
+  app.route('/assistant', assistantRoutes(deps));
   app.route('/sync', syncRoutes(deps));
   app.route('/webhooks', webhookRoutes);
 
