@@ -1,4 +1,4 @@
-import { act, renderRouter, screen, within } from 'expo-router/testing-library';
+import { act, renderRouter, screen } from 'expo-router/testing-library';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -45,52 +45,32 @@ const CORE = [
   'Node.js',
   'TypeScript essencial',
   'TypeScript avançado',
+  'Build e bundlers',
 ];
-const FRAMEWORKS = ['React', 'Vue', 'Next.js', 'Express', 'Angular', 'NestJS'];
 
-describe('Requirement: Trilhas de JavaScript no catálogo', () => {
-  it('JavaScript no Frontend', async () => {
+describe('Requirement: Trilha de build e bundlers no catálogo', () => {
+  it('Linguagem pura no Frontend', async () => {
     await open('/area/frontend/javascript');
-    expect(buttons(CORE)).toEqual([
-      'JavaScript essencial',
-      'JavaScript assíncrono',
-      'JavaScript no navegador',
-      'TypeScript essencial',
-      'TypeScript avançado',
-    ]);
-    expect(buttons(FRAMEWORKS)).toEqual(['React', 'Vue', 'Next.js', 'Angular']);
-    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('4 trilhas')).toBeOnTheScreen();
-    expect(within(screen.getByRole('button', { name: /^Vue,/ })).getByText('1 trilha')).toBeOnTheScreen();
+    const list = buttons(CORE);
+    expect(list.indexOf('Build e bundlers')).toBe(list.indexOf('TypeScript avançado') + 1);
   });
 
-  it('JavaScript no Backend', async () => {
+  it('Linguagem pura no Mobile', async () => {
+    await open('/area/mobile/javascript');
+    expect(screen.getAllByRole('header').map((h) => String(h.props.children))).toContain('Linguagem pura');
+    expect(buttons(CORE)).toEqual(['Build e bundlers']);
+  });
+
+  it('Fora do Backend', async () => {
     await open('/area/backend/javascript');
-    expect(buttons(CORE)).toEqual([
-      'JavaScript essencial',
-      'JavaScript assíncrono',
-      'Node.js',
-      'TypeScript essencial',
-      'TypeScript avançado',
-    ]);
-    expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
-  });
-
-  it('Contagem na tela da área', async () => {
-    await open('/area/frontend');
-    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('13 trilhas')).toBeOnTheScreen();
-    expect(screen.queryByRole('button', { name: /^TypeScript,/ })).toBeNull();
-  });
-
-  it('Frontend aparece na Home', async () => {
-    await open('/');
-    expect(screen.getByRole('button', { name: /^Frontend,/ })).toBeOnTheScreen();
+    expect(buttons(CORE)).not.toContain('Build e bundlers');
   });
 });
 
-describe('Requirement: Tradução das trilhas de JavaScript', () => {
+describe('Requirement: Tradução da trilha de build e bundlers', () => {
   it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/area/frontend/javascript');
-    expect(screen.getByRole('button', { name: /^JavaScript essentials,/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Build tools and bundlers,/ })).toBeOnTheScreen();
   });
 });
