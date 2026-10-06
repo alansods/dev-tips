@@ -1,0 +1,330 @@
+{
+  "id": "modulos-nativos-no-expo",
+  "title": "Módulos nativos no Expo",
+  "description": "Bibliotecas com código nativo no Expo: development build, prebuild, config plugins, login com Google, compras, push, permissões e como criar e manter módulos.",
+  "areas": [
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react-native",
+  "decks": [
+    {
+      "id": "expo-go-e-development-build",
+      "title": "Expo Go e development build",
+      "description": "Quando o código nativo entra em jogo e como o Expo gera o projeto nativo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "bibliotecas-nativas-e-expo-go",
+          "level": "junior",
+          "term": "Bibliotecas nativas e o Expo Go",
+          "definition": "Algumas bibliotecas são só JavaScript; outras trazem código Swift, Objective-C, Kotlin ou Java que precisa ser compilado dentro do app. O Expo Go é um app pronto, baixado da loja, com um conjunto fixo de módulos nativos do Expo SDK: o seu código JavaScript roda dentro dele, mas nenhum código nativo novo pode ser adicionado. Por isso login com Google, compras no app, SDKs de pagamento e muitas bibliotecas de terceiros não funcionam no Expo Go. Sinais de que a biblioteca é nativa: pastas ios/ e android/ no pacote, um config plugin ou a doc avisando que não roda no Expo Go.",
+          "relatedTerms": [
+            "fluxo-com-development-build",
+            "prebuild-e-cng"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "fluxo-com-development-build",
+          "level": "pleno",
+          "term": "Fluxo com development build",
+          "definition": "Com um development build (a sua própria versão do Expo Go, com os módulos nativos do projeto), o dia a dia continua igual: o app instalado se conecta ao Metro e as mudanças de JavaScript aparecem na hora com Fast Refresh. Só é preciso gerar e instalar um build novo quando muda algo nativo: adicionar ou atualizar uma biblioteca nativa, mudar um config plugin, permissões, ícone ou identificador do app. O build pode ser local (npx expo run:ios ou run:android) ou na nuvem (eas build --profile development) e compartilhado com a equipe.",
+          "relatedTerms": [
+            "bibliotecas-nativas-e-expo-go",
+            "fingerprint-e-runtime-version"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "prebuild-e-cng",
+          "level": "pleno",
+          "term": "Prebuild e CNG",
+          "definition": "Continuous Native Generation: em vez de manter as pastas ios/ e android/ editadas à mão para sempre, o Expo as gera a partir da configuração do app (app.json ou app.config.ts) e dos config plugins, sempre que preciso. O comando é npx expo prebuild (com --clean para gerar do zero); o EAS Build e o expo run rodam o prebuild sozinhos. Como as pastas podem ser recriadas a qualquer momento, nada deve ser editado diretamente nelas: toda customização nativa vai para a configuração ou para um plugin. Isso deixa atualizar o SDK bem mais simples.",
+          "relatedTerms": [
+            "config-plugin",
+            "bibliotecas-nativas-e-expo-go"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "config-plugin",
+          "level": "pleno",
+          "term": "Config plugin",
+          "definition": "Função JavaScript que roda durante o prebuild e altera os arquivos nativos gerados: Info.plist e entitlements no iOS, AndroidManifest.xml e arquivos Gradle no Android. Bibliotecas nativas trazem o próprio plugin, listado em plugins no app.json, muitas vezes com opções (texto de uma permissão, URL scheme, versão mínima do Android). Quando nenhuma biblioteca faz o ajuste necessário, escreve-se um plugin próprio com os mods de expo/config-plugins, como withInfoPlist, withAndroidManifest e withEntitlementsPlist.",
+          "relatedTerms": [
+            "prebuild-e-cng",
+            "permissoes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "plugins-no-app-json",
+          "level": "pleno",
+          "title": "Plugins com opções no app.json",
+          "body": "Cada biblioteca nativa entra em plugins, com as opções que viram configuração nativa no prebuild: texto da permissão, URL scheme do Google, versão mínima do Android.",
+          "snippet": {
+            "file": "app.json",
+            "language": "json",
+            "code": "{\n  \"expo\": {\n    \"ios\": { \"bundleIdentifier\": \"com.cardapio.app\" },\n    \"android\": { \"package\": \"com.cardapio.app\" },\n    \"plugins\": [\n      \"expo-secure-store\",\n      [\n        \"expo-camera\",\n        { \"cameraPermission\": \"Usamos a câmera para ler o QR code da mesa.\" }\n      ],\n      [\n        \"@react-native-google-signin/google-signin\",\n        { \"iosUrlScheme\": \"com.googleusercontent.apps.123456-abc\" }\n      ],\n      [\n        \"expo-build-properties\",\n        { \"android\": { \"minSdkVersion\": 26 } }\n      ]\n    ]\n  }\n}"
+          },
+          "relatedTerms": [
+            "config-plugin",
+            "permissoes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "config-plugin-proprio",
+          "level": "senior",
+          "title": "Config plugin próprio",
+          "body": "Plugin real de um app Expo: remove dos entitlements do iOS a capacidade de push que outra biblioteca adiciona.",
+          "snippet": {
+            "file": "plugins/withoutPushEntitlement.js",
+            "language": "js",
+            "code": "// plugins/withoutPushEntitlement.js\n// O expo-notifications adiciona a capacidade de push (aps-environment) no iOS.\n// Um app que só usa notificações locais não precisa dela, e a conta Apple\n// gratuita não consegue assinar apps com push: o plugin remove a entrada.\nconst { withEntitlementsPlist } = require('expo/config-plugins');\n\nmodule.exports = function withoutPushEntitlement(config) {\n  return withEntitlementsPlist(config, (cfg) => {\n    delete cfg.modResults['aps-environment'];\n    return cfg;\n  });\n};\n\n// app.json: \"plugins\": [\"./plugins/withoutPushEntitlement\", \"expo-notifications\"]"
+          },
+          "relatedTerms": [
+            "config-plugin",
+            "notificacoes-push"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integracoes-nativas",
+      "title": "Integrações nativas",
+      "description": "O que login com Google, compras, push e permissões exigem para funcionar.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "login-com-google",
+          "level": "pleno",
+          "term": "Login com Google",
+          "definition": "Usa o SDK nativo do Google por uma biblioteca com config plugin (por exemplo @react-native-google-signin/google-signin) e não roda no Expo Go. No Google Cloud (ou Firebase), cada plataforma tem um cliente OAuth: o Android é identificado pelo package e pelo SHA-1 do certificado que assina o app; o iOS, pelo bundle identifier, e o URL scheme gerado vai para o plugin. Um cliente do tipo Web dá o webClientId, usado para o Google emitir o idToken que o backend valida. Cada certificado precisa do seu SHA-1: o de desenvolvimento, o de upload e o de assinatura do Google Play.",
+          "relatedTerms": [
+            "config-plugin",
+            "bibliotecas-nativas-e-expo-go"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "compras-no-app-nativo",
+          "level": "pleno",
+          "term": "Compras no app",
+          "definition": "As compras dentro do app usam o StoreKit e o Google Play Billing, então exigem uma biblioteca nativa (react-native-purchases ou expo-iap) e um development build; no Expo Go dá no máximo para simular. Além do código, cada loja exige os produtos cadastrados com o mesmo bundle identifier ou package do app, contratos, dados bancários e fiscais preenchidos e, no Android, o app enviado a uma trilha de teste antes de os produtos aparecerem. Testes usam contas de sandbox no iOS e testadores de licença no Android.",
+          "relatedTerms": [
+            "bibliotecas-nativas-e-expo-go",
+            "fluxo-com-development-build"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "notificacoes-push",
+          "level": "pleno",
+          "term": "Notificações push",
+          "definition": "Com expo-notifications, o app pede permissão e obtém um token do aparelho, que o backend usa para enviar mensagens pelo serviço de push da Expo, ou direto pela Apple e pelo Google. Por baixo, cada plataforma tem o seu serviço: no iOS, o APNs, que exige conta paga de desenvolvedor, a capacidade de push (entitlement aps-environment) e uma chave APNs; no Android, o Firebase Cloud Messaging, com uma chave de conta de serviço do FCM V1 enviada ao EAS. Push precisa de aparelho de verdade e não funciona no Expo Go do Android. Notificações locais, agendadas pelo próprio app, não precisam de nada disso.",
+          "relatedTerms": [
+            "config-plugin",
+            "permissoes"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "permissoes",
+          "level": "junior",
+          "term": "Permissões",
+          "definition": "Câmera, localização, fotos, microfone e notificações exigem permissão. No iOS, cada uma precisa de um texto explicando o uso (como NSCameraUsageDescription no Info.plist), que a App Review recusa se for vago; no Expo, esse texto vem das opções do plugin da biblioteca. No Android, as permissões são declaradas no AndroidManifest e as perigosas também pedidas em tempo de execução. Peça só o que usar, no momento em que a pessoa vai usar, explique antes de pedir e trate a recusa, levando às configurações do aparelho quando fizer sentido.",
+          "relatedTerms": [
+            "config-plugin",
+            "notificacoes-push"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "login-com-google-no-app",
+          "level": "pleno",
+          "title": "Login com Google no app",
+          "body": "Configura com o webClientId, faz o login nativo e manda o idToken para o backend validar. Cancelar não é erro.",
+          "snippet": {
+            "file": "src/auth/google.ts",
+            "language": "ts",
+            "code": "import {\n  GoogleSignin,\n  isErrorWithCode,\n  isSuccessResponse,\n  statusCodes,\n} from '@react-native-google-signin/google-signin';\n\n// Uma vez, na abertura do app. O webClientId (cliente \"Web\" no Google Cloud)\n// faz o Google emitir um idToken que o backend consegue validar.\nGoogleSignin.configure({ webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID });\n\nexport async function entrarComGoogle() {\n  try {\n    await GoogleSignin.hasPlayServices(); // Android: confere o Google Play Services\n    const res = await GoogleSignin.signIn();\n    if (!isSuccessResponse(res) || !res.data.idToken) return null; // cancelou\n\n    // O backend valida o idToken com o Google e cria a sessão do app\n    return api.post('/auth/google', { idToken: res.data.idToken });\n  } catch (e) {\n    if (isErrorWithCode(e) && e.code === statusCodes.IN_PROGRESS) return null;\n    throw e; // DEVELOPER_ERROR costuma ser SHA-1 ou client ID errado\n  }\n}"
+          },
+          "relatedTerms": [
+            "login-com-google"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "registrar-token-de-push",
+          "level": "pleno",
+          "title": "Registrar o token de push",
+          "body": "Canal no Android, permissão, token com o projectId do EAS e envio do token para o backend.",
+          "snippet": {
+            "file": "src/notificacoes/registrarPush.ts",
+            "language": "ts",
+            "code": "import Constants from 'expo-constants';\nimport * as Device from 'expo-device';\nimport * as Notifications from 'expo-notifications';\nimport { Platform } from 'react-native';\n\nexport async function registrarPush(): Promise<string | null> {\n  if (!Device.isDevice) return null; // push precisa de aparelho de verdade\n\n  if (Platform.OS === 'android') {\n    // Android 8+: toda notificação pertence a um canal\n    await Notifications.setNotificationChannelAsync('pedidos', {\n      name: 'Status do pedido',\n      importance: Notifications.AndroidImportance.HIGH,\n    });\n  }\n\n  let { status } = await Notifications.getPermissionsAsync();\n  if (status !== 'granted') ({ status } = await Notifications.requestPermissionsAsync());\n  if (status !== 'granted') return null;\n\n  const projectId = Constants.expoConfig?.extra?.eas?.projectId;\n  const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId });\n  await api.post('/push-tokens', { token, platform: Platform.OS }); // o backend envia os pushes\n  return token;\n}"
+          },
+          "relatedTerms": [
+            "notificacoes-push",
+            "permissoes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "criar-e-manter-modulos",
+      "title": "Criar e manter módulos",
+      "description": "Como as bibliotecas nativas entram no app e como escrever a sua.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "autolinking",
+          "level": "pleno",
+          "term": "Autolinking",
+          "definition": "Mecanismo que liga automaticamente o código nativo das bibliotecas instaladas ao projeto iOS e Android no build: basta a dependência estar no package.json, sem editar Podfile ou arquivos Gradle à mão. No Expo, instalar com npx expo install escolhe a versão compatível com o SDK do projeto, e npx expo-doctor aponta versões incompatíveis e dependências nativas duplicadas. Remover uma biblioteca nativa também exige um build novo.",
+          "relatedTerms": [
+            "nova-arquitetura-e-compatibilidade",
+            "fingerprint-e-runtime-version"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "nova-arquitetura-e-compatibilidade",
+          "level": "pleno",
+          "term": "Nova Arquitetura e compatibilidade",
+          "definition": "Nas versões atuais do React Native, a Nova Arquitetura (JSI, Fabric e TurboModules) é obrigatória, então toda biblioteca nativa precisa ser compatível com ela. Antes de adicionar uma, vale conferir no React Native Directory se ela suporta a Nova Arquitetura e as plataformas do app, se é mantida (lançamentos e issues recentes) e se tem config plugin para o Expo. Bibliotecas abandonadas costumam ser o que trava a atualização do SDK.",
+          "relatedTerms": [
+            "autolinking",
+            "expo-modules-api"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "expo-modules-api",
+          "level": "senior",
+          "term": "Expo Modules API",
+          "definition": "API do Expo para escrever módulos nativos em Swift e Kotlin com uma DSL parecida nas duas plataformas: Name dá o nome do módulo, Function expõe uma função síncrona, AsyncFunction uma que vira Promise, Events declara eventos e View expõe um componente nativo. npx create-expo-module --local cria o módulo dentro do projeto, já com autolinking e suporte à Nova Arquitetura. No JavaScript, requireNativeModule('Nome') devolve o objeto com as funções. É o caminho recomendado para acessar uma API do sistema que nenhuma biblioteca cobre.",
+          "relatedTerms": [
+            "nova-arquitetura-e-compatibilidade",
+            "autolinking"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "fingerprint-e-runtime-version",
+          "level": "senior",
+          "term": "Fingerprint e runtime version",
+          "definition": "Um update OTA só traz JavaScript e assets; ele só pode ir para builds com o mesmo código nativo, identificados pela runtime version. Com a política fingerprint, o Expo calcula um hash de tudo o que afeta o nativo (dependências nativas, config plugins, app.json) e usa como runtime version: se algo nativo mudou, o hash muda, o build novo é obrigatório e o update não chega aos apps antigos, que quebrariam ao chamar um módulo inexistente. O mesmo hash serve na CI para decidir entre publicar um update ou gerar um build.",
+          "relatedTerms": [
+            "fluxo-com-development-build",
+            "autolinking"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "modulo-nativo-swift",
+          "level": "senior",
+          "title": "Módulo nativo com Expo Modules API",
+          "body": "A definição do módulo em Swift: nome, uma função síncrona, uma assíncrona e um evento. O Kotlin segue a mesma DSL.",
+          "snippet": {
+            "file": "modules/leitor-nfc/ios/LeitorNfcModule.swift",
+            "language": "text",
+            "code": "// modules/leitor-nfc/ios/LeitorNfcModule.swift\nimport CoreNFC\nimport ExpoModulesCore\n\npublic class LeitorNfcModule: Module {\n  public func definition() -> ModuleDefinition {\n    Name(\"LeitorNfc\")\n\n    // Síncrona: volta na hora para o JavaScript\n    Function(\"disponivel\") { () -> Bool in\n      return NFCNDEFReaderSession.readingAvailable\n    }\n\n    // Assíncrona: vira uma Promise no JavaScript\n    AsyncFunction(\"lerCartao\") { (promise: Promise) in\n      self.iniciarLeitura(promise)\n    }\n\n    // Eventos que o JavaScript pode escutar\n    Events(\"onTagLida\")\n  }\n}\n\n// O Kotlin (android/.../LeitorNfcModule.kt) usa a mesma DSL:\n// Name(\"LeitorNfc\"); Function(\"disponivel\") { ... }; AsyncFunction(\"lerCartao\") { ... }"
+          },
+          "relatedTerms": [
+            "expo-modules-api"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "usar-modulo-no-javascript",
+          "level": "pleno",
+          "title": "Usar o módulo no JavaScript",
+          "body": "requireNativeModule com o mesmo nome do módulo nativo, tipado e exposto por funções do próprio projeto.",
+          "snippet": {
+            "file": "modules/leitor-nfc/index.ts",
+            "language": "ts",
+            "code": "// modules/leitor-nfc/index.ts\nimport { requireNativeModule, type EventSubscription } from 'expo-modules-core';\n\ntype LeitorNfc = {\n  disponivel(): boolean;\n  lerCartao(): Promise<{ id: string }>;\n  addListener(evento: 'onTagLida', cb: (tag: { id: string }) => void): EventSubscription;\n};\n\n// Mesmo nome do Name(\"LeitorNfc\") no Swift e no Kotlin\nconst Nativo = requireNativeModule<LeitorNfc>('LeitorNfc');\n\nexport const nfcDisponivel = () => Nativo.disponivel();\nexport const lerCartao = () => Nativo.lerCartao();\n\n// Na tela\nif (nfcDisponivel()) {\n  const { id } = await lerCartao();\n}"
+          },
+          "relatedTerms": [
+            "expo-modules-api"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre código nativo em apps Expo que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "biblioteca-nao-funciona-no-expo-go",
+          "level": "junior",
+          "question": "Por que essa biblioteca não funciona no Expo Go?",
+          "answer": "Porque ela tem código nativo, e o Expo Go é um app já compilado, com um conjunto fixo de módulos do Expo SDK: não dá para adicionar código nativo nele. Para usar a biblioteca, gero um development build do próprio app, local com npx expo run ou na nuvem com eas build, instalo no aparelho ou simulador e continuo desenvolvendo com o Metro. O Expo Go continua útil para protótipos que só usam o SDK.",
+          "relatedTerms": [
+            "bibliotecas-nativas-e-expo-go",
+            "fluxo-com-development-build"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "google-falha-na-loja",
+          "level": "pleno",
+          "question": "O login com Google funciona no build de teste, mas falha na versão da loja. Por quê?",
+          "answer": "Quase sempre é o SHA-1. No Android, o Google libera o login só para os certificados cadastrados no cliente OAuth. O build de teste é assinado pela chave de desenvolvimento ou de upload, mas o Google Play assina de novo o app distribuído com a chave de assinatura dele, que tem outro SHA-1. A correção é pegar o SHA-1 da chave de assinatura do app no Play Console e cadastrar no Google Cloud ou Firebase. O erro costuma aparecer como DEVELOPER_ERROR.",
+          "relatedTerms": [
+            "login-com-google"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-e-config-plugin",
+          "level": "pleno",
+          "question": "O que é um config plugin e quando você escreve um?",
+          "answer": "É uma função que roda no prebuild e altera os arquivos nativos gerados (Info.plist, entitlements, AndroidManifest, Gradle). Com eles, a configuração nativa fica no código e as pastas ios/ e android/ podem ser geradas de novo a qualquer momento. Uso primeiro o plugin da própria biblioteca, com opções no app.json. Escrevo um quando preciso de um ajuste que nenhuma biblioteca faz, como remover uma capacidade que outra adicionou ou incluir uma chave no Info.plist.",
+          "relatedTerms": [
+            "config-plugin",
+            "prebuild-e-cng"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "permissao-por-update-ota",
+          "level": "pleno",
+          "question": "Mudei uma permissão no app.json. Posso mandar por update OTA?",
+          "answer": "Não. Permissões, plugins, ícone, identificadores e bibliotecas nativas viram configuração nativa no prebuild e fazem parte do binário; um update OTA só troca JavaScript e assets. Preciso de um build novo e de uma nova publicação nas lojas. Com a runtime version baseada em fingerprint, essa mudança altera o hash, então o update não vai para os apps antigos, que não teriam a permissão. O código que usa a permissão nova deve esperar a versão nova do app.",
+          "relatedTerms": [
+            "fingerprint-e-runtime-version",
+            "permissoes"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "escolher-biblioteca-nativa",
+          "level": "senior",
+          "question": "Como você escolhe uma biblioteca nativa?",
+          "answer": "Primeiro vejo se o Expo SDK já resolve, porque esses módulos acompanham cada versão do SDK. Se não, olho no React Native Directory: suporte à Nova Arquitetura, plataformas, manutenção (lançamentos e issues recentes, quantas pessoas mantêm), config plugin para o Expo e licença. Também avalio o tamanho que ela adiciona ao app e se o problema vale a dependência. Uma biblioteca nativa abandonada trava a atualização do SDK, então prefiro poucas e bem mantidas.",
+          "relatedTerms": [
+            "nova-arquitetura-e-compatibilidade",
+            "autolinking"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-escrever-modulo-proprio",
+          "level": "senior",
+          "question": "Quando vale escrever um módulo nativo próprio?",
+          "answer": "Quando preciso de uma API do sistema ou de um SDK nativo que nenhuma biblioteca mantida cobre, ou quando a biblioteca existente é grande demais para o pouco que eu uso. Com a Expo Modules API, crio o módulo dentro do projeto em Swift e Kotlin, exponho só as funções necessárias e tipo a interface no TypeScript. O custo é manter o código nas duas plataformas a cada versão do sistema e do SDK, então comparo isso com usar ou contribuir para uma biblioteca existente.",
+          "relatedTerms": [
+            "expo-modules-api",
+            "nova-arquitetura-e-compatibilidade"
+          ]
+        }
+      ]
+    }
+  ]
+}

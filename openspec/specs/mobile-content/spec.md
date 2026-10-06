@@ -12,11 +12,11 @@ O catálogo SHALL ter a trilha `react-native` ("React Native"), registrada logo 
 
 #### Scenario: Área Mobile
 - **WHEN** o usuário abre a área Mobile
-- **THEN** a seção "Linguagens" mostra só "JavaScript" com "6 trilhas", e as seções "Trilhas" e "Comparativos" não aparecem
+- **THEN** a seção "Linguagens" mostra só "JavaScript" com "7 trilhas", e as seções "Trilhas" e "Comparativos" não aparecem
 
 #### Scenario: JavaScript no Mobile
 - **WHEN** o usuário abre Mobile › JavaScript
-- **THEN** "Linguagem pura" mostra só "Build e bundlers" e "Frameworks" mostra "React" com "3 trilhas" e depois "React Native" com "2 trilhas"
+- **THEN** "Linguagem pura" mostra só "Build e bundlers" e "Frameworks" mostra "React" com "3 trilhas" e depois "React Native" com "3 trilhas"
 
 #### Scenario: Framework React Native
 - **WHEN** o usuário abre Mobile › JavaScript › React Native
