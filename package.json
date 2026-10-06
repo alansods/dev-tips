@@ -58,6 +58,7 @@
     "icons": "node scripts/generate-icons.js"
   },
   "private": true,
+  "license": "UNLICENSED",
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
