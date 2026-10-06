@@ -1,0 +1,120 @@
+{
+  "title": "State and data in React",
+  "description": "Where to keep each piece of state in React and React Native apps: Context, Zustand, Redux Toolkit, server data with React Query and SWR, Axios and custom hooks.",
+  "decks": {
+    "estado-global": {
+      "title": "Global state",
+      "description": "When state leaves the component and which tool to use to share it."
+    },
+    "dados-do-servidor": {
+      "title": "Server data",
+      "description": "Fetching, caching and updating API data without reinventing loading."
+    },
+    "hooks-personalizados": {
+      "title": "Custom hooks",
+      "description": "Extracting, composing and designing hooks that keep components simple."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about state, data and hooks that come up in frontend interviews."
+    }
+  },
+  "cards": {
+    "estado-local-e-global": {
+      "term": "Local state and global state",
+      "definition": "Local state lives in one component (useState), and only that component and the children that receive props use it. Global state is read by distant parts of the tree, such as the logged-in user, theme or cart. Rule of thumb: start local, lift it to the common ancestor when two siblings need the same data, and only make global what many screens use. Too much global state couples screens and makes it hard to see who changes what."
+    },
+    "context-e-rerenderizacao": {
+      "term": "Context and re-rendering",
+      "definition": "Context solves prop drilling: the Provider hands down a value and any descendant reads it with useContext. It is not a state manager with selective subscriptions: when the value changes, every component consuming that Context re-renders, even if it only uses one field. So it fits data that rarely changes (theme, language, user). For data that changes often, split it into smaller Contexts, memoize the value with useMemo or use a store with selectors."
+    },
+    "zustand": {
+      "term": "Zustand",
+      "definition": "A small hook-based global state library. create returns a hook (useCart) that holds state and actions together, with no Provider. Each component passes a selector (state => state.items.length) and only re-renders when the selected value changes. To select several fields into an object, use useShallow. It also works outside React (useCart.getState()), which helps in interceptors and tests."
+    },
+    "redux-toolkit": {
+      "term": "Redux Toolkit",
+      "definition": "The official, current way to use Redux. createSlice generates the reducer and action creators together; with Immer inside, the reducer can write state.items.push and the result stays immutable. configureStore already wires up DevTools and the thunk middleware. Compared with Zustand it has more structure: a single flow (dispatch an action → reducer → new state), DevTools with history and strong patterns for large teams. For API data, Redux Toolkit itself ships RTK Query."
+    },
+    "store-zustand-seletores": {
+      "title": "Zustand store with selectors",
+      "body": "State and actions in the same hook. The selector makes the component subscribe only to what it uses; useShallow compares the object field by field."
+    },
+    "slice-redux-toolkit": {
+      "title": "Redux Toolkit slice",
+      "body": "createSlice generates the reducer and actions; the typed hooks avoid repeating RootState and AppDispatch in every component."
+    },
+    "estado-do-servidor": {
+      "term": "Server state",
+      "definition": "Data that belongs to the backend, of which the app only holds a copy: order list, profile, menu. Unlike client state (open modal, selected item), it can go stale without the app knowing, is shared with other users and needs loading, errors, caching, retries and request deduplication. Handling it with useEffect + useState on every screen repeats code and causes bugs; libraries such as React Query and SWR solve this problem."
+    },
+    "react-query-e-swr": {
+      "term": "React Query and SWR",
+      "definition": "Caching libraries for server state. Each fetch has a key (queryKey in React Query, key in SWR); components with the same key share the result and a single request. They return data, error and loading state, retry on failure and refetch in the background when focus or the connection comes back. SWR is smaller and follows the stale-while-revalidate idea; TanStack Query (React Query) has more features, such as mutations, infinite pagination, optimistic updates and DevTools."
+    },
+    "stale-time-e-invalidacao": {
+      "term": "staleTime and invalidation",
+      "definition": "In React Query, staleTime says how long data is considered fresh; the default is 0, so all data is stale from the start and is refetched in the background when another screen mounts, the window regains focus or the network reconnects. gcTime (formerly cacheTime) is how long data nobody is using stays in the cache before being discarded; the default is 5 minutes. After a mutation, invalidateQueries marks the keys as stale and refetches the ones in use. Tuning staleTime per kind of data is the main way to avoid too many requests."
+    },
+    "axios-e-interceptors": {
+      "term": "Axios and interceptors",
+      "definition": "Axios is an HTTP client that, compared with fetch, parses JSON automatically, rejects the Promise on 4xx and 5xx status, has a timeout and lets you create an instance with a baseURL and default headers. Interceptors are functions that run before every request (to add the token) or after every response (to handle a 401, refresh the token and retry the call). With fetch, the same is done with your own wrapper function; React Query works with either."
+    },
+    "query-e-mutation": {
+      "title": "useQuery and useMutation with invalidation",
+      "body": "Per-resource hooks hide the key and the HTTP call. After an order is created, the list is invalidated and fetched again."
+    },
+    "interceptor-de-token": {
+      "title": "Token interceptor with Axios",
+      "body": "The request interceptor adds the token; the response interceptor refreshes the token on a 401 and retries the call, with a single refresh for several simultaneous failures."
+    },
+    "hook-personalizado": {
+      "term": "Custom hook",
+      "definition": "A function whose name starts with use and that calls other hooks. It extracts stateful logic repeated across components (fetching data, debouncing, forms) and leaves the component with just the UI. Each component using the hook gets its own state: hooks share logic, not data. It follows the rules of hooks: only at the top level of a component or another hook, never inside an if or a loop."
+    },
+    "use-reducer": {
+      "term": "useReducer",
+      "definition": "An alternative to useState when the next state depends on several rules or when several fields change together. The logic lives in a pure function reducer(state, action) that returns the new state, and the component only dispatches named actions. It is easier to test (it is a pure function) and helps avoid impossible states, such as \"sending\" and \"error\" at the same time. It is the same model as Redux, only local to the component."
+    },
+    "composicao-de-hooks": {
+      "term": "Hook composition",
+      "definition": "Custom hooks can use other custom hooks, like functions calling functions: useProductSearch uses useDebounce and useQuery; useAuth uses a Context and a store. Each hook has one responsibility, and bigger ones are built from smaller ones. Swapping a piece (e.g., moving from SWR to React Query) stays inside one hook, without touching the screens."
+    },
+    "api-de-um-hook": {
+      "term": "A hook's API",
+      "definition": "Designing what a hook returns is designing an API. Good practices: return a named object ({ data, isPending, refetch }) when there are many values, and a tuple only when it is used like useState; keep returned functions stable (useCallback), because they end up in callers' dependency arrays; take options in an object so it can grow without breaking; and do not hide unexpected side effects. The hook should be testable on its own, with renderHook."
+    },
+    "use-debounce": {
+      "title": "useDebounce",
+      "body": "A generic hook that only returns the value after a period without changes. Composed with useQuery, it avoids one request per keystroke."
+    },
+    "reducer-tipado": {
+      "title": "Reducer with typed actions",
+      "body": "A discriminated union of actions lets TypeScript check every case and prevents impossible states."
+    },
+    "context-zustand-ou-redux": {
+      "question": "When do you use Context, Zustand or Redux?",
+      "answer": "First I separate server data: that goes to React Query or SWR, not to any of the three. Of what is left, Context for values that rarely change and are read in many places (theme, language, user). Zustand when there is shared client state that changes often and I want selectors without boilerplate. Redux Toolkit when the team is large, the state flow is complex and a strict pattern, middleware and DevTools with history are worth it."
+    },
+    "api-em-store-global": {
+      "question": "Why not keep API data in a global store?",
+      "answer": "Because then I reimplement a cache by hand: loading and error per request, when to refetch, deduplication, retries, invalidation after a mutation and cleaning up what nobody uses. A server-state library already does this with one key per resource. The global store stays small, with client state only (filters, local cart, preferences), and API data always has one source of truth: the query cache."
+    },
+    "evitar-rerender-context": {
+      "question": "How do you avoid unnecessary re-renders with Context?",
+      "answer": "Every consumer re-renders when the value changes, so: I memoize the value with useMemo so the Provider does not create a new object on every render; I split state and actions into different Contexts (components that only dispatch actions do not re-render when state changes); I split large Contexts by subject; and I move the Provider down, close to its consumers. If the value still changes a lot and each screen uses a slice of it, I switch to a store with selectors, such as Zustand, or use useSyncExternalStore."
+    },
+    "query-stale": {
+      "question": "What happens when a React Query query becomes stale?",
+      "answer": "Nothing right away: the data stays on screen. Stale only means it may be refetched. The refetch happens in the background when another component with the same key mounts, when the window regains focus or the network reconnects, or when I invalidate the key. While it fetches, the screen shows the old data and isFetching is true, without going back to loading. With the default staleTime of 0 this always happens; raising staleTime reduces fetches."
+    },
+    "fetch-ou-axios": {
+      "question": "fetch or Axios?",
+      "answer": "fetch is built into the browser, React Native and Node, so it adds no dependency. But it does not reject on 404 or 500 (you have to check response.ok), requires response.json() and has no built-in timeout or interceptors (a timeout is done with AbortController). Axios handles this out of the box and supports an instance with a baseURL and token. In a small project I use fetch with a wrapper; when there is authentication with refresh and many calls, Axios saves code."
+    },
+    "testar-hook": {
+      "question": "How would you organize and test a custom hook?",
+      "answer": "One hook per responsibility, named for what it does (useOrders, useDebounce), in src/hooks or next to the feature, with pure logic (reducer, formatting) in separate functions tested without React. I test the hook itself with Testing Library's renderHook: check the initial value, trigger actions inside act and check the result; for hooks using React Query I wrap them in a test QueryClientProvider and mock the API (e.g., MSW), and for time I use fake timers."
+    }
+  }
+}

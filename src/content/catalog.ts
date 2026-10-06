@@ -39,6 +39,14 @@ import ciCdEssencial from '../../content/tracks/ci-cd-essencial/track.json';
 import githubActions from '../../content/tracks/github-actions/track.json';
 import awsEssencial from '../../content/tracks/aws-essencial/track.json';
 import deployNaAws from '../../content/tracks/deploy-na-aws/track.json';
+import estadoEDadosNoReact from '../../content/tracks/estado-e-dados-no-react/track.json';
+import testesNoFrontend from '../../content/tracks/testes-no-frontend/track.json';
+import estilizacaoEDesignSystem from '../../content/tracks/estilizacao-e-design-system/track.json';
+import buildEBundlers from '../../content/tracks/build-e-bundlers/track.json';
+import gitEColaboracao from '../../content/tracks/git-e-colaboracao/track.json';
+import pagamentosNoApp from '../../content/tracks/pagamentos-no-app/track.json';
+import performanceNoNextjs from '../../content/tracks/performance-no-nextjs/track.json';
+import modulosNativosNoExpo from '../../content/tracks/modulos-nativos-no-expo/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -78,6 +86,14 @@ const registry: unknown[] = [
   githubActions,
   awsEssencial,
   deployNaAws,
+  estadoEDadosNoReact,
+  testesNoFrontend,
+  estilizacaoEDesignSystem,
+  buildEBundlers,
+  gitEColaboracao,
+  pagamentosNoApp,
+  performanceNoNextjs,
+  modulosNativosNoExpo,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

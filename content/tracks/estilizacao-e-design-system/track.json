@@ -1,0 +1,337 @@
+{
+  "id": "estilizacao-e-design-system",
+  "title": "Estilização e design system",
+  "description": "Interfaces consistentes e acessíveis na web e no mobile: Tailwind, NativeWind, design tokens, componentes com variantes, Storybook e acessibilidade.",
+  "areas": [
+    "frontend",
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react",
+  "decks": [
+    {
+      "id": "tailwind-e-nativewind",
+      "title": "Tailwind e NativeWind",
+      "description": "Estilizar com classes utilitárias no React e no React Native.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "utility-first",
+          "level": "junior",
+          "term": "Utility-first",
+          "definition": "Abordagem de estilo em que cada classe faz uma coisa só (p-4 aplica padding, text-sm muda o tamanho da fonte) e o visual é montado combinando classes direto no componente, em vez de escrever um seletor CSS por componente. As vantagens: não é preciso inventar nomes, o CSS final não cresce a cada tela e o estilo fica junto do markup. A desvantagem é o className longo; a resposta é extrair componentes, não voltar a escrever CSS por tela.",
+          "relatedTerms": [
+            "tailwind-css",
+            "classes-condicionais"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tailwind-css",
+          "level": "junior",
+          "term": "Tailwind CSS",
+          "definition": "Framework utility-first que gera só o CSS das classes usadas no projeto. Tem variantes por estado e por contexto como prefixo: hover:, focus:, disabled:, dark: e os breakpoints sm:, md:, lg: (mobile-first, valem dali para cima). Os valores vêm de um tema com escala de cores, espaçamentos e fontes, o que mantém a consistência. No Tailwind 4 o tema é definido no CSS com @theme; até a versão 3, num tailwind.config.js. Valores fora do tema usam colchetes, como w-[37px], e devem ser exceção.",
+          "relatedTerms": [
+            "utility-first",
+            "design-tokens"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "nativewind",
+          "level": "pleno",
+          "term": "NativeWind",
+          "definition": "Biblioteca que leva as classes do Tailwind para o React Native: o componente recebe className e o NativeWind converte as classes em objetos de estilo nativos, a maior parte em tempo de build. Suporta dark:, os breakpoints, active: (pressionado) e prefixos por plataforma (ios:, android:). Como o React Native não tem cascata nem todas as propriedades do CSS, algumas classes não têm efeito. A versão estável usa o tailwind.config.js do Tailwind 3 com o preset do NativeWind; o mesmo vocabulário de classes serve para web e mobile.",
+          "relatedTerms": [
+            "tailwind-css",
+            "utility-first"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "classes-condicionais",
+          "level": "pleno",
+          "term": "Classes condicionais",
+          "definition": "Montar o className conforme props e estado sem concatenar strings à mão. clsx (ou classnames) junta classes e descarta as falsas: clsx('p-4', selected && 'bg-brand-500'). tailwind-merge (twMerge) resolve conflitos do Tailwind, mantendo a última classe de cada grupo: twMerge('px-4', 'px-8') vira 'px-8'. É comum um helper cn que usa os dois, para que um className vindo de fora consiga sobrescrever o padrão do componente. As classes devem estar escritas por inteiro no código, porque o Tailwind não detecta classes montadas como `bg-${cor}-500`.",
+          "relatedTerms": [
+            "tailwind-css",
+            "componente-com-variantes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "card-com-nativewind",
+          "level": "pleno",
+          "title": "Card com NativeWind",
+          "body": "Um card do cardápio estilizado só com classes: estado pressionado com active:, tema escuro com dark: e um selo condicional.",
+          "snippet": {
+            "file": "src/components/DishCard.tsx",
+            "language": "ts",
+            "code": "import { Pressable, Text, View } from 'react-native';\n\ntype Props = { name: string; price: string; soldOut?: boolean; onPress: () => void };\n\nexport function DishCard({ name, price, soldOut = false, onPress }: Props) {\n  return (\n    <Pressable\n      onPress={onPress}\n      disabled={soldOut}\n      className=\"flex-row items-center justify-between rounded-2xl bg-white p-4 active:opacity-70 dark:bg-zinc-900\"\n    >\n      <View className=\"gap-1\">\n        <Text className=\"text-base font-semibold text-zinc-900 dark:text-white\">{name}</Text>\n        <Text className=\"text-sm text-zinc-500\">{price}</Text>\n      </View>\n      {soldOut && <Text className=\"text-xs font-medium uppercase text-red-600\">Esgotado</Text>}\n    </Pressable>\n  );\n}"
+          },
+          "relatedTerms": [
+            "nativewind",
+            "classes-condicionais"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "tokens-no-theme",
+          "level": "pleno",
+          "title": "Tokens no @theme",
+          "body": "No Tailwind 4, os tokens da marca viram classes e variáveis CSS a partir do próprio arquivo CSS.",
+          "snippet": {
+            "file": "src/app.css",
+            "language": "text",
+            "code": "/* app.css (Tailwind v4: tokens definidos no próprio CSS) */\n@import \"tailwindcss\";\n\n@theme {\n  --color-brand-500: oklch(0.62 0.19 35);\n  --color-brand-600: oklch(0.55 0.18 35);\n  --font-display: \"Inter\", sans-serif;\n  --radius-card: 1rem;\n}\n\n/* Agora existem bg-brand-500, text-brand-600, font-display, rounded-card,\n   e as variáveis CSS --color-brand-500 etc. para usar em qualquer lugar */"
+          },
+          "relatedTerms": [
+            "tailwind-css",
+            "design-tokens"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "design-system",
+      "title": "Design system",
+      "description": "Tokens, componentes reutilizáveis e documentação que mantêm a interface consistente.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "design-system",
+          "level": "senior",
+          "term": "Design system",
+          "definition": "Conjunto de decisões de interface compartilhadas por design e código: tokens (cores, tipografia, espaçamento), componentes reutilizáveis com variantes, padrões de uso e documentação. Reduz retrabalho, deixa telas consistentes e acelera novas features. Manter um exige dono, versionamento e changelog (é um produto interno com usuários), contribuição aberta com revisão, componentes acessíveis por padrão e métricas de adoção. O erro comum é começar por uma biblioteca enorme; o melhor é extrair dos padrões que já se repetem no app.",
+          "relatedTerms": [
+            "design-tokens",
+            "componente-com-variantes"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "design-tokens",
+          "level": "pleno",
+          "term": "Design tokens",
+          "definition": "Valores de design com nome, guardados num só lugar e usados em todo o produto: cor, espaçamento, raio, fonte, sombra, duração. Em camadas: tokens primitivos (blue-500) e tokens semânticos (color-primary, color-surface, text-muted), que dizem o papel e não o valor. Os componentes usam só os semânticos; assim o tema escuro e uma troca de marca mudam o mapeamento, não cada componente. Podem ser gerados a partir do Figma para CSS, Tailwind e React Native, e usar a mesma fonte na web e no mobile.",
+          "relatedTerms": [
+            "design-system",
+            "tailwind-css"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "componente-com-variantes",
+          "level": "pleno",
+          "term": "Componente com variantes",
+          "definition": "Componente base do design system (Button, Badge, Input) cuja aparência muda por props com valores fechados, como variant=\"primary\" | \"secondary\" e size=\"sm\" | \"md\", em vez de receber cores e tamanhos soltos. Bibliotecas como class-variance-authority (cva) descrevem as variantes e geram o className, e o TypeScript impede variantes inexistentes. Um bom componente aceita className para ajustes de layout, repassa as props nativas (disabled, onPress) e já vem acessível.",
+          "relatedTerms": [
+            "design-system",
+            "classes-condicionais"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "storybook",
+          "level": "pleno",
+          "term": "Storybook",
+          "definition": "Ambiente para desenvolver e documentar componentes isolados do app. Cada story é um estado do componente (primário, desabilitado, carregando, com texto longo) descrito por args. Serve de catálogo vivo do design system, gera documentação das props (autodocs), permite testes de interação (play), checagem de acessibilidade com addon e testes visuais por comparação de imagem. Existe Storybook para React Native, que roda as stories dentro do app ou do Expo.",
+          "relatedTerms": [
+            "design-system",
+            "componente-com-variantes"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "button-com-variantes",
+          "level": "pleno",
+          "title": "Button com variantes",
+          "body": "cva descreve as variantes e os padrões; o TypeScript infere as props de variante e twMerge deixa o className de fora vencer.",
+          "snippet": {
+            "file": "src/ui/Button.tsx",
+            "language": "ts",
+            "code": "import { cva, type VariantProps } from 'class-variance-authority';\nimport { twMerge } from 'tailwind-merge';\n\nconst button = cva('inline-flex items-center justify-center rounded-lg font-medium disabled:opacity-50', {\n  variants: {\n    variant: {\n      primary: 'bg-brand-500 text-white hover:bg-brand-600',\n      secondary: 'bg-zinc-100 text-zinc-900 hover:bg-zinc-200',\n      ghost: 'bg-transparent text-zinc-700 hover:bg-zinc-100',\n    },\n    size: { sm: 'h-8 px-3 text-sm', md: 'h-10 px-4', lg: 'h-12 px-6 text-lg' },\n  },\n  defaultVariants: { variant: 'primary', size: 'md' },\n});\n\ntype ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & VariantProps<typeof button>;\n\nexport function Button({ variant, size, className, ...props }: ButtonProps) {\n  // twMerge resolve conflitos: um className=\"px-8\" vindo de fora vence o px-4 da variante\n  return <button className={twMerge(button({ variant, size }), className)} {...props} />;\n}"
+          },
+          "relatedTerms": [
+            "componente-com-variantes",
+            "classes-condicionais"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "stories-do-button",
+          "level": "pleno",
+          "title": "Stories do Button",
+          "body": "Formato CSF3: o meta define o componente e os args padrão; cada export é uma story, e a play testa o clique dentro do Storybook.",
+          "snippet": {
+            "file": "src/ui/Button.stories.tsx",
+            "language": "ts",
+            "code": "import type { Meta, StoryObj } from '@storybook/react-vite';\nimport { expect, fn } from 'storybook/test';\nimport { Button } from './Button';\n\nconst meta = {\n  component: Button,\n  tags: ['autodocs'], // gera a página de documentação com as props\n  args: { children: 'Fazer pedido', onClick: fn() },\n} satisfies Meta<typeof Button>;\n\nexport default meta;\ntype Story = StoryObj<typeof meta>;\n\nexport const Primary: Story = {};\nexport const Secondary: Story = { args: { variant: 'secondary' } };\nexport const Disabled: Story = { args: { disabled: true } };\n\nexport const Clicked: Story = {\n  play: async ({ args, canvas, userEvent }) => {\n    await userEvent.click(canvas.getByRole('button', { name: 'Fazer pedido' }));\n    await expect(args.onClick).toHaveBeenCalled();\n  },\n};"
+          },
+          "relatedTerms": [
+            "storybook",
+            "componente-com-variantes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "acessibilidade",
+      "title": "Acessibilidade",
+      "description": "Interfaces que funcionam para todo mundo, com leitor de tela, teclado e toque.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "acessibilidade",
+          "level": "junior",
+          "term": "Acessibilidade",
+          "definition": "Fazer a interface funcionar para pessoas com deficiência visual, motora, auditiva ou cognitiva, e também para quem usa o app no sol, com uma mão só ou com fonte grande. A referência é a WCAG, com critérios como contraste mínimo, rótulos em controles, navegação por teclado e alternativa em texto para imagens. Além de inclusão, é exigência legal em vários casos (no Brasil, a Lei Brasileira de Inclusão) e melhora a experiência e os testes de todo mundo. É mais barato fazer desde o início do que corrigir depois.",
+          "relatedTerms": [
+            "papeis-e-rotulos",
+            "contraste-e-area-de-toque"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "papeis-e-rotulos",
+          "level": "pleno",
+          "term": "Papéis e rótulos",
+          "definition": "Tecnologias assistivas descrevem cada elemento pelo papel (botão, link, campo, cabeçalho), pelo nome acessível e pelo estado (selecionado, desabilitado, expandido). Na web, use primeiro o elemento HTML certo (button, a, label ligado ao input) e recorra a ARIA só quando não existir um. No React Native, use role e aria-label (ou accessibilityRole e accessibilityLabel) e os estados correspondentes. Botões só com ícone sempre precisam de rótulo, e ícones decorativos devem ficar ocultos para o leitor de tela.",
+          "relatedTerms": [
+            "acessibilidade",
+            "leitor-de-tela-e-foco"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "contraste-e-area-de-toque",
+          "level": "pleno",
+          "term": "Contraste e área de toque",
+          "definition": "Texto precisa de contraste de pelo menos 4,5:1 com o fundo (3:1 para texto grande e ícones), o que vale conferir nos dois temas. Informação não pode depender só de cor: um erro tem texto ou ícone, não só borda vermelha. Alvos de toque devem ter cerca de 44×44 pt no iOS e 48×48 dp no Android; um ícone pequeno ganha área com padding ou hitSlop. O layout também deve aguentar fonte maior do sistema (Dynamic Type no iOS, escala de fonte no Android) sem cortar texto.",
+          "relatedTerms": [
+            "acessibilidade",
+            "design-tokens"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "leitor-de-tela-e-foco",
+          "level": "senior",
+          "term": "Leitor de tela e foco",
+          "definition": "VoiceOver (iOS) e TalkBack (Android) leem os elementos na ordem de foco, que deve seguir a ordem visual. Ao abrir um modal, o foco vai para dentro dele e não pode escapar para a tela de trás; ao fechar, volta para o elemento que o abriu. Mudanças importantes sem troca de foco, como \"item adicionado\" ou um erro, devem ser anunciadas (região live na web, announceForAccessibility no React Native). Validar exige testar com o leitor de tela ligado, além das ferramentas automáticas, que pegam só parte dos problemas.",
+          "relatedTerms": [
+            "papeis-e-rotulos",
+            "acessibilidade"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "botao-icone-acessivel",
+          "level": "pleno",
+          "title": "Botão de ícone acessível no React Native",
+          "body": "Papel, rótulo que diz a ação e o estado, e área de toque ampliada com hitSlop. O ícone fica dentro do botão e não é lido separado.",
+          "snippet": {
+            "file": "src/components/FavoriteButton.tsx",
+            "language": "ts",
+            "code": "import { Pressable } from 'react-native';\nimport { Ionicons } from '@expo/vector-icons';\n\ntype Props = { favorite: boolean; dishName: string; onToggle: () => void };\n\nexport function FavoriteButton({ favorite, dishName, onToggle }: Props) {\n  return (\n    <Pressable\n      onPress={onToggle}\n      role=\"button\"\n      aria-label={favorite ? `Remover ${dishName} dos favoritos` : `Favoritar ${dishName}`}\n      aria-selected={favorite}\n      hitSlop={12} // amplia a área de toque além do ícone de 24 pt\n      className=\"p-2\"\n    >\n      {/* o Pressable acessível agrupa os filhos: o leitor de tela lê só o rótulo do botão */}\n      <Ionicons name={favorite ? 'heart' : 'heart-outline'} size={24} />\n    </Pressable>\n  );\n}"
+          },
+          "relatedTerms": [
+            "papeis-e-rotulos",
+            "contraste-e-area-de-toque"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "campo-com-erro-acessivel",
+          "level": "pleno",
+          "title": "Campo com erro acessível na web",
+          "body": "label ligado ao input, aria-invalid e aria-describedby apontando para a mensagem, que é anunciada com role=\"alert\".",
+          "snippet": {
+            "file": "src/components/EmailField.tsx",
+            "language": "ts",
+            "code": "export function EmailField({ error }: { error?: string }) {\n  return (\n    <div>\n      <label htmlFor=\"email\">E-mail</label>\n      <input\n        id=\"email\"\n        type=\"email\"\n        autoComplete=\"email\"\n        aria-invalid={error ? true : undefined}\n        aria-describedby={error ? 'email-error' : undefined}\n      />\n      {/* role=\"alert\" faz o leitor de tela anunciar o erro quando ele aparece */}\n      {error && (\n        <p id=\"email-error\" role=\"alert\" className=\"text-sm text-red-700\">\n          {error}\n        </p>\n      )}\n    </div>\n  );\n}"
+          },
+          "relatedTerms": [
+            "papeis-e-rotulos",
+            "leitor-de-tela-e-foco"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre estilização, design systems e acessibilidade que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "tailwind-ou-css",
+          "level": "junior",
+          "question": "Tailwind ou CSS tradicional?",
+          "answer": "Com CSS tradicional eu escrevo seletores e invento nomes de classe; o arquivo cresce a cada tela e fica difícil saber o que pode ser apagado. Com Tailwind eu combino classes prontas do tema direto no componente: os valores ficam consistentes, o CSS final é pequeno e o estilo mora junto do markup. O custo é o className longo e aprender o vocabulário. Num app com componentes React, prefiro Tailwind e extraio componentes para não repetir classes; CSS próprio fica para casos especiais.",
+          "relatedTerms": [
+            "utility-first",
+            "tailwind-css"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "estilo-no-react-native",
+          "level": "pleno",
+          "question": "No React Native: StyleSheet, NativeWind ou CSS-in-JS?",
+          "answer": "StyleSheet é o padrão, sem dependência, com estilos em objetos JavaScript; funciona bem, mas tema e variantes ficam por minha conta. NativeWind traz o vocabulário do Tailwind, dark mode e breakpoints, e permite compartilhar classes e tokens com a web. Soluções CSS-in-JS como styled-components têm custo em tempo de execução. Para um app que compartilha design system com a web, escolho NativeWind; para algo pequeno ou muito focado em performance de animação, StyleSheet basta.",
+          "relatedTerms": [
+            "nativewind",
+            "design-tokens"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tema-claro-e-escuro",
+          "level": "pleno",
+          "question": "Como você implementaria tema claro e escuro?",
+          "answer": "Com tokens semânticos (surface, text, primary) que têm um valor por tema, e os componentes usando só esses tokens, nunca cores fixas. Na web, troco as variáveis CSS por classe ou por prefers-color-scheme e uso dark: no Tailwind; no React Native, leio useColorScheme e aplico o tema (o NativeWind faz isso com dark:). Deixo a pessoa escolher entre claro, escuro e o do sistema, salvo a escolha e confiro o contraste nos dois temas, inclusive imagens e sombras.",
+          "relatedTerms": [
+            "design-tokens",
+            "contraste-e-area-de-toque"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "variante-ou-componente-novo",
+          "level": "pleno",
+          "question": "Quando criar uma variante e quando criar um componente novo?",
+          "answer": "Variante quando é o mesmo componente, com o mesmo comportamento e a mesma estrutura, mudando só a aparência ou o tamanho: Button primário, secundário, pequeno. Componente novo quando muda o comportamento, a semântica ou a estrutura: um IconButton precisa de rótulo obrigatório, um Link navega em vez de executar ação. Se as props começam a ter combinações que não fazem sentido ou o componente vira um switch gigante, é sinal de dividir. Componentes compostos (Card.Header, Card.Body) ajudam a evitar props demais.",
+          "relatedTerms": [
+            "componente-com-variantes",
+            "design-system"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "montar-design-system",
+          "level": "senior",
+          "question": "Como você montaria e manteria um design system?",
+          "answer": "Começo pelo inventário: cores, espaçamentos e componentes que já se repetem no app, e defino tokens primitivos e semânticos com o time de design. Depois extraio os componentes mais usados (Button, Input, Text, Card), acessíveis e documentados no Storybook, e migro as telas aos poucos. Para manter: um dono, versionamento com changelog, revisão das contribuições, testes de interação e visuais e lint que impede cores fixas. Meço adoção e removo o que ninguém usa.",
+          "relatedTerms": [
+            "design-system",
+            "storybook",
+            "design-tokens"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "garantir-acessibilidade",
+          "level": "senior",
+          "question": "Como garantir a acessibilidade de um app?",
+          "answer": "Tratando como requisito desde o design: contraste e tamanhos já nos tokens, componentes base acessíveis por padrão e critérios de aceite nas histórias. No código, lint de acessibilidade, testes que buscam por papel e nome (getByRole) e o addon de acessibilidade no Storybook. Como as ferramentas automáticas pegam só parte dos problemas, testo os fluxos principais com VoiceOver, TalkBack e teclado, e com fonte grande. Bugs de acessibilidade entram no backlog com a mesma prioridade dos outros.",
+          "relatedTerms": [
+            "acessibilidade",
+            "leitor-de-tela-e-foco",
+            "papeis-e-rotulos"
+          ]
+        }
+      ]
+    }
+  ]
+}

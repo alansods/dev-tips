@@ -35,6 +35,14 @@ import ciCdEssencialEn from '../../content/tracks/ci-cd-essencial/translations/e
 import githubActionsEn from '../../content/tracks/github-actions/translations/en.json';
 import awsEssencialEn from '../../content/tracks/aws-essencial/translations/en.json';
 import deployNaAwsEn from '../../content/tracks/deploy-na-aws/translations/en.json';
+import estadoEDadosNoReactEn from '../../content/tracks/estado-e-dados-no-react/translations/en.json';
+import testesNoFrontendEn from '../../content/tracks/testes-no-frontend/translations/en.json';
+import estilizacaoEDesignSystemEn from '../../content/tracks/estilizacao-e-design-system/translations/en.json';
+import buildEBundlersEn from '../../content/tracks/build-e-bundlers/translations/en.json';
+import gitEColaboracaoEn from '../../content/tracks/git-e-colaboracao/translations/en.json';
+import pagamentosNoAppEn from '../../content/tracks/pagamentos-no-app/translations/en.json';
+import performanceNoNextjsEn from '../../content/tracks/performance-no-nextjs/translations/en.json';
+import modulosNativosNoExpoEn from '../../content/tracks/modulos-nativos-no-expo/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -70,4 +78,12 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'github-actions': { en: githubActionsEn },
   'aws-essencial': { en: awsEssencialEn },
   'deploy-na-aws': { en: deployNaAwsEn },
+  'estado-e-dados-no-react': { en: estadoEDadosNoReactEn },
+  'testes-no-frontend': { en: testesNoFrontendEn },
+  'estilizacao-e-design-system': { en: estilizacaoEDesignSystemEn },
+  'build-e-bundlers': { en: buildEBundlersEn },
+  'git-e-colaboracao': { en: gitEColaboracaoEn },
+  'pagamentos-no-app': { en: pagamentosNoAppEn },
+  'performance-no-nextjs': { en: performanceNoNextjsEn },
+  'modulos-nativos-no-expo': { en: modulosNativosNoExpoEn },
 };

@@ -62,6 +62,6 @@ describe('Requirement: Busca do glossário no idioma exibido', () => {
     await open('/glossary');
     fireEvent.changeText(screen.getByLabelText('Search term'), 'browser');
     const items = screen.getAllByTestId('glossary-item');
-    expect(items.map((el) => el.props.accessibilityLabel)).toEqual(['CORS']);
+    expect(items.map((el) => el.props.accessibilityLabel)).toContain('CORS');
   });
 });

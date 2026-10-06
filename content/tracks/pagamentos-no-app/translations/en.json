@@ -1,0 +1,120 @@
+{
+  "title": "In-app payments",
+  "description": "Charging inside a mobile app: when to use App Store and Google Play purchases, IAP in Expo with RevenueCat, payment gateways, Pix, webhooks and idempotency.",
+  "decks": {
+    "compras-dentro-do-app": {
+      "title": "In-app purchases",
+      "description": "What the stores require to sell inside an app."
+    },
+    "iap-no-expo": {
+      "title": "IAP in Expo",
+      "description": "Implementing in-app purchases with Expo and RevenueCat."
+    },
+    "pagamentos-e-backend": {
+      "title": "Payments and the backend",
+      "description": "Charging for physical goods safely and confirming on the server."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about payments in apps that come up in interviews."
+    }
+  },
+  "cards": {
+    "compra-dentro-do-app": {
+      "term": "In-app purchase (IAP)",
+      "definition": "A purchase made through the store's own payment system: StoreKit on the App Store and Google Play Billing on Android. The person pays with their store account, the store charges, handles refunds and pays the developer minus its commission. To sell digital content and features used in the app (a subscription, game coins, unlocking features), the stores require IAP, except for regional exceptions. The app never receives card data: only the result of the transaction."
+    },
+    "bens-digitais-e-fisicos": {
+      "term": "Digital and physical goods",
+      "definition": "The rule that decides the payment method. Digital goods and services consumed in the app (a premium subscription, content, credits) use the store's purchase. Physical goods and services consumed outside the app (a food order, a ride, a ticket, a product delivered home) cannot use IAP: the app uses a payment gateway, Pix or wallets such as Apple Pay and Google Pay, with no store commission. The same app can have both cases, such as a delivery app with a digital benefits plan."
+    },
+    "tipos-de-produto": {
+      "term": "Product types",
+      "definition": "The stores split IAP products into: consumables, used up and purchasable again (coins, a pack of questions); non-consumables, bought once and kept forever (removing ads, a theme); and auto-renewable subscriptions, charged every period until the person cancels, with optional free trials and offers. Each product is registered in App Store Connect and the Google Play Console with an id, and the price comes from the store in each country."
+    },
+    "comissoes-e-regras-por-pais": {
+      "term": "Commissions and rules by country",
+      "definition": "The stores' standard commission is 30%, with 15% in cases such as small developers (up to about US$ 1 million a year, in both stores' programs) and subscriptions (on Google, from the start; on Apple, after one year of subscription). Regional rules opened exceptions: links to pay outside the app in the US, alternative stores and payments in the European Union and, in Brazil, since June 2026, Apple's agreement with CADE, which allows an external link (15% fee) and third-party payment in the app (25%). Since the rules change quickly, check the current guidelines before deciding."
+    },
+    "decidir-meio-de-pagamento": {
+      "title": "Choosing the payment method",
+      "body": "The store rule becomes code: what is digital and used in the app goes through the store; what is physical or consumed outside goes through the gateway."
+    },
+    "produtos-e-direitos": {
+      "title": "Products and entitlements in code",
+      "body": "Store products change (an annual plan, a promotion); the app only asks whether the person has the entitlement."
+    },
+    "revenuecat": {
+      "term": "RevenueCat",
+      "definition": "A service and SDK (react-native-purchases) that wraps StoreKit and Google Play Billing in a single API. It validates receipts on the server, keeps each customer's history, works out what is active, handles renewal, cancellation and refunds, and notifies your backend through webhooks. It also lets you change the offers and prices shown without shipping a new version. The alternative is implementing it directly with a library such as expo-iap, which requires validating receipts and tracking renewals in your own backend."
+    },
+    "offerings-e-entitlements": {
+      "term": "Offerings and entitlements",
+      "definition": "In RevenueCat, an entitlement is the right the app unlocks (\"pro\"), and one or more store products grant it (monthly, annual). An offering is the set of packages shown on the paywall, configured in the dashboard: you can change the current offer or run A/B tests without updating the app. The code fetches offerings to build the paywall and checks customerInfo.entitlements.active to unlock features, without depending on the product id."
+    },
+    "development-build-e-sandbox": {
+      "term": "Development build and sandbox",
+      "definition": "IAP libraries have native code, so real purchases require a development build; in Expo Go, RevenueCat only simulates purchases. To test without charging, each store has its own environment: on iOS, sandbox test accounts (and TestFlight, which also uses the sandbox); on Android, license testers and an internal testing track in the Play Console. In the sandbox, subscriptions renew in minutes, so you can test renewal and expiration quickly."
+    },
+    "restaurar-compras": {
+      "term": "Restoring purchases",
+      "definition": "A function that recovers purchases already made with the store account, for people who changed devices, reinstalled the app or are not logged in. Apple requires a restore button in apps with non-consumables or subscriptions. If the app has login, it is best to tie purchases to the account (in RevenueCat, logIn with the user id), so access follows the person on any device and platform."
+    },
+    "paywall-com-offerings": {
+      "title": "Paywall with offerings",
+      "body": "Configures the SDK with the platform's public key, shows the current offering's packages with the store price and unlocks access through the entitlement. Cancelling is not an error."
+    },
+    "conferir-acesso-e-restaurar": {
+      "title": "Checking access and restoring",
+      "body": "Access through the active entitlement, restoring for a new device and purchases tied to the app account at login."
+    },
+    "gateway-de-pagamento": {
+      "term": "Payment gateway",
+      "definition": "A company that processes card, Pix, boleto and wallet payments (Stripe, Mercado Pago, Pagar.me, Adyen). Card data goes from the app straight to the gateway, which returns a token: your server never sees the card number, which greatly reduces PCI DSS requirements. The common flow: the backend creates the charge with an amount calculated on the server, the app collects the payment with the gateway's SDK and the backend receives the confirmation by webhook."
+    },
+    "pix": {
+      "term": "Pix",
+      "definition": "The Brazilian Central Bank's instant payment, available around the clock. To charge, the backend asks the bank or gateway for a charge with an amount, an identifier (txid) and an expiration time, and gets a QR code and a copy-and-paste code, which the app shows (on a phone, copying the code is usually easier than scanning a QR code). Confirmation arrives by webhook when the payment lands, usually within seconds. There is also Pix Automático, for recurring charges authorized once."
+    },
+    "webhook-como-fonte-da-verdade": {
+      "term": "Webhook as the source of truth",
+      "definition": "The app does not decide whether a payment was approved: the response may never arrive (network down, app closed) or may be forged. The backend confirms it when it receives the webhook from the gateway, the stores or RevenueCat. The endpoint should verify the webhook signature, tolerate repeated and out-of-order events, respond quickly (heavy processing goes to a queue) and have a reconciliation job that queries the gateway to catch missed events."
+    },
+    "idempotencia": {
+      "term": "Idempotency",
+      "definition": "Making the same operation have the same effect whether it runs once or many times. In payments, it protects against double charges: a double tap on the button, a retry after a timeout or a webhook delivered twice. When creating the charge, you use an idempotency key (for example, the order id), which the gateway uses to return the same charge instead of creating another. In the webhook, you store the id of each processed event with a uniqueness constraint and ignore repeats."
+    },
+    "payment-sheet": {
+      "title": "Charging in the app with the Payment Sheet",
+      "body": "The backend creates the charge and returns the client secret; the app shows Stripe's payment sheet; the order is confirmed later, through the webhook."
+    },
+    "webhook-verificado": {
+      "title": "Verified, idempotent webhook",
+      "body": "Verifies the signature against the raw body, ignores already processed events and only then marks the order as paid."
+    },
+    "delivery-sem-compra-da-loja": {
+      "question": "Why doesn't a delivery app use App Store or Google Play purchases?",
+      "answer": "Because food is a physical good consumed outside the app, and store rules say physical goods and real-world services must use another payment method. So the order is paid through a gateway (card, Apple Pay, Google Pay) or Pix, with no store commission. If the same app sells something digital used inside it, such as a plan with in-app benefits, that product falls under the IAP rule, except for each country's exceptions."
+    },
+    "onde-validar-compra": {
+      "question": "Where do you validate a purchase?",
+      "answer": "On the server, never only in the app. The app can be tampered with, and a success screen proves nothing. For IAP, the receipt is validated with the store by the backend or by a service such as RevenueCat, and the backend stores the user's entitlement. For a gateway, the backend confirms through the signed webhook. The app only reflects the state the server confirmed, and paid features that depend on the server check the entitlement on every request."
+    },
+    "testar-sem-cobrar": {
+      "question": "How do you test payments without charging real money?",
+      "answer": "Each environment has its own test mode. IAP: a development build with sandbox accounts on iOS and license testers with an internal track on Android, where subscriptions renew in minutes; in Expo Go, RevenueCat only simulates. Gateway: test keys and test cards that simulate approval, decline and extra authentication, plus a CLI or tunnel to receive webhooks on the local machine. And automated backend tests with sample webhook events, including repeated and out-of-order ones."
+    },
+    "assinatura-cancelada": {
+      "question": "Someone cancelled their subscription. When do you cut off access?",
+      "answer": "At the end of the period already paid for, not at the moment of cancellation: cancelling only turns off renewal. If renewal fails because of a card problem, the stores have a grace period and retry the charge; during the grace period I keep access and tell the person to update their payment method. A refund removes access immediately. In practice, I rely on the entitlement state and webhook events (cancellation, expiration, refund), not on dates calculated in the app."
+    },
+    "pix-foi-pago": {
+      "question": "With Pix, how does the app know the payment was made?",
+      "answer": "The backend creates the charge and the app shows the QR code and the copy-and-paste code with the expiration time. When the payment lands, the bank or gateway calls the backend's webhook, which checks the charge by txid and amount and marks the order as paid. The app finds out through a real-time notification (push, WebSocket) or by polling the status while the screen is open. If the charge expires, the order is cancelled or a new charge is generated."
+    },
+    "evitar-cobranca-dupla": {
+      "question": "How do you make sure an order is not charged twice?",
+      "answer": "In layers. In the app, I disable the button while the charge is in progress. In the backend, I create the charge with an idempotency key derived from the order, so a retry returns the same charge, and only allow payment for orders in the right state. In the webhook, I verify the signature and store the event id with a uniqueness constraint, to process each event once. And a periodic reconciliation with the gateway catches mismatches and triggers a refund if something slips through."
+    }
+  }
+}

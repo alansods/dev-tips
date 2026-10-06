@@ -1,0 +1,120 @@
+{
+  "title": "Frontend testing",
+  "description": "Unit and integration tests in React and React Native: Jest, Testing Library, mocks, a mocked API with MSW and what is worth testing.",
+  "decks": {
+    "jest": {
+      "title": "Jest",
+      "description": "The test runner: assertions, mocks and control over time."
+    },
+    "testing-library": {
+      "title": "Testing Library",
+      "description": "Testing components by what people see and do, on the web and in React Native."
+    },
+    "testes-de-integracao": {
+      "title": "Integration tests",
+      "description": "Testing several pieces together, with the API mocked at the network level."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Frontend testing questions that come up in interviews."
+    }
+  },
+  "cards": {
+    "jest": {
+      "term": "Jest",
+      "definition": "A testing framework for JavaScript and TypeScript: it finds .test.ts files, runs each test/it in isolation and reports what failed. It comes with assertions (expect), mocks and fake timers. In React Native, the jest-expo preset sets up the environment; on the web, Vitest is an alternative with the same API, more integrated with Vite. Tests run in Node, without a real browser or device."
+    },
+    "matchers": {
+      "term": "Matchers",
+      "definition": "Functions chained on expect that compare the result: toBe compares by identity (numbers, strings), toEqual compares the structure of objects and arrays, toThrow expects an error, toHaveBeenCalledWith checks a mock's call. resolves and rejects test Promises. Testing Library adds UI matchers such as toBeOnTheScreen, toHaveTextContent and toBeDisabled. A good test has few assertions, all tied to the behavior it describes."
+    },
+    "mocks": {
+      "term": "Mocks",
+      "definition": "Controlled stand-ins for a dependency. jest.fn() creates a fake function that records calls and can return a value (mockReturnValue, mockResolvedValue). jest.mock('module') replaces a whole module with mocks. jest.spyOn watches or replaces an existing method and can be undone with mockRestore. They isolate code from the network, time, storage and native modules. Mocking too much tests the implementation instead of the behavior and lets the test pass while the app is broken."
+    },
+    "fake-timers": {
+      "term": "Fake timers",
+      "definition": "jest.useFakeTimers() replaces setTimeout, setInterval and Date with versions the test controls. With jest.advanceTimersByTime(300) or jest.runAllTimers(), time passes instantly, without actually waiting. It is how you test debounce, polling, session expiry and delayed animations quickly and deterministically. At the end, jest.useRealTimers() restores the normal clock; when advancing time triggers a React state update, it goes inside act."
+    },
+    "mock-de-modulo": {
+      "title": "Module mock with jest.mock",
+      "body": "The API module becomes a mock; the test sets the response and checks the call. jest.mocked gives the mock's types in TypeScript."
+    },
+    "fake-timers-debounce": {
+      "title": "Fake timers in a debounce",
+      "body": "Time advances instantly with advanceTimersByTime, so the debounce test runs in milliseconds."
+    },
+    "testing-library": {
+      "term": "Testing Library",
+      "definition": "A family of libraries for testing UIs the way people use them: render the component, find elements by text, role or label, interact and check what shows up. On purpose, it does not expose internal state or the component instance: if the test only depends on what is visible, a refactor that does not change behavior does not break it. There are versions for React on the web (@testing-library/react) and for React Native (@testing-library/react-native), with the same philosophy and a similar API."
+    },
+    "prioridade-das-queries": {
+      "term": "Query priority",
+      "definition": "Testing Library recommends finding elements in the order a person or a screen reader would: first getByRole with a name (\"Sign in\" button, \"Email\" field), then getByLabelText, getByPlaceholderText and getByText, and only last getByTestId. Querying by role and accessible name also tests accessibility: if the test cannot find the button by name, the screen reader cannot either. testID is for things that have neither text nor role."
+    },
+    "get-query-find": {
+      "term": "get, query and find",
+      "definition": "Three variants of each query. getBy returns the element or throws if it does not exist: it is the default. queryBy returns null instead of throwing: use it only to assert that something is not on screen. findBy returns a Promise and waits for the element to appear (up to 1 second by default): use it for content that arrives after a fetch or an animation. Each one has an All version (getAllBy...) for lists. Using findBy avoids putting getBy inside waitFor."
+    },
+    "user-event-e-fire-event": {
+      "term": "userEvent and fireEvent",
+      "definition": "fireEvent fires a single event (press, changeText) directly on the element. userEvent simulates a person's full interaction: a tap goes through pressIn, press and pressOut; typing fires focus and one event per character, and respects disabled elements. Because it is more realistic, userEvent is recommended. The API is async: you create the instance with userEvent.setup() and await each interaction. fireEvent is for events userEvent does not cover, such as a specific scroll."
+    },
+    "formulario-com-user-event": {
+      "title": "Form with userEvent",
+      "body": "On the web, the test fills in fields by accessible name, clicks the button and checks the call and the error message, without looking at internal state."
+    },
+    "tela-react-native-find-by": {
+      "title": "React Native screen with findBy",
+      "body": "findBy waits for the item to arrive from the API; queryBy asserts that the empty-cart message is gone."
+    },
+    "piramide-e-trofeu": {
+      "term": "Testing pyramid and trophy",
+      "definition": "The pyramid suggests many unit tests, fewer integration tests and few end-to-end (E2E) tests, because the ones at the top are slower and more brittle. On the frontend, the \"testing trophy\" puts most of the weight on integration tests: rendering a whole screen with a mocked API gives a lot of confidence at a low cost. At the bottom sit static analysis (TypeScript, ESLint) and unit tests of pure logic; at the top, a few E2E tests (Playwright on the web, Detox or Maestro on mobile) for critical flows."
+    },
+    "mock-de-api-com-msw": {
+      "term": "API mocking with MSW",
+      "definition": "MSW (Mock Service Worker) intercepts HTTP requests at the network layer and returns responses defined in handlers (http.get('/menu', () => HttpResponse.json(...))). The app runs its real fetch, Axios and React Query code; only the response is fake. In Node tests you use setupServer; each test can swap the response with server.use (to simulate a 500 error, an empty list, a delay) and resetHandlers undoes it. The same handlers serve development and Storybook."
+    },
+    "render-hook": {
+      "term": "renderHook",
+      "definition": "A Testing Library function to test a custom hook without writing a test component. It returns result.current with the hook's current value and rerender to change its props. State updates triggered by the hook's functions go inside act. Hooks that depend on a Provider (React Query, Context, navigation) get a wrapper with that Provider. Simple hooks are usually covered by the test of the component that uses them; renderHook pays off for reused hooks with their own logic."
+    },
+    "o-que-testar": {
+      "term": "What to test",
+      "definition": "Test the behavior that matters to users and what is costly to break: main flows (login, order, payment), business rules, loading, empty and error states, and bugs that have already happened. Do not test implementation details (state names, how many times it rendered), third-party libraries or styles. High coverage does not guarantee quality: 100% of lines executed without useful assertions protects nothing. Use coverage to find important areas without tests, not as a goal."
+    },
+    "handler-msw-erro": {
+      "title": "MSW handler and API error",
+      "body": "An MSW server with the default response; the test swaps it for a 500 with server.use and checks the error message. onUnhandledRequest: 'error' fails the test if any call has no handler."
+    },
+    "hook-react-query-render-hook": {
+      "title": "React Query hook in renderHook",
+      "body": "A new QueryClient per test and no retry keep the test fast and isolated. waitFor waits for the query to finish."
+    },
+    "unitario-integracao-ou-e2e": {
+      "question": "What is the difference between unit, integration and end-to-end tests?",
+      "answer": "A unit test checks one isolated piece, such as a function or a hook, with its dependencies mocked: it is fast and points to the error precisely. An integration test checks several pieces together, such as a whole screen with navigation, state and a mocked API: it catches wiring errors. An end-to-end (E2E) test runs the real app in a browser or device against a real or test backend: it gives the most confidence, but it is slow and less stable. On the frontend, I focus on integration tests."
+    },
+    "get-by-role-ou-test-id": {
+      "question": "Why prefer getByRole over testID?",
+      "answer": "Because getByRole with a name finds the element the way people and screen readers perceive it: a button called \"Sign in\". If someone swaps the component for another one with the same role and text, the test still passes; if the button loses its accessible label, the test fails, which is good. testID is an implementation detail, invisible to users, and does not guarantee the element is accessible. I only use testID when there is no text or role, as in a chart."
+    },
+    "testar-codigo-assincrono": {
+      "question": "How do you test asynchronous code?",
+      "answer": "With async/await in the test: I await the function's Promise or use findBy, which waits for the element to appear on screen, and waitFor for assertions that take a while to hold (with no side effects inside it). userEvent interactions are awaited too. For time (debounce, polling), I use fake timers and advance the clock. Common mistakes: forgetting the await so the test ends before the assertion, or sleeping for a fixed time, which makes the test slow and flaky."
+    },
+    "snapshot-vale-a-pena": {
+      "question": "Are snapshot tests worth it?",
+      "answer": "Usually not much. A snapshot stores the rendered output and fails on any change, so it breaks with every layout change, and the team ends up updating with -u without reading. It does not say which behavior matters. It can help with small, stable outputs, such as a formatter or a configuration object, preferably inline (toMatchInlineSnapshot). For components, I prefer explicit assertions about what the person sees."
+    },
+    "mockar-modulo-ou-rede": {
+      "question": "Do you mock the API module or the network?",
+      "answer": "I prefer the network, with MSW. Mocking the module (jest.mock('../api')) skips the HTTP client, interceptors, parsing and the React Query integration, so the test passes even if that layer breaks. Mocking the network runs all the app's code and only the response is fake; the same handlers serve development. I mock the module when the dependency is not HTTP (a native module, analytics, storage) or in a unit test of a function that just passes data through."
+    },
+    "testes-instaveis-no-frontend": {
+      "question": "How do you deal with flaky tests on the frontend?",
+      "answer": "First I reproduce it: run the test many times and in isolation, to see whether it depends on order or timing. The most common causes are waiting a fixed time instead of findBy/waitFor, state leaking between tests (QueryClient cache, global store, mocks and handlers not reset), dependence on dates and time zones, and real requests. I fix the cause: one QueryClient per test, resetting mocks and handlers in afterEach, fake timers and fixed dates. A flaky test is not ignored forever: I either fix it or remove it."
+    }
+  }
+}

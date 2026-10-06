@@ -1,0 +1,333 @@
+{
+  "id": "pagamentos-no-app",
+  "title": "Pagamentos no app",
+  "description": "Cobrar dentro de um app mobile: quando usar a compra da App Store e do Google Play, IAP no Expo com RevenueCat, gateway, Pix, webhooks e idempotência.",
+  "areas": [
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react-native",
+  "decks": [
+    {
+      "id": "compras-dentro-do-app",
+      "title": "Compras dentro do app",
+      "description": "O que as lojas exigem para vender dentro de um app.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "compra-dentro-do-app",
+          "level": "junior",
+          "term": "Compra dentro do app (IAP)",
+          "definition": "Compra feita pelo sistema de pagamento da própria loja: StoreKit na App Store e Google Play Billing no Android. A pessoa paga com a conta da loja, a loja cobra, processa reembolsos e repassa o valor ao desenvolvedor descontando a comissão. Para vender conteúdo e recursos digitais usados no app (assinatura, moedas de jogo, desbloquear funções), as lojas exigem IAP, salvo exceções regionais. O app não recebe dados de cartão: só o resultado da transação.",
+          "relatedTerms": [
+            "bens-digitais-e-fisicos",
+            "tipos-de-produto"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "bens-digitais-e-fisicos",
+          "level": "pleno",
+          "term": "Bens digitais e bens físicos",
+          "definition": "A regra que decide o meio de pagamento. Bens e serviços digitais consumidos no app (assinatura premium, conteúdo, créditos) usam a compra da loja. Bens físicos e serviços consumidos fora do app (um pedido de comida, uma corrida, um ingresso, um produto entregue em casa) não podem usar IAP: o app usa um gateway de pagamento, Pix ou carteiras como Apple Pay e Google Pay, sem comissão da loja. Um mesmo app pode ter os dois casos, como um app de delivery com um plano de benefícios digital.",
+          "relatedTerms": [
+            "compra-dentro-do-app",
+            "comissoes-e-regras-por-pais"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipos-de-produto",
+          "level": "junior",
+          "term": "Tipos de produto",
+          "definition": "As lojas dividem os produtos de IAP em: consumíveis, que acabam ao usar e podem ser comprados de novo (moedas, pacote de perguntas); não consumíveis, comprados uma vez e para sempre (remover anúncios, um tema); e assinaturas com renovação automática, cobradas a cada período até a pessoa cancelar, com teste grátis e ofertas opcionais. Cada produto é cadastrado no App Store Connect e no Google Play Console com um id, e o preço vem da loja em cada país.",
+          "relatedTerms": [
+            "compra-dentro-do-app",
+            "offerings-e-entitlements"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "comissoes-e-regras-por-pais",
+          "level": "senior",
+          "term": "Comissões e regras por país",
+          "definition": "A comissão padrão das lojas é de 30%, com 15% em casos como pequenos desenvolvedores (até cerca de US$ 1 milhão por ano, nos programas das duas lojas) e assinaturas (no Google, desde o início; na Apple, após um ano de assinatura). Regras regionais abriram exceções: links para pagamento fora do app nos EUA, lojas e pagamentos alternativos na União Europeia e, no Brasil, desde junho de 2026, o acordo da Apple com o CADE, que permite link externo (taxa de 15%) e pagamento de terceiros no app (25%). Como as regras mudam rápido, confira as diretrizes atuais antes de decidir.",
+          "relatedTerms": [
+            "bens-digitais-e-fisicos",
+            "compra-dentro-do-app"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "decidir-meio-de-pagamento",
+          "level": "pleno",
+          "title": "Decidir o meio de pagamento",
+          "body": "A regra das lojas vira código: o que é digital e usado no app vai pela loja; o que é físico ou consumido fora vai pelo gateway.",
+          "snippet": {
+            "file": "src/pagamentos/meio.ts",
+            "language": "ts",
+            "code": "type Item =\n  | { kind: 'pedido'; total: number }               // comida entregue: bem físico\n  | { kind: 'assinatura-pro'; plano: 'mensal' }     // recurso digital usado no app\n  | { kind: 'credito-gorjeta'; valor: number };     // gorjeta para o entregador: serviço fora do app\n\ntype Meio = 'loja' | 'gateway';\n\n// Regra geral das lojas: digital consumido no app → compra da loja (IAP);\n// bem físico ou serviço consumido fora do app → outro meio (gateway, Pix)\nexport function meioDePagamento(item: Item): Meio {\n  switch (item.kind) {\n    case 'assinatura-pro':\n      return 'loja';\n    case 'pedido':\n    case 'credito-gorjeta':\n      return 'gateway';\n  }\n}"
+          },
+          "relatedTerms": [
+            "bens-digitais-e-fisicos"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "produtos-e-direitos",
+          "level": "pleno",
+          "title": "Produtos e direitos no código",
+          "body": "Os produtos da loja mudam (plano anual, promoção); o app pergunta só se a pessoa tem o direito.",
+          "snippet": {
+            "file": "src/pagamentos/produtos.ts",
+            "language": "ts",
+            "code": "// Produtos são o que a loja vende; direitos (entitlements) são o que o app libera\ntype Produto =\n  | { id: 'pro_mensal'; tipo: 'assinatura'; periodo: 'P1M' }\n  | { id: 'pro_anual'; tipo: 'assinatura'; periodo: 'P1Y' }\n  | { id: 'tema_escuro'; tipo: 'nao-consumivel' }\n  | { id: 'pacote_100_perguntas'; tipo: 'consumivel'; quantidade: 100 };\n\ntype Direito = 'pro' | 'tema-escuro';\n\n// Dois produtos dão o mesmo direito: o código só pergunta pelo direito\nconst direitoDe: Partial<Record<Produto['id'], Direito>> = {\n  pro_mensal: 'pro',\n  pro_anual: 'pro',\n  tema_escuro: 'tema-escuro',\n};\n\nexport const temAcesso = (ativos: Direito[], direito: Direito) => ativos.includes(direito);"
+          },
+          "relatedTerms": [
+            "tipos-de-produto",
+            "offerings-e-entitlements"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "iap-no-expo",
+      "title": "IAP no Expo",
+      "description": "Implementar compras dentro do app com Expo e RevenueCat.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "revenuecat",
+          "level": "pleno",
+          "term": "RevenueCat",
+          "definition": "Serviço e SDK (react-native-purchases) que envolvem o StoreKit e o Google Play Billing numa API só. Ele valida os recibos no servidor, guarda o histórico de cada cliente, calcula o que está ativo, trata renovação, cancelamento e reembolso, e avisa o seu backend por webhooks. Também permite trocar ofertas e preços exibidos sem publicar versão nova. A alternativa é implementar direto com uma biblioteca como expo-iap, o que exige validar recibos e acompanhar renovações no seu próprio backend.",
+          "relatedTerms": [
+            "offerings-e-entitlements",
+            "restaurar-compras"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "offerings-e-entitlements",
+          "level": "pleno",
+          "term": "Offerings e entitlements",
+          "definition": "No RevenueCat, entitlement é o direito que o app libera (\"pro\"), e um ou mais produtos da loja dão esse direito (mensal, anual). Offering é o conjunto de pacotes mostrado no paywall, configurado no painel: dá para trocar a oferta atual ou fazer testes A/B sem atualizar o app. O código busca as offerings para montar o paywall e confere customerInfo.entitlements.active para liberar recursos, sem depender do id de produto.",
+          "relatedTerms": [
+            "revenuecat",
+            "tipos-de-produto"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "development-build-e-sandbox",
+          "level": "pleno",
+          "term": "Development build e sandbox",
+          "definition": "Bibliotecas de IAP têm código nativo, então compras reais exigem um development build; no Expo Go, o RevenueCat só simula as compras. Para testar sem cobrar, cada loja tem seu ambiente: no iOS, contas de teste do sandbox (e o TestFlight, que também usa sandbox); no Android, testadores de licença e uma trilha de teste interna no Play Console. No sandbox, as assinaturas renovam em minutos, o que permite testar renovação e expiração em pouco tempo.",
+          "relatedTerms": [
+            "revenuecat",
+            "restaurar-compras"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "restaurar-compras",
+          "level": "pleno",
+          "term": "Restaurar compras",
+          "definition": "Função que recupera as compras já feitas pela conta da loja, para quem trocou de aparelho, reinstalou o app ou está sem login. A Apple exige um botão de restaurar em apps com não consumíveis ou assinaturas. Se o app tem login, o ideal é associar as compras à conta (no RevenueCat, logIn com o id do usuário), para o acesso acompanhar a pessoa em qualquer aparelho e plataforma.",
+          "relatedTerms": [
+            "revenuecat",
+            "offerings-e-entitlements"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "paywall-com-offerings",
+          "level": "pleno",
+          "title": "Paywall com offerings",
+          "body": "Configura o SDK com a chave pública da plataforma, mostra os pacotes da offering atual com o preço da loja e libera o acesso pelo entitlement. Cancelar não é erro.",
+          "snippet": {
+            "file": "src/pagamentos/Paywall.tsx",
+            "language": "ts",
+            "code": "import { useEffect, useState } from 'react';\nimport { Alert, Button, Platform, View } from 'react-native';\nimport Purchases, { type PurchasesPackage } from 'react-native-purchases';\n\n// Na abertura do app, uma vez (chave pública da plataforma; o id liga as compras à conta)\nPurchases.configure({\n  apiKey: Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_RC_IOS_KEY! : process.env.EXPO_PUBLIC_RC_ANDROID_KEY!,\n  appUserID: usuario.id,\n});\n\nexport function Paywall({ onUnlocked }: { onUnlocked: () => void }) {\n  const [pacotes, setPacotes] = useState<PurchasesPackage[]>([]);\n\n  useEffect(() => {\n    // Preços vêm da loja, já no formato e na moeda da pessoa\n    Purchases.getOfferings().then((o) => setPacotes(o.current?.availablePackages ?? []));\n  }, []);\n\n  async function comprar(pacote: PurchasesPackage) {\n    try {\n      const { customerInfo } = await Purchases.purchasePackage(pacote);\n      if (customerInfo.entitlements.active['pro']) onUnlocked();\n    } catch (e: any) {\n      if (!e.userCancelled) Alert.alert('Não foi possível concluir a compra');\n    }\n  }\n\n  return (\n    <View>\n      {pacotes.map((p) => (\n        <Button key={p.identifier} title={`${p.product.title} · ${p.product.priceString}`} onPress={() => comprar(p)} />\n      ))}\n    </View>\n  );\n}"
+          },
+          "relatedTerms": [
+            "offerings-e-entitlements",
+            "revenuecat"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "conferir-acesso-e-restaurar",
+          "level": "pleno",
+          "title": "Conferir acesso e restaurar",
+          "body": "Acesso pelo direito ativo, restauração para aparelho novo e compras ligadas à conta do app no login.",
+          "snippet": {
+            "file": "src/pagamentos/acesso.ts",
+            "language": "ts",
+            "code": "import Purchases from 'react-native-purchases';\n\n// Acesso vem do direito ativo, não de um produto específico\nexport async function isPro(): Promise<boolean> {\n  const info = await Purchases.getCustomerInfo(); // usa cache e atualiza em segundo plano\n  return info.entitlements.active['pro'] !== undefined;\n}\n\n// Botão \"Restaurar compras\": aparelho novo, app reinstalado ou outra conta da loja\nexport async function restaurar(): Promise<boolean> {\n  const info = await Purchases.restorePurchases();\n  return info.entitlements.active['pro'] !== undefined;\n}\n\n// Ao logar e deslogar, as compras acompanham a conta do app\nawait Purchases.logIn(usuario.id);\nawait Purchases.logOut();"
+          },
+          "relatedTerms": [
+            "restaurar-compras",
+            "offerings-e-entitlements"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pagamentos-e-backend",
+      "title": "Pagamentos e backend",
+      "description": "Cobrar bens físicos com segurança e confirmar no servidor.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "gateway-de-pagamento",
+          "level": "pleno",
+          "term": "Gateway de pagamento",
+          "definition": "Empresa que processa pagamentos com cartão, Pix, boleto e carteiras (Stripe, Mercado Pago, Pagar.me, Adyen). Os dados do cartão vão do app direto para o gateway, que devolve um token: o seu servidor nunca vê o número do cartão, o que reduz muito as exigências do PCI DSS. O fluxo comum: o backend cria a cobrança com o valor calculado no servidor, o app coleta o pagamento com o SDK do gateway e o backend recebe a confirmação por webhook.",
+          "relatedTerms": [
+            "pix",
+            "webhook-como-fonte-da-verdade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pix",
+          "level": "pleno",
+          "term": "Pix",
+          "definition": "Pagamento instantâneo do Banco Central, disponível o tempo todo. Para cobrar, o backend pede ao banco ou gateway uma cobrança com valor, identificador (txid) e prazo de expiração, e recebe um QR code e o código copia e cola, que o app exibe (no celular, copiar o código costuma ser mais prático que ler QR code). A confirmação chega por webhook quando o pagamento cai, normalmente em segundos. Há também o Pix Automático, para cobranças recorrentes autorizadas uma vez.",
+          "relatedTerms": [
+            "gateway-de-pagamento",
+            "webhook-como-fonte-da-verdade"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "webhook-como-fonte-da-verdade",
+          "level": "senior",
+          "term": "Webhook como fonte da verdade",
+          "definition": "O app não decide se um pagamento foi aprovado: a resposta pode não chegar (rede caiu, app fechado) ou ser forjada. Quem confirma é o backend, ao receber o webhook do gateway, das lojas ou do RevenueCat. O endpoint deve verificar a assinatura do webhook, tolerar eventos repetidos e fora de ordem, responder rápido (o processamento pesado vai para uma fila) e ter uma rotina de reconciliação que consulta o gateway para pegar eventos perdidos.",
+          "relatedTerms": [
+            "idempotencia",
+            "gateway-de-pagamento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "idempotencia",
+          "level": "senior",
+          "term": "Idempotência",
+          "definition": "Fazer a mesma operação várias vezes ter o mesmo efeito de fazê-la uma vez. Em pagamentos, protege contra cobrança dupla: um toque duplo no botão, um retry depois de timeout ou um webhook entregue duas vezes. Na criação da cobrança, usa-se uma chave de idempotência (por exemplo o id do pedido), que o gateway usa para devolver a mesma cobrança em vez de criar outra. No webhook, guarda-se o id de cada evento processado com restrição de unicidade e ignora-se o repetido.",
+          "relatedTerms": [
+            "webhook-como-fonte-da-verdade",
+            "gateway-de-pagamento"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "payment-sheet",
+          "level": "pleno",
+          "title": "Cobrança no app com o Payment Sheet",
+          "body": "O backend cria a cobrança e devolve o client secret; o app mostra a folha de pagamento do Stripe; a confirmação do pedido vem depois, pelo webhook.",
+          "snippet": {
+            "file": "src/pagamentos/useCheckout.ts",
+            "language": "ts",
+            "code": "import { useStripe } from '@stripe/stripe-react-native';\nimport { Alert } from 'react-native';\n\nexport function useCheckout() {\n  const { initPaymentSheet, presentPaymentSheet } = useStripe();\n\n  return async function pagar(pedidoId: string) {\n    // 1. O backend calcula o valor e cria o PaymentIntent; o app nunca define o preço\n    const { clientSecret } = await api.post(`/pedidos/${pedidoId}/pagamento`).then((r) => r.data);\n\n    // 2. A folha de pagamento do Stripe coleta o cartão (tokenizado, sem passar pelo app)\n    const init = await initPaymentSheet({ merchantDisplayName: 'Cardápio', paymentIntentClientSecret: clientSecret });\n    if (init.error) return Alert.alert('Erro', init.error.message);\n\n    const { error } = await presentPaymentSheet();\n    if (error) return error.code === 'Canceled' ? undefined : Alert.alert('Pagamento recusado', error.message);\n\n    // 3. Sucesso na tela não confirma o pedido: o backend confirma pelo webhook\n    navegarPara(`/pedidos/${pedidoId}/acompanhar`);\n  };\n}"
+          },
+          "relatedTerms": [
+            "gateway-de-pagamento",
+            "webhook-como-fonte-da-verdade"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "webhook-verificado",
+          "level": "senior",
+          "title": "Webhook verificado e idempotente",
+          "body": "Verifica a assinatura com o corpo cru, ignora eventos já processados e só então marca o pedido como pago.",
+          "snippet": {
+            "file": "server/webhooks.ts",
+            "language": "ts",
+            "code": "import express from 'express';\nimport Stripe from 'stripe';\n\nconst stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);\nconst app = express();\n\n// Corpo cru: a assinatura é calculada sobre os bytes exatos que o Stripe enviou\napp.post('/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {\n  let event: Stripe.Event;\n  try {\n    event = stripe.webhooks.constructEvent(req.body, req.header('stripe-signature')!, process.env.STRIPE_WEBHOOK_SECRET!);\n  } catch {\n    return res.sendStatus(400); // assinatura inválida: não veio do Stripe\n  }\n\n  // Idempotência: o mesmo evento pode chegar mais de uma vez\n  const novo = await db.eventos.inserirSeNaoExiste(event.id); // UNIQUE em event.id\n  if (!novo) return res.sendStatus(200);\n\n  if (event.type === 'payment_intent.succeeded') {\n    const intent = event.data.object;\n    await db.pedidos.marcarComoPago(intent.metadata.pedidoId, intent.id);\n  }\n  res.sendStatus(200); // responder rápido; trabalho pesado vai para uma fila\n});"
+          },
+          "relatedTerms": [
+            "webhook-como-fonte-da-verdade",
+            "idempotencia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre pagamentos em apps que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "delivery-sem-compra-da-loja",
+          "level": "junior",
+          "question": "Por que um app de delivery não usa a compra da App Store ou do Google Play?",
+          "answer": "Porque a comida é um bem físico consumido fora do app, e as regras das lojas dizem que bens físicos e serviços do mundo real devem usar outro meio de pagamento. Então o pedido é pago por gateway (cartão, Apple Pay, Google Pay) ou Pix, sem comissão da loja. Se o mesmo app vender algo digital usado dentro dele, como um plano com benefícios no app, esse produto entra na regra de IAP, salvo as exceções de cada país.",
+          "relatedTerms": [
+            "bens-digitais-e-fisicos",
+            "compra-dentro-do-app"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "onde-validar-compra",
+          "level": "pleno",
+          "question": "Onde você valida uma compra?",
+          "answer": "No servidor, nunca só no app. O app pode ser modificado, e uma resposta de sucesso na tela não prova nada. Para IAP, o recibo é validado com a loja pelo backend ou por um serviço como o RevenueCat, e o backend guarda o direito do usuário. Para gateway, o backend confirma pelo webhook assinado. O app só reflete o estado que o servidor confirmou, e recursos pagos que dependem do servidor conferem o direito em cada requisição.",
+          "relatedTerms": [
+            "webhook-como-fonte-da-verdade",
+            "revenuecat"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testar-sem-cobrar",
+          "level": "pleno",
+          "question": "Como você testa pagamentos sem cobrar de verdade?",
+          "answer": "Cada ambiente tem o seu modo de teste. IAP: development build com contas de sandbox no iOS e testadores de licença com trilha interna no Android, onde as assinaturas renovam em minutos; no Expo Go, o RevenueCat só simula. Gateway: chaves de teste e cartões de teste que simulam aprovação, recusa e autenticação extra, além de um CLI ou túnel para receber webhooks na máquina local. E testes automatizados do backend com eventos de webhook de exemplo, inclusive repetidos e fora de ordem.",
+          "relatedTerms": [
+            "development-build-e-sandbox",
+            "webhook-como-fonte-da-verdade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "assinatura-cancelada",
+          "level": "pleno",
+          "question": "A pessoa cancelou a assinatura. Quando você corta o acesso?",
+          "answer": "No fim do período que já foi pago, não no momento do cancelamento: cancelar só desliga a renovação. Se a renovação falhar por problema no cartão, as lojas têm um período de carência e novas tentativas de cobrança; durante a carência, mantenho o acesso e aviso a pessoa para atualizar o pagamento. Reembolso tira o acesso na hora. Na prática, eu confio no estado do entitlement e nos eventos de webhook (cancelamento, expiração, reembolso), e não em datas calculadas no app.",
+          "relatedTerms": [
+            "offerings-e-entitlements",
+            "revenuecat"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "pix-foi-pago",
+          "level": "pleno",
+          "question": "No Pix, como o app sabe que o pagamento foi feito?",
+          "answer": "O backend cria a cobrança e o app mostra o QR code e o copia e cola com o prazo de expiração. Quando o pagamento cai, o banco ou gateway chama o webhook do backend, que confere a cobrança pelo txid e o valor e marca o pedido como pago. O app fica sabendo por notificação em tempo real (push, WebSocket) ou consultando o status de tempos em tempos enquanto a tela está aberta. Se a cobrança expirar, o pedido é cancelado ou gera uma nova cobrança.",
+          "relatedTerms": [
+            "pix",
+            "webhook-como-fonte-da-verdade"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "evitar-cobranca-dupla",
+          "level": "senior",
+          "question": "Como garantir que um pedido não seja cobrado duas vezes?",
+          "answer": "Em camadas. No app, desabilito o botão enquanto a cobrança está em andamento. No backend, crio a cobrança com uma chave de idempotência derivada do pedido, para um retry devolver a mesma cobrança, e só permito pagamento para pedidos no estado certo. No webhook, verifico a assinatura e guardo o id do evento com restrição de unicidade, para processar cada evento uma vez. E uma reconciliação periódica com o gateway pega divergências e dispara estorno se algo escapar.",
+          "relatedTerms": [
+            "idempotencia",
+            "webhook-como-fonte-da-verdade"
+          ]
+        }
+      ]
+    }
+  ]
+}

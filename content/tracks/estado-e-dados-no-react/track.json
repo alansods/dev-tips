@@ -1,0 +1,333 @@
+{
+  "id": "estado-e-dados-no-react",
+  "title": "Estado e dados no React",
+  "description": "Onde guardar cada estado em apps React e React Native: Context, Zustand, Redux Toolkit, dados do servidor com React Query e SWR, Axios e hooks personalizados.",
+  "areas": [
+    "frontend",
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react",
+  "decks": [
+    {
+      "id": "estado-global",
+      "title": "Estado global",
+      "description": "Quando o estado sai do componente e qual ferramenta usar para compartilhá-lo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "estado-local-e-global",
+          "level": "junior",
+          "term": "Estado local e estado global",
+          "definition": "Estado local vive num componente (useState) e só ele e os filhos que recebem props o usam. Estado global é lido por partes distantes da árvore, como usuário logado, tema ou carrinho. A regra prática: comece local, suba para o ancestral comum quando dois irmãos precisarem do mesmo dado, e só torne global o que muitas telas usam. Estado global demais acopla telas e dificulta entender quem muda o quê.",
+          "relatedTerms": [
+            "context-e-rerenderizacao",
+            "zustand"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "context-e-rerenderizacao",
+          "level": "pleno",
+          "term": "Context e re-renderização",
+          "definition": "Context resolve o prop drilling: o Provider entrega um valor e qualquer descendente o lê com useContext. Não é um gerenciador de estado com assinatura seletiva: quando o value muda, todo componente que consome aquele Context re-renderiza, mesmo que use só um campo. Por isso serve bem para dados que mudam pouco (tema, idioma, usuário). Para dados que mudam muito, divida em Contexts menores, memorize o value com useMemo ou use uma store com seletores.",
+          "relatedTerms": [
+            "estado-local-e-global",
+            "zustand"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "zustand",
+          "level": "pleno",
+          "term": "Zustand",
+          "definition": "Biblioteca pequena de estado global baseada em hooks. create devolve um hook (useCart) que guarda estado e ações juntos, sem Provider. Cada componente passa um seletor (state => state.items.length) e só re-renderiza quando o valor selecionado muda. Para selecionar vários campos num objeto, usa-se useShallow. Também funciona fora do React (useCart.getState()), útil em interceptors e testes.",
+          "relatedTerms": [
+            "redux-toolkit",
+            "context-e-rerenderizacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "redux-toolkit",
+          "level": "pleno",
+          "term": "Redux Toolkit",
+          "definition": "Forma oficial e atual de usar Redux. createSlice gera reducer e action creators juntos; com Immer dentro, o reducer pode escrever state.items.push e o resultado continua imutável. configureStore já liga DevTools e middleware de thunk. Comparado ao Zustand, tem mais estrutura: fluxo único (dispatch de ação → reducer → novo estado), DevTools com histórico e padrões fortes para equipes grandes. Para dados da API, o próprio Redux Toolkit traz o RTK Query.",
+          "relatedTerms": [
+            "zustand",
+            "estado-local-e-global"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "store-zustand-seletores",
+          "level": "pleno",
+          "title": "Store com Zustand e seletores",
+          "body": "Estado e ações no mesmo hook. O seletor faz o componente assinar só o que usa; useShallow compara o objeto campo a campo.",
+          "snippet": {
+            "file": "src/stores/cart.ts",
+            "language": "ts",
+            "code": "import { create } from 'zustand';\nimport { useShallow } from 'zustand/react/shallow';\n\ntype CartState = {\n  items: { id: string; qty: number }[];\n  add: (id: string) => void;\n  clear: () => void;\n};\n\nexport const useCart = create<CartState>()((set) => ({\n  items: [],\n  add: (id) => set((state) => ({ items: [...state.items, { id, qty: 1 }] })),\n  clear: () => set({ items: [] }),\n}));\n\n// Re-renderiza só quando a quantidade de itens muda\nconst count = useCart((state) => state.items.length);\n\n// Vários campos: useShallow evita re-render quando nada mudou\nconst { add, clear } = useCart(useShallow((state) => ({ add: state.add, clear: state.clear })));"
+          },
+          "relatedTerms": [
+            "zustand",
+            "context-e-rerenderizacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "slice-redux-toolkit",
+          "level": "pleno",
+          "title": "Slice com Redux Toolkit",
+          "body": "createSlice gera o reducer e as ações; os hooks tipados evitam repetir RootState e AppDispatch em cada componente.",
+          "snippet": {
+            "file": "src/store/index.ts",
+            "language": "ts",
+            "code": "import { configureStore, createSlice, type PayloadAction } from '@reduxjs/toolkit';\nimport { useDispatch, useSelector } from 'react-redux';\n\nconst cartSlice = createSlice({\n  name: 'cart',\n  initialState: { items: [] as string[] },\n  reducers: {\n    added(state, action: PayloadAction<string>) {\n      state.items.push(action.payload); // Immer: parece mutação, gera estado novo\n    },\n    cleared(state) {\n      state.items = [];\n    },\n  },\n});\n\nexport const { added, cleared } = cartSlice.actions;\n\nexport const store = configureStore({ reducer: { cart: cartSlice.reducer } });\nexport type RootState = ReturnType<typeof store.getState>;\nexport type AppDispatch = typeof store.dispatch;\n\nexport const useAppSelector = useSelector.withTypes<RootState>();\nexport const useAppDispatch = useDispatch.withTypes<AppDispatch>();"
+          },
+          "relatedTerms": [
+            "redux-toolkit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dados-do-servidor",
+      "title": "Dados do servidor",
+      "description": "Buscar, guardar em cache e atualizar dados da API sem reinventar o loading.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "estado-do-servidor",
+          "level": "pleno",
+          "term": "Estado do servidor",
+          "definition": "Dado que pertence ao backend e o app só tem uma cópia: lista de pedidos, perfil, cardápio. Diferente do estado do cliente (modal aberto, item selecionado), ele pode ficar desatualizado sem o app saber, é compartilhado com outros usuários e exige loading, erro, cache, novas tentativas e deduplicação de requisições. Tratar isso com useEffect + useState em cada tela repete código e gera bugs; bibliotecas como React Query e SWR resolvem esse problema.",
+          "relatedTerms": [
+            "react-query-e-swr",
+            "stale-time-e-invalidacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "react-query-e-swr",
+          "level": "pleno",
+          "term": "React Query e SWR",
+          "definition": "Bibliotecas de cache para estado do servidor. Cada busca tem uma chave (queryKey no React Query, key no SWR); componentes com a mesma chave compartilham o resultado e uma só requisição. Elas devolvem data, erro e estado de carregamento, tentam de novo em falhas e buscam de novo em segundo plano ao voltar o foco ou a conexão. SWR é menor e segue a ideia stale-while-revalidate; o TanStack Query (React Query) traz mais recursos, como mutações, paginação infinita, atualização otimista e DevTools.",
+          "relatedTerms": [
+            "estado-do-servidor",
+            "stale-time-e-invalidacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "stale-time-e-invalidacao",
+          "level": "senior",
+          "term": "staleTime e invalidação",
+          "definition": "No React Query, staleTime diz por quanto tempo o dado é considerado fresco; o padrão é 0, então todo dado já nasce stale e é buscado de novo em segundo plano ao montar outra tela, voltar o foco ou reconectar. gcTime (antigo cacheTime) é quanto tempo um dado sem ninguém usando fica no cache antes de ser descartado; o padrão é 5 minutos. Depois de uma mutação, invalidateQueries marca as chaves como stale e busca de novo as que estão em uso. Ajustar staleTime por tipo de dado é a principal forma de evitar requisições demais.",
+          "relatedTerms": [
+            "react-query-e-swr",
+            "estado-do-servidor"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "axios-e-interceptors",
+          "level": "pleno",
+          "term": "Axios e interceptors",
+          "definition": "Axios é um cliente HTTP que, comparado ao fetch, converte JSON automaticamente, rejeita a Promise em status 4xx e 5xx, tem timeout e permite criar uma instância com baseURL e cabeçalhos padrão. Interceptors são funções que rodam antes de cada requisição (colocar o token) ou depois de cada resposta (tratar 401, renovar o token e repetir a chamada). Com fetch, o mesmo se faz com uma função wrapper própria; React Query funciona com qualquer um dos dois.",
+          "relatedTerms": [
+            "estado-do-servidor",
+            "react-query-e-swr"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "query-e-mutation",
+          "level": "pleno",
+          "title": "useQuery e useMutation com invalidação",
+          "body": "Hooks por recurso escondem a chave e a chamada HTTP. Depois de criar um pedido, a lista é invalidada e buscada de novo.",
+          "snippet": {
+            "file": "src/api/orders.ts",
+            "language": "ts",
+            "code": "import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';\n\nexport function useOrders() {\n  return useQuery({\n    queryKey: ['orders'],\n    queryFn: () => api.get<Order[]>('/orders').then((r) => r.data),\n    staleTime: 30_000, // 30 s fresco: não busca de novo ao remontar\n  });\n}\n\nexport function useCreateOrder() {\n  const queryClient = useQueryClient();\n  return useMutation({\n    mutationFn: (input: NewOrder) => api.post<Order>('/orders', input),\n    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),\n  });\n}\n\n// Na tela\nconst { data, isPending, isError } = useOrders();\nconst createOrder = useCreateOrder();\ncreateOrder.mutate({ productId: 'p1', qty: 2 });"
+          },
+          "relatedTerms": [
+            "react-query-e-swr",
+            "stale-time-e-invalidacao"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "interceptor-de-token",
+          "level": "senior",
+          "title": "Interceptor de token com Axios",
+          "body": "O interceptor de requisição coloca o token; o de resposta renova o token num 401 e repete a chamada, com um único refresh para várias falhas simultâneas.",
+          "snippet": {
+            "file": "src/api/client.ts",
+            "language": "ts",
+            "code": "import axios from 'axios';\n\nexport const api = axios.create({ baseURL: 'https://api.example.com', timeout: 10_000 });\n\napi.interceptors.request.use((config) => {\n  const token = getAccessToken();\n  if (token) config.headers.Authorization = `Bearer ${token}`;\n  return config;\n});\n\nlet refreshing: Promise<string> | null = null;\n\napi.interceptors.response.use(\n  (response) => response,\n  async (error) => {\n    const original = error.config;\n    if (error.response?.status !== 401 || original._retry) throw error;\n    original._retry = true;\n    // Várias requisições com 401 ao mesmo tempo esperam um único refresh\n    refreshing ??= refreshToken().finally(() => (refreshing = null));\n    original.headers.Authorization = `Bearer ${await refreshing}`;\n    return api(original);\n  },\n);"
+          },
+          "relatedTerms": [
+            "axios-e-interceptors"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hooks-personalizados",
+      "title": "Hooks personalizados",
+      "description": "Extrair, compor e desenhar hooks que deixam os componentes simples.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "hook-personalizado",
+          "level": "junior",
+          "term": "Hook personalizado",
+          "definition": "Função cujo nome começa com use e que chama outros hooks. Serve para extrair lógica com estado repetida entre componentes (buscar dados, debounce, formulário) e deixar o componente só com a interface. Cada componente que usa o hook ganha o próprio estado: hooks compartilham lógica, não dados. Segue as regras dos hooks: só no topo do componente ou de outro hook, nunca dentro de if ou loop.",
+          "relatedTerms": [
+            "composicao-de-hooks",
+            "api-de-um-hook"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "use-reducer",
+          "level": "pleno",
+          "term": "useReducer",
+          "definition": "Alternativa ao useState quando o próximo estado depende de várias regras ou quando vários campos mudam juntos. A lógica fica numa função pura reducer(state, action) que devolve o novo estado, e o componente só faz dispatch de ações com nome. Fica mais fácil de testar (é uma função pura) e de evitar estados impossíveis, como \"enviando\" e \"erro\" ao mesmo tempo. É o mesmo modelo do Redux, só que local ao componente.",
+          "relatedTerms": [
+            "hook-personalizado",
+            "redux-toolkit"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "composicao-de-hooks",
+          "level": "pleno",
+          "term": "Composição de hooks",
+          "definition": "Hooks personalizados podem usar outros hooks personalizados, como funções que chamam funções: useProductSearch usa useDebounce e useQuery; useAuth usa um Context e uma store. Assim cada hook tem uma responsabilidade e os maiores são montados com os menores. A troca de uma peça (ex.: sair do SWR para o React Query) fica restrita a um hook, sem mexer nas telas.",
+          "relatedTerms": [
+            "hook-personalizado",
+            "api-de-um-hook"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "api-de-um-hook",
+          "level": "senior",
+          "term": "API de um hook",
+          "definition": "Desenhar o retorno de um hook é desenhar uma API. Boas práticas: devolver objeto com nomes ({ data, isPending, refetch }) quando há muitos valores, e tupla só quando o uso é como o do useState; manter estáveis (useCallback) as funções devolvidas, porque elas vão para arrays de dependências de quem usa; receber opções num objeto para crescer sem quebrar; e não esconder efeitos colaterais inesperados. O hook deve ser testável sozinho, com renderHook.",
+          "relatedTerms": [
+            "hook-personalizado",
+            "composicao-de-hooks"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "use-debounce",
+          "level": "pleno",
+          "title": "useDebounce",
+          "body": "Hook genérico que só devolve o valor depois de um tempo sem mudanças. Composto com useQuery, evita uma requisição por tecla digitada.",
+          "snippet": {
+            "file": "src/hooks/useDebounce.ts",
+            "language": "ts",
+            "code": "import { useEffect, useState } from 'react';\n\nexport function useDebounce<T>(value: T, delay = 300): T {\n  const [debounced, setDebounced] = useState(value);\n\n  useEffect(() => {\n    const id = setTimeout(() => setDebounced(value), delay);\n    return () => clearTimeout(id); // nova digitação cancela o timer anterior\n  }, [value, delay]);\n\n  return debounced;\n}\n\n// Busca só quando a pessoa para de digitar\nconst [search, setSearch] = useState('');\nconst term = useDebounce(search, 400);\nconst { data } = useQuery({ queryKey: ['products', term], queryFn: () => findProducts(term) });"
+          },
+          "relatedTerms": [
+            "hook-personalizado",
+            "composicao-de-hooks"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "reducer-tipado",
+          "level": "pleno",
+          "title": "Reducer com ações tipadas",
+          "body": "Uma union discriminada de ações deixa o TypeScript conferir cada case e impede estados impossíveis.",
+          "snippet": {
+            "file": "src/hooks/useSubmit.ts",
+            "language": "ts",
+            "code": "import { useReducer } from 'react';\n\ntype State = { status: 'idle' | 'sending' | 'error'; message?: string };\ntype Action =\n  | { type: 'submit' }\n  | { type: 'failed'; message: string }\n  | { type: 'reset' };\n\nfunction reducer(state: State, action: Action): State {\n  switch (action.type) {\n    case 'submit':\n      return { status: 'sending' };\n    case 'failed':\n      return { status: 'error', message: action.message };\n    case 'reset':\n      return { status: 'idle' };\n  }\n}\n\nconst [state, dispatch] = useReducer(reducer, { status: 'idle' });\ndispatch({ type: 'failed', message: 'Sem conexão' });"
+          },
+          "relatedTerms": [
+            "use-reducer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre estado, dados e hooks que aparecem em entrevistas de frontend.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "context-zustand-ou-redux",
+          "level": "pleno",
+          "question": "Quando usar Context, Zustand ou Redux?",
+          "answer": "Primeiro separo o que é dado do servidor: isso vai para o React Query ou SWR, não para nenhum dos três. Do que sobra, Context para valores que mudam pouco e são lidos em muitos lugares (tema, idioma, usuário). Zustand quando há estado de cliente compartilhado que muda com frequência e quero seletores sem boilerplate. Redux Toolkit quando a equipe é grande, o fluxo de estado é complexo e vale ter padrão rígido, middleware e DevTools com histórico.",
+          "relatedTerms": [
+            "context-e-rerenderizacao",
+            "zustand",
+            "redux-toolkit"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "api-em-store-global",
+          "level": "pleno",
+          "question": "Por que não guardar os dados da API numa store global?",
+          "answer": "Porque aí eu reimplemento um cache à mão: loading e erro por requisição, quando buscar de novo, deduplicação, retry, invalidação depois de uma mutação e limpeza do que ninguém usa. Uma biblioteca de estado do servidor já faz isso com uma chave por recurso. A store global fica pequena, só com estado do cliente (filtros, carrinho local, preferências), e os dados da API ficam sempre com uma fonte da verdade: o cache da query.",
+          "relatedTerms": [
+            "estado-do-servidor",
+            "react-query-e-swr"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "evitar-rerender-context",
+          "level": "senior",
+          "question": "Como evitar re-renderizações desnecessárias com Context?",
+          "answer": "Todo consumidor re-renderiza quando o value muda, então: memorizo o value com useMemo para não criar objeto novo a cada render do Provider; separo estado e ações em Contexts diferentes (quem só dispara ações não re-renderiza quando o estado muda); divido Contexts grandes por assunto; e desço o Provider para perto de quem usa. Se ainda assim o valor muda muito e cada tela usa um pedaço, troco por uma store com seletores, como Zustand, ou uso useSyncExternalStore.",
+          "relatedTerms": [
+            "context-e-rerenderizacao",
+            "zustand"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "query-stale",
+          "level": "pleno",
+          "question": "O que acontece quando uma query do React Query fica stale?",
+          "answer": "Nada imediato: o dado continua na tela. Stale só significa que ele pode ser buscado de novo. A nova busca acontece em segundo plano quando outro componente com a mesma chave monta, quando a janela volta o foco ou a rede reconecta, ou quando eu invalido a chave. Enquanto busca, a tela mostra o dado antigo e isFetching fica true, sem voltar para o loading. Com staleTime padrão 0, isso acontece sempre; aumentar o staleTime reduz as buscas.",
+          "relatedTerms": [
+            "stale-time-e-invalidacao",
+            "react-query-e-swr"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "fetch-ou-axios",
+          "level": "junior",
+          "question": "fetch ou Axios?",
+          "answer": "fetch é nativo no navegador, no React Native e no Node, então não adiciona dependência. Mas ele não rejeita em 404 ou 500 (é preciso checar response.ok), exige response.json() e não tem timeout nem interceptors prontos (timeout se faz com AbortController). Axios resolve isso de fábrica e permite uma instância com baseURL e token. Em projeto pequeno uso fetch com um wrapper; quando há autenticação com refresh e muitas chamadas, Axios economiza código.",
+          "relatedTerms": [
+            "axios-e-interceptors"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testar-hook",
+          "level": "senior",
+          "question": "Como você organizaria e testaria um hook personalizado?",
+          "answer": "Um hook por responsabilidade, com nome pelo que faz (useOrders, useDebounce), em src/hooks ou junto da feature, e a lógica pura (reducer, formatação) em funções separadas, testadas sem React. O hook em si testo com renderHook da Testing Library: verifico o valor inicial, disparo ações dentro de act e confiro o resultado; para hooks com React Query, envolvo num QueryClientProvider de teste e simulo a API (ex.: MSW), e para tempo uso fake timers.",
+          "relatedTerms": [
+            "hook-personalizado",
+            "api-de-um-hook",
+            "use-reducer"
+          ]
+        }
+      ]
+    }
+  ]
+}

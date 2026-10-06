@@ -54,7 +54,7 @@
     },
     "ssr": {
       "term": "SSR, SSG and ISR",
-      "definition": "Page generation strategies. SSG builds the HTML at build time (fast, ideal for fixed content); SSR builds it on every request (always fresh data, more server cost); ISR is SSG that regenerates after a while or on demand, without a new build."
+      "definition": "Page generation strategies. SSG builds the HTML at build time (fast, ideal for fixed content); SSR builds it on every request (always fresh data, more server cost); ISR is SSG that regenerates after a while or on demand, without a new build. In today's Next, these ideas show up as static or dynamic routes, cached content and partial prerendering, which mixes static and dynamic parts on the same page."
     },
     "hidratacao": {
       "term": "Hydration",
@@ -64,10 +64,6 @@
       "title": "Server and Client together",
       "body": "The page fetches data on the server and passes it to an interactive button, which is the only part sent as JavaScript to the browser."
     },
-    "revalidate": {
-      "title": "Caching and revalidation",
-      "body": "next.revalidate regenerates the data after 60 seconds (ISR); cache \"no-store\" always fetches (SSR). revalidatePath, called after a change, invalidates the page right away. Caching defaults changed between versions: check the docs for yours."
-    },
     "server-action": {
       "term": "Server Action",
       "definition": "An async function marked with \"use server\" that runs on the server and can be called straight from a form or a Client Component, without creating an API route. Since it is a public endpoint under the hood, it must validate input and check permissions."
@@ -75,10 +71,6 @@
     "route-handler": {
       "term": "Route Handler",
       "definition": "A route.js file inside app/ that exports functions named after HTTP methods (GET, POST...) and creates an API endpoint. Used for webhooks, integrations and clients other than the app itself."
-    },
-    "middleware-next": {
-      "term": "Middleware",
-      "definition": "Code that runs before the request reaches the route, defined in a single file at the root (middleware.js, called proxy in newer versions). It is used to redirect, rewrite URLs, do light authentication checks and adjust headers."
     },
     "streaming": {
       "term": "Streaming with Suspense",
@@ -94,7 +86,7 @@
     },
     "ssr-vs-ssg": {
       "question": "When should you use SSR, SSG or ISR?",
-      "answer": "SSG for content that is the same for every user and barely changes over time (docs, landing pages): it is the fastest. ISR when the content is the same for everyone but changes sometimes (catalog, blog): static with revalidation. SSR when it depends on the request (logged-in user, cookies) or must always be current."
+      "answer": "SSG for content that is the same for every user and barely changes over time (docs, landing pages): it is the fastest. ISR when the content is the same for everyone but changes sometimes (catalog, blog): static with revalidation. SSR when it depends on the request (logged-in user, cookies) or must always be current. In today's Next I think in parts of the page: what is the same for everyone stays static or cached, and what depends on the request stays dynamic, inside Suspense."
     },
     "server-vs-client": {
       "question": "What is the difference between Server and Client Components?",
@@ -110,11 +102,19 @@
     },
     "por-que-nextjs": {
       "question": "What does Next.js add to React?",
-      "answer": "File-based routing, server rendering (SSR, SSG, ISR and streaming), Server Components, Server Actions and API routes, image and font optimization, automatic code splitting per route and a production-ready build. With plain React, each of these pieces is a separate choice and setup."
+      "answer": "File-based routing, server rendering (SSR, SSG, ISR and streaming), Server Components, Server Actions and API routes, image and font optimization, automatic code splitting per route and a production-ready build, with Turbopack as the default bundler. With plain React, each of these pieces is a separate choice and setup."
     },
     "route-handler-vs-action": {
       "question": "When should you use a Route Handler and when a Server Action?",
       "answer": "A Server Action for mutations triggered by the app itself (forms, buttons), because it integrates with revalidation and works without writing fetch. A Route Handler when the endpoint is consumed from outside: webhooks, mobile apps, integrations, or when I need to control the method, headers and response format."
+    },
+    "proxy": {
+      "term": "Proxy (formerly Middleware)",
+      "definition": "Code that runs before the request reaches the route, defined in a proxy.ts file at the root, with export function proxy and a matcher that picks the routes. It is used to redirect, rewrite URLs, do lightweight authentication checks and adjust headers. In Next 16 it replaced middleware.ts, now deprecated (the middleware-to-proxy codemod does the switch), and it runs on Node.js; anyone who still needs the edge runtime keeps middleware.ts."
+    },
+    "cache-e-revalidacao": {
+      "title": "Caching and revalidation",
+      "body": "With cacheComponents enabled (Next 16), whatever can be reused gets 'use cache', with cacheLife for the duration and cacheTag to invalidate it later with updateTag. Without cacheComponents, the previous model applies, with revalidate and no-store on each fetch and revalidatePath. The details are in the Next.js performance track."
     }
   }
 }

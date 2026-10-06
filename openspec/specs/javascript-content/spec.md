@@ -17,7 +17,7 @@ O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das tril
 | `nextjs` | Next.js | frontend | javascript | nextjs |
 | `express` | Express | backend | javascript | express |
 
-O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na linguagem `javascript`. A linguagem `javascript` SHALL reunir também as trilhas de TypeScript e os frameworks Angular e NestJS (capability `typescript-content`), de modo que a tela da linguagem mostre juntos, sem separar JS de TS, a linguagem pura e todos os frameworks do ecossistema.
+O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na linguagem `javascript`. A linguagem `javascript` SHALL reunir também as trilhas de TypeScript e os frameworks Angular e NestJS (capability `typescript-content`) e as trilhas "Estado e dados no React" (capability `react-state-content`) "Testes no frontend" (capability `frontend-testing-content`) "Estilização e design system" (capability `styling-design-system-content`) "Build e bundlers" (capability `build-tooling-content`) e "Performance no Next.js" (capability `nextjs-performance-content`), de modo que a tela da linguagem mostre juntos, sem separar JS de TS, a linguagem pura e todos os frameworks do ecossistema.
 
 #### Scenario: Trilhas registradas
 - **WHEN** o catálogo é carregado
@@ -25,7 +25,7 @@ O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na
 
 #### Scenario: JavaScript no Frontend
 - **WHEN** o usuário abre Frontend › JavaScript
-- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono, JavaScript no navegador, TypeScript essencial e TypeScript avançado, e "Frameworks" mostra React, Vue, Next.js e Angular, cada um com "1 trilha"
+- **THEN** "Linguagem pura" mostra JavaScript essencial, JavaScript assíncrono, JavaScript no navegador, TypeScript essencial, TypeScript avançado e Build e bundlers, e "Frameworks" mostra React, Vue, Next.js e Angular, com "4 trilhas" em React, "2 trilhas" em Next.js e "1 trilha" nos demais
 
 #### Scenario: JavaScript no Backend
 - **WHEN** o usuário abre Backend › JavaScript
@@ -33,7 +33,7 @@ O cadastro de linguagens e frameworks SHALL ter React, Vue, Next.js e Express na
 
 #### Scenario: Contagem na tela da área
 - **WHEN** o usuário abre a área Frontend
-- **THEN** a seção "Linguagens" mostra "JavaScript" com "9 trilhas" e não mostra "TypeScript"
+- **THEN** a seção "Linguagens" mostra "JavaScript" com "14 trilhas" e não mostra "TypeScript"
 
 ### Requirement: Decks das trilhas de JavaScript
 Cada trilha SHALL ter exatamente 4 decks, nesta ordem: três decks de conteúdo com 6 cards cada (tipos `concept` ou `code`, com pelo menos 2 `concept` por deck) e o deck `perguntas-de-entrevista` ("Perguntas de entrevista"), com 6 cards `question`. Cada trilha tem, portanto, 24 cards. Os decks de conteúdo SHALL ser:
@@ -88,4 +88,27 @@ Cada trilha SHALL ter `translations/en.json`, registrado no app, com tradução 
 #### Scenario: Trilha em inglês
 - **WHEN** o app está em inglês e o usuário abre Frontend › JavaScript
 - **THEN** a trilha "JavaScript essencial" aparece como "JavaScript essentials"
+
+### Requirement: Trilha Next.js na versão atual
+O conteúdo da trilha `nextjs` SHALL seguir o Next.js 16:
+- o card `proxy` (deck `dados-e-api`) SHALL ter o termo "Proxy (antigo Middleware)" e apresentar `proxy.ts` como o arquivo atual, citando `middleware.ts` só como o nome antigo;
+- o card `cache-e-revalidacao` (deck `renderizacao`) SHALL ter um snippet com Cache Components (`'use cache'`, `cacheLife` e `cacheTag`) e SHALL explicar que `revalidate` no `fetch` é o modelo anterior, usado sem `cacheComponents`.
+
+A trilha MUST NOT ter os cards com os ids antigos `middleware-next` e `revalidate`.
+
+#### Scenario: Proxy no lugar de Middleware
+- **WHEN** o card `proxy` é lido
+- **THEN** o termo é "Proxy (antigo Middleware)" e a definição cita `proxy.ts`
+
+#### Scenario: Cache Components no card de cache
+- **WHEN** o card `cache-e-revalidacao` é lido
+- **THEN** o snippet contém `'use cache'`, `cacheLife` e `cacheTag`, e o texto cita `cacheComponents`
+
+#### Scenario: Ids antigos removidos
+- **WHEN** a trilha `nextjs` é carregada
+- **THEN** ela continua com 24 cards e não tem cards com id `middleware-next` nem `revalidate`
+
+#### Scenario: Proxy em inglês
+- **WHEN** o app está em inglês e o card `proxy` é exibido
+- **THEN** o termo aparece como "Proxy (formerly Middleware)"
 

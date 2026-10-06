@@ -59,7 +59,9 @@ describe('Requirement: Trilhas de JavaScript no catálogo', () => {
       'TypeScript avançado',
     ]);
     expect(buttons(FRAMEWORKS)).toEqual(['React', 'Vue', 'Next.js', 'Angular']);
-    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('1 trilha')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('4 trilhas')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^Vue,/ })).getByText('1 trilha')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^Next\.js,/ })).getByText('2 trilhas')).toBeOnTheScreen();
   });
 
   it('JavaScript no Backend', async () => {
@@ -76,7 +78,7 @@ describe('Requirement: Trilhas de JavaScript no catálogo', () => {
 
   it('Contagem na tela da área', async () => {
     await open('/area/frontend');
-    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('9 trilhas')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('14 trilhas')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: /^TypeScript,/ })).toBeNull();
   });
 

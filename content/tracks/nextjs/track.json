@@ -120,7 +120,7 @@
           "id": "ssr",
           "level": "pleno",
           "term": "SSR, SSG e ISR",
-          "definition": "Estratégias de geração de páginas. SSG gera o HTML no build (rápido, ideal para conteúdo fixo); SSR gera a cada requisição (dados sempre atuais, mais custo no servidor); ISR é SSG que se regenera depois de um tempo ou sob demanda, sem novo build.",
+          "definition": "Estratégias de geração de páginas. SSG gera o HTML no build (rápido, ideal para conteúdo fixo); SSR gera a cada requisição (dados sempre atuais, mais custo no servidor); ISR é SSG que se regenera depois de um tempo ou sob demanda, sem novo build. No Next atual, essas ideias aparecem como rota estática ou dinâmica, conteúdo em cache e pré-renderização parcial, que mistura partes estáticas e dinâmicas na mesma página.",
           "relatedTerms": [
             "server-component"
           ]
@@ -154,14 +154,14 @@
         },
         {
           "type": "code",
-          "id": "revalidate",
+          "id": "cache-e-revalidacao",
           "level": "senior",
           "title": "Cache e revalidação",
-          "body": "next.revalidate regenera o dado depois de 60 segundos (ISR); cache \"no-store\" busca sempre (SSR). revalidatePath, chamado depois de uma alteração, invalida a página na hora. Os padrões de cache mudaram entre versões: confira a documentação da sua.",
+          "body": "Com cacheComponents ligado (Next 16), o que pode ser reaproveitado leva 'use cache', com cacheLife para o tempo e cacheTag para invalidar depois com updateTag. Sem cacheComponents vale o modelo anterior, com revalidate e no-store em cada fetch e revalidatePath. O detalhe está na trilha Performance no Next.js.",
           "snippet": {
             "file": "exemplo.js",
             "language": "js",
-            "code": "// regenera a cada 60 s\nconst posts = await fetch(\"https://api.example.com/posts\", {\n  next: { revalidate: 60 },\n}).then((r) => r.json());\n\n// sempre atualizado\nconst cart = await fetch(\"https://api.example.com/cart\", { cache: \"no-store\" });\n\n// depois de criar um post\nimport { revalidatePath } from \"next/cache\";\nrevalidatePath(\"/posts\");"
+            "code": "// next.config.ts: cacheComponents: true\nimport { cacheLife, cacheTag, updateTag } from \"next/cache\";\n\n// Igual para todo mundo: guardado em cache por horas\nasync function getPosts() {\n  \"use cache\";\n  cacheLife(\"hours\");\n  cacheTag(\"posts\");\n  return db.post.findMany();\n}\n\n// Depois de criar um post: expira o cache, a próxima leitura já vê o novo\nasync function createPost(formData) {\n  \"use server\";\n  await db.post.create({ data: { title: formData.get(\"title\") } });\n  updateTag(\"posts\");\n}\n\n// Modelo anterior (sem cacheComponents):\n// fetch(url, { next: { revalidate: 60 } })  → regenera a cada 60 s\n// fetch(url, { cache: \"no-store\" })         → busca sempre\n// revalidatePath(\"/posts\")                  → invalida a página"
           },
           "relatedTerms": [
             "ssr"
@@ -196,10 +196,10 @@
         },
         {
           "type": "concept",
-          "id": "middleware-next",
+          "id": "proxy",
           "level": "pleno",
-          "term": "Middleware",
-          "definition": "Código que roda antes de a requisição chegar à rota, definido num único arquivo na raiz (middleware.js, chamado de proxy nas versões mais novas). Serve para redirecionar, reescrever URLs, checar autenticação de forma leve e ajustar cabeçalhos.",
+          "term": "Proxy (antigo Middleware)",
+          "definition": "Código que roda antes de a requisição chegar à rota, definido num arquivo proxy.ts na raiz, com export function proxy e um matcher que escolhe as rotas. Serve para redirecionar, reescrever URLs, checar autenticação de forma leve e ajustar cabeçalhos. No Next 16 ele substituiu o middleware.ts, agora descontinuado (o codemod middleware-to-proxy faz a troca), e roda em Node.js; quem ainda precisa do runtime edge mantém o middleware.ts.",
           "relatedTerms": [
             "route-handler"
           ]
@@ -256,7 +256,7 @@
           "id": "ssr-vs-ssg",
           "level": "pleno",
           "question": "Quando usar SSR, SSG ou ISR?",
-          "answer": "SSG para o que não muda entre usuários e quase não muda no tempo (docs, landing pages): é o mais rápido. ISR quando o conteúdo é igual para todos mas muda às vezes (catálogo, blog): estático com revalidação. SSR quando depende da requisição (usuário logado, cookies) ou precisa estar sempre atual.",
+          "answer": "SSG para o que não muda entre usuários e quase não muda no tempo (docs, landing pages): é o mais rápido. ISR quando o conteúdo é igual para todos mas muda às vezes (catálogo, blog): estático com revalidação. SSR quando depende da requisição (usuário logado, cookies) ou precisa estar sempre atual. No Next atual eu penso por partes da página: o que é igual para todos fica estático ou em cache, e o que depende da requisição fica dinâmico, dentro de um Suspense.",
           "relatedTerms": [
             "ssr"
           ]
@@ -297,7 +297,7 @@
           "id": "por-que-nextjs",
           "level": "junior",
           "question": "O que o Next.js adiciona ao React?",
-          "answer": "Rotas por arquivos, renderização no servidor (SSR, SSG, ISR e streaming), Server Components, Server Actions e rotas de API, otimização de imagens e fontes, divisão automática do código por rota e um build pronto para produção. Com React puro, cada uma dessas peças é uma escolha e uma configuração à parte.",
+          "answer": "Rotas por arquivos, renderização no servidor (SSR, SSG, ISR e streaming), Server Components, Server Actions e rotas de API, otimização de imagens e fontes, divisão automática do código por rota e um build pronto para produção, com o Turbopack como bundler padrão. Com React puro, cada uma dessas peças é uma escolha e uma configuração à parte.",
           "relatedTerms": [
             "app-router",
             "ssr"

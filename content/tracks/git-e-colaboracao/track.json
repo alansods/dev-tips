@@ -1,0 +1,330 @@
+{
+  "id": "git-e-colaboracao",
+  "title": "Git e colaboração",
+  "description": "Versionar código e trabalhar em equipe: commits, branches, merge e rebase, pull requests, code review, conflitos e como desfazer erros.",
+  "areas": [
+    "fundamentos"
+  ],
+  "decks": [
+    {
+      "id": "modelo-do-git",
+      "title": "Modelo do Git",
+      "description": "Como o Git guarda o histórico e onde ficam as suas mudanças.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "commit",
+          "level": "junior",
+          "term": "Commit",
+          "definition": "Foto do projeto inteiro num momento, com autor, data, mensagem e um ponteiro para o commit anterior (o pai). É identificado por um hash (a1b2c3…) calculado a partir do conteúdo, então um commit nunca muda: \"editar\" um commit cria outro com hash novo. O histórico é a corrente de commits ligados pelos pais. Bons commits são pequenos, fazem uma coisa só e deixam o projeto funcionando, o que facilita revisar, reverter e achar bugs.",
+          "relatedTerms": [
+            "branch-e-head",
+            "staging-area"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "branch-e-head",
+          "level": "junior",
+          "term": "Branch e HEAD",
+          "definition": "Branch é só um nome que aponta para um commit; quando você commita, ela avança para o commit novo. Criar uma branch é barato e não copia arquivos. HEAD indica onde você está: normalmente aponta para uma branch (git switch main), e o próximo commit vai para ela. Se HEAD aponta direto para um commit (\"detached HEAD\"), commits novos ficam sem branch e podem se perder; basta criar uma branch ali para guardá-los.",
+          "relatedTerms": [
+            "commit",
+            "repositorio-remoto"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "staging-area",
+          "level": "junior",
+          "term": "Staging area",
+          "definition": "Área intermediária (também chamada de index) entre os arquivos que você editou e o próximo commit. git add coloca uma mudança no stage; git commit grava só o que está lá. Isso permite separar um trabalho grande em commits lógicos, inclusive escolhendo partes de um arquivo com git add -p. git status mostra o que está modificado, o que está no stage e o que o Git ainda não rastreia; git diff --staged mostra o que vai entrar no commit.",
+          "relatedTerms": [
+            "commit",
+            "branch-e-head"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "repositorio-remoto",
+          "level": "pleno",
+          "term": "Repositório remoto",
+          "definition": "Cópia do repositório em outro lugar, geralmente no GitHub ou GitLab, com o nome padrão origin. O Git é distribuído: cada clone tem o histórico completo e trabalha offline. git fetch baixa os commits novos do remoto e atualiza origin/main sem mexer nas suas branches; git pull é fetch seguido de merge (ou rebase) na branch atual; git push envia os seus commits. O push só é aceito se o remoto não tiver commits que você ainda não tem.",
+          "relatedTerms": [
+            "branch-e-head",
+            "merge-e-rebase"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "fluxo-do-dia-a-dia",
+          "level": "junior",
+          "title": "Fluxo do dia a dia",
+          "body": "Atualizar a main, criar uma branch, commitar o que interessa e enviar para abrir o pull request.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "git switch main\ngit pull                          # traz e integra o que a equipe enviou\ngit switch -c feat/busca-no-cardapio\n\n# ...edita os arquivos...\ngit status                        # o que mudou e o que já está no stage\ngit add src/busca.ts              # escolhe o que entra no próximo commit\ngit commit -m \"feat: busca por nome no cardápio\"\n\ngit push -u origin feat/busca-no-cardapio   # -u liga a branch local à remota"
+          },
+          "relatedTerms": [
+            "staging-area",
+            "repositorio-remoto"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "desfazer-no-local",
+          "level": "pleno",
+          "title": "Desfazer no local",
+          "body": "Comandos para desfazer antes do push, do mais seguro ao mais destrutivo. Depois do push, prefira revert.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "git restore src/busca.ts            # descarta mudanças não commitadas no arquivo\ngit restore --staged src/busca.ts   # tira do stage, mantém a mudança no arquivo\n\ngit commit --amend                  # corrige a mensagem ou inclui o que faltou no último commit\ngit reset --soft HEAD~1             # desfaz o último commit, mantém tudo no stage\ngit reset --hard HEAD~1             # desfaz o último commit e APAGA as mudanças (cuidado)\n\ngit stash                           # guarda as mudanças para trocar de branch\ngit stash pop                       # traz de volta"
+          },
+          "relatedTerms": [
+            "staging-area",
+            "revert-e-reset"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fluxo-em-equipe",
+      "title": "Fluxo em equipe",
+      "description": "Integrar o trabalho de várias pessoas com segurança.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "merge-e-rebase",
+          "level": "pleno",
+          "term": "Merge e rebase",
+          "definition": "Duas formas de juntar o trabalho de duas branches. Merge cria um commit de merge com dois pais e preserva o histórico como aconteceu. Rebase reaplica os seus commits, um por um, em cima de outra branch, gerando commits novos (hashes novos) e um histórico linear. Regra de ouro: não faça rebase de commits que outras pessoas já usam, porque reescrever o histórico compartilhado obriga todo mundo a consertar o próprio clone. Squash merge junta a branch inteira num commit só.",
+          "relatedTerms": [
+            "pull-request-e-code-review",
+            "conflito"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pull-request-e-code-review",
+          "level": "pleno",
+          "term": "Pull request e code review",
+          "definition": "Pull request (merge request no GitLab) é o pedido para integrar uma branch, com a descrição da mudança, a discussão e os resultados da CI. No code review, outra pessoa lê o código procurando bugs, problemas de design, segurança, testes faltando e clareza, e aprova ou pede mudanças. PRs pequenos são revisados mais rápido e melhor. Proteções de branch garantem que nada entra na main sem CI verde e aprovação.",
+          "relatedTerms": [
+            "merge-e-rebase",
+            "estrategia-de-branches"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "estrategia-de-branches",
+          "level": "senior",
+          "term": "Estratégia de branches",
+          "definition": "Como a equipe organiza as branches. No trunk-based development, todo mundo integra na main com frequência, em branches curtas (horas ou poucos dias), e o que não está pronto fica atrás de feature flags; combina com deploy contínuo. No Git Flow há branches longas (develop, release, hotfix), útil para versões publicadas com calendário, como apps nas lojas, mas gera mais conflitos e integração tardia. Muitas equipes ficam no meio: main sempre estável, branches curtas e, às vezes, uma branch de integração antes da produção.",
+          "relatedTerms": [
+            "pull-request-e-code-review",
+            "merge-e-rebase"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mensagem-de-commit",
+          "level": "pleno",
+          "term": "Mensagem de commit",
+          "definition": "A mensagem explica o porquê da mudança, que o diff não mostra. Formato comum: um título curto no imperativo (até uns 50 caracteres), uma linha em branco e um corpo com o contexto. Conventional Commits padroniza o título com um tipo (feat, fix, docs, refactor, test, chore), um escopo opcional e ! para mudanças incompatíveis; com isso dá para gerar changelog e decidir a próxima versão semântica automaticamente.",
+          "relatedTerms": [
+            "commit",
+            "pull-request-e-code-review"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "atualizar-branch-com-rebase",
+          "level": "pleno",
+          "title": "Atualizar a branch com rebase",
+          "body": "Trazer a main atual para baixo da sua branch antes do PR. Como o rebase reescreve os seus commits, o push precisa de --force-with-lease, que recusa se alguém enviou algo novo para a branch.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "git switch feat/busca-no-cardapio\ngit fetch origin\ngit rebase origin/main              # reaplica os seus commits em cima da main atual\n\n# em conflito: resolve os arquivos, depois\ngit add src/busca.ts\ngit rebase --continue               # ou git rebase --abort para voltar ao início\n\n# o histórico da branch mudou: o push normal é recusado\ngit push --force-with-lease         # só sobrescreve se ninguém tiver enviado nada novo"
+          },
+          "relatedTerms": [
+            "merge-e-rebase",
+            "conflito"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "conventional-commits",
+          "level": "junior",
+          "title": "Conventional Commits",
+          "body": "Uma mensagem completa, com título, corpo e referência à issue, e exemplos de títulos de outros tipos.",
+          "snippet": {
+            "file": "mensagens de commit",
+            "language": "text",
+            "code": "feat(cardapio): busca por nome do prato\n\nFiltra a lista enquanto a pessoa digita, com debounce de 300 ms.\nA busca ignora acentos e maiúsculas.\n\nCloses #142\n\n---\nfix(pedido): total não somava a taxa de entrega\nrefactor(api): extrai cliente HTTP para src/api/client.ts\ndocs: explica as variáveis de ambiente no README\nfeat(auth)!: troca login por senha por login com Google\n\nBREAKING CHANGE: a rota /login foi removida."
+          },
+          "relatedTerms": [
+            "mensagem-de-commit"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "resolver-problemas",
+      "title": "Resolver problemas",
+      "description": "Conflitos, commits errados e como recuperar o que parecia perdido.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "conflito",
+          "level": "pleno",
+          "term": "Conflito",
+          "definition": "Acontece quando duas branches mudaram as mesmas linhas de um arquivo (ou uma apagou o que a outra editou) e o Git não sabe qual versão manter. Ele para o merge ou o rebase e marca o trecho com <<<<<<<, ======= e >>>>>>>. Você edita o arquivo para a versão certa, que pode combinar as duas, roda os testes, marca como resolvido com git add e continua. Branches curtas e atualizadas com frequência reduzem conflitos.",
+          "relatedTerms": [
+            "merge-e-rebase",
+            "revert-e-reset"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "revert-e-reset",
+          "level": "pleno",
+          "term": "revert e reset",
+          "definition": "git revert cria um commit novo que desfaz as mudanças de um commit anterior: o histórico continua intacto, então é o jeito seguro de desfazer algo que já foi enviado. git reset move a branch para outro commit: --soft mantém as mudanças no stage, --mixed (padrão) mantém nos arquivos e --hard descarta tudo. Reset reescreve o histórico e só deve ser usado em commits que ainda não foram compartilhados. Para reverter um merge, é preciso indicar o lado principal com git revert -m 1.",
+          "relatedTerms": [
+            "conflito",
+            "reflog"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cherry-pick",
+          "level": "pleno",
+          "term": "cherry-pick",
+          "definition": "Copia um commit específico de outra branch para a branch atual, criando um commit novo com as mesmas mudanças. Uso típico: levar uma correção da main para uma branch de release (hotfix) ou recuperar um commit feito na branch errada. Abusar dele duplica commits e complica merges futuros; quando muitos commits precisam ir juntos, normalmente é melhor fazer merge ou rebase.",
+          "relatedTerms": [
+            "revert-e-reset",
+            "reflog"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "reflog",
+          "level": "senior",
+          "term": "reflog",
+          "definition": "Registro local de todos os lugares por onde HEAD e as branches passaram: commits, checkouts, resets, rebases. Com ele dá para recuperar commits que pareciam perdidos depois de um reset --hard, de um rebase que deu errado ou de uma branch apagada: git reflog mostra o hash anterior e git switch -c recuperada <hash> traz de volta. Só vale para o seu clone (não vai para o remoto) e as entradas expiram: por padrão em 90 dias, e em 30 dias para commits que não estão em nenhuma branch.",
+          "relatedTerms": [
+            "revert-e-reset",
+            "branch-e-head"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "resolver-um-conflito",
+          "level": "pleno",
+          "title": "Resolver um conflito",
+          "body": "Os marcadores mostram a versão de cada lado. A resolução é editar o arquivo, testar, marcar com git add e concluir.",
+          "snippet": {
+            "file": "terminal",
+            "language": "text",
+            "code": "$ git merge main\nCONFLICT (content): Merge conflict in src/pedido.ts\n\n# src/pedido.ts\n<<<<<<< HEAD\nconst taxa = calcularTaxa(endereco);\n=======\nconst taxa = calcularTaxaDeEntrega(endereco, loja);\n>>>>>>> main\n\n# 1. edita o arquivo e deixa a versão certa (sem os marcadores)\n# 2. roda os testes\n$ git add src/pedido.ts\n$ git commit                        # conclui o merge (no rebase: git rebase --continue)"
+          },
+          "relatedTerms": [
+            "conflito"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "bisect",
+          "level": "senior",
+          "title": "Achar o commit do bug com bisect",
+          "body": "Busca binária no histórico: entre centenas de commits, poucos testes apontam qual introduziu o bug.",
+          "snippet": {
+            "file": "terminal",
+            "language": "bash",
+            "code": "git bisect start\ngit bisect bad                      # o commit atual tem o bug\ngit bisect good v2.3.0              # nessa versão funcionava\n\n# o Git faz checkout no meio do intervalo; você testa e responde:\ngit bisect good                     # ou: git bisect bad\n# ...repete até ele apontar o primeiro commit com o bug\n\ngit bisect run npm test -- pedido   # ou automatiza com um comando que falha no bug\ngit bisect reset                    # volta para onde estava"
+          },
+          "relatedTerms": [
+            "commit",
+            "reflog"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre Git e trabalho em equipe que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "fetch-ou-pull",
+          "level": "junior",
+          "question": "Qual a diferença entre git fetch e git pull?",
+          "answer": "git fetch só baixa os commits novos do remoto e atualiza as referências remotas (origin/main), sem mexer na minha branch nem nos meus arquivos; dá para ver o que chegou antes de integrar. git pull faz o fetch e em seguida integra na branch atual, com merge ou com rebase, conforme a configuração. Quando quero controle, faço fetch, olho o log e depois decido como integrar.",
+          "relatedTerms": [
+            "repositorio-remoto",
+            "merge-e-rebase"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "merge-ou-rebase",
+          "level": "pleno",
+          "question": "Quando você usa merge e quando usa rebase?",
+          "answer": "Rebase na minha branch local, para atualizá-la com a main e deixar o histórico linear antes do PR, porque esses commits ainda são só meus. Merge para integrar uma branch compartilhada ou quando quero preservar como o trabalho aconteceu. Nunca rebase em branch que outras pessoas usam. Na hora de integrar o PR, sigo o padrão da equipe: muitas usam squash merge para ter um commit por PR na main.",
+          "relatedTerms": [
+            "merge-e-rebase",
+            "pull-request-e-code-review"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "commit-na-branch-errada",
+          "level": "pleno",
+          "question": "Commitei na branch errada. E agora?",
+          "answer": "Se ainda não fiz push: crio a branch certa a partir de onde estou (git switch -c feat/certa), que leva os commits, e volto a branch errada (por exemplo, a main) para trás com git switch main e git reset --hard origin/main. Se a branch certa já existe, uso git cherry-pick nos commits e depois removo da errada com reset. Se já fiz push na branch errada compartilhada, não reescrevo: faço revert nela e cherry-pick na certa.",
+          "relatedTerms": [
+            "cherry-pick",
+            "revert-e-reset"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "desfazer-commit-enviado",
+          "level": "pleno",
+          "question": "Como desfazer um commit que já foi enviado?",
+          "answer": "Com git revert <hash>, que cria um commit novo desfazendo as mudanças e mantém o histórico, então ninguém precisa consertar o clone. Se for um merge, uso git revert -m 1 <hash>; e se depois quiser trazer aquela branch de novo, preciso reverter o revert, porque o Git considera os commits dela já integrados. reset seguido de push forçado só em branch que é só minha, nunca na main.",
+          "relatedTerms": [
+            "revert-e-reset",
+            "merge-e-rebase"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "o-que-observar-no-code-review",
+          "level": "senior",
+          "question": "O que você observa num code review?",
+          "answer": "Primeiro se a mudança resolve o problema certo e cabe no design do sistema; depois bugs e casos de borda, como erros, estados vazios e concorrência; segurança, como entrada não validada e segredos; testes que cobrem o comportamento; e legibilidade e nomes. Estilo fica com lint e formatter. Comento com sugestões concretas e explico o porquê, separo o que bloqueia do que é opcional e reviso rápido, porque PR parado atrasa todo mundo.",
+          "relatedTerms": [
+            "pull-request-e-code-review",
+            "mensagem-de-commit"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "segredo-commitado",
+          "level": "senior",
+          "question": "Um segredo foi commitado no repositório. O que fazer?",
+          "answer": "Primeiro considero a chave vazada e revogo ou troco a chave no provedor, porque apagar do código não basta: ela fica no histórico, em clones e forks. Depois removo do código e passo a ler de variável de ambiente ou cofre de segredos. Se for preciso limpar o histórico, uso git filter-repo e faço push forçado, avisando a equipe para clonar de novo. Para prevenir: .gitignore para .env, secret scanning e um hook antes do commit.",
+          "relatedTerms": [
+            "commit",
+            "repositorio-remoto"
+          ]
+        }
+      ]
+    }
+  ]
+}
