@@ -1,4 +1,4 @@
-// Tela Conta: dados da conta Google, Sair e Apagar conta, com confirmação na
+// Tela Conta: dados da conta Google, plano Pro, Sair e Apagar conta, com confirmação na
 // própria tela. Nenhuma das ações apaga o progresso guardado no aparelho.
 
 import { Redirect, router } from 'expo-router';
@@ -16,6 +16,7 @@ import { Button } from '../components/Button';
 import { IconButton } from '../components/IconButton';
 import { BackIcon, GoogleLogo } from '../components/icons';
 import { useT } from '../i18n';
+import { PlanCard } from '../subscriptions/PlanCard';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
@@ -82,6 +83,8 @@ export default function AccountScreen() {
           </View>
         </View>
 
+        <PlanCard />
+
         <View style={{ gap: spacing.sm }}>
           <SectionTitle>{t.sync.section}</SectionTitle>
           <View style={[styles.syncCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -122,6 +125,9 @@ export default function AccountScreen() {
               </AppText>
               <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
                 {t.account.deleteKeep}
+              </AppText>
+              <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
+                {t.account.deleteSubscription}
               </AppText>
               {message ? (
                 <View accessibilityRole="alert" style={[styles.alert, { backgroundColor: colors.warnSoft }]}>
