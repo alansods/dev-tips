@@ -1,4 +1,4 @@
-import { act, renderRouter, screen, within } from 'expo-router/testing-library';
+import { act, renderRouter, screen } from 'expo-router/testing-library';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -38,42 +38,24 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const headers = () => screen.getAllByRole('header').map((h) => String(h.props.children));
+const TRACKS = ['React Native', 'Pagamentos no app'];
 
-describe('Requirement: Trilha de React Native no catálogo', () => {
-  it('Área Mobile', async () => {
-    await open('/area/mobile');
-    expect(headers()).toContain('Linguagens');
-    for (const absent of ['Trilhas', 'Comparativos']) expect(headers()).not.toContain(absent);
-    expect(buttons(['JavaScript'])).toEqual(['JavaScript']);
-    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('6 trilhas')).toBeOnTheScreen();
-  });
-
-  it('JavaScript no Mobile', async () => {
-    await open('/area/mobile/javascript');
-    expect(headers()).toContain('Frameworks');
-    expect(headers()).toContain('Linguagem pura');
-    expect(buttons(['Build e bundlers'])).toEqual(['Build e bundlers']);
-    expect(buttons(['React Native', 'React', 'Angular'])).toEqual(['React', 'React Native']);
-    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('3 trilhas')).toBeOnTheScreen();
-    expect(within(screen.getByRole('button', { name: /^React Native,/ })).getByText('2 trilhas')).toBeOnTheScreen();
-  });
-
+describe('Requirement: Trilha de pagamentos no catálogo', () => {
   it('Framework React Native', async () => {
     await open('/area/mobile/javascript/react-native');
-    expect(screen.getByRole('button', { name: /^React Native,/ })).toBeOnTheScreen();
+    expect(buttons(TRACKS)).toEqual(['React Native', 'Pagamentos no app']);
   });
 
-  it('React Native fora do Frontend', async () => {
+  it('Só no Mobile', async () => {
     await open('/area/frontend/javascript');
-    expect(screen.queryByRole('button', { name: /^React Native,/ })).toBeNull();
+    expect(buttons(TRACKS)).toEqual([]);
   });
 });
 
-describe('Requirement: Tradução da trilha de React Native', () => {
-  it('Área em inglês', async () => {
+describe('Requirement: Tradução da trilha de pagamentos', () => {
+  it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/');
-    expect(screen.getByRole('button', { name: /^Mobile,/ })).toBeOnTheScreen();
+    await open('/area/mobile/javascript/react-native');
+    expect(screen.getByRole('button', { name: /^In-app payments,/ })).toBeOnTheScreen();
   });
 });
