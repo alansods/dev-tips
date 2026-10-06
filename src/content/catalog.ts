@@ -43,6 +43,7 @@ import estadoEDadosNoReact from '../../content/tracks/estado-e-dados-no-react/tr
 import testesNoFrontend from '../../content/tracks/testes-no-frontend/track.json';
 import estilizacaoEDesignSystem from '../../content/tracks/estilizacao-e-design-system/track.json';
 import buildEBundlers from '../../content/tracks/build-e-bundlers/track.json';
+import gitEColaboracao from '../../content/tracks/git-e-colaboracao/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -86,6 +87,7 @@ const registry: unknown[] = [
   testesNoFrontend,
   estilizacaoEDesignSystem,
   buildEBundlers,
+  gitEColaboracao,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));
