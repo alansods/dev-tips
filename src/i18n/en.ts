@@ -64,7 +64,8 @@ export const en: Messages = {
     deleteBody:
       'Your data in the cloud (progress, reviews and preferences) will be deleted forever. This can’t be undone.',
     deleteKeep: 'Progress on this device stays, and you can keep using the app without an account.',
-    deleteSubscription: 'If you subscribe to Pro, also cancel it on Google Play: deleting your account does not stop billing.',
+    deleteSubscription:
+      'If you subscribe to Pro, also cancel it on Google Play: deleting your account does not stop billing.',
     deleteConfirm: 'Delete my account',
     deleteOffline: 'No connection. Try again when you’re online.',
     deleteError: 'Couldn’t delete the account right now. Try again.',
