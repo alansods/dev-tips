@@ -1,0 +1,120 @@
+{
+  "title": "Git and collaboration",
+  "description": "Versioning code and working as a team: commits, branches, merge and rebase, pull requests, code review, conflicts and how to undo mistakes.",
+  "decks": {
+    "modelo-do-git": {
+      "title": "The Git model",
+      "description": "How Git stores history and where your changes live."
+    },
+    "fluxo-em-equipe": {
+      "title": "Team workflow",
+      "description": "Integrating several people's work safely."
+    },
+    "resolver-problemas": {
+      "title": "Fixing problems",
+      "description": "Conflicts, wrong commits and how to recover what seemed lost."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about Git and teamwork that come up in interviews."
+    }
+  },
+  "cards": {
+    "commit": {
+      "term": "Commit",
+      "definition": "A snapshot of the whole project at a moment, with author, date, message and a pointer to the previous commit (the parent). It is identified by a hash (a1b2c3…) computed from its content, so a commit never changes: \"editing\" a commit creates another one with a new hash. History is the chain of commits linked by their parents. Good commits are small, do one thing and leave the project working, which makes it easier to review, revert and find bugs."
+    },
+    "branch-e-head": {
+      "term": "Branch and HEAD",
+      "definition": "A branch is just a name pointing to a commit; when you commit, it moves forward to the new commit. Creating a branch is cheap and copies no files. HEAD says where you are: it usually points to a branch (git switch main), and the next commit goes to it. If HEAD points straight to a commit (\"detached HEAD\"), new commits have no branch and can get lost; just create a branch there to keep them."
+    },
+    "staging-area": {
+      "term": "Staging area",
+      "definition": "An intermediate area (also called the index) between the files you edited and the next commit. git add puts a change in the stage; git commit records only what is there. This lets you split a big piece of work into logical commits, even picking parts of a file with git add -p. git status shows what is modified, what is staged and what Git does not track yet; git diff --staged shows what will go into the commit."
+    },
+    "repositorio-remoto": {
+      "term": "Remote repository",
+      "definition": "A copy of the repository somewhere else, usually on GitHub or GitLab, with the default name origin. Git is distributed: each clone has the full history and works offline. git fetch downloads new commits from the remote and updates origin/main without touching your branches; git pull is fetch followed by a merge (or rebase) into the current branch; git push sends your commits. A push is only accepted if the remote has no commits you do not have yet."
+    },
+    "fluxo-do-dia-a-dia": {
+      "title": "Day-to-day flow",
+      "body": "Update main, create a branch, commit what matters and push to open the pull request."
+    },
+    "desfazer-no-local": {
+      "title": "Undoing locally",
+      "body": "Commands to undo before pushing, from the safest to the most destructive. After pushing, prefer revert."
+    },
+    "merge-e-rebase": {
+      "term": "Merge and rebase",
+      "definition": "Two ways to combine the work of two branches. Merge creates a merge commit with two parents and keeps history as it happened. Rebase replays your commits, one by one, on top of another branch, producing new commits (new hashes) and a linear history. Golden rule: do not rebase commits other people already use, because rewriting shared history forces everyone to fix their clone. Squash merge combines the whole branch into a single commit."
+    },
+    "pull-request-e-code-review": {
+      "term": "Pull request and code review",
+      "definition": "A pull request (merge request in GitLab) is the request to integrate a branch, with the description of the change, the discussion and the CI results. In code review, someone else reads the code looking for bugs, design problems, security issues, missing tests and clarity, and approves or requests changes. Small PRs are reviewed faster and better. Branch protection ensures nothing gets into main without green CI and an approval."
+    },
+    "estrategia-de-branches": {
+      "term": "Branching strategy",
+      "definition": "How the team organizes branches. In trunk-based development, everyone integrates into main often, in short-lived branches (hours or a few days), and unfinished work stays behind feature flags; it pairs with continuous deployment. Git Flow has long-lived branches (develop, release, hotfix), useful for scheduled released versions, such as store apps, but it causes more conflicts and late integration. Many teams sit in between: an always-stable main, short branches and sometimes an integration branch before production."
+    },
+    "mensagem-de-commit": {
+      "term": "Commit message",
+      "definition": "The message explains why the change was made, which the diff does not show. A common format: a short title in the imperative (up to about 50 characters), a blank line and a body with context. Conventional Commits standardizes the title with a type (feat, fix, docs, refactor, test, chore), an optional scope and ! for breaking changes; with that you can generate a changelog and pick the next semantic version automatically."
+    },
+    "atualizar-branch-com-rebase": {
+      "title": "Updating a branch with rebase",
+      "body": "Bringing the current main under your branch before the PR. Since rebase rewrites your commits, the push needs --force-with-lease, which refuses if someone pushed something new to the branch."
+    },
+    "conventional-commits": {
+      "title": "Conventional Commits",
+      "body": "A full message, with title, body and issue reference, and sample titles of other types."
+    },
+    "conflito": {
+      "term": "Conflict",
+      "definition": "Happens when two branches changed the same lines of a file (or one deleted what the other edited) and Git does not know which version to keep. It stops the merge or rebase and marks the section with <<<<<<<, ======= and >>>>>>>. You edit the file into the right version, which may combine both, run the tests, mark it as resolved with git add and continue. Short branches updated often reduce conflicts."
+    },
+    "revert-e-reset": {
+      "term": "revert and reset",
+      "definition": "git revert creates a new commit that undoes the changes of an earlier commit: history stays intact, so it is the safe way to undo something already pushed. git reset moves the branch to another commit: --soft keeps the changes staged, --mixed (the default) keeps them in the files and --hard discards everything. Reset rewrites history and should only be used on commits that have not been shared. To revert a merge, you must state the mainline side with git revert -m 1."
+    },
+    "cherry-pick": {
+      "term": "cherry-pick",
+      "definition": "Copies a specific commit from another branch onto the current branch, creating a new commit with the same changes. Typical use: taking a fix from main to a release branch (hotfix) or recovering a commit made on the wrong branch. Overusing it duplicates commits and complicates future merges; when many commits need to go together, merge or rebase is usually better."
+    },
+    "reflog": {
+      "term": "reflog",
+      "definition": "A local record of every place HEAD and branches have been: commits, checkouts, resets, rebases. With it you can recover commits that seemed lost after a reset --hard, a rebase gone wrong or a deleted branch: git reflog shows the previous hash and git switch -c recovered <hash> brings it back. It only exists in your clone (it is not pushed) and entries expire: by default after 90 days, and after 30 days for commits that are no longer on any branch."
+    },
+    "resolver-um-conflito": {
+      "title": "Resolving a conflict",
+      "body": "The markers show each side's version. Resolving means editing the file, testing, marking it with git add and finishing."
+    },
+    "bisect": {
+      "title": "Finding the bug's commit with bisect",
+      "body": "A binary search through history: among hundreds of commits, a few tests point to the one that introduced the bug."
+    },
+    "fetch-ou-pull": {
+      "question": "What is the difference between git fetch and git pull?",
+      "answer": "git fetch only downloads new commits from the remote and updates the remote references (origin/main), without touching my branch or my files; I can see what arrived before integrating. git pull fetches and then integrates into the current branch, with merge or rebase depending on the configuration. When I want control, I fetch, look at the log and then decide how to integrate."
+    },
+    "merge-ou-rebase": {
+      "question": "When do you use merge and when do you use rebase?",
+      "answer": "Rebase on my local branch, to update it with main and keep history linear before the PR, because those commits are still only mine. Merge to integrate a shared branch or when I want to keep how the work happened. Never rebase a branch other people use. When integrating the PR, I follow the team's convention: many use squash merge to have one commit per PR on main."
+    },
+    "commit-na-branch-errada": {
+      "question": "I committed to the wrong branch. Now what?",
+      "answer": "If I have not pushed: I create the right branch from where I am (git switch -c feat/right), which takes the commits along, and move the wrong branch (for example, main) back with git switch main and git reset --hard origin/main. If the right branch already exists, I cherry-pick the commits and then remove them from the wrong one with reset. If I already pushed to a shared wrong branch, I do not rewrite it: I revert there and cherry-pick onto the right one."
+    },
+    "desfazer-commit-enviado": {
+      "question": "How do you undo a commit that has already been pushed?",
+      "answer": "With git revert <hash>, which creates a new commit undoing the changes and keeps history, so nobody has to fix their clone. If it is a merge, I use git revert -m 1 <hash>; and if I later want to bring that branch in again, I need to revert the revert, because Git considers its commits already integrated. reset followed by a force push only on a branch that is mine alone, never on main."
+    },
+    "o-que-observar-no-code-review": {
+      "question": "What do you look for in a code review?",
+      "answer": "First, whether the change solves the right problem and fits the system's design; then bugs and edge cases, such as errors, empty states and concurrency; security, such as unvalidated input and secrets; tests that cover the behavior; and readability and naming. Style is left to the linter and formatter. I comment with concrete suggestions and explain why, separate what blocks from what is optional and review quickly, because a stalled PR slows everyone down."
+    },
+    "segredo-commitado": {
+      "question": "A secret was committed to the repository. What do you do?",
+      "answer": "First I treat the key as leaked and revoke or rotate it with the provider, because deleting it from the code is not enough: it stays in history, clones and forks. Then I remove it from the code and read it from an environment variable or a secrets vault. If the history must be cleaned, I use git filter-repo and force push, telling the team to clone again. To prevent it: .gitignore for .env, secret scanning and a pre-commit hook."
+    }
+  }
+}

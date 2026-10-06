@@ -39,6 +39,7 @@ import estadoEDadosNoReactEn from '../../content/tracks/estado-e-dados-no-react/
 import testesNoFrontendEn from '../../content/tracks/testes-no-frontend/translations/en.json';
 import estilizacaoEDesignSystemEn from '../../content/tracks/estilizacao-e-design-system/translations/en.json';
 import buildEBundlersEn from '../../content/tracks/build-e-bundlers/translations/en.json';
+import gitEColaboracaoEn from '../../content/tracks/git-e-colaboracao/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -78,4 +79,5 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'testes-no-frontend': { en: testesNoFrontendEn },
   'estilizacao-e-design-system': { en: estilizacaoEDesignSystemEn },
   'build-e-bundlers': { en: buildEBundlersEn },
+  'git-e-colaboracao': { en: gitEColaboracaoEn },
 };
