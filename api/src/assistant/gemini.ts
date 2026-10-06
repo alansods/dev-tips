@@ -15,16 +15,18 @@ export type GeminiClient = {
 
 export const MAX_OUTPUT_TOKENS = 800;
 const TIMEOUT_MS = 30_000;
+/** Erros temporários (sobrecarga, limite de taxa, falha interna): vale tentar de novo uma vez. */
+const RETRYABLE = [429, 500, 503];
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const answerSchema = z.object({ inScope: z.boolean(), answer: z.string().min(1) });
 
 type GenerateContentResponse = { candidates?: { content?: { parts?: { text?: string }[] } }[] };
 
-export const geminiClient = (fetcher: typeof fetch = fetch): GeminiClient => ({
+export const geminiClient = (fetcher: typeof fetch = fetch, { retryDelayMs = 1_000 } = {}): GeminiClient => ({
   async ask({ system, history, question }, { apiKey, model }) {
-    const res = await fetcher(
-      `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
-      {
+    const call = () =>
+      fetcher(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         signal: AbortSignal.timeout(TIMEOUT_MS),
@@ -45,9 +47,17 @@ export const geminiClient = (fetcher: typeof fetch = fetch): GeminiClient => ({
             temperature: 0.4,
           },
         }),
-      },
-    );
-    if (!res.ok) throw new Error(`Gemini respondeu ${res.status}`);
+      });
+    let res = await call();
+    if (RETRYABLE.includes(res.status)) {
+      await sleep(retryDelayMs);
+      res = await call();
+    }
+    if (!res.ok) {
+      // A mensagem do Google vai para o log (wrangler tail), nunca para o app.
+      const detail = (await res.text().catch(() => '')).slice(0, 500);
+      throw new Error(`Gemini respondeu ${res.status}: ${detail}`);
+    }
     const data = await res.json<GenerateContentResponse>();
     const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text ?? '').join('');
     if (!text) throw new Error('Gemini sem resposta');

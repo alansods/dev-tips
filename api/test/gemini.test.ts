@@ -54,9 +54,37 @@ describe('Cliente do Gemini', () => {
     expect(await geminiClient(fetcher).ask(REQUEST, CONFIG)).toEqual({ inScope: false, answer: 'Fora.' });
   });
 
-  it('erro HTTP lança', async () => {
-    const { fetcher } = fakeFetch(() => new Response('{}', { status: 500 }));
-    await expect(geminiClient(fetcher).ask(REQUEST, CONFIG)).rejects.toThrow();
+  it('erro HTTP lança com a mensagem do Google', async () => {
+    const { fetcher } = fakeFetch(
+      () => new Response(JSON.stringify({ error: { message: 'The model is overloaded.' } }), { status: 400 }),
+    );
+    await expect(geminiClient(fetcher, { retryDelayMs: 0 }).ask(REQUEST, CONFIG)).rejects.toThrow(
+      'Gemini respondeu 400: {"error":{"message":"The model is overloaded."}}',
+    );
+  });
+
+  it('erro temporário (503) tenta de novo uma vez', async () => {
+    let n = 0;
+    const { fetcher, calls } = fakeFetch(() =>
+      n++ === 0 ? new Response('{}', { status: 503 }) : modelReply({ inScope: true, answer: 'Agora foi.' }),
+    );
+    expect(await geminiClient(fetcher, { retryDelayMs: 0 }).ask(REQUEST, CONFIG)).toEqual({
+      inScope: true,
+      answer: 'Agora foi.',
+    });
+    expect(calls).toHaveLength(2);
+  });
+
+  it('erro temporário duas vezes lança', async () => {
+    const { fetcher, calls } = fakeFetch(() => new Response('{}', { status: 503 }));
+    await expect(geminiClient(fetcher, { retryDelayMs: 0 }).ask(REQUEST, CONFIG)).rejects.toThrow('503');
+    expect(calls).toHaveLength(2);
+  });
+
+  it('erro que não é temporário não tenta de novo', async () => {
+    const { fetcher, calls } = fakeFetch(() => new Response('{}', { status: 403 }));
+    await expect(geminiClient(fetcher, { retryDelayMs: 0 }).ask(REQUEST, CONFIG)).rejects.toThrow('403');
+    expect(calls).toHaveLength(1);
   });
 
   it('JSON fora do formato lança', async () => {
