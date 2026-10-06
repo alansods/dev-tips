@@ -46,6 +46,7 @@ import buildEBundlers from '../../content/tracks/build-e-bundlers/track.json';
 import gitEColaboracao from '../../content/tracks/git-e-colaboracao/track.json';
 import pagamentosNoApp from '../../content/tracks/pagamentos-no-app/track.json';
 import performanceNoNextjs from '../../content/tracks/performance-no-nextjs/track.json';
+import modulosNativosNoExpo from '../../content/tracks/modulos-nativos-no-expo/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -92,6 +93,7 @@ const registry: unknown[] = [
   gitEColaboracao,
   pagamentosNoApp,
   performanceNoNextjs,
+  modulosNativosNoExpo,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));
