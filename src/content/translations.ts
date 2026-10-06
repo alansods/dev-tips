@@ -36,6 +36,7 @@ import githubActionsEn from '../../content/tracks/github-actions/translations/en
 import awsEssencialEn from '../../content/tracks/aws-essencial/translations/en.json';
 import deployNaAwsEn from '../../content/tracks/deploy-na-aws/translations/en.json';
 import estadoEDadosNoReactEn from '../../content/tracks/estado-e-dados-no-react/translations/en.json';
+import testesNoFrontendEn from '../../content/tracks/testes-no-frontend/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -72,4 +73,5 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'aws-essencial': { en: awsEssencialEn },
   'deploy-na-aws': { en: deployNaAwsEn },
   'estado-e-dados-no-react': { en: estadoEDadosNoReactEn },
+  'testes-no-frontend': { en: testesNoFrontendEn },
 };

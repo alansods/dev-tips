@@ -1,0 +1,332 @@
+{
+  "id": "testes-no-frontend",
+  "title": "Testes no frontend",
+  "description": "Testes unitários e de integração em React e React Native: Jest, Testing Library, mocks, API simulada com MSW e o que vale testar.",
+  "areas": [
+    "frontend",
+    "mobile"
+  ],
+  "language": "javascript",
+  "framework": "react",
+  "decks": [
+    {
+      "id": "jest",
+      "title": "Jest",
+      "description": "O runner de testes: asserções, mocks e controle do tempo.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "jest",
+          "level": "junior",
+          "term": "Jest",
+          "definition": "Framework de testes para JavaScript e TypeScript: encontra os arquivos .test.ts, roda cada test/it isolado e reporta o que falhou. Traz junto as asserções (expect), os mocks e os fake timers. Em React Native, o preset jest-expo já configura o ambiente; na web, o Vitest é uma alternativa com a mesma API, mais integrada ao Vite. Testes rodam em Node, sem navegador nem aparelho de verdade.",
+          "relatedTerms": [
+            "matchers",
+            "mocks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "matchers",
+          "level": "junior",
+          "term": "Matchers",
+          "definition": "Funções encadeadas no expect que comparam o resultado: toBe compara por identidade (números, strings), toEqual compara a estrutura de objetos e arrays, toThrow espera um erro, toHaveBeenCalledWith confere a chamada de um mock. resolves e rejects testam Promises. A Testing Library adiciona matchers de interface, como toBeOnTheScreen, toHaveTextContent e toBeDisabled. Um bom teste tem poucas asserções, todas ligadas ao comportamento que ele descreve.",
+          "relatedTerms": [
+            "jest",
+            "mocks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mocks",
+          "level": "pleno",
+          "term": "Mocks",
+          "definition": "Substitutos controlados de uma dependência. jest.fn() cria uma função falsa que registra as chamadas e pode devolver um valor (mockReturnValue, mockResolvedValue). jest.mock('modulo') troca um módulo inteiro por mocks. jest.spyOn observa ou substitui um método existente e pode ser desfeito com mockRestore. Servem para isolar o código de rede, tempo, armazenamento e módulos nativos. Mockar demais testa a implementação em vez do comportamento e deixa o teste passar com o app quebrado.",
+          "relatedTerms": [
+            "jest",
+            "fake-timers"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "fake-timers",
+          "level": "pleno",
+          "term": "Fake timers",
+          "definition": "jest.useFakeTimers() troca setTimeout, setInterval e Date por versões controladas pelo teste. Com jest.advanceTimersByTime(300) ou jest.runAllTimers(), o tempo passa na hora, sem esperar de verdade. É o jeito de testar debounce, polling, expiração de sessão e animações com atraso de forma rápida e determinística. Ao final, jest.useRealTimers() volta ao relógio normal; quando o avanço do tempo dispara atualização de estado no React, ele vai dentro de act.",
+          "relatedTerms": [
+            "mocks",
+            "jest"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "mock-de-modulo",
+          "level": "pleno",
+          "title": "Mock de módulo com jest.mock",
+          "body": "O módulo da API vira mock; o teste define a resposta e confere a chamada. jest.mocked dá os tipos do mock no TypeScript.",
+          "snippet": {
+            "file": "src/features/dashboard.test.ts",
+            "language": "ts",
+            "code": "import { getOrders } from '../api/orders';\nimport { loadDashboard } from './dashboard';\n\njest.mock('../api/orders'); // troca todas as funções do módulo por jest.fn()\n\nconst mockedGetOrders = jest.mocked(getOrders);\n\nafterEach(() => jest.clearAllMocks());\n\ntest('soma o total dos pedidos', async () => {\n  mockedGetOrders.mockResolvedValue([\n    { id: '1', total: 30 },\n    { id: '2', total: 12.5 },\n  ]);\n\n  const dashboard = await loadDashboard('loja-1');\n\n  expect(mockedGetOrders).toHaveBeenCalledWith('loja-1');\n  expect(dashboard.revenue).toBe(42.5);\n});"
+          },
+          "relatedTerms": [
+            "mocks",
+            "matchers"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "fake-timers-debounce",
+          "level": "pleno",
+          "title": "Fake timers num debounce",
+          "body": "O tempo avança na hora com advanceTimersByTime, então o teste do debounce roda em milissegundos.",
+          "snippet": {
+            "file": "src/hooks/useDebounce.test.ts",
+            "language": "ts",
+            "code": "import { act, renderHook } from '@testing-library/react-native';\nimport { useDebounce } from './useDebounce';\n\nbeforeEach(() => jest.useFakeTimers());\nafterEach(() => jest.useRealTimers());\n\ntest('só atualiza depois de 300 ms sem mudanças', async () => {\n  const { result, rerender } = await renderHook(({ value }) => useDebounce(value, 300), {\n    initialProps: { value: 'p' },\n  });\n\n  await rerender({ value: 'pizza' });\n  expect(result.current).toBe('p'); // ainda o valor antigo\n\n  await act(async () => {\n    jest.advanceTimersByTime(300); // o tempo passa na hora, sem esperar de verdade\n  });\n  expect(result.current).toBe('pizza');\n});"
+          },
+          "relatedTerms": [
+            "fake-timers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testing-library",
+      "title": "Testing Library",
+      "description": "Testar componentes pelo que a pessoa vê e faz, na web e no React Native.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "testing-library",
+          "level": "junior",
+          "term": "Testing Library",
+          "definition": "Família de bibliotecas para testar interfaces como o usuário usa: renderiza o componente, encontra elementos pelo texto, papel ou rótulo, interage e confere o que aparece. Não expõe estado interno nem instância do componente, de propósito: se o teste só depende do que é visível, uma refatoração que não muda o comportamento não quebra o teste. Há versões para React web (@testing-library/react) e para React Native (@testing-library/react-native), com a mesma filosofia e API parecida.",
+          "relatedTerms": [
+            "prioridade-das-queries",
+            "get-query-find"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "prioridade-das-queries",
+          "level": "pleno",
+          "term": "Prioridade das queries",
+          "definition": "A Testing Library recomenda buscar elementos na ordem em que uma pessoa ou um leitor de tela os encontraria: primeiro getByRole com name (botão \"Entrar\", campo \"E-mail\"), depois getByLabelText, getByPlaceholderText e getByText, e só por último getByTestId. Buscar por papel e nome acessível testa também a acessibilidade: se o teste não acha o botão pelo nome, o leitor de tela também não acha. testID fica para o que não tem texto nem papel.",
+          "relatedTerms": [
+            "testing-library",
+            "get-query-find"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "get-query-find",
+          "level": "pleno",
+          "term": "get, query e find",
+          "definition": "Três variantes de cada query. getBy devolve o elemento ou lança erro se ele não existir: é a padrão. queryBy devolve null em vez de erro: serve só para afirmar que algo não está na tela. findBy devolve uma Promise e espera o elemento aparecer (por padrão até 1 segundo): serve para conteúdo que chega depois de uma busca ou animação. Cada uma tem a versão All (getAllBy...) para listas. Usar findBy evita colocar getBy dentro de waitFor.",
+          "relatedTerms": [
+            "prioridade-das-queries",
+            "testing-library"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "user-event-e-fire-event",
+          "level": "pleno",
+          "term": "userEvent e fireEvent",
+          "definition": "fireEvent dispara um único evento (press, changeText) direto no elemento. userEvent simula a interação completa de uma pessoa: um toque passa por pressIn, press e pressOut; digitar dispara foco e um evento por caractere, e respeita elementos desabilitados. Por ser mais realista, userEvent é o recomendado. A API é assíncrona: cria-se a instância com userEvent.setup() e cada interação leva await. fireEvent fica para eventos que o userEvent não cobre, como um scroll específico.",
+          "relatedTerms": [
+            "testing-library",
+            "get-query-find"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "formulario-com-user-event",
+          "level": "pleno",
+          "title": "Formulário com userEvent",
+          "body": "Na web, o teste preenche os campos pelo nome acessível, clica no botão e confere a chamada e a mensagem de erro, sem olhar o estado interno.",
+          "snippet": {
+            "file": "src/components/LoginForm.test.tsx",
+            "language": "ts",
+            "code": "import { render, screen } from '@testing-library/react';\nimport userEvent from '@testing-library/user-event';\nimport { LoginForm } from './LoginForm';\n\ntest('envia e-mail e senha', async () => {\n  const user = userEvent.setup();\n  const onSubmit = jest.fn();\n  render(<LoginForm onSubmit={onSubmit} />);\n\n  await user.type(screen.getByRole('textbox', { name: 'E-mail' }), 'ana@exemplo.com');\n  await user.type(screen.getByLabelText('Senha'), '123456');\n  await user.click(screen.getByRole('button', { name: 'Entrar' }));\n\n  expect(onSubmit).toHaveBeenCalledWith({ email: 'ana@exemplo.com', password: '123456' });\n});\n\ntest('mostra erro com e-mail vazio', async () => {\n  const user = userEvent.setup();\n  render(<LoginForm onSubmit={jest.fn()} />);\n\n  await user.click(screen.getByRole('button', { name: 'Entrar' }));\n\n  expect(screen.getByRole('alert')).toHaveTextContent('Informe o e-mail');\n});"
+          },
+          "relatedTerms": [
+            "user-event-e-fire-event",
+            "prioridade-das-queries"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "tela-react-native-find-by",
+          "level": "pleno",
+          "title": "Tela React Native com findBy",
+          "body": "findBy espera o item chegar da API; queryBy afirma que a mensagem de carrinho vazio sumiu.",
+          "snippet": {
+            "file": "src/screens/MenuScreen.test.tsx",
+            "language": "ts",
+            "code": "import { render, screen, userEvent } from '@testing-library/react-native';\nimport { MenuScreen } from './MenuScreen';\n\ntest('lista os pratos e adiciona ao carrinho', async () => {\n  const user = userEvent.setup();\n  await render(<MenuScreen />); // await funciona com render síncrono (v13) e assíncrono (v14)\n\n  // findBy espera o item aparecer depois da busca na API\n  const pizza = await screen.findByText('Pizza margherita');\n  expect(pizza).toBeOnTheScreen();\n\n  await user.press(screen.getByRole('button', { name: 'Adicionar Pizza margherita' }));\n\n  expect(screen.getByText('1 item no carrinho')).toBeOnTheScreen();\n  expect(screen.queryByText('Carrinho vazio')).not.toBeOnTheScreen();\n});"
+          },
+          "relatedTerms": [
+            "get-query-find",
+            "testing-library"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "testes-de-integracao",
+      "title": "Testes de integração",
+      "description": "Testar várias peças juntas, com a API simulada na rede.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "piramide-e-trofeu",
+          "level": "pleno",
+          "term": "Pirâmide e troféu de testes",
+          "definition": "A pirâmide propõe muitos testes unitários, menos de integração e poucos ponta a ponta (E2E), porque os de cima são mais lentos e frágeis. No frontend, o \"troféu de testes\" coloca a maior parte nos testes de integração: renderizar uma tela inteira com a API simulada dá muita confiança por custo baixo. Embaixo ficam análise estática (TypeScript, ESLint) e testes unitários de lógica pura; em cima, poucos E2E (Playwright na web, Detox ou Maestro no mobile) para os fluxos críticos.",
+          "relatedTerms": [
+            "o-que-testar",
+            "mock-de-api-com-msw"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mock-de-api-com-msw",
+          "level": "pleno",
+          "term": "Mock de API com MSW",
+          "definition": "MSW (Mock Service Worker) intercepta as requisições HTTP na camada de rede e devolve respostas definidas em handlers (http.get('/menu', () => HttpResponse.json(...))). O app roda o código real de fetch, Axios e React Query; só a resposta é falsa. Nos testes em Node, usa-se setupServer; cada teste pode trocar a resposta com server.use (para simular erro 500, lista vazia, atraso) e resetHandlers desfaz a troca. Os mesmos handlers servem para desenvolvimento e Storybook.",
+          "relatedTerms": [
+            "piramide-e-trofeu",
+            "render-hook"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "render-hook",
+          "level": "pleno",
+          "term": "renderHook",
+          "definition": "Função da Testing Library para testar um hook personalizado sem criar um componente de teste. Devolve result.current com o valor atual do hook e rerender para mudar as props. Atualizações de estado disparadas por funções do hook vão dentro de act. Hooks que dependem de Provider (React Query, Context, navegação) recebem um wrapper com esse Provider. Hooks simples costumam ser cobertos pelo teste do componente que os usa; renderHook compensa para hooks reutilizados e com lógica própria.",
+          "relatedTerms": [
+            "mock-de-api-com-msw",
+            "o-que-testar"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "o-que-testar",
+          "level": "senior",
+          "term": "O que testar",
+          "definition": "Teste o comportamento que importa para quem usa e o que é caro quebrar: fluxos principais (login, pedido, pagamento), regras de negócio, estados de carregamento, vazio e erro, e bugs que já aconteceram. Não teste detalhes de implementação (nome de estado, quantas vezes renderizou), bibliotecas de terceiros nem estilos. Cobertura alta não garante qualidade: 100% de linhas executadas sem asserções úteis não protege nada. Use a cobertura para achar áreas importantes sem teste, não como meta.",
+          "relatedTerms": [
+            "piramide-e-trofeu",
+            "render-hook"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "handler-msw-erro",
+          "level": "senior",
+          "title": "Handler MSW e erro da API",
+          "body": "Um servidor MSW com a resposta padrão; o teste troca a resposta por um 500 com server.use e confere a mensagem de erro. onUnhandledRequest: 'error' falha o teste se alguma chamada não tiver handler.",
+          "snippet": {
+            "file": "src/screens/MenuScreen.test.tsx",
+            "language": "ts",
+            "code": "import { http, HttpResponse } from 'msw';\nimport { setupServer } from 'msw/node';\n\nconst server = setupServer(\n  http.get('https://api.example.com/menu', () =>\n    HttpResponse.json([{ id: 'p1', name: 'Pizza margherita', price: 42 }]),\n  ),\n);\n\nbeforeAll(() => server.listen({ onUnhandledRequest: 'error' }));\nafterEach(() => server.resetHandlers()); // desfaz os server.use de cada teste\nafterAll(() => server.close());\n\ntest('mostra mensagem quando a API falha', async () => {\n  server.use(\n    http.get('https://api.example.com/menu', () => new HttpResponse(null, { status: 500 })),\n  );\n  await render(<MenuScreen />);\n\n  expect(await screen.findByText('Não foi possível carregar o cardápio')).toBeOnTheScreen();\n});"
+          },
+          "relatedTerms": [
+            "mock-de-api-com-msw"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "hook-react-query-render-hook",
+          "level": "senior",
+          "title": "Hook com React Query no renderHook",
+          "body": "Um QueryClient novo por teste e sem retry deixa o teste rápido e isolado. waitFor espera a query terminar.",
+          "snippet": {
+            "file": "src/api/useOrders.test.tsx",
+            "language": "ts",
+            "code": "import { QueryClient, QueryClientProvider } from '@tanstack/react-query';\nimport { renderHook, waitFor } from '@testing-library/react-native';\nimport type { ReactNode } from 'react';\nimport { useOrders } from './useOrders';\n\nfunction createWrapper() {\n  // Um client novo por teste: o cache de um teste não vaza para o outro\n  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });\n  return ({ children }: { children: ReactNode }) => (\n    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>\n  );\n}\n\ntest('carrega os pedidos', async () => {\n  const { result } = await renderHook(() => useOrders(), { wrapper: createWrapper() });\n\n  await waitFor(() => expect(result.current.isSuccess).toBe(true));\n  expect(result.current.data).toHaveLength(2); // resposta vinda do handler do MSW\n});"
+          },
+          "relatedTerms": [
+            "render-hook",
+            "mock-de-api-com-msw"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas sobre testes de frontend que aparecem em entrevistas.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "unitario-integracao-ou-e2e",
+          "level": "junior",
+          "question": "Qual a diferença entre teste unitário, de integração e ponta a ponta?",
+          "answer": "O unitário testa uma peça isolada, como uma função ou um hook, com as dependências simuladas: é rápido e aponta o erro com precisão. O de integração testa várias peças juntas, como uma tela inteira com navegação, estado e API simulada: pega erros de encaixe. O ponta a ponta (E2E) roda o app de verdade num navegador ou aparelho, contra um backend real ou de teste: dá mais confiança, mas é lento e mais instável. No frontend, concentro esforço nos de integração.",
+          "relatedTerms": [
+            "piramide-e-trofeu"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "get-by-role-ou-test-id",
+          "level": "pleno",
+          "question": "Por que preferir getByRole a testID?",
+          "answer": "Porque getByRole com o nome busca o elemento como a pessoa e o leitor de tela o percebem: um botão chamado \"Entrar\". Se alguém trocar o componente por outro com o mesmo papel e texto, o teste continua passando; se o botão perder o rótulo acessível, o teste falha, o que é bom. testID é um detalhe de implementação, invisível para quem usa, e não garante que o elemento é acessível. Uso testID só quando não há texto nem papel, como num gráfico.",
+          "relatedTerms": [
+            "prioridade-das-queries",
+            "testing-library"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testar-codigo-assincrono",
+          "level": "pleno",
+          "question": "Como testar código assíncrono?",
+          "answer": "Com async/await no teste: espero a Promise da função ou uso findBy, que espera o elemento aparecer na tela, e waitFor para asserções que levam um tempo para valer (sem efeitos colaterais dentro dele). Interações com userEvent também levam await. Para tempo (debounce, polling), uso fake timers e avanço o relógio. Erros comuns: esquecer o await e o teste terminar antes da asserção, ou usar sleep com tempo fixo, que deixa o teste lento e instável.",
+          "relatedTerms": [
+            "get-query-find",
+            "fake-timers"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "snapshot-vale-a-pena",
+          "level": "pleno",
+          "question": "Teste de snapshot vale a pena?",
+          "answer": "Em geral, pouco. O snapshot guarda a saída renderizada e falha em qualquer mudança, então quebra com toda alteração de layout, e a equipe acaba atualizando com -u sem ler. Ele não diz qual comportamento importa. Pode ser útil em saídas pequenas e estáveis, como um formatador ou um objeto de configuração, de preferência inline (toMatchInlineSnapshot). Para componentes, prefiro asserções explícitas sobre o que a pessoa vê.",
+          "relatedTerms": [
+            "matchers",
+            "o-que-testar"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mockar-modulo-ou-rede",
+          "level": "senior",
+          "question": "Você mocka o módulo da API ou a rede?",
+          "answer": "Prefiro a rede, com MSW. Mockando o módulo (jest.mock('../api')), o teste pula o cliente HTTP, os interceptors, o parse e a integração com o React Query, e passa mesmo se essa camada quebrar. Simulando a rede, todo o código do app roda e só a resposta é falsa; os mesmos handlers servem para desenvolvimento. Mocko módulo quando a dependência não é HTTP (módulo nativo, analytics, armazenamento) ou num teste unitário de uma função que só repassa dados.",
+          "relatedTerms": [
+            "mock-de-api-com-msw",
+            "mocks"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "testes-instaveis-no-frontend",
+          "level": "senior",
+          "question": "Como lidar com testes instáveis (flaky) no frontend?",
+          "answer": "Primeiro reproduzo: rodo o teste várias vezes e isolado, para ver se depende de ordem ou tempo. As causas mais comuns são esperar com tempo fixo em vez de findBy/waitFor, estado vazando entre testes (cache do QueryClient, store global, mocks e handlers não resetados), dependência de data e fuso e requisições reais. Corrijo a causa: um QueryClient por teste, reset de mocks e handlers no afterEach, fake timers e datas fixas. Teste instável não fica ignorado para sempre: ou conserto ou removo.",
+          "relatedTerms": [
+            "get-query-find",
+            "render-hook"
+          ]
+        }
+      ]
+    }
+  ]
+}

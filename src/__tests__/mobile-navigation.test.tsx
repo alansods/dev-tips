@@ -46,7 +46,7 @@ describe('Requirement: Trilha de React Native no catálogo', () => {
     expect(headers()).toContain('Linguagens');
     for (const absent of ['Trilhas', 'Comparativos']) expect(headers()).not.toContain(absent);
     expect(buttons(['JavaScript'])).toEqual(['JavaScript']);
-    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('2 trilhas')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^JavaScript,/ })).getByText('3 trilhas')).toBeOnTheScreen();
   });
 
   it('JavaScript no Mobile', async () => {
@@ -54,7 +54,7 @@ describe('Requirement: Trilha de React Native no catálogo', () => {
     expect(headers()).toContain('Frameworks');
     expect(headers()).not.toContain('Linguagem pura');
     expect(buttons(['React Native', 'React', 'Angular'])).toEqual(['React', 'React Native']);
-    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('1 trilha')).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: /^React,/ })).getByText('2 trilhas')).toBeOnTheScreen();
     expect(within(screen.getByRole('button', { name: /^React Native,/ })).getByText('1 trilha')).toBeOnTheScreen();
   });
 
