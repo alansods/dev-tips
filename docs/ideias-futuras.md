@@ -53,7 +53,47 @@ A pessoa escreve só a ideia, em poucas palavras, e a IA completa o resto no for
 - **Direitos e privacidade:** a política de privacidade precisa mencionar que o texto digitado é enviado a um provedor de IA.
 - **Idioma:** gerar no idioma do app (PT-BR ou inglês) e, opcionalmente, nos dois.
 
-## 2. Outras ideias já levantadas
+## 2. Trilha personalizada para uma vaga
+
+### O problema
+
+Quem se prepara para uma vaga não sabe quais conceitos dos requisitos ainda não domina, nem por onde começar. A descrição da vaga lista ferramentas e práticas (por exemplo React, Expo, Zustand, Jest, CI/CD), mas o app só oferece as trilhas do catálogo, organizadas por assunto e não pela vaga.
+
+### A ideia
+
+A pessoa cola a descrição e os requisitos da vaga, e a IA monta uma trilha de estudo personalizada para ela, com cards para aprender e revisar os conceitos que a vaga pede.
+
+**Fluxo:**
+
+1. Botão "Preparar para uma vaga", na aba Trilhas.
+2. A pessoa cola o texto da vaga (descrição, responsabilidades e requisitos).
+3. A IA extrai os requisitos e cruza com o catálogo:
+   - o que já existe vira atalho para os decks oficiais (por exemplo, "Testes no frontend › Testing Library");
+   - o que falta vira uma trilha privada, com um deck por requisito e um deck de perguntas de entrevista no nível da vaga (júnior, pleno ou sênior).
+4. A pessoa revisa, tira ou adiciona requisitos e salva. Nada é salvo sem passar por ela.
+5. Os cards entram na repetição espaçada como qualquer outro.
+
+**Extra:** um painel de prontidão para a vaga, com a porcentagem de cada requisito já estudado ou dominado, e a data da entrevista para o app sugerir quanto revisar por dia.
+
+### Onde aparece
+
+- Na seção "Criados por você" (ideia 1), com o nome da vaga e da empresa.
+- Privada por padrão. Depois da entrevista, a pessoa pode arquivar a trilha e manter os cards que quiser.
+
+### Do que depende
+
+- **Ideia 1:** a mesma base de trilhas e cards do usuário gerados por IA na API e validados pelo schema da capability `content-model`.
+- **Login e sincronização:** a trilha fica na conta.
+- **Plano Pro:** cada geração custa uma chamada ao modelo de IA; a funcionalidade pode ficar no plano pago ou ter um limite grátis por mês.
+
+### Perguntas em aberto
+
+- **Privacidade:** o texto da vaga é enviado a um provedor de IA; a política de privacidade precisa dizer isso.
+- **Qualidade:** a IA pode interpretar errado um requisito ou gerar um card com erro técnico. Marcar os cards como "gerado por IA" e deixar a pessoa corrigir.
+- **Custos:** limite de gerações por vaga e por mês, e reaproveitar os decks oficiais sempre que existirem, para gerar menos.
+- **Vaga desatualizada:** o que fazer com a trilha depois da entrevista (arquivar, manter só os cards errados, apagar).
+
+## 3. Outras ideias já levantadas
 
 - **Login com Apple:** a App Store exige "Sign in with Apple" em apps com login social. Precisa da conta paga de desenvolvedor Apple; entra numa change própria antes de publicar no iOS. A tabela `users` já tem a coluna `provider` pensando nisso.
 
