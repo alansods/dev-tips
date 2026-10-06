@@ -224,7 +224,8 @@ describe('Requirement: Conta no app', () => {
     await press('Cancelar');
     expect(screen.queryByRole('header', { name: 'Apagar sua conta?' })).toBeNull();
     expect(useAccountStore.getState().user).toEqual(ana);
-    expect(fetchMock).not.toHaveBeenCalled();
+    const deletes = fetchMock.mock.calls.filter(([, init]) => (init as RequestInit | undefined)?.method === 'DELETE');
+    expect(deletes).toHaveLength(0);
   });
 
   it('apagar sem conexão mantém a conta', async () => {

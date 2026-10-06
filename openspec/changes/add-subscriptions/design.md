@@ -67,13 +67,13 @@ Separar verificar de registrar garante que "só conta se respondeu". Nesta chang
 ### 7. App: `src/subscriptions/`
 - `store.ts`: Zustand com o último `GET /me/subscription`, persistido no AsyncStorage para uso offline.
 - `purchases.ts`: um adaptador fino sobre `react-native-purchases`, com `configure`, `logIn`, `logOut`, `getMonthlyPackage`, `purchase`, `restore` e `manageSubscriptions`. Os testes mockam este módulo, e nenhum outro arquivo importa a SDK.
-- `useSubscription.ts`: hook com `isPro`, `plan` e `refresh()`. É ele que dispara as atualizações previstas na spec (abrir o app, login, voltar ao primeiro plano).
+- `lifecycle.ts`: `startSubscriptionLifecycle()` (montado no layout raiz) reage ao login, ao logout e à volta ao primeiro plano: liga as compras ao usuário, consulta o plano ou volta ao grátis. `useIsPro()` fica em `store.ts`.
 - **Paywall:** é a rota `src/app/paywall.tsx`, em tela cheia (`presentation: 'fullScreenModal'`). O preço vem do `product.priceString` da loja, que já vem formatado na moeda local.
 - **"Gerenciar assinatura":** usa `Purchases.showManageSubscriptions()`, que abre a tela de assinaturas da loja.
 - **Plataformas:** `purchases.ts` só configura a SDK no Android. Na web e no iOS, a UI de assinatura não aparece.
 
 ### 8. Chaves e configuração
-- **No app**, a chave pública do RevenueCat para Android (`goog_…`) ficam em `app.config.ts` como `extra`. São chaves públicas por design.
+- **No app**, a chave pública do RevenueCat para Android (`goog_…`) fica em `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` (`.env` local ou perfil do EAS), no mesmo padrão das outras configurações públicas. É pública por design; sem ela, a venda fica desligada.
 - **Na API**, `REVENUECAT_WEBHOOK_AUTH` e `REVENUECAT_SECRET_KEY` são segredos (`wrangler secret put`). Nunca vão para o repositório.
 
 ## Risks / Trade-offs

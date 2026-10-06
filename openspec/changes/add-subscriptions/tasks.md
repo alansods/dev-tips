@@ -22,23 +22,23 @@
 
 ## 4. App: base de assinaturas
 
-- [ ] 4.1 Instalar `react-native-purchases` com `npx expo install`; adicionar as chaves públicas em `app.config.ts`; criar o mock em `jest.setup.ts`
-- [ ] 4.2 Teste falhando: cenários de "Plano no app" (consulta após login, uso do plano guardado sem conexão, sair volta ao plano grátis e chama `logOut`)
-- [ ] 4.3 Implementação: `src/subscriptions/purchases.ts`, `store.ts`, `useSubscription.ts` e a ligação com login e logout em `src/auth/actions.ts`; testes passando
+- [x] 4.1 Instalar `react-native-purchases` com `npx expo install`; chave pública em `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` (`.env.example`); criar o mock em `jest.setup.ts`
+- [x] 4.2 Teste falhando: cenários de "Plano no app" (consulta após login, uso do plano guardado sem conexão, sair volta ao plano grátis e chama `logOut`)
+- [x] 4.3 Implementação: `src/subscriptions/purchases.ts`, `store.ts` e `lifecycle.ts` (reage ao login/logout pelo store da conta, montado no layout raiz); testes passando
 
 ## 5. App: telas
 
-- [ ] 5.1 Teste falhando: cenários de "Linha Dev Tips Pro em Ajustes"
-- [ ] 5.2 Implementação: linha na seção Conta de Ajustes, com textos em PT-BR e EN; testes passando
-- [ ] 5.3 Teste falhando: cenários de "Paywall" (conteúdo, preço carregando, fechar)
-- [ ] 5.4 Implementação: `src/app/paywall.tsx` seguindo a tela 8 do design; testes passando
-- [ ] 5.5 Teste falhando: cenários de "Assinar pelo app" e "Restaurar compras"
-- [ ] 5.6 Implementação: fluxo de compra e de restauração com sincronização e mensagens; testes passando
-- [ ] 5.7 Teste falhando: cenários novos de "Conta no app" (plano grátis, assinante, renovação desligada, admin) e o texto novo da confirmação de apagar a conta
-- [ ] 5.8 Implementação: bloco "Plano" na tela Conta seguindo a tela 10 do design; testes passando
+- [x] 5.1 Teste falhando: cenários de "Linha Dev Tips Pro em Ajustes"
+- [x] 5.2 Implementação: linha na seção Conta de Ajustes, com textos em PT-BR e EN; testes passando
+- [x] 5.3 Teste falhando: cenários de "Paywall" (conteúdo, preço carregando, fechar)
+- [x] 5.4 Implementação: `src/app/paywall.tsx` seguindo a tela 8 do design; testes passando
+- [x] 5.5 Teste falhando: cenários de "Assinar pelo app" e "Restaurar compras"
+- [x] 5.6 Implementação: fluxo de compra e de restauração com sincronização e mensagens; testes passando
+- [x] 5.7 Teste falhando: cenários novos de "Conta no app" (plano grátis, assinante, renovação desligada, admin) e o texto novo da confirmação de apagar a conta
+- [x] 5.8 Implementação: bloco "Plano" na tela Conta seguindo a tela 10 do design; testes passando
 
 ## 6. Fechamento
 
-- [ ] 6.1 Documentar em `api/README` (ou `docs/backend/`) a configuração do RevenueCat, do Google Play Console, dos segredos e do webhook
-- [ ] 6.2 Rodar `openspec validate --strict`
-- [ ] 6.3 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit` no app, e `npm test` e `npm run typecheck` em `api/`
+- [x] 6.1 Documentar em `docs/backend/assinaturas.md` a configuração do RevenueCat, do Google Play Console, dos segredos e do webhook
+- [x] 6.2 Rodar `openspec validate --strict`
+- [x] 6.3 Rodar `npm test`, `npm run lint` e `npx tsc --noEmit` no app, e `npm test` e `npm run typecheck` em `api/`

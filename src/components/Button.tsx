@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
@@ -12,10 +12,13 @@ type Props = {
   variant?: Variant;
   /** Nome para leitor de tela, quando o texto visível não basta (ex.: "Estudar Glossário"). */
   accessibilityLabel?: string;
+  disabled?: boolean;
+  /** Mostra um indicador de carregamento ao lado do texto. */
+  loading?: boolean;
 };
 
 /** Botão de texto com altura mínima de 48px. */
-export function Button({ title, onPress, variant = 'primary', accessibilityLabel }: Props) {
+export function Button({ title, onPress, variant = 'primary', accessibilityLabel, disabled = false, loading }: Props) {
   const { colors } = useTheme();
   const look = {
     primary: { bg: colors.accent, border: colors.accent, text: colors.onAccent },
@@ -26,15 +29,24 @@ export function Button({ title, onPress, variant = 'primary', accessibilityLabel
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? title}
+      accessibilityState={{ disabled, busy: loading }}
+      disabled={disabled}
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        { backgroundColor: look.bg, borderColor: look.border, opacity: pressed ? 0.8 : 1 },
+        {
+          backgroundColor: look.bg,
+          borderColor: look.border,
+          opacity: disabled && !loading ? 0.5 : pressed ? 0.8 : 1,
+        },
       ]}
     >
-      <AppText font="semibold" size={16} style={{ color: look.text }}>
-        {title}
-      </AppText>
+      <View style={styles.inner}>
+        {loading ? <ActivityIndicator color={look.text} /> : null}
+        <AppText font="semibold" size={16} style={{ color: look.text }}>
+          {title}
+        </AppText>
+      </View>
     </Pressable>
   );
 }
@@ -49,4 +61,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  inner: { flexDirection: 'row', alignItems: 'center', gap: 8 },
 });

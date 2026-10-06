@@ -15,6 +15,7 @@ import { useReminderSync } from '../reminders/useReminderSync';
 import { FirstSyncToast } from '../sync/FirstSyncToast';
 import { useSync } from '../sync/useSync';
 import { useReminderTapNavigation } from '../reminders/useReminderTap';
+import { useSubscriptionLifecycle } from '../subscriptions/lifecycle';
 import { FontsReadyContext } from '../theme/fonts';
 import { ThemeProvider, useTheme } from '../theme/ThemeProvider';
 
@@ -73,11 +74,13 @@ function RootStack() {
   useReminderSync();
   useReminderTapNavigation();
   useSync();
+  useSubscriptionLifecycle();
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="paywall" options={{ presentation: 'fullScreenModal' }} />
       </Stack>
       <FirstSyncToast />
     </>
