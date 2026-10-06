@@ -94,6 +94,8 @@ export const ptBR = {
     restored: 'Assinatura restaurada.',
     restoreNone: 'Nenhuma assinatura ativa encontrada.',
     restoreError: 'Não foi possível restaurar agora. Tente de novo.',
+    iosPrice: 'R$ 14,90',
+    iosUnavailable: 'A assinatura pelo iPhone ainda não está disponível. Em breve!',
     planSection: 'Plano',
     freePlan: 'Plano grátis',
     learnPro: 'Conhecer o Pro',

@@ -3,7 +3,7 @@
 
 import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { deleteAccount, signOut } from '../auth/actions';
@@ -126,11 +126,9 @@ export default function AccountScreen() {
               <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
                 {t.account.deleteKeep}
               </AppText>
-              {Platform.OS === 'android' ? (
-                <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
-                  {t.account.deleteSubscription}
-                </AppText>
-              ) : null}
+              <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
+                {t.account.deleteSubscription}
+              </AppText>
               {message ? (
                 <View accessibilityRole="alert" style={[styles.alert, { backgroundColor: colors.warnSoft }]}>
                   <AppText size={14}>{message}</AppText>

@@ -1,5 +1,6 @@
 // Linha "Dev Tips Pro" da seção Conta: no plano grátis abre o paywall; para
-// quem é Pro, abre a tela Conta. Só no Android, onde o Pro é vendido.
+// quem é Pro, abre a tela Conta. No Android e no iOS (no iOS a compra ainda
+// não existe: o paywall avisa).
 
 import { router } from 'expo-router';
 import { Platform, Pressable, StyleSheet, View } from 'react-native';
@@ -17,7 +18,7 @@ export function ProRow() {
   const t = useT();
   const pro = useIsPro();
 
-  if (Platform.OS !== 'android') return null;
+  if (Platform.OS === 'web') return null;
 
   const detail = pro ? t.pro.rowActive : t.pro.rowFree;
   return (

@@ -1,9 +1,10 @@
 // Paywall do Dev Tips Pro (tela 8 do design). Assinar e restaurar exigem
-// conta: sem sessão, abre o login, que volta para cá ao terminar.
+// conta: sem sessão, abre o login, que volta para cá ao terminar. No iOS a
+// venda ainda não existe: preço fixo e um aviso no lugar da compra.
 
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAccountStore } from '../auth/store';
@@ -33,7 +34,9 @@ export default function PaywallScreen() {
   const { colors } = useTheme();
   const t = useT();
   const signedIn = useAccountStore((s) => s.user !== null);
-  const [price, setPrice] = useState<string | null>(null);
+  const ios = Platform.OS === 'ios';
+  const [storePrice, setPrice] = useState<string | null>(null);
+  const price = ios ? t.pro.iosPrice : storePrice;
   const [busy, setBusy] = useState<'subscribe' | 'restore' | null>(null);
   const [message, setMessage] = useState<Message | null>(null);
   const closing = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -41,14 +44,16 @@ export default function PaywallScreen() {
 
   useEffect(() => {
     let alive = true;
-    void monthlyPrice().then((p) => {
-      if (alive) setPrice(p);
-    });
+    if (!ios) {
+      void monthlyPrice().then((p) => {
+        if (alive) setPrice(p);
+      });
+    }
     return () => {
       alive = false;
       if (closing.current) clearTimeout(closing.current);
     };
-  }, []);
+  }, [ios]);
 
   const succeed = (text: string) => {
     setMessage({ text, tone: 'ok' });
@@ -56,6 +61,7 @@ export default function PaywallScreen() {
   };
 
   const onSubscribe = async () => {
+    if (ios) return setMessage({ text: t.pro.iosUnavailable, tone: 'error' });
     if (!signedIn) return router.push('/login');
     setMessage(null);
     setBusy('subscribe');
@@ -67,6 +73,7 @@ export default function PaywallScreen() {
   };
 
   const onRestore = async () => {
+    if (ios) return setMessage({ text: t.pro.iosUnavailable, tone: 'error' });
     if (!signedIn) return router.push('/login');
     setMessage(null);
     setBusy('restore');

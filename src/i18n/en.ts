@@ -97,6 +97,8 @@ export const en: Messages = {
     restored: 'Subscription restored.',
     restoreNone: 'No active subscription found.',
     restoreError: 'Could not restore right now. Try again.',
+    iosPrice: 'R$ 14,90',
+    iosUnavailable: 'Subscribing on iPhone is not available yet. Coming soon!',
     planSection: 'Plan',
     freePlan: 'Free plan',
     learnPro: 'See Pro',

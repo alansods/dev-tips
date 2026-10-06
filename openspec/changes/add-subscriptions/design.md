@@ -70,7 +70,7 @@ Separar verificar de registrar garante que "só conta se respondeu". Nesta chang
 - `lifecycle.ts`: `startSubscriptionLifecycle()` (montado no layout raiz) reage ao login, ao logout e à volta ao primeiro plano: liga as compras ao usuário, consulta o plano ou volta ao grátis. `useIsPro()` fica em `store.ts`.
 - **Paywall:** é a rota `src/app/paywall.tsx`, em tela cheia (`presentation: 'fullScreenModal'`). O preço vem do `product.priceString` da loja, que já vem formatado na moeda local.
 - **"Gerenciar assinatura":** usa `Purchases.showManageSubscriptions()`, que abre a tela de assinaturas da loja.
-- **Plataformas:** `purchases.ts` só configura a SDK no Android. Na web e no iOS, a UI de assinatura não aparece.
+- **Plataformas:** `purchases.ts` só configura a SDK no Android (`billingAvailable()`). No iOS a UI do Pro aparece, com preço fixo no paywall; "Assinar" e "Restaurar" mostram o aviso de indisponível. Na web, a UI não aparece.
 
 ### 8. Chaves e configuração
 - **No app**, a chave pública do RevenueCat para Android (`goog_…`) fica em `EXPO_PUBLIC_REVENUECAT_ANDROID_KEY` (`.env` local ou perfil do EAS), no mesmo padrão das outras configurações públicas. É pública por design; sem ela, a venda fica desligada.

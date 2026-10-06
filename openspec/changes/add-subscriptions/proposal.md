@@ -29,7 +29,7 @@ O próximo recurso do Dev Tips, o chat "Perguntar" no card (change `add-card-ass
 
 - O chat "Perguntar" em si: botão no card, selo PRO, sheet do chat e tela de cota atingida. Ficam na change `add-card-assistant`, que consome a cota criada aqui.
 - Plano anual, créditos avulsos, teste grátis e amostra grátis.
-- iOS e App Store: o app sai só para Android por enquanto. O lançamento no iPhone será uma change própria (venda pela App Store via RevenueCat e Login com Apple).
+- Venda no iOS pela App Store: por enquanto, o iPhone mostra o Pro (linha, paywall e bloco Plano), mas ao tentar assinar aparece o aviso de que ainda não está disponível. A venda pela App Store (via RevenueCat) e o Login com Apple serão uma change própria.
 - Assinatura na versão web do app (a web não tem a seção Conta).
 - Telas de administração e relatórios de receita (o painel do RevenueCat cobre isso).
 

@@ -125,7 +125,7 @@ Na seção "Conta" de Ajustes, logo abaixo do convite para entrar ou da linha do
 - no plano grátis, com o texto "Tire dúvidas sobre cada card"; tocar nela abre o paywall;
 - para usuários Pro, com o texto "Ativo"; tocar nela abre a tela "Conta".
 
-A linha MUST NOT aparecer na web (onde a seção "Conta" não existe) nem no iOS (onde o Pro ainda não é vendido).
+A linha SHALL aparecer no Android e no iOS, e MUST NOT aparecer na web (onde a seção "Conta" não existe).
 
 #### Scenario: Usuário grátis
 - **WHEN** um usuário sem assinatura toca em "Dev Tips Pro" em Ajustes
@@ -136,8 +136,8 @@ A linha MUST NOT aparecer na web (onde a seção "Conta" não existe) nem no iOS
 - **THEN** a linha "Dev Tips Pro" mostra "Ativo", e tocar nela abre a tela "Conta"
 
 #### Scenario: iOS
-- **WHEN** o app roda no iPhone e o usuário abre Ajustes
-- **THEN** a linha "Dev Tips Pro" não aparece
+- **WHEN** o app roda no iPhone e um usuário sem assinatura abre Ajustes
+- **THEN** a linha "Dev Tips Pro" aparece com "Tire dúvidas sobre cada card"
 
 ### Requirement: Paywall
 O paywall SHALL abrir em tela cheia, com botão de fechar, e mostrar:
@@ -153,6 +153,8 @@ O paywall SHALL abrir em tela cheia, com botão de fechar, e mostrar:
 
 Enquanto o preço da loja não carrega, o botão "Assinar o Pro" SHALL ficar desabilitado. "Termos" e "Privacidade" SHALL abrir os mesmos endereços da seção Sobre.
 
+No iOS, onde a venda ainda não existe, o paywall SHALL mostrar o mesmo conteúdo com o preço fixo "R$ 14,90/mês" e o botão "Assinar o Pro" habilitado. Tocar em "Assinar o Pro" ou em "Restaurar compras" SHALL mostrar o aviso "A assinatura pelo iPhone ainda não está disponível. Em breve!", sem abrir login nem loja.
+
 #### Scenario: Conteúdo
 - **WHEN** o paywall abre e a loja devolve o preço "R$ 14,90"
 - **THEN** a tela mostra "Pro mensal", "100 perguntas por mês", "R$ 14,90/mês" e o botão "Assinar o Pro" habilitado
@@ -160,6 +162,18 @@ Enquanto o preço da loja não carrega, o botão "Assinar o Pro" SHALL ficar des
 #### Scenario: Preço carregando
 - **WHEN** o paywall abre e a loja ainda não respondeu
 - **THEN** o botão "Assinar o Pro" fica desabilitado
+
+#### Scenario: Paywall no iOS
+- **WHEN** o paywall abre no iPhone
+- **THEN** a tela mostra "R$ 14,90/mês" e o botão "Assinar o Pro" habilitado
+
+#### Scenario: Assinar no iOS
+- **WHEN** o usuário toca em "Assinar o Pro" no iPhone
+- **THEN** aparece "A assinatura pelo iPhone ainda não está disponível. Em breve!" e nenhuma compra é iniciada
+
+#### Scenario: Restaurar no iOS
+- **WHEN** o usuário toca em "Restaurar compras" no paywall do iPhone
+- **THEN** aparece "A assinatura pelo iPhone ainda não está disponível. Em breve!"
 
 #### Scenario: Fechar
 - **WHEN** o usuário toca em fechar

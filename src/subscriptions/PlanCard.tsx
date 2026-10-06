@@ -1,5 +1,6 @@
 // Bloco "Plano" da tela Conta (tela 10 do design): plano grátis, assinante
-// ou admin. Só no Android, onde o Pro é vendido.
+// ou admin. No Android e no iOS; no iOS, sem "Gerenciar" e "Restaurar",
+// porque a assinatura é do Google Play.
 
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -25,7 +26,8 @@ export function PlanCard() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  if (Platform.OS !== 'android') return null;
+  if (Platform.OS === 'web') return null;
+  const storeActions = Platform.OS === 'android';
 
   const onRestore = async () => {
     setBusy(true);
@@ -100,20 +102,22 @@ export function PlanCard() {
             <AppText size={14}>{message}</AppText>
           </View>
         ) : null}
-        <View style={{ gap: spacing.sm }}>
-          <View style={{ flexDirection: 'row' }}>
-            <Button title={t.pro.manage} variant="secondary" onPress={() => void manageSubscriptions()} />
+        {storeActions ? (
+          <View style={{ gap: spacing.sm }}>
+            <View style={{ flexDirection: 'row' }}>
+              <Button title={t.pro.manage} variant="secondary" onPress={() => void manageSubscriptions()} />
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <Button
+                title={t.pro.restore}
+                variant="secondary"
+                disabled={busy}
+                loading={busy}
+                onPress={() => void onRestore()}
+              />
+            </View>
           </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Button
-              title={t.pro.restore}
-              variant="secondary"
-              disabled={busy}
-              loading={busy}
-              onPress={() => void onRestore()}
-            />
-          </View>
-        </View>
+        ) : null}
       </View>
     );
   }

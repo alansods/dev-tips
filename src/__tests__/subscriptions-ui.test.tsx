@@ -121,7 +121,9 @@ describe('Requirement: Linha Dev Tips Pro em Ajustes', () => {
   it('iOS', async () => {
     setOS('ios');
     await open('/settings');
-    expect(screen.queryByText('Dev Tips Pro')).toBeNull();
+    expect(button(/Dev Tips Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
+    await press(/Dev Tips Pro/);
+    expect(screen).toHavePathname('/paywall');
   });
 });
 
@@ -147,6 +149,32 @@ describe('Requirement: Paywall', () => {
     jest.mocked(monthlyPrice).mockReturnValue(new Promise(() => {}));
     await open('/paywall');
     expect(button('Assinar o Pro')).toBeDisabled();
+  });
+
+  it('Paywall no iOS', async () => {
+    setOS('ios');
+    jest.mocked(monthlyPrice).mockResolvedValue(null);
+    await open('/paywall');
+    expect(screen.getByText('R$ 14,90/mês')).toBeOnTheScreen();
+    expect(button('Assinar o Pro')).toBeEnabled();
+  });
+
+  it('Assinar no iOS', async () => {
+    setOS('ios');
+    await open('/paywall');
+    await press('Assinar o Pro');
+    expect(screen.getByText('A assinatura pelo iPhone ainda não está disponível. Em breve!')).toBeOnTheScreen();
+    expect(screen).toHavePathname('/paywall');
+    expect(purchaseMonthly).not.toHaveBeenCalled();
+  });
+
+  it('Restaurar no iOS', async () => {
+    setOS('ios');
+    await signedIn(FREE);
+    await open('/paywall');
+    await press('Restaurar compras');
+    expect(screen.getByText('A assinatura pelo iPhone ainda não está disponível. Em breve!')).toBeOnTheScreen();
+    expect(restorePurchases).not.toHaveBeenCalled();
   });
 
   it('Fechar', async () => {
@@ -297,8 +325,17 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
     await signedIn(PRO);
     api(PRO);
     await open('/account');
-    expect(screen.queryByText('Pro mensal')).toBeNull();
-    expect(screen.queryByText('Plano grátis')).toBeNull();
+    expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
+    expect(screen.getByText('30 / 100')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Gerenciar assinatura' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Restaurar compras' })).toBeNull();
+  });
+
+  it('Plano grátis na Conta no iOS', async () => {
+    setOS('ios');
+    await signedIn(FREE);
+    await open('/account');
+    expect(screen.getByText('Plano grátis')).toBeOnTheScreen();
   });
 
   it('Confirmação de apagar avisa sobre a assinatura', async () => {

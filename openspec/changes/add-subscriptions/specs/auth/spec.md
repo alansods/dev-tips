@@ -20,7 +20,7 @@ O bloco "Plano" SHALL mostrar:
   - os botões "Gerenciar assinatura" (abre o gerenciamento de assinaturas do Google Play) e "Restaurar compras";
 - **para admin**: o selo "PRO", "Pro (admin)" e "Perguntas sem limite", sem "Gerenciar assinatura".
 
-No iOS, onde o Pro ainda não é vendido, o bloco "Plano" MUST NOT aparecer.
+O bloco "Plano" SHALL aparecer no Android e no iOS. No iOS, onde o Pro ainda não é vendido, o assinante MUST NOT ver os botões "Gerenciar assinatura" e "Restaurar compras".
 
 "Sair" SHALL pedir confirmação ("Sair da conta?", com "Cancelar" e "Sair") e, confirmado, encerrar a sessão na API e no aparelho. "Apagar conta" SHALL pedir confirmação explicando:
 - que os dados na nuvem serão apagados para sempre;
@@ -62,5 +62,5 @@ A confirmação de "Apagar conta" SHALL ter os botões "Cancelar" e "Apagar minh
 - **THEN** o bloco Plano mostra "Pro (admin)" e "Perguntas sem limite", sem o botão "Gerenciar assinatura"
 
 #### Scenario: Conta no iOS
-- **WHEN** um usuário logado abre a tela Conta no iPhone
-- **THEN** o bloco Plano não aparece
+- **WHEN** um assinante abre a tela Conta no iPhone
+- **THEN** o bloco Plano mostra "Pro mensal" e "30 / 100", sem os botões "Gerenciar assinatura" e "Restaurar compras"
