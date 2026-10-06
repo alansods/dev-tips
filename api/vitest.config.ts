@@ -17,6 +17,7 @@ export default defineConfig({
           ADMIN_EMAILS: 'admin@example.com',
           REVENUECAT_WEBHOOK_AUTH: 'segredo-do-webhook',
           REVENUECAT_SECRET_KEY: 'sk_teste',
+          GEMINI_API_KEY: 'chave-gemini-teste',
         },
       },
     })),
