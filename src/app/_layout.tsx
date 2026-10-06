@@ -80,7 +80,8 @@ function RootStack() {
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="paywall" options={{ presentation: 'fullScreenModal' }} />
+        {/* Empilhada (não fullScreenModal): no iPhone real o modal ignorava a área segura e escondia o "Fechar". */}
+        <Stack.Screen name="paywall" options={{ animation: 'slide_from_bottom' }} />
       </Stack>
       <FirstSyncToast />
     </>

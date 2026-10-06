@@ -68,7 +68,7 @@ Separar verificar de registrar garante que "só conta se respondeu". Nesta chang
 - `store.ts`: Zustand com o último `GET /me/subscription`, persistido no AsyncStorage para uso offline.
 - `purchases.ts`: um adaptador fino sobre `react-native-purchases`, com `configure`, `logIn`, `logOut`, `getMonthlyPackage`, `purchase`, `restore` e `manageSubscriptions`. Os testes mockam este módulo, e nenhum outro arquivo importa a SDK.
 - `lifecycle.ts`: `startSubscriptionLifecycle()` (montado no layout raiz) reage ao login, ao logout e à volta ao primeiro plano: liga as compras ao usuário, consulta o plano ou volta ao grátis. `useIsPro()` fica em `store.ts`.
-- **Paywall:** é a rota `src/app/paywall.tsx`, em tela cheia (`presentation: 'fullScreenModal'`). O preço vem do `product.priceString` da loja, que já vem formatado na moeda local.
+- **Paywall:** é a rota `src/app/paywall.tsx`, em tela cheia, empilhada como as outras telas e com `animation: 'slide_from_bottom'`. O `presentation: 'fullScreenModal'` foi descartado: no iPhone real, a área segura não era aplicada dentro do modal e o botão de fechar ficava sob a barra de status. O preço vem do `product.priceString` da loja, que já vem formatado na moeda local.
 - **"Gerenciar assinatura":** usa `Purchases.showManageSubscriptions()`, que abre a tela de assinaturas da loja.
 - **Plataformas:** `purchases.ts` só configura a SDK no Android (`billingAvailable()`). No iOS a UI do Pro aparece, com preço fixo no paywall; "Assinar" e "Restaurar" mostram o aviso de indisponível. Na web, a UI não aparece.
 

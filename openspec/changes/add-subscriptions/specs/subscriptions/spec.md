@@ -140,7 +140,7 @@ A linha SHALL aparecer no Android e no iOS, e MUST NOT aparecer na web (onde a s
 - **THEN** a linha "Dev Tips Pro" aparece com "Tire dúvidas sobre cada card"
 
 ### Requirement: Paywall
-O paywall SHALL abrir em tela cheia, com botão de fechar, e mostrar:
+O paywall SHALL abrir em tela cheia, deslizando de baixo para cima, com botão de fechar abaixo da barra de status e do notch (sempre alcançável pelo toque), e mostrar:
 - o selo "PRO", o título "Travou num card? Pergunte." e o texto "Com o Pro, você tira dúvidas sobre o card que está estudando, na hora, sem sair da sessão.";
 - três benefícios:
   - "Explicações de outro jeito quando a resposta do card não bastou";
