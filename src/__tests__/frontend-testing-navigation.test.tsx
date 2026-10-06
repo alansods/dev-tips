@@ -38,27 +38,26 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const TRACKS = ['React', 'Estado e dados no React'];
+const TRACKS = ['React', 'Estado e dados no React', 'Testes no frontend'];
 
-describe('Requirement: Trilha de estado e dados no catálogo', () => {
+describe('Requirement: Trilha de testes no frontend no catálogo', () => {
   it('Framework React no Frontend', async () => {
     await open('/area/frontend/javascript/react');
     const list = buttons(TRACKS);
-    expect(list.indexOf('Estado e dados no React')).toBe(list.indexOf('React') + 1);
+    expect(list.indexOf('Testes no frontend')).toBe(list.indexOf('Estado e dados no React') + 1);
   });
 
   it('Framework React no Mobile', async () => {
     await open('/area/mobile/javascript/react');
     const list = buttons(TRACKS);
-    expect(list[0]).toBe('Estado e dados no React');
-    expect(list).not.toContain('React');
+    expect(list.indexOf('Testes no frontend')).toBe(list.indexOf('Estado e dados no React') + 1);
   });
 });
 
-describe('Requirement: Tradução da trilha de estado e dados', () => {
+describe('Requirement: Tradução da trilha de testes no frontend', () => {
   it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/area/frontend/javascript/react');
-    expect(screen.getByRole('button', { name: /^State and data in React,/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Frontend testing,/ })).toBeOnTheScreen();
   });
 });
