@@ -41,6 +41,7 @@ import awsEssencial from '../../content/tracks/aws-essencial/track.json';
 import deployNaAws from '../../content/tracks/deploy-na-aws/track.json';
 import estadoEDadosNoReact from '../../content/tracks/estado-e-dados-no-react/track.json';
 import testesNoFrontend from '../../content/tracks/testes-no-frontend/track.json';
+import estilizacaoEDesignSystem from '../../content/tracks/estilizacao-e-design-system/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -82,6 +83,7 @@ const registry: unknown[] = [
   deployNaAws,
   estadoEDadosNoReact,
   testesNoFrontend,
+  estilizacaoEDesignSystem,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

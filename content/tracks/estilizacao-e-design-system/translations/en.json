@@ -1,0 +1,120 @@
+{
+  "title": "Styling and design systems",
+  "description": "Consistent, accessible interfaces on the web and on mobile: Tailwind, NativeWind, design tokens, components with variants, Storybook and accessibility.",
+  "decks": {
+    "tailwind-e-nativewind": {
+      "title": "Tailwind and NativeWind",
+      "description": "Styling with utility classes in React and React Native."
+    },
+    "design-system": {
+      "title": "Design system",
+      "description": "Tokens, reusable components and documentation that keep the UI consistent."
+    },
+    "acessibilidade": {
+      "title": "Accessibility",
+      "description": "Interfaces that work for everyone, with screen readers, keyboard and touch."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Questions about styling, design systems and accessibility that come up in interviews."
+    }
+  },
+  "cards": {
+    "utility-first": {
+      "term": "Utility-first",
+      "definition": "A styling approach in which each class does one thing (p-4 sets padding, text-sm changes the font size) and the look is built by combining classes right in the component, instead of writing a CSS selector per component. The upsides: no need to invent names, the final CSS does not grow with every screen and the style lives next to the markup. The downside is a long className; the answer is to extract components, not to go back to writing CSS per screen."
+    },
+    "tailwind-css": {
+      "term": "Tailwind CSS",
+      "definition": "A utility-first framework that generates CSS only for the classes used in the project. It has state and context variants as prefixes: hover:, focus:, disabled:, dark: and the sm:, md:, lg: breakpoints (mobile-first, applying from that size up). Values come from a theme with color, spacing and font scales, which keeps things consistent. In Tailwind 4 the theme is defined in CSS with @theme; up to version 3, in a tailwind.config.js. Off-theme values use brackets, such as w-[37px], and should be the exception."
+    },
+    "nativewind": {
+      "term": "NativeWind",
+      "definition": "A library that brings Tailwind classes to React Native: the component takes a className and NativeWind turns the classes into native style objects, mostly at build time. It supports dark:, breakpoints, active: (pressed) and platform prefixes (ios:, android:). Since React Native has no cascade and not every CSS property, some classes have no effect. The stable version uses Tailwind 3's tailwind.config.js with the NativeWind preset; the same class vocabulary works for web and mobile."
+    },
+    "classes-condicionais": {
+      "term": "Conditional classes",
+      "definition": "Building the className from props and state without concatenating strings by hand. clsx (or classnames) joins classes and drops the falsy ones: clsx('p-4', selected && 'bg-brand-500'). tailwind-merge (twMerge) resolves Tailwind conflicts, keeping the last class of each group: twMerge('px-4', 'px-8') becomes 'px-8'. A cn helper that uses both is common, so that a className passed from outside can override the component's default. Classes must be written out in full in the code, because Tailwind does not detect classes built like `bg-${color}-500`."
+    },
+    "card-com-nativewind": {
+      "title": "Card with NativeWind",
+      "body": "A menu card styled with classes only: pressed state with active:, dark theme with dark: and a conditional badge."
+    },
+    "tokens-no-theme": {
+      "title": "Tokens in @theme",
+      "body": "In Tailwind 4, the brand tokens become classes and CSS variables straight from the CSS file."
+    },
+    "design-system": {
+      "term": "Design system",
+      "definition": "A set of UI decisions shared by design and code: tokens (colors, typography, spacing), reusable components with variants, usage patterns and documentation. It reduces rework, keeps screens consistent and speeds up new features. Maintaining one requires an owner, versioning and a changelog (it is an internal product with users), open contribution with review, accessible-by-default components and adoption metrics. The common mistake is to start with a huge library; it is better to extract it from patterns the app already repeats."
+    },
+    "design-tokens": {
+      "term": "Design tokens",
+      "definition": "Named design values kept in one place and used across the product: color, spacing, radius, font, shadow, duration. In layers: primitive tokens (blue-500) and semantic tokens (color-primary, color-surface, text-muted), which state the role rather than the value. Components use only the semantic ones; that way a dark theme or a rebrand changes the mapping, not every component. They can be generated from Figma into CSS, Tailwind and React Native, using the same source on web and mobile."
+    },
+    "componente-com-variantes": {
+      "term": "Component with variants",
+      "definition": "A design system base component (Button, Badge, Input) whose look changes through props with closed values, such as variant=\"primary\" | \"secondary\" and size=\"sm\" | \"md\", instead of loose colors and sizes. Libraries such as class-variance-authority (cva) describe the variants and generate the className, and TypeScript prevents variants that do not exist. A good component accepts a className for layout tweaks, passes native props through (disabled, onPress) and is accessible out of the box."
+    },
+    "storybook": {
+      "term": "Storybook",
+      "definition": "An environment for building and documenting components in isolation from the app. Each story is a state of the component (primary, disabled, loading, long text) described by args. It acts as a living catalog of the design system, generates prop documentation (autodocs) and supports interaction tests (play), accessibility checks with an addon and visual tests by image comparison. There is a Storybook for React Native, which runs the stories inside the app or Expo."
+    },
+    "button-com-variantes": {
+      "title": "Button with variants",
+      "body": "cva describes the variants and defaults; TypeScript infers the variant props and twMerge lets the outside className win."
+    },
+    "stories-do-button": {
+      "title": "Button stories",
+      "body": "CSF3 format: the meta sets the component and default args; each export is a story, and play tests the click inside Storybook."
+    },
+    "acessibilidade": {
+      "term": "Accessibility",
+      "definition": "Making the UI work for people with visual, motor, hearing or cognitive disabilities, and also for people using the app in sunlight, one-handed or with large fonts. The reference is WCAG, with criteria such as minimum contrast, labels on controls, keyboard navigation and text alternatives for images. Beyond inclusion, it is a legal requirement in many cases (in Brazil, the Brazilian Inclusion Law) and improves the experience and the tests for everyone. It is cheaper to build it in from the start than to fix it later."
+    },
+    "papeis-e-rotulos": {
+      "term": "Roles and labels",
+      "definition": "Assistive technologies describe each element by its role (button, link, field, heading), accessible name and state (selected, disabled, expanded). On the web, use the right HTML element first (button, a, a label tied to the input) and fall back to ARIA only when none exists. In React Native, use role and aria-label (or accessibilityRole and accessibilityLabel) and the matching states. Icon-only buttons always need a label, and decorative icons should be hidden from the screen reader."
+    },
+    "contraste-e-area-de-toque": {
+      "term": "Contrast and touch targets",
+      "definition": "Text needs a contrast of at least 4.5:1 against its background (3:1 for large text and icons), worth checking in both themes. Information cannot rely on color alone: an error has text or an icon, not just a red border. Touch targets should be about 44×44 pt on iOS and 48×48 dp on Android; a small icon gains area with padding or hitSlop. The layout should also handle a larger system font (Dynamic Type on iOS, font scale on Android) without cutting text."
+    },
+    "leitor-de-tela-e-foco": {
+      "term": "Screen readers and focus",
+      "definition": "VoiceOver (iOS) and TalkBack (Android) read elements in focus order, which should follow the visual order. When a modal opens, focus moves into it and must not escape to the screen behind; when it closes, focus returns to the element that opened it. Important changes without a focus change, such as \"item added\" or an error, should be announced (a live region on the web, announceForAccessibility in React Native). Validating requires testing with the screen reader on, in addition to automated tools, which only catch part of the problems."
+    },
+    "botao-icone-acessivel": {
+      "title": "Accessible icon button in React Native",
+      "body": "Role, a label that states the action and the state, and a touch area enlarged with hitSlop. The icon sits inside the button and is not read separately."
+    },
+    "campo-com-erro-acessivel": {
+      "title": "Accessible field with an error on the web",
+      "body": "A label tied to the input, aria-invalid and aria-describedby pointing to the message, which is announced with role=\"alert\"."
+    },
+    "tailwind-ou-css": {
+      "question": "Tailwind or traditional CSS?",
+      "answer": "With traditional CSS I write selectors and invent class names; the file grows with every screen and it is hard to know what can be deleted. With Tailwind I combine ready-made theme classes right in the component: values stay consistent, the final CSS is small and the style lives with the markup. The cost is a long className and learning the vocabulary. In an app built with React components, I prefer Tailwind and extract components to avoid repeating classes; custom CSS is for special cases."
+    },
+    "estilo-no-react-native": {
+      "question": "In React Native: StyleSheet, NativeWind or CSS-in-JS?",
+      "answer": "StyleSheet is the default, with no dependency and styles as JavaScript objects; it works well, but theming and variants are up to me. NativeWind brings Tailwind's vocabulary, dark mode and breakpoints, and lets me share classes and tokens with the web. CSS-in-JS solutions such as styled-components have a runtime cost. For an app that shares a design system with the web, I choose NativeWind; for something small or very focused on animation performance, StyleSheet is enough."
+    },
+    "tema-claro-e-escuro": {
+      "question": "How would you implement light and dark themes?",
+      "answer": "With semantic tokens (surface, text, primary) that have one value per theme, and components using only those tokens, never hard-coded colors. On the web, I swap CSS variables by class or by prefers-color-scheme and use dark: in Tailwind; in React Native, I read useColorScheme and apply the theme (NativeWind does this with dark:). I let people choose between light, dark and system, save the choice and check contrast in both themes, including images and shadows."
+    },
+    "variante-ou-componente-novo": {
+      "question": "When do you create a variant and when a new component?",
+      "answer": "A variant when it is the same component, with the same behavior and structure, changing only its look or size: primary, secondary, small Button. A new component when behavior, semantics or structure change: an IconButton requires a label, a Link navigates instead of running an action. If props start allowing combinations that make no sense or the component becomes a giant switch, it is time to split. Compound components (Card.Header, Card.Body) help avoid too many props."
+    },
+    "montar-design-system": {
+      "question": "How would you build and maintain a design system?",
+      "answer": "I start with an inventory: colors, spacing and components that already repeat in the app, and I define primitive and semantic tokens with the design team. Then I extract the most used components (Button, Input, Text, Card), accessible and documented in Storybook, and migrate screens gradually. To maintain it: an owner, versioning with a changelog, review of contributions, interaction and visual tests, and a lint rule that blocks hard-coded colors. I measure adoption and remove what nobody uses."
+    },
+    "garantir-acessibilidade": {
+      "question": "How do you ensure an app is accessible?",
+      "answer": "By treating it as a requirement from design onward: contrast and sizes already in the tokens, base components accessible by default and acceptance criteria in the stories. In code, an accessibility lint, tests that query by role and name (getByRole) and the accessibility addon in Storybook. Since automated tools only catch part of the problems, I test the main flows with VoiceOver, TalkBack and the keyboard, and with large fonts. Accessibility bugs go into the backlog with the same priority as others."
+    }
+  }
+}
