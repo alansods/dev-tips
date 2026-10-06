@@ -32,15 +32,62 @@ const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('butto
 /** Seção da aba Progresso da trilha CRUD (há mais de uma trilha no catálogo). */
 const crud = () => within(screen.getByTestId(`track-progress-${TRACK}`));
 const pressInCrud = (name: string) => fireEvent.press(crud().getByRole('button', { name }));
+const header = (trackId = TRACK) => screen.getByTestId(`track-progress-header-${trackId}`);
+const togglePanel = (trackId = TRACK) => fireEvent.press(header(trackId));
 
-async function openProgress() {
+async function openProgress({ expandCrud = true } = {}) {
   renderRouter(APP, { initialUrl: '/progress' });
   await act(async () => {});
+  if (expandCrud) togglePanel();
 }
 
 beforeEach(() => resetStudyStore());
 
 describe('Requirement: Aba Progresso', () => {
+  it('Painéis começam fechados', async () => {
+    await openProgress({ expandCrud: false });
+    expect(screen.getAllByTestId(/^track-progress-header-/).length).toBeGreaterThan(1);
+    expect(header()).toBeCollapsed();
+    expect(crud().getByText(crudTrack.title)).toBeOnTheScreen();
+    expect(crud().getByLabelText('0% da trilha dominada')).toBeOnTheScreen();
+    expect(crud().getByTestId(`track-progress-bar-${TRACK}`)).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Zerar progresso' })).toBeNull();
+    expect(screen.queryByText('Por deck')).toBeNull();
+    expect(screen.queryByLabelText(/não vistos$/)).toBeNull();
+  });
+
+  it('Abrir e fechar um painel', async () => {
+    await openProgress({ expandCrud: false });
+    togglePanel();
+    expect(header()).toBeExpanded();
+    expect(crud().getByLabelText(`${TOTAL} não vistos`)).toBeOnTheScreen();
+    expect(crud().getByText('O que vamos criar')).toBeOnTheScreen();
+    expect(crud().getByRole('button', { name: 'Zerar progresso' })).toBeOnTheScreen();
+    togglePanel();
+    expect(header()).toBeCollapsed();
+    expect(crud().queryByLabelText(`${TOTAL} não vistos`)).toBeNull();
+    expect(crud().queryByRole('button', { name: 'Zerar progresso' })).toBeNull();
+  });
+
+  it('Vários painéis abertos', async () => {
+    await openProgress();
+    const other = screen
+      .getAllByTestId(/^track-progress-header-/)
+      .map((h) => h.props.testID.replace('track-progress-header-', ''))
+      .find((id: string) => id !== TRACK)!;
+    togglePanel(other);
+    expect(header()).toBeExpanded();
+    expect(header(other)).toBeExpanded();
+    expect(screen.getAllByRole('button', { name: 'Zerar progresso' })).toHaveLength(2);
+  });
+
+  it('Porcentagem no painel fechado', async () => {
+    seed(deckIds('glossario').slice(0, 4), 'known');
+    await openProgress({ expandCrud: false });
+    expect(header()).toBeCollapsed();
+    expect(crud().getByLabelText('5% da trilha dominada')).toBeOnTheScreen();
+  });
+
   it('Sem progresso', async () => {
     await openProgress();
     expect(crud().getByText(crudTrack.title)).toBeOnTheScreen();

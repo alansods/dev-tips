@@ -3,8 +3,8 @@ import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
+import { ExpansionPanel } from '../../components/ExpansionPanel';
 import { ProgressBar } from '../../components/ProgressBar';
-import { ProgressRing } from '../../components/ProgressRing';
 import { Screen } from '../../components/Screen';
 import { useCatalog } from '../../content/useCatalog';
 import type { Track } from '../../content';
@@ -37,19 +37,28 @@ function TrackProgress({ track }: { track: Track }) {
   const unseen = stats.total - stats.answered;
 
   return (
-    <View testID={`track-progress-${track.id}`} style={{ gap: spacing.lg }}>
-      <View style={[styles.hero, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-        <ProgressRing percent={percent} label={t.progress.ring(percent)} />
-        <View style={{ flex: 1, gap: 4 }}>
-          <AppText font="semibold" size={16} accessibilityRole="header">
-            {track.title}
-          </AppText>
-          <AppText size={13} tone="muted">
-            {t.progress.mastered(stats.known, stats.total)}
-          </AppText>
+    <ExpansionPanel
+      testID={`track-progress-${track.id}`}
+      headerTestID={`track-progress-header-${track.id}`}
+      accessibilityLabel={`${track.title}, ${t.progress.ring(percent)}`}
+      header={
+        <View style={{ gap: spacing.sm }}>
+          <View style={styles.headRow}>
+            <AppText font="semibold" size={16} accessibilityRole="header" style={{ flex: 1 }}>
+              {track.title}
+            </AppText>
+            <AppText font="monoMedium" size={14} accessibilityLabel={t.progress.ring(percent)}>
+              {`${percent}%`}
+            </AppText>
+          </View>
+          <ProgressBar
+            testID={`track-progress-bar-${track.id}`}
+            value={stats.known / stats.total}
+            unknownValue={stats.unknown / stats.total}
+          />
         </View>
-      </View>
-
+      }
+    >
       <View style={styles.counts}>
         <Count value={stats.known} label={t.answer.known.short} bg={colors.accentSoft} tone="accentText" />
         <Count value={stats.unknown} label={t.progress.toReview} bg={colors.warnSoft} tone="warn" />
@@ -62,7 +71,7 @@ function TrackProgress({ track }: { track: Track }) {
       {track.decks.map((deck) => {
         const ds = deckStats(track.id, deck, progress);
         return (
-          <View key={deck.id} style={[styles.deck, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <View key={deck.id} style={[styles.deck, { backgroundColor: colors.bg, borderColor: colors.line }]}>
             <View style={styles.deckHead}>
               <AppText font="semibold" size={15} style={{ flex: 1 }}>
                 {deck.title}
@@ -102,7 +111,7 @@ function TrackProgress({ track }: { track: Track }) {
           <Button title={t.progress.reset} variant="secondary" onPress={() => setConfirming(true)} />
         </View>
       )}
-    </View>
+    </ExpansionPanel>
   );
 }
 
@@ -139,14 +148,7 @@ function Legend({ color, label }: { color: string; label: string }) {
 }
 
 const styles = StyleSheet.create({
-  hero: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
-    padding: spacing.lg,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-  },
+  headRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   counts: { flexDirection: 'row', gap: spacing.sm },
   count: { flex: 1, padding: spacing.md, borderRadius: radius.md, gap: 2 },
   deck: { padding: spacing.md, borderRadius: radius.md, borderWidth: 1, gap: spacing.sm },
