@@ -3,6 +3,7 @@ import { useEffect, useMemo, useReducer, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { CardAssistant } from '../assistant/CardAssistant';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
 import { CardFace } from '../components/cards/CardFace';
@@ -139,7 +140,7 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
         </ScrollView>
       </View>
 
-      <View style={styles.actions}>
+      <View testID="session-actions" style={styles.actions}>
         {state.revealed ? (
           <>
             <Button title={t.answer.unknown.button} variant="warn" onPress={() => respond('unknown')} />
@@ -148,6 +149,8 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
         ) : (
           <Button title={t.session.showAnswer} onPress={() => dispatch({ type: 'reveal' })} />
         )}
+        {/* Sempre o último da barra, nas duas faces: o botão nunca muda de lugar. */}
+        <CardAssistant card={card} />
       </View>
       <TermSheet track={track} termId={openTerm} onChangeTerm={setOpenTerm} onClose={() => setOpenTerm(null)} />
     </SafeAreaView>

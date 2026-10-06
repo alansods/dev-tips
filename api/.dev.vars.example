@@ -5,3 +5,11 @@
 JWT_SECRET=troque-por-um-valor-aleatorio-longo
 # Client IDs do Google aceitos como público (aud) do ID token, separados por vírgula.
 GOOGLE_CLIENT_IDS=000000000000-xxxxxxxx.apps.googleusercontent.com
+# Valor exato do cabeçalho Authorization que o webhook do RevenueCat envia (configurado no painel do RevenueCat).
+REVENUECAT_WEBHOOK_AUTH=troque-por-um-valor-aleatorio-longo
+# Chave secreta (sk_…) do RevenueCat, usada para consultar a assinatura de um usuário.
+REVENUECAT_SECRET_KEY=sk_xxxxxxxxxxxxxxxx
+# E-mails com acesso Pro sem pagar e sem cota, separados por vírgula.
+ADMIN_EMAILS=seu-email@gmail.com
+# Chave do Gemini (Google AI Studio), usada pelo chat "Perguntar".
+GEMINI_API_KEY=troque-pela-sua-chave

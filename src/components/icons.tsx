@@ -174,3 +174,22 @@ export function AppMark({ size = 36 }: { size?: number }) {
     </Svg>
   );
 }
+
+/** Balão de conversa com "?" (botão "Perguntar"). */
+export function AskIcon({ color, size = 24 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M21 12a8.5 8.5 0 0 1-12.3 7.6L3.5 21l1.5-5A8.5 8.5 0 1 1 21 12z" {...stroke(color)} />
+      <Path d="M9.8 9.6a2.3 2.3 0 1 1 3.2 2.1c-.6.3-1 .8-1 1.4v.4M12 16.4h.01" {...stroke(color)} />
+    </Svg>
+  );
+}
+
+/** Seta para cima (enviar). */
+export function SendIcon({ color, size = 20 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M12 19V5M5 12l7-7 7 7" {...stroke(color)} />
+    </Svg>
+  );
+}

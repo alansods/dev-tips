@@ -27,6 +27,7 @@ beforeEach(() => {
   /* eslint-disable @typescript-eslint/no-require-imports */
   require('./src/i18n/store').useSettingsStore.setState({ language: null, onboardingSeen: true });
   require('./src/auth/store').useAccountStore.setState({ user: null });
+  require('./src/subscriptions/store').resetSubscriptionStore();
   require('./src/auth/tokens').__resetSecureStoreForTests();
   /* eslint-enable @typescript-eslint/no-require-imports */
 });
@@ -103,3 +104,19 @@ beforeEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   require('expo-network').__setNetworkState(true);
 });
+
+// RevenueCat: módulo nativo simulado. Os testes de compra trocam o adaptador
+// (src/subscriptions/purchases.ts) por funções próprias.
+jest.mock('react-native-purchases', () => ({
+  __esModule: true,
+  default: {
+    configure: jest.fn(),
+    logIn: jest.fn(() => Promise.resolve({ customerInfo: {}, created: false })),
+    logOut: jest.fn(() => Promise.resolve({})),
+    getOfferings: jest.fn(() => Promise.resolve({ current: null, all: {} })),
+    purchasePackage: jest.fn(() => Promise.reject(new Error('sem loja nos testes'))),
+    restorePurchases: jest.fn(() => Promise.resolve({})),
+    showManageSubscriptions: jest.fn(() => Promise.resolve()),
+  },
+  PURCHASES_ERROR_CODE: { NETWORK_ERROR: '10', OFFLINE_CONNECTION_ERROR: '35' },
+}));

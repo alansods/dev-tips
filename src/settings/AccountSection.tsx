@@ -1,4 +1,5 @@
-// Seção "Conta" de Ajustes: convite para entrar ou a linha da conta conectada.
+// Seção "Conta" de Ajustes: convite para entrar ou a linha da conta conectada,
+// e logo abaixo a linha "Dev Tips Pro".
 // Não aparece na web (o login do Google é nativo).
 
 import { router } from 'expo-router';
@@ -13,6 +14,7 @@ import { ChevronRightIcon, CloudUpIcon } from '../components/icons';
 import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
+import { ProRow } from './ProRow';
 import { SectionTitle } from './SectionTitle';
 
 export function AccountSection() {
@@ -69,6 +71,7 @@ export function AccountSection() {
           </View>
         </View>
       )}
+      <ProRow />
     </View>
   );
 }

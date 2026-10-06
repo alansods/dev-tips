@@ -17,5 +17,7 @@
   "vars": {
     // Origens web que podem chamar a API (separadas por vírgula). O app nativo não envia Origin.
     "ALLOWED_ORIGINS": "http://localhost:8081",
+    // Modelo do Gemini usado pelo chat "Perguntar" (a chave fica no segredo GEMINI_API_KEY).
+    "GEMINI_MODEL": "gemini-3.8-flash",
   },
 }
