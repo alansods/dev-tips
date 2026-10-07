@@ -180,7 +180,7 @@ export const en: Messages = {
     seeAll: 'See all',
     newBadge: 'New',
     welcomeKicker: 'Welcome to Dev Tips',
-    welcomeTitle: 'Short cards to study fullstack development',
+    welcomeTitle: 'Short cards to study',
     welcomeBody: 'Read the front, try to answer, flip the card. The app brings back what you still don’t know.',
     whatToStudy: 'What do you want to study?',
     interestsHint: 'Changes the suggestions on this screen. You can change it later in Profile.',

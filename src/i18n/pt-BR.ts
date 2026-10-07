@@ -178,7 +178,7 @@ export const ptBR = {
     seeAll: 'Ver todas',
     newBadge: 'Nova',
     welcomeKicker: 'Bem-vindo ao Dev Tips',
-    welcomeTitle: 'Cards curtos para estudar desenvolvimento fullstack',
+    welcomeTitle: 'Cards curtos para estudar',
     welcomeBody: 'Leia a frente, tente responder, vire o card. O app traz de volta o que você ainda não sabe.',
     whatToStudy: 'O que você quer estudar?',
     interestsHint: 'Muda as sugestões desta tela. Dá para trocar depois no Perfil.',
