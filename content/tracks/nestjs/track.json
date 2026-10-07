@@ -2,6 +2,7 @@
   "id": "nestjs",
   "title": "NestJS",
   "description": "O framework Node.js com arquitetura de módulos e injeção de dependência: controllers, providers, pipes, guards e interceptors.",
+  "prerequisites": ["express", "typescript-essencial"],
   "areas": [
     "backend"
   ],

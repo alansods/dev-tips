@@ -165,6 +165,7 @@ export const ptBR = {
     },
     areaKicker: 'Área',
     sections: {
+      path: 'Ordem sugerida',
       tracks: 'Trilhas',
       languages: 'Linguagens',
       comparisons: 'Comparativos',
@@ -176,6 +177,9 @@ export const ptBR = {
       aws: 'AWS',
     },
     trackCount: (n: number) => `${n} ${plural(n, 'trilha', 'trilhas')}`,
+    trackStatus: { done: 'Concluída', started: 'Em andamento', new: 'Não iniciada' },
+    pathRowLabel: (position: number, title: string, status: string) => `${position}. ${title}, ${status}`,
+    pathDue: (n: number) => `${n} para revisar`,
     areaLabel: (area: string, tracks: string, known: number, total: number) =>
       `${area}, ${tracks}, ${known} de ${total} cards que você sabe`,
     rowLabel: (name: string, tracks: string) => `${name}, ${tracks}`,

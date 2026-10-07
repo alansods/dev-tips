@@ -2,6 +2,7 @@
   "id": "build-e-bundlers",
   "title": "Build e bundlers",
   "description": "Do código-fonte ao que roda no navegador e no aparelho: transpilação, Babel, Vite, Webpack, Metro, Hermes, variáveis de ambiente e perfis do EAS.",
+  "prerequisites": ["javascript-no-navegador"],
   "areas": [
     "frontend",
     "mobile"

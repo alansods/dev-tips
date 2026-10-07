@@ -49,6 +49,14 @@ export const tracksStats = (tracks: readonly Track[], progress: Progress): Stats
 
 export type DeckAction = 'start' | 'continue' | 'restart';
 
+export type TrackStatus = 'done' | 'started' | 'new';
+
+/** Concluída (tudo "já sabia"), em andamento (algo respondido) ou não iniciada. */
+export function trackStatus(stats: Stats): TrackStatus {
+  if (stats.total > 0 && stats.known === stats.total) return 'done';
+  return stats.answered > 0 ? 'started' : 'new';
+}
+
 export function deckAction(stats: Stats): DeckAction {
   if (stats.answered === 0) return 'start';
   if (stats.known === stats.total) return 'restart';

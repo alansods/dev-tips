@@ -2,6 +2,7 @@
   "id": "javascript-assincrono",
   "title": "JavaScript assíncrono",
   "description": "Como o JavaScript faz várias coisas sem travar: event loop, Promises e async/await.",
+  "prerequisites": ["javascript-essencial"],
   "areas": [
     "frontend",
     "backend"

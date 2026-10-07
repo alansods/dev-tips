@@ -168,6 +168,7 @@ export const en: Messages = {
     },
     areaKicker: 'Area',
     sections: {
+      path: 'Suggested order',
       tracks: 'Tracks',
       languages: 'Languages',
       comparisons: 'Comparisons',
@@ -179,6 +180,9 @@ export const en: Messages = {
       aws: 'AWS',
     },
     trackCount: (n) => `${n} ${plural(n, 'track', 'tracks')}`,
+    trackStatus: { done: 'Completed', started: 'In progress', new: 'Not started' },
+    pathRowLabel: (position, title, status) => `${position}. ${title}, ${status}`,
+    pathDue: (n) => `${n} to review`,
     areaLabel: (area, tracks, known, total) => `${area}, ${tracks}, ${known} of ${total} cards you know`,
     rowLabel: (name, tracks) => `${name}, ${tracks}`,
     areaNotFound: 'Area not found.',

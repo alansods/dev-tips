@@ -3,6 +3,7 @@
   "title": "Deploy na AWS",
   "description": "Como colocar aplicações no ar na AWS: containers com ECS e Fargate, Lambda, CloudFront e infraestrutura como código.",
   "icon": { "text": "AWS" },
+  "prerequisites": ["aws-essencial"],
   "areas": [
     "devops"
   ],

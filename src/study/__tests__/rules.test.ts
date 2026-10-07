@@ -11,6 +11,7 @@ import {
   sessionReducer,
   summary,
   trackStats,
+  trackStatus,
   type Progress,
 } from '../rules';
 
@@ -162,6 +163,14 @@ describe('Requirement: Sessão de estudo (ordem sorteada)', () => {
     const ordered = ids(endpoints);
     sessionOrder(ordered, allCards, always(0));
     expect(ordered).toEqual(ids(endpoints));
+  });
+});
+
+describe('Requirement: Ordem sugerida na área (estado da trilha)', () => {
+  it('Estados', () => {
+    expect(trackStatus({ total: 5, known: 5, unknown: 0, answered: 5 })).toBe('done');
+    expect(trackStatus({ total: 5, known: 1, unknown: 1, answered: 2 })).toBe('started');
+    expect(trackStatus({ total: 5, known: 0, unknown: 0, answered: 0 })).toBe('new');
   });
 });
 

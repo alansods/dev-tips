@@ -135,7 +135,7 @@ describe('Requirement: Zerar progresso de uma trilha', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
     fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
     press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks/);
+    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     for (const deck of crudTrack.decks) {
       expect(screen.getByRole('button', { name: `Estudar ${deck.title}` })).toBeOnTheScreen();
     }

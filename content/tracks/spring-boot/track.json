@@ -2,6 +2,7 @@
   "id": "spring-boot",
   "title": "Spring Boot",
   "description": "Como o Spring Boot funciona por dentro: IoC e beans, auto-configuração, Spring Data JPA, transações, Web e Security.",
+  "prerequisites": ["java-essencial"],
   "areas": [
     "backend"
   ],

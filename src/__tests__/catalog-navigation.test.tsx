@@ -102,18 +102,18 @@ describe('Requirement: Revisão na Home', () => {
 describe('Requirement: Tela da área', () => {
   it('Backend com o conteúdo atual', async () => {
     await open('/area/backend');
-    expect(headers()).toEqual(expect.arrayContaining(['Backend', 'Comparativos']));
+    expect(headers()).toEqual(['Backend', 'Ordem sugerida', 'Comparativos']);
     expect(headers()).not.toContain('Trilhas');
     expect(headers()).not.toContain('Linguagens');
-    expect(screen.getByText('O mesmo CRUD em quatro frameworks')).toBeOnTheScreen();
+    expect(screen.getAllByText('O mesmo CRUD em quatro frameworks').length).toBeGreaterThan(0);
     expect(screen.queryByRole('button', { name: /^Trilhas, tab/ })).toBeNull(); // tela cheia, sem abas
   });
 
   it('Fundamentos com o conteúdo atual', async () => {
     await open('/area/fundamentos');
-    expect(headers()).toEqual(expect.arrayContaining(['Fundamentos', 'Trilhas']));
+    expect(headers()).toEqual(['Fundamentos', 'Ordem sugerida', 'Trilhas']);
     expect(headers()).not.toContain('Comparativos');
-    expect(screen.getByText('Fundamentos web')).toBeOnTheScreen();
+    expect(screen.getAllByText('Fundamentos web').length).toBeGreaterThan(0);
   });
 
   it('Abrir trilha pela área', async () => {
@@ -158,7 +158,7 @@ describe('Requirement: Identidade, variantes e colunas da trilha', () => {
   it('Comparativa em Backend', async () => {
     await open('/area/backend');
     expect(headers()).toContain('Comparativos');
-    expect(screen.getByText('O mesmo CRUD em quatro frameworks')).toBeOnTheScreen();
+    expect(screen.getAllByText('O mesmo CRUD em quatro frameworks').length).toBeGreaterThan(0);
   });
 });
 

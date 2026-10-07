@@ -3,6 +3,7 @@
   "title": "Node.js",
   "description": "JavaScript no servidor: o runtime, módulos, npm, streams e processos.",
   "icon": { "logo": "nodedotjs" },
+  "prerequisites": ["javascript-assincrono"],
   "areas": [
     "backend"
   ],
