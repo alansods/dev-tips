@@ -199,6 +199,8 @@ export const en: Messages = {
     flipHint: 'Shows the answer',
     tapToReveal: 'Tap to see the answer',
     showAnswer: 'Show answer',
+    showQuestion: 'See question',
+    showQuestionHint: 'Goes back to the front of the card',
     reviewTitle: "Today's review",
   },
   summary: {

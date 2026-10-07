@@ -5,7 +5,11 @@
 Define o acabamento do app: a animação de virar o card, a identidade visual (ícone e splash), os alvos de toque mínimos e a configuração para gerar builds instaláveis.
 ## Requirements
 ### Requirement: Animação de virar o card
-Ao mostrar o verso de um card, a sessão SHALL animar a troca, com a frente girando até sumir e o verso aparecendo, em até 300 ms. Quando o sistema estiver com "reduzir movimento" ativado, a troca SHALL ser imediata, sem animação. A animação MUST NOT atrasar nem bloquear os botões "Não sabia" e "Já sabia", que aparecem assim que o verso é pedido.
+Ao mostrar o verso de um card, ou ao voltar dele para a frente, a sessão SHALL animar a troca: o lado atual gira até sumir e o outro aparece, em até 300 ms. Quando o sistema estiver com "reduzir movimento" ativado, a troca SHALL ser imediata, sem animação.
+
+A animação MUST NOT atrasar nem bloquear os botões da sessão:
+- ao pedir o verso, "Não sabia" e "Já sabia" aparecem assim que o verso é pedido;
+- ao voltar para a frente, "Mostrar resposta" aparece assim que a frente é pedida.
 
 #### Scenario: Duração da animação
 - **WHEN** o usuário pede o verso com "reduzir movimento" desativado
@@ -18,6 +22,10 @@ Ao mostrar o verso de um card, a sessão SHALL animar a troca, com a frente gira
 #### Scenario: Botões disponíveis durante a animação
 - **WHEN** o usuário toca em "Mostrar resposta"
 - **THEN** os botões "Não sabia" e "Já sabia" ficam disponíveis imediatamente
+
+#### Scenario: Voltar para a frente com animação
+- **WHEN** o verso está visível, "reduzir movimento" está desativado e o usuário toca em "Ver pergunta"
+- **THEN** a frente aparece com a mesma animação de virar, e o botão "Mostrar resposta" fica disponível imediatamente
 
 ### Requirement: Identidade visual
 O app SHALL usar ícone e splash próprios, gerados a partir do mesmo desenho (cards empilhados com o acento do design), com estes requisitos:

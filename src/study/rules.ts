@@ -63,6 +63,31 @@ export function sessionCardIds(trackId: string, deck: Deck, progress: Progress):
   return cards.map((c) => c.id);
 }
 
+/**
+ * Ordem sorteada dos cards de uma sessão (Fisher-Yates). Os cards de passo
+ * (`step`) voltam às posições que ocuparam, em ordem crescente de número,
+ * para a sequência do passo a passo continuar fazendo sentido.
+ */
+export function sessionOrder(
+  ids: readonly string[],
+  cardsById: ReadonlyMap<string, Card>,
+  random: () => number = Math.random,
+): string[] {
+  const order = [...ids];
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  const stepNumber = (id: string) => {
+    const card = cardsById.get(id);
+    return card?.type === 'step' ? card.number : undefined;
+  };
+  const steps = order.filter((id) => stepNumber(id) !== undefined);
+  steps.sort((a, b) => stepNumber(a)! - stepNumber(b)!);
+  let next = 0;
+  return order.map((id) => (stepNumber(id) === undefined ? id : steps[next++]));
+}
+
 // ---------- sessão ----------
 
 export type SessionState = {
@@ -74,7 +99,7 @@ export type SessionState = {
 };
 
 export type SessionAction =
-  { type: 'reveal' } | { type: 'answer'; result: AnswerResult } | { type: 'restart'; ids: string[] };
+  { type: 'flip' } | { type: 'answer'; result: AnswerResult } | { type: 'restart'; ids: string[] };
 
 export const initialSession = (ids: string[]): SessionState => ({
   ids,
@@ -87,7 +112,8 @@ export const initialSession = (ids: string[]): SessionState => ({
 export function sessionReducer(state: SessionState, action: SessionAction): SessionState {
   if (action.type === 'restart') return initialSession(action.ids);
   if (state.finished) return state;
-  if (action.type === 'reveal') return state.revealed ? state : { ...state, revealed: true };
+  // Alterna frente e verso, quantas vezes o usuário quiser.
+  if (action.type === 'flip') return { ...state, revealed: !state.revealed };
   // answer: só com o verso visível
   if (!state.revealed) return state;
   const id = state.ids[state.index];

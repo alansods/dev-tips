@@ -197,6 +197,8 @@ export const ptBR = {
     flipHint: 'Mostra a resposta',
     tapToReveal: 'Toque para ver a resposta',
     showAnswer: 'Mostrar resposta',
+    showQuestion: 'Ver pergunta',
+    showQuestionHint: 'Volta para a frente do card',
     reviewTitle: 'Revisão de hoje',
   },
   summary: {

@@ -8,9 +8,10 @@ import ProgressScreen from '../app/(tabs)/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
+import * as chance from '../study/chance';
 import { resetStudyStore, useStudyStore } from '../study/store';
 import { progressKey } from '../study/rules';
-import { crudTrack } from '../test-utils';
+import { cardById, crudTrack } from '../test-utils';
 
 const APP = {
   _layout: RootLayout,
@@ -42,6 +43,12 @@ function answer(result: 'Já sabia' | 'Não sabia') {
 }
 
 beforeEach(() => resetStudyStore());
+
+const term = (id: string) => {
+  const card = cardById(id);
+  if (card.type !== 'concept') throw new Error(`${id} não é um conceito`);
+  return card.term;
+};
 
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
@@ -124,6 +131,46 @@ describe('Requirement: Sessão de estudo', () => {
     expect(screen.getByText('2/5')).toBeOnTheScreen();
   });
 
+  it('Ordem sorteada', async () => {
+    // Sorteio sempre 0: o segundo card do deck vai para a primeira posição.
+    jest.spyOn(chance, 'random').mockReturnValue(0);
+    const [first, second] = deckIds('glossario');
+    await open(`/study/${TRACK}/glossario`);
+    expect(screen.getByText(term(second))).toBeOnTheScreen();
+    expect(screen.queryByText(term(first))).toBeNull();
+  });
+
+  it('Nova ordem a cada sessão', async () => {
+    const [first, second] = deckIds('glossario');
+    await open(`/track/${TRACK}`);
+    press('Estudar Glossário');
+    expect(screen.getByText(term(first))).toBeOnTheScreen();
+    press('Sair da sessão');
+    jest.spyOn(chance, 'random').mockReturnValue(0);
+    press('Estudar Glossário');
+    expect(screen.getByText(term(second))).toBeOnTheScreen();
+  });
+
+  it('Passos em ordem', async () => {
+    jest.spyOn(chance, 'random').mockReturnValue(0);
+    await open(`/study/${TRACK}/passo-a-passo`);
+    expect(screen.getByText('Passo 1')).toBeOnTheScreen();
+    answer('Já sabia');
+    expect(screen.getByText('Passo 2')).toBeOnTheScreen();
+  });
+
+  it('Mesmos cards', async () => {
+    const ids = deckIds('o-que-vamos-criar');
+    seed(ids.slice(0, 2), 'known');
+    jest.spyOn(chance, 'random').mockReturnValue(0);
+    await open(`/track/${TRACK}`);
+    press('Continuar O que vamos criar');
+    expect(screen.getByText('1 / 3')).toBeOnTheScreen();
+    for (let i = 0; i < 3; i++) answer('Já sabia');
+    const known = Object.entries(useStudyStore.getState().progress).filter(([, r]) => r === 'known');
+    expect(known.map(([k]) => k).sort()).toEqual(ids.map((id) => progressKey(TRACK, id)).sort());
+  });
+
   it('deck inexistente mostra aviso', async () => {
     await open(`/study/${TRACK}/nao-existe`);
     expect(screen.getByText(/não encontrado/i)).toBeOnTheScreen();
@@ -143,6 +190,35 @@ describe('Requirement: Virar e responder (na tela)', () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
     press('Virar card');
     expect(screen.getByText('C · Create')).toBeOnTheScreen();
+  });
+
+  it('Voltar para a pergunta', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    press('Ver pergunta');
+    expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Já sabia' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Não sabia' })).toBeNull();
+    expect(screen.queryByText('C · Create')).toBeNull();
+  });
+
+  it('Tocar no verso', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    fireEvent.press(screen.getByTestId('card-back'));
+    expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
+    expect(screen.queryByText('C · Create')).toBeNull();
+  });
+
+  it('Virar de novo', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    press('Ver pergunta');
+    press('Mostrar resposta');
+    expect(screen.getByText('C · Create')).toBeOnTheScreen();
+    press('Já sabia');
+    expect(screen.getByText('2 / 5')).toBeOnTheScreen();
+    expect(useStudyStore.getState().progress[progressKey(TRACK, 'endpoint-create')]).toBe('known');
   });
 
   it('Responder e avançar', async () => {
@@ -232,5 +308,14 @@ describe('Requirement: Animação de virar o card (na sessão)', () => {
     // sem avançar timers: a animação ainda está em curso, mas os botões já existem
     expect(screen.getByRole('button', { name: 'Não sabia' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
+  });
+
+  it('Voltar para a frente com animação', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    press('Ver pergunta');
+    // sem avançar timers: a volta ainda anima, mas "Mostrar resposta" já existe
+    expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
+    expect(screen.getByTestId('card-front')).toBeOnTheScreen();
   });
 });
