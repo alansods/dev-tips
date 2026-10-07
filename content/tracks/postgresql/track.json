@@ -2,6 +2,7 @@
   "id": "postgresql",
   "title": "PostgreSQL",
   "description": "O banco relacional open source mais completo: tipos avançados, índices, MVCC, VACUUM e extensões.",
+  "icon": { "logo": "postgresql" },
   "areas": [
     "banco-de-dados"
   ],

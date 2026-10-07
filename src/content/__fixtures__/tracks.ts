@@ -106,14 +106,14 @@ export function fullTrack(): Json {
 export function testTaxonomy(): Json {
   return {
     languages: [
-      { id: 'java', name: 'Java' },
-      { id: 'python', name: 'Python' },
-      { id: 'typescript', name: 'TypeScript' },
+      { id: 'java', name: 'Java', icon: 'openjdk' },
+      { id: 'python', name: 'Python', icon: 'python' },
+      { id: 'typescript', name: 'TypeScript', icon: 'typescript' },
     ],
     frameworks: [
-      { id: 'spring', name: 'Spring Boot', language: 'java' },
-      { id: 'fastapi', name: 'FastAPI', language: 'python' },
-      { id: 'nest', name: 'NestJS', language: 'typescript' },
+      { id: 'spring', name: 'Spring Boot', language: 'java', icon: 'springboot' },
+      { id: 'fastapi', name: 'FastAPI', language: 'python', icon: 'fastapi' },
+      { id: 'nest', name: 'NestJS', language: 'typescript', icon: 'nestjs' },
     ],
   };
 }

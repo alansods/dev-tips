@@ -2,6 +2,7 @@
   "id": "nodejs",
   "title": "Node.js",
   "description": "JavaScript no servidor: o runtime, módulos, npm, streams e processos.",
+  "icon": { "logo": "nodedotjs" },
   "areas": [
     "backend"
   ],

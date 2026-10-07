@@ -6,6 +6,9 @@ import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
 import { FullScreenHeader } from '../../components/FullScreen';
 import { ProgressBar } from '../../components/ProgressBar';
+import { TechIcon } from '../../components/TechIcon';
+import { repoTaxonomy } from '../../content';
+import { trackIcon } from '../../content/icons';
 import { useCatalogTrack } from '../../content/useCatalog';
 import type { Deck, Track } from '../../content';
 import { useT } from '../../i18n';
@@ -38,6 +41,7 @@ function TrackContent({ track }: { track: Track }) {
 
   return (
     <ScrollView contentContainerStyle={styles.content}>
+      <TechIcon icon={trackIcon(track, repoTaxonomy)} size={48} />
       <AppText font="bold" size={24} accessibilityRole="header" style={{ lineHeight: 30 }}>
         {track.title}
       </AppText>

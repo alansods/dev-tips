@@ -2,6 +2,7 @@
   "id": "typescript-avancado",
   "title": "TypeScript avançado",
   "description": "Tipos reutilizáveis: generics, utility types, tipos mapeados e condicionais, keyof e type guards.",
+  "icon": { "logo": "typescript" },
   "areas": [
     "frontend",
     "backend"

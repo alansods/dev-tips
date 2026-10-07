@@ -43,6 +43,7 @@
     "jest-expo": "~57.0.5",
     "prettier": "^3.9.9",
     "react-test-renderer": "19.2.3",
+    "simple-icons": "^16.34.0",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -55,7 +56,7 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "icons": "node scripts/generate-icons.js"
+    "tech-icons": "node scripts/generate-tech-icons.mjs"
   },
   "private": true,
   "license": "UNLICENSED",

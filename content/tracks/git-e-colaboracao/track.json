@@ -2,6 +2,7 @@
   "id": "git-e-colaboracao",
   "title": "Git e colaboração",
   "description": "Versionar código e trabalhar em equipe: commits, branches, merge e rebase, pull requests, code review, conflitos e como desfazer erros.",
+  "icon": { "logo": "git" },
   "areas": [
     "fundamentos"
   ],

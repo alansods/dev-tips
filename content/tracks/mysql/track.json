@@ -2,6 +2,7 @@
   "id": "mysql",
   "title": "MySQL",
   "description": "O banco relacional mais popular da web: InnoDB, índice clusterizado, replicação, charset e diferenças para o PostgreSQL.",
+  "icon": { "logo": "mysql" },
   "areas": [
     "banco-de-dados"
   ],

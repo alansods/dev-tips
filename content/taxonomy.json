@@ -1,19 +1,19 @@
 {
   "languages": [
-    { "id": "javascript", "name": "JavaScript" },
-    { "id": "java", "name": "Java" },
-    { "id": "python", "name": "Python" }
+    { "id": "javascript", "name": "JavaScript", "icon": "javascript" },
+    { "id": "java", "name": "Java", "icon": "openjdk" },
+    { "id": "python", "name": "Python", "icon": "python" }
   ],
   "frameworks": [
-    { "id": "react", "name": "React", "language": "javascript" },
-    { "id": "vue", "name": "Vue", "language": "javascript" },
-    { "id": "nextjs", "name": "Next.js", "language": "javascript" },
-    { "id": "express", "name": "Express", "language": "javascript" },
-    { "id": "angular", "name": "Angular", "language": "javascript" },
-    { "id": "nest", "name": "NestJS", "language": "javascript" },
-    { "id": "react-native", "name": "React Native", "language": "javascript" },
-    { "id": "spring", "name": "Spring Boot", "language": "java" },
-    { "id": "fastapi", "name": "FastAPI", "language": "python" },
-    { "id": "django", "name": "Django", "language": "python" }
+    { "id": "react", "name": "React", "language": "javascript", "icon": "react" },
+    { "id": "vue", "name": "Vue", "language": "javascript", "icon": "vuedotjs" },
+    { "id": "nextjs", "name": "Next.js", "language": "javascript", "icon": "nextdotjs" },
+    { "id": "express", "name": "Express", "language": "javascript", "icon": "express" },
+    { "id": "angular", "name": "Angular", "language": "javascript", "icon": "angular" },
+    { "id": "nest", "name": "NestJS", "language": "javascript", "icon": "nestjs" },
+    { "id": "react-native", "name": "React Native", "language": "javascript", "icon": "react" },
+    { "id": "spring", "name": "Spring Boot", "language": "java", "icon": "springboot" },
+    { "id": "fastapi", "name": "FastAPI", "language": "python", "icon": "fastapi" },
+    { "id": "django", "name": "Django", "language": "python", "icon": "django" }
   ]
 }
