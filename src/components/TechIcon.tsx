@@ -12,7 +12,7 @@ import type { ColorScheme, ColorTokens } from '../theme/tokens';
 import { AppText } from './AppText';
 import { AREA_ICONS } from './icons';
 
-export type TechIconSize = 32 | 40 | 48;
+export type TechIconSize = 20 | 32 | 40 | 48;
 
 /** Cor do logo: a da marca, exceto no escuro quando ela some contra o fundo. */
 export function logoColor(hex: string, scheme: ColorScheme, colors: ColorTokens): string {

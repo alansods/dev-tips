@@ -270,6 +270,7 @@ export const ptBR = {
       question: 'Entrevista',
     },
     stepNumber: (n: number) => `Passo ${n}`,
+    origin: (track: string, deck: string) => `${track} · ${deck}`,
     supplement: 'Complemento',
     levels: { junior: 'Júnior', pleno: 'Pleno', senior: 'Sênior' },
     relatedTerms: 'Termos relacionados',

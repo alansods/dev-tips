@@ -270,6 +270,7 @@ export const en: Messages = {
       question: 'Interview',
     },
     stepNumber: (n) => `Step ${n}`,
+    origin: (track, deck) => `${track} · ${deck}`,
     supplement: 'Supplement',
     levels: { junior: 'Junior', pleno: 'Mid-level', senior: 'Senior' },
     relatedTerms: 'Related terms',
