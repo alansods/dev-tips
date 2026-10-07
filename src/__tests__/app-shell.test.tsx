@@ -104,6 +104,16 @@ describe('Requirement: Fontes do design', () => {
 });
 
 describe('Requirement: Navegação por abas (cabeçalho)', () => {
+  it('nenhuma aba mostra o título num cabeçalho', async () => {
+    await renderApp();
+    // o nome da aba aparece só uma vez: na barra de abas
+    expect(screen.getAllByText('Início')).toHaveLength(1);
+    for (const label of ['Trilhas', 'Perfil']) {
+      fireEvent.press(tab(label));
+      expect(screen.getAllByText(label)).toHaveLength(1);
+    }
+  });
+
   it('Cabeçalho sem botões', async () => {
     await renderApp();
     expect(screen.queryByRole('button', { name: /^Usar tema/ })).toBeNull();

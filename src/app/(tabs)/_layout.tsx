@@ -22,11 +22,8 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerStyle: { backgroundColor: colors.bg },
-        headerShadowVisible: false,
-        headerTintColor: colors.ink,
-        headerTitleAlign: 'left',
-        headerTitleStyle: { fontFamily: family('bold'), fontSize: 20, color: colors.ink },
+        // Sem cabeçalho: o nome da aba já aparece na barra de abas.
+        headerShown: false,
         sceneStyle: { backgroundColor: colors.bg },
         tabBarActiveTintColor: colors.accentText,
         tabBarInactiveTintColor: colors.muted,
