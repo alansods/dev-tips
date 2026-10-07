@@ -4,7 +4,6 @@
 
 Mantém uma cópia do progresso e das preferências na conta do usuário, juntando as mudanças feitas em cada aparelho, sem deixar de funcionar offline.
 ## Requirements
-
 ### Requirement: Enviar mudanças à API
 `PUT /sync`, com sessão válida, SHALL receber `{ "cards": [{ "trackId", "cardId", "result", "box", "due", "updatedAt" }], "settings": { "language", "preferredVariant", "updatedAt" } }` (as duas partes opcionais; `result`, `box` e `due` nulos significam "sem resposta", usados ao zerar). Para cada card, a API SHALL guardar a versão recebida só se o `updatedAt` dela for maior que o guardado; o mesmo vale para `settings`. A resposta SHALL ser `200` com `{ "serverTime" }`. Um corpo inválido SHALL responder `400` com o código `invalid_body`; mais de 500 cards numa requisição SHALL responder `400` com o código `too_many_items`.
 
@@ -36,7 +35,7 @@ Mantém uma cópia do progresso e das preferências na conta do usuário, juntan
 - **THEN** a resposta traz todos os cards e as preferências da conta
 
 ### Requirement: O que sincroniza
-Com sessão, o app SHALL sincronizar, por card, a resposta ("já sabia" ou "não sabia") com a caixa e a data de revisão, além do idioma escolhido e do framework preferido de cada trilha. Os lembretes e o último dia de estudo MUST continuar só no aparelho. Sem sessão, o app MUST NOT chamar a API de sincronização.
+Com sessão, o app SHALL sincronizar, por card, a resposta ("já sabia" ou "não sabia") com a caixa e a data de revisão, além do idioma escolhido e do framework preferido de cada trilha. Os lembretes, o último dia de estudo e os dias estudados MUST continuar só no aparelho. Sem sessão, o app MUST NOT chamar a API de sincronização.
 
 #### Scenario: Progresso em outro aparelho
 - **WHEN** o usuário marca `cors` como "já sabia" no aparelho A, e o aparelho B, com a mesma conta, sincroniza
@@ -91,7 +90,7 @@ No primeiro login de um aparelho, o progresso local SHALL ser juntado ao da cont
 - **THEN** no aparelho B a trilha CRUD também aparece zerado
 
 ### Requirement: Estado da sincronização
-A tela Conta e a linha da conta em Ajustes SHALL mostrar o estado da sincronização: "Sincronizado agora há pouco" (ou "Sincronizado há N minutos"), "Sincronizando…", "Aguardando conexão" (sem conexão, com mudanças na fila) ou "Não foi possível sincronizar" (erro da API).
+A tela Conta e a linha da conta na aba Perfil SHALL mostrar o estado da sincronização: "Sincronizado agora há pouco" (ou "Sincronizado há N minutos"), "Sincronizando…", "Aguardando conexão" (sem conexão, com mudanças na fila) ou "Não foi possível sincronizar" (erro da API).
 
 #### Scenario: Sincronizado
 - **WHEN** a última sincronização terminou há menos de 1 minuto
@@ -115,3 +114,4 @@ Com sessão e sem conexão, as abas SHALL mostrar abaixo do cabeçalho o aviso "
 #### Scenario: Offline sem conta
 - **WHEN** não há sessão e a conexão cai
 - **THEN** nenhum aviso de offline aparece
+

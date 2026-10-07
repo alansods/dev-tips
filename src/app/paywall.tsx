@@ -25,7 +25,7 @@ const CLOSE_DELAY_MS = 800;
 
 function close() {
   if (router.canGoBack()) router.back();
-  else router.replace('/settings');
+  else router.replace('/profile');
 }
 
 type Message = { text: string; tone: 'ok' | 'error' };

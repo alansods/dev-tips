@@ -6,7 +6,7 @@ import type { Messages } from './pt-BR';
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const en: Messages = {
-  tabs: { tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress' },
+  tabs: { tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress', profile: 'Profile' },
   common: {
     back: 'Back',
     close: 'Close',
@@ -14,15 +14,20 @@ export const en: Messages = {
     trackNotFound: 'Track not found.',
     deckNotFound: 'Deck not found.',
   },
-  themeToggle: { toLight: 'Use light theme', toDark: 'Use dark theme' },
   settings: {
-    title: 'Settings',
     language: 'Language',
     about: 'About',
     privacy: 'Privacy policy',
     terms: 'Terms of use',
     version: 'Version',
     versionLabel: (version) => `Version ${version}`,
+    theme: 'Theme',
+    themeModes: { system: 'Automatic', light: 'Light', dark: 'Dark' },
+    study: 'Your study',
+    progressByTrack: 'Progress by track',
+    streak: (n) => (n === 1 ? 'day in a row' : 'days in a row'),
+    knownCards: (n) => (n === 1 ? 'card I know' : 'cards I know'),
+    startedTracks: (n) => (n === 1 ? 'track started' : 'tracks started'),
   },
   errors: {
     title: 'Something went wrong',

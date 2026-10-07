@@ -1,30 +1,32 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppText } from '../../components/AppText';
-import { Button } from '../../components/Button';
-import { ExpansionPanel } from '../../components/ExpansionPanel';
-import { ProgressBar } from '../../components/ProgressBar';
-import { Screen } from '../../components/Screen';
-import { TechIcon } from '../../components/TechIcon';
-import { repoTaxonomy } from '../../content';
-import { trackIcon } from '../../content/icons';
-import { useCatalog } from '../../content/useCatalog';
-import type { Track } from '../../content';
-import { useT } from '../../i18n';
-import { deckStats, trackStats } from '../../study/rules';
-import { useStudyStore } from '../../study/store';
-import { useTheme } from '../../theme/ThemeProvider';
-import { radius, spacing } from '../../theme/tokens';
+import { AppText } from '../components/AppText';
+import { Button } from '../components/Button';
+import { ExpansionPanel } from '../components/ExpansionPanel';
+import { ProgressBar } from '../components/ProgressBar';
+import { FullScreen } from '../components/FullScreen';
+import { TechIcon } from '../components/TechIcon';
+import { repoTaxonomy } from '../content';
+import { trackIcon } from '../content/icons';
+import { useCatalog } from '../content/useCatalog';
+import type { Track } from '../content';
+import { useT } from '../i18n';
+import { deckStats, trackStats } from '../study/rules';
+import { useStudyStore } from '../study/store';
+import { useTheme } from '../theme/ThemeProvider';
+import { radius, spacing } from '../theme/tokens';
 
+/** Progresso por trilha, em tela cheia, aberto pela aba Perfil. */
 export default function ProgressScreen() {
   const catalog = useCatalog();
+  const t = useT();
   return (
-    <Screen>
+    <FullScreen kicker={t.tabs.profile} title={t.tabs.progress} missing="" fallback="/profile">
       {catalog.map((track) => (
         <TrackProgress key={track.id} track={track} />
       ))}
-    </Screen>
+    </FullScreen>
   );
 }
 

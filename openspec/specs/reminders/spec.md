@@ -4,10 +4,10 @@
 Lembra o usuário, uma vez por dia e só se ele quiser, de revisar os cards que vencem ou de praticar, usando notificações locais do aparelho.
 ## Requirements
 ### Requirement: Seção Lembretes
-A tela Ajustes SHALL mostrar, depois da seção "Idioma", a seção "Lembretes" com o interruptor "Lembrete diário" e a escolha de horário entre "Manhã 08:00", "Almoço 12:30" e "Noite 20:00". O lembrete MUST começar desligado, com "Noite 20:00" selecionado. A escolha de horário SHALL ficar disponível só com o lembrete ligado. Na web, a seção MUST NOT aparecer.
+A aba Perfil SHALL mostrar, depois da seção "Idioma", a seção "Lembretes" com o interruptor "Lembrete diário" e a escolha de horário entre "Manhã 08:00", "Almoço 12:30" e "Noite 20:00". O lembrete MUST começar desligado, com "Noite 20:00" selecionado. A escolha de horário SHALL ficar disponível só com o lembrete ligado. Na web, a seção MUST NOT aparecer.
 
 #### Scenario: Estado inicial
-- **WHEN** o usuário abre Ajustes pela primeira vez
+- **WHEN** o usuário abre a aba Perfil pela primeira vez
 - **THEN** a seção "Lembretes" mostra "Lembrete diário" desligado e nenhuma notificação está agendada
 
 #### Scenario: Horário só com o lembrete ligado
@@ -16,7 +16,7 @@ A tela Ajustes SHALL mostrar, depois da seção "Idioma", a seção "Lembretes" 
 
 #### Scenario: Web
 - **WHEN** o app roda na web
-- **THEN** a tela Ajustes não mostra a seção "Lembretes"
+- **THEN** a aba Perfil não mostra a seção "Lembretes"
 
 ### Requirement: Permissão sob demanda
 O app MUST NOT pedir permissão de notificação ao abrir. Ao ligar o lembrete, o app SHALL pedir a permissão se ela ainda não foi concedida. Com a permissão concedida, o lembrete fica ligado e as notificações são agendadas. Com a permissão negada, o lembrete SHALL continuar desligado e a seção SHALL mostrar "Ative as notificações nas configurações do aparelho." com o botão "Abrir ajustes", que abre os ajustes do app no sistema.

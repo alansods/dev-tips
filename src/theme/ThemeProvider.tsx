@@ -6,10 +6,14 @@ import { palettes, type ColorScheme, type ColorTokens } from './tokens';
 
 export const COLOR_SCHEME_KEY = 'dev-tips:color-scheme';
 
+/** Escolha do usuário: seguir o sistema ou forçar claro/escuro. */
+export type ThemeMode = 'system' | ColorScheme;
+
 type ThemeValue = {
   scheme: ColorScheme;
   colors: ColorTokens;
-  toggle: () => void;
+  mode: ThemeMode;
+  setMode: (mode: ThemeMode) => void;
 };
 
 const ThemeContext = createContext<ThemeValue | null>(null);
@@ -17,9 +21,10 @@ const ThemeContext = createContext<ThemeValue | null>(null);
 const isScheme = (v: unknown): v is ColorScheme => v === 'light' || v === 'dark';
 
 /**
- * Segue o modo do sistema até o usuário escolher um manualmente; a escolha
- * fica salva no aparelho e prevalece nas próximas aberturas. Falhas de
- * leitura/escrita da preferência são ignoradas (o app segue o sistema).
+ * Segue o modo do sistema ("Automático") até o usuário escolher claro ou
+ * escuro; a escolha fica salva no aparelho e prevalece nas próximas aberturas.
+ * Voltar para "Automático" apaga a escolha. Falhas de leitura/escrita da
+ * preferência são ignoradas (o app segue o sistema).
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const system = useColorScheme();
@@ -40,15 +45,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const scheme: ColorScheme = override ?? (system === 'dark' ? 'dark' : 'light');
 
-  const toggle = useCallback(() => {
-    const next: ColorScheme = scheme === 'dark' ? 'light' : 'dark';
-    setOverride(next);
+  const setMode = useCallback((mode: ThemeMode) => {
+    setOverride(mode === 'system' ? null : mode);
     Promise.resolve()
-      .then(() => AsyncStorage.setItem(COLOR_SCHEME_KEY, next))
+      .then(() =>
+        mode === 'system' ? AsyncStorage.removeItem(COLOR_SCHEME_KEY) : AsyncStorage.setItem(COLOR_SCHEME_KEY, mode),
+      )
       .catch(() => {});
-  }, [scheme]);
+  }, []);
 
-  const value = useMemo(() => ({ scheme, colors: palettes[scheme], toggle }), [scheme, toggle]);
+  const value = useMemo(
+    () => ({ scheme, colors: palettes[scheme], mode: override ?? ('system' as const), setMode }),
+    [scheme, override, setMode],
+  );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

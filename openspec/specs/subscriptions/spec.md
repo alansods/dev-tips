@@ -120,25 +120,6 @@ Uma pergunta SHALL contar na cota só quando for respondida com sucesso. Uma ren
 - **WHEN** um assinante apaga a conta e entra de novo com o mesmo Google
 - **THEN** o novo usuário aparece como plano grátis até sincronizar ou restaurar a compra
 
-### Requirement: Linha Dev Tips Pro em Ajustes
-Na seção "Conta" de Ajustes, logo abaixo do convite para entrar ou da linha do usuário, o app SHALL mostrar a linha "Dev Tips Pro":
-- no plano grátis, com o texto "Tire dúvidas sobre cada card"; tocar nela abre o paywall;
-- para usuários Pro, com o texto "Ativo"; tocar nela abre a tela "Conta".
-
-A linha SHALL aparecer no Android e no iOS, e MUST NOT aparecer na web (onde a seção "Conta" não existe).
-
-#### Scenario: Usuário grátis
-- **WHEN** um usuário sem assinatura toca em "Dev Tips Pro" em Ajustes
-- **THEN** o paywall abre
-
-#### Scenario: Usuário Pro
-- **WHEN** um assinante abre Ajustes
-- **THEN** a linha "Dev Tips Pro" mostra "Ativo", e tocar nela abre a tela "Conta"
-
-#### Scenario: iOS
-- **WHEN** o app roda no iPhone e um usuário sem assinatura abre Ajustes
-- **THEN** a linha "Dev Tips Pro" aparece com "Tire dúvidas sobre cada card"
-
 ### Requirement: Paywall
 O paywall SHALL abrir em tela cheia, deslizando de baixo para cima, com botão de fechar abaixo da barra de status e do notch (sempre alcançável pelo toque), e mostrar:
 - o selo "PRO", o título "Travou num card? Pergunte." e o texto "Com o Pro, você tira dúvidas sobre o card que está estudando, na hora, sem sair da sessão.";
@@ -233,5 +214,24 @@ O app SHALL guardar no aparelho a última resposta, para usar sem conexão. Ao s
 
 #### Scenario: Sair da conta
 - **WHEN** um assinante sai da conta
-- **THEN** a linha "Dev Tips Pro" em Ajustes volta a mostrar "Tire dúvidas sobre cada card"
+- **THEN** a linha "Dev Tips Pro" na aba Perfil volta a mostrar "Tire dúvidas sobre cada card"
+
+### Requirement: Linha Dev Tips Pro no Perfil
+Na seção "Conta" da aba Perfil, logo abaixo do convite para entrar ou da linha do usuário, o app SHALL mostrar a linha "Dev Tips Pro":
+- no plano grátis, com o texto "Tire dúvidas sobre cada card"; tocar nela abre o paywall;
+- para usuários Pro, com o texto "Ativo"; tocar nela abre a tela "Conta".
+
+A linha SHALL aparecer no Android e no iOS, e MUST NOT aparecer na web (onde a seção "Conta" não existe).
+
+#### Scenario: Usuário grátis
+- **WHEN** um usuário sem assinatura toca em "Dev Tips Pro" na aba Perfil
+- **THEN** o paywall abre
+
+#### Scenario: Usuário Pro
+- **WHEN** um assinante abre a aba Perfil
+- **THEN** a linha "Dev Tips Pro" mostra "Ativo", e tocar nela abre a tela "Conta"
+
+#### Scenario: iOS
+- **WHEN** o app roda no iPhone e um usuário sem assinatura abre a aba Perfil
+- **THEN** a linha "Dev Tips Pro" aparece com "Tire dúvidas sobre cada card"
 

@@ -7,7 +7,8 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 
 // Os layouts e telas reais do app, montados num roteador em memória.
 const APP = {
@@ -15,10 +16,11 @@ const APP = {
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
 };
 
-const TAB_LABELS = ['Trilhas', 'Glossário', 'Progresso'];
+const TAB_LABELS = ['Trilhas', 'Glossário', 'Perfil'];
 
 async function renderApp() {
   renderRouter(APP, { initialUrl: '/' });
@@ -94,11 +96,13 @@ describe('Requirement: Fontes do design', () => {
   });
 });
 
-describe('cabeçalho', () => {
-  it('tem o botão de tema em todas as abas', async () => {
+describe('Requirement: Navegação por abas (cabeçalho)', () => {
+  it('Cabeçalho sem botões', async () => {
     await renderApp();
-    expect(screen.getByRole('button', { name: /^Usar tema/ })).toBeOnTheScreen();
-    fireEvent.press(tab('Progresso'));
-    expect(screen.getByRole('button', { name: /^Usar tema/ })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Usar tema/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Ajustes' })).toBeNull();
+    fireEvent.press(tab('Perfil'));
+    expect(screen).toHavePathname('/profile');
+    expect(screen.queryByRole('button', { name: 'Ajustes' })).toBeNull();
   });
 });

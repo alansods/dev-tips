@@ -9,7 +9,7 @@ O app SHALL mostrar o ícone de cada item, segundo o requisito "Ícone de lingua
 - na linha de cada linguagem e de cada framework: o logo da linguagem ou do framework;
 - no card de cada área, na aba Trilhas: o ícone de traço da área;
 - na tela da trilha, junto do título: o ícone da trilha;
-- no cabeçalho de cada painel da aba Progresso: o ícone da trilha.
+- no cabeçalho de cada painel da tela Progresso: o ícone da trilha.
 
 #### Scenario: Card de trilha com logo do framework
 - **WHEN** o usuário abre a área Frontend e a trilha React aparece
@@ -36,7 +36,7 @@ O app SHALL mostrar o ícone de cada item, segundo o requisito "Ícone de lingua
 - **THEN** a tela mostra o logo do Next.js junto do título
 
 #### Scenario: Painel de progresso
-- **WHEN** o usuário abre a aba Progresso
+- **WHEN** o usuário abre a tela Progresso
 - **THEN** o painel da trilha Django mostra o logo do Django no cabeçalho
 
 ### Requirement: Cores do ícone

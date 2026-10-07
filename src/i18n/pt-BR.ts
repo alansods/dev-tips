@@ -4,7 +4,7 @@
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const ptBR = {
-  tabs: { tracks: 'Trilhas', glossary: 'Glossário', progress: 'Progresso' },
+  tabs: { tracks: 'Trilhas', glossary: 'Glossário', progress: 'Progresso', profile: 'Perfil' },
   common: {
     back: 'Voltar',
     close: 'Fechar',
@@ -12,15 +12,20 @@ export const ptBR = {
     trackNotFound: 'Trilha não encontrada.',
     deckNotFound: 'Deck não encontrado.',
   },
-  themeToggle: { toLight: 'Usar tema claro', toDark: 'Usar tema escuro' },
   settings: {
-    title: 'Ajustes',
     language: 'Idioma',
     about: 'Sobre',
     privacy: 'Política de privacidade',
     terms: 'Termos de uso',
     version: 'Versão',
     versionLabel: (version: string) => `Versão ${version}`,
+    theme: 'Tema',
+    themeModes: { system: 'Automático', light: 'Claro', dark: 'Escuro' },
+    study: 'Seu estudo',
+    progressByTrack: 'Progresso por trilha',
+    streak: (n: number) => plural(n, 'dia seguido', 'dias seguidos'),
+    knownCards: (n: number) => plural(n, 'card que sei', 'cards que sei'),
+    startedTracks: (n: number) => plural(n, 'trilha iniciada', 'trilhas iniciadas'),
   },
   errors: {
     title: 'Algo deu errado',
