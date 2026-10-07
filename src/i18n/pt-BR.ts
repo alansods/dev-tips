@@ -212,6 +212,12 @@ export const ptBR = {
     trackStatus: { done: 'Concluída', started: 'Em andamento', new: 'Não iniciada' },
     pathRowLabel: (position: number, title: string, status: string) => `${position}. ${title}, ${status}`,
     pathDue: (n: number) => `${n} para revisar`,
+    searchLabel: 'Buscar trilha, linguagem ou tema',
+    filters: { all: 'Todas', started: 'Em andamento', new: 'Não iniciadas', done: 'Concluídas' },
+    filterCount: (label: string, n: number) => `${label} · ${n}`,
+    byLanguage: 'Por linguagem',
+    byArea: 'Por área',
+    noResults: 'Nenhuma trilha encontrada.',
     areaLabel: (area: string, tracks: string, known: number, total: number) =>
       `${area}, ${tracks}, ${known} de ${total} cards que você sabe`,
     rowLabel: (name: string, tracks: string) => `${name}, ${tracks}`,

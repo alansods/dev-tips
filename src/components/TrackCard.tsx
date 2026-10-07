@@ -88,11 +88,14 @@ export function AreaCard({
   name,
   tracks,
   onPress,
+  compact = false,
 }: {
   area: Area;
   name: string;
   tracks: readonly Track[];
   onPress: () => void;
+  /** Em duas colunas: ícone acima do nome. */
+  compact?: boolean;
 }) {
   const t = useT();
   const progress = useStudyStore((s) => s.progress);
@@ -101,10 +104,10 @@ export function AreaCard({
   const count = t.nav.trackCount(tracks.length);
   return (
     <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress}>
-      <View style={styles.row}>
+      <View style={compact ? { gap: spacing.sm } : styles.row}>
         <TechIcon icon={{ kind: 'area', area }} size={40} />
         <View style={{ flex: 1, gap: 2 }}>
-          <AppText font="semibold" size={18}>
+          <AppText font="semibold" size={compact ? 16 : 18}>
             {name}
           </AppText>
           <AppText size={13} tone="muted">
