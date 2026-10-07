@@ -6,6 +6,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import TrackScreen from '../app/track/[trackId]';
@@ -18,6 +19,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -75,7 +77,7 @@ describe('Requirement: Seção Lembretes', () => {
 
 describe('Requirement: Permissão sob demanda', () => {
   it('Nada é pedido ao abrir', async () => {
-    await open('/');
+    await open('/tracks');
     expect(N.requestPermissionsAsync).not.toHaveBeenCalled();
   });
 
@@ -162,7 +164,7 @@ describe('Requirement: Abrir pela notificação', () => {
     seedDue('crud-4-frameworks', 2);
     seedDue('fundamentos-web', 5);
     N.useLastNotificationResponse.mockReturnValue(tap('n1'));
-    await open('/');
+    await open('/tracks');
     expect(screen).toHavePathname('/track/fundamentos-web');
   });
 

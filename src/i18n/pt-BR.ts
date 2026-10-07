@@ -4,7 +4,7 @@
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const ptBR = {
-  tabs: { tracks: 'Trilhas', glossary: 'Glossário', progress: 'Progresso', profile: 'Perfil' },
+  tabs: { home: 'Início', tracks: 'Trilhas', glossary: 'Glossário', progress: 'Progresso', profile: 'Perfil' },
   common: {
     back: 'Voltar',
     close: 'Fechar',
@@ -19,6 +19,7 @@ export const ptBR = {
     terms: 'Termos de uso',
     version: 'Versão',
     versionLabel: (version: string) => `Versão ${version}`,
+    interests: 'Áreas de interesse',
     theme: 'Tema',
     themeModes: { system: 'Automático', light: 'Claro', dark: 'Escuro' },
     study: 'Seu estudo',
@@ -153,6 +154,37 @@ export const ptBR = {
   home: {
     cardLabel: (title: string, known: number, total: number) => `${title}, ${known} de ${total} cards que você sabe`,
     dueBadge: (n: number) => `${n} para revisar hoje`,
+    greeting: { morning: 'Bom dia', afternoon: 'Boa tarde', evening: 'Boa noite' },
+    greetingWithName: (greeting: string, name: string) => `${greeting}, ${name}`,
+    headline: 'Bora estudar um pouco?',
+    streak: (n: number) => `${n} ${plural(n, 'dia', 'dias')}`,
+    streakLabel: (n: number) => `${n} ${plural(n, 'dia seguido', 'dias seguidos')} de estudo`,
+    reviewKicker: 'Revisão de hoje',
+    reviewCount: (n: number) => `${n} ${plural(n, 'card', 'cards')} para revisar`,
+    reviewMeta: (tracks: number, minutes: number) =>
+      `${tracks} ${plural(tracks, 'trilha', 'trilhas')} · ~${minutes} min`,
+    startReview: 'Começar revisão',
+    nothingToReview: 'Nada para revisar hoje',
+    tomorrow: (n: number) => `Amanhã: ${n} ${plural(n, 'card', 'cards')}`,
+    week: (n: number) => `Estudou em ${n} dos últimos 7 dias`,
+    weekdays: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'],
+    continueTitle: 'Continue de onde parou',
+    deckPosition: (position: number, count: number, deck: string) => `deck ${position} de ${count} · ${deck}`,
+    continueLabel: (track: string, deck: string) => `Continuar ${track}, ${deck}`,
+    alsoInProgress: 'Também em andamento',
+    nextAfter: (track: string) => `Próximo passo depois de ${track}`,
+    forYou: 'Sugestões para você',
+    newTracks: 'Novas trilhas',
+    seeAll: 'Ver todas',
+    newBadge: 'Nova',
+    welcomeKicker: 'Bem-vindo ao Dev Tips',
+    welcomeTitle: 'Cards curtos para estudar desenvolvimento fullstack',
+    welcomeBody: 'Leia a frente, tente responder, vire o card. O app traz de volta o que você ainda não sabe.',
+    whatToStudy: 'O que você quer estudar?',
+    interestsHint: 'Muda as sugestões desta tela. Dá para trocar depois no Perfil.',
+    startHere: 'Comece por aqui',
+    startTrack: 'Começar a trilha',
+    then: (track: string) => `Depois: ${track}`,
   },
   nav: {
     areas: {

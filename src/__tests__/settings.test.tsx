@@ -6,6 +6,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import { useSettingsStore } from '../i18n';
@@ -17,6 +18,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -40,17 +42,17 @@ const tab = (label: string) => screen.getByRole(TAB_ROLE, { name: new RegExp(`^$
 
 describe('Requirement: Aba Perfil', () => {
   it('Abrir o Perfil', async () => {
-    await open('/');
+    await open('/tracks');
     fireEvent.press(tab('Perfil'));
     expect(screen).toHavePathname('/profile');
     expect(screen.getByRole('header', { name: 'Idioma' })).toBeOnTheScreen();
     expect(radio('Português (Brasil)')).toBeChecked();
     expect(radio('English')).not.toBeChecked();
-    expect(tabLabels()).toEqual(['Trilhas', 'Glossário', 'Perfil']);
+    expect(tabLabels()).toEqual(['Início', 'Trilhas', 'Glossário', 'Perfil']);
   });
 
   it('Abrir o progresso por trilha', async () => {
-    await open('/');
+    await open('/tracks');
     fireEvent.press(tab('Perfil'));
     press('Progresso por trilha');
     expect(screen).toHavePathname('/progress');
@@ -107,7 +109,7 @@ describe('Requirement: Trocar o idioma', () => {
     fireEvent.press(radio('English'));
     expect(screen.getByRole('header', { name: 'Language' })).toBeOnTheScreen();
     expect(useSettingsStore.getState().language).toBe('en');
-    expect(tabLabels()).toEqual(['Tracks', 'Glossary', 'Profile']);
+    expect(tabLabels()).toEqual(['Home', 'Tracks', 'Glossary', 'Profile']);
   });
 });
 
@@ -135,7 +137,7 @@ describe('Requirement: Aba Perfil (seções)', () => {
   it('Ordem das seções', async () => {
     await open('/profile');
     const headers = screen.getAllByRole('header').map((el) => String(el.props.children));
-    expect(headers).toEqual(['Conta', 'Seu estudo', 'Idioma', 'Lembretes', 'Tema', 'Sobre']);
+    expect(headers).toEqual(['Conta', 'Seu estudo', 'Áreas de interesse', 'Idioma', 'Lembretes', 'Tema', 'Sobre']);
   });
 });
 

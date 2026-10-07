@@ -4,6 +4,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
@@ -21,6 +22,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -58,7 +60,7 @@ afterEach(() => fetchMock.mockRestore());
 describe('Requirement: Aviso de offline', () => {
   it('Ficar offline com conta', async () => {
     await signIn();
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(OFFLINE)).toBeNull();
     await act(async () => network.__setNetworkState(false));
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
@@ -71,7 +73,7 @@ describe('Requirement: Aviso de offline', () => {
   it('Reconectar', async () => {
     await signIn();
     network.__setNetworkState(false);
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
     await act(async () => network.__setNetworkState(true));
     expect(screen.queryByText(OFFLINE)).toBeNull();
@@ -79,7 +81,7 @@ describe('Requirement: Aviso de offline', () => {
 
   it('Offline sem conta', async () => {
     network.__setNetworkState(false);
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(OFFLINE)).toBeNull();
   });
 });
@@ -108,7 +110,7 @@ describe('Requirement: Primeiro login', () => {
   it('mensagem depois da primeira sincronização', async () => {
     useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
     await signIn();
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText('Seu progresso foi salvo na conta.')).toBeOnTheScreen();
     expect(server.card('crud-4-frameworks', 'cors')?.result).toBe('known');
   });

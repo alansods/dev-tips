@@ -4,6 +4,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
@@ -23,6 +24,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -50,7 +52,7 @@ afterEach(() => jest.restoreAllMocks());
 
 describe('Requirement: Home por áreas', () => {
   it('Áreas com o conteúdo atual', async () => {
-    await open('/');
+    await open('/tracks');
     const areas = screen
       .getAllByRole('button')
       .map((b) => String(b.props.accessibilityLabel ?? ''))
@@ -62,7 +64,7 @@ describe('Requirement: Home por áreas', () => {
   });
 
   it('Progresso somado da área', async () => {
-    await open('/');
+    await open('/tracks');
     const backend = within(screen.getByRole('button', { name: /^Backend,/ }));
     expect(backend.getByText(`0/${total(crudTrack)}`)).toBeOnTheScreen();
     expect(backend.getByText('1 trilha')).toBeOnTheScreen();
@@ -71,7 +73,7 @@ describe('Requirement: Home por áreas', () => {
   });
 
   it('Tocar na área', async () => {
-    await open('/');
+    await open('/tracks');
     press(/^Backend,/);
     expect(screen).toHavePathname('/area/backend');
   });
@@ -80,7 +82,7 @@ describe('Requirement: Home por áreas', () => {
 describe('Requirement: Revisão na Home', () => {
   it('Aviso na Home', async () => {
     glossaryIds.slice(0, 2).forEach((id) => useStudyStore.getState().answer(crudTrack.id, id, 'unknown'));
-    await open('/');
+    await open('/tracks');
     expect(
       within(screen.getByRole('button', { name: /^Backend,/ })).getByText('2 para revisar hoje'),
     ).toBeOnTheScreen();
@@ -94,7 +96,7 @@ describe('Requirement: Revisão na Home', () => {
   });
 
   it('Sem revisão', async () => {
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(/para revisar hoje/)).toBeNull();
   });
 });
@@ -136,7 +138,7 @@ describe('Requirement: Tela da área', () => {
 
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
-    await open('/');
+    await open('/tracks');
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks,/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
@@ -144,13 +146,13 @@ describe('Requirement: Tela da trilha', () => {
   });
 
   it('Voltar para as trilhas', async () => {
-    await open('/');
+    await open('/tracks');
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks,/);
     press('Voltar');
     expect(screen).toHavePathname('/area/backend');
     press('Voltar');
-    expect(screen).toHavePathname('/');
+    expect(screen).toHavePathname('/tracks');
   });
 });
 
@@ -174,7 +176,7 @@ describe('Requirement: Textos da navegação', () => {
   beforeEach(() => useSettingsStore.setState({ language: 'en' }));
 
   it('Home em inglês', async () => {
-    await open('/');
+    await open('/tracks');
     expect(screen.getByRole('button', { name: /^Fundamentals,/ })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: /^Backend,/ })).toBeOnTheScreen();
     expect(within(screen.getByRole('button', { name: /^Backend,/ })).getByText('1 track')).toBeOnTheScreen();

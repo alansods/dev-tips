@@ -136,6 +136,12 @@ export const trackSchema = z.object({
   framework: id().optional(),
   icon: trackIconSchema.optional(),
   prerequisites: z.array(id()).default([]),
+  addedAt: z
+    .string()
+    .refine((s) => /^\d{4}-\d{2}-\d{2}$/.test(s) && new Date(`${s}T00:00:00Z`).toISOString().startsWith(s), {
+      error: 'data deve estar no formato AAAA-MM-DD e existir',
+    })
+    .optional(),
   section: z.enum(SECTIONS, { error: `seção desconhecida; use: ${SECTIONS.join(', ')}` }).optional(),
   variants: z.array(variantSchema).optional(),
   compareColumns: z.array(compareColumnSchema).optional(),

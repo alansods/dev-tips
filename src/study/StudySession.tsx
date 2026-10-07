@@ -17,7 +17,15 @@ import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { flipDuration } from './motion';
 import * as chance from './chance';
-import { cardTitle, initialSession, sessionOrder, sessionReducer, summary, type SessionState } from './rules';
+import {
+  cardTitle,
+  initialSession,
+  progressKey,
+  sessionOrder,
+  sessionReducer,
+  summary,
+  type SessionState,
+} from './rules';
 import { useStudyStore } from './store';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -26,26 +34,47 @@ export function leaveToTrack(trackId: string) {
   else router.replace(`/track/${trackId}`);
 }
 
+/** Um card da sessão e a trilha a que ele pertence. */
+export type SessionEntry = { trackId: string; cardId: string };
+
 type SessionProps = {
-  track: Track;
+  /** Trilhas dos cards da sessão (uma, no deck; várias, na revisão de todas as trilhas). */
+  tracks: readonly Track[];
   /** Nome exibido no cabeçalho e no resumo (ex.: título do deck ou "Revisão de hoje"). */
   title: string;
-  /** Ids dos cards, calculados uma única vez na abertura da sessão. */
-  initialIds: () => string[];
+  /** Cards da sessão, calculados uma única vez na abertura. */
+  entries: () => SessionEntry[];
+  /** Sair da sessão (botão de fechar e "Voltar" do resumo). */
+  onExit: () => void;
 };
 
 /** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
-export function StudySession({ track, title, initialIds }: SessionProps) {
+export function StudySession({ tracks, title, entries, onExit }: SessionProps) {
   const { colors } = useTheme();
   const t = useT();
   const answerCard = useStudyStore((s) => s.answer);
   const setVariant = useStudyStore((s) => s.setVariant);
-  const variantId = useStudyStore((s) => s.preferredVariant[track.id]) ?? track.variants?.[0]?.id ?? '';
+  const preferredVariant = useStudyStore((s) => s.preferredVariant);
 
-  const cardsById = useMemo(() => new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c])), [track]);
+  // Cada card da sessão é identificado por `trackId:cardId` (a mesma chave do progresso).
+  const byKey = useMemo(
+    () =>
+      new Map(
+        tracks.flatMap((track) =>
+          track.decks.flatMap((d) => d.cards).map((card) => [progressKey(track.id, card.id), { track, card }] as const),
+        ),
+      ),
+    [tracks],
+  );
+  const cardsById = useMemo(() => new Map([...byKey].map(([key, { card }]) => [key, card])), [byKey]);
   // A ordem é sorteada ao abrir (e ao reiniciar pelo resumo) e fica fixa até o fim da sessão.
-  const order = (ids: string[]) => sessionOrder(ids, cardsById, chance.random);
-  const [state, dispatch] = useReducer(sessionReducer, undefined, () => initialSession(order(initialIds())));
+  const order = (keys: string[]) => sessionOrder(keys, cardsById, chance.random);
+  const [state, dispatch] = useReducer(sessionReducer, undefined, () =>
+    initialSession(order(entries().map((e) => progressKey(e.trackId, e.cardId)))),
+  );
+  const current = state.finished ? undefined : byKey.get(state.ids[state.index]);
+  const track = current?.track ?? tracks[0];
+  const variantId = preferredVariant[track.id] ?? track.variants?.[0]?.id ?? '';
   const [openTerm, setOpenTerm] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
   // 0 = de lado (90°, invisível), 1 = de frente. Anima o lado que entra quando o
@@ -73,7 +102,7 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
     ],
   };
 
-  const exit = () => leaveToTrack(track.id);
+  const exit = onExit;
 
   if (state.finished) {
     return (
@@ -89,7 +118,7 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
     );
   }
 
-  const card = cardsById.get(state.ids[state.index])!;
+  const card = current!.card;
   const total = state.ids.length;
   const respond = (result: 'known' | 'unknown') => {
     answerCard(track.id, card.id, result);

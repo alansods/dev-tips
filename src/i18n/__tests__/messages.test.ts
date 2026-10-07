@@ -27,7 +27,13 @@ describe('Requirement: Interface traduzida', () => {
   });
 
   it('textos em inglês da spec', () => {
-    expect(en.tabs).toEqual({ tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress', profile: 'Profile' });
+    expect(en.tabs).toEqual({
+      home: 'Home',
+      tracks: 'Tracks',
+      glossary: 'Glossary',
+      progress: 'Progress',
+      profile: 'Profile',
+    });
     expect(en.settings.theme).toBe('Theme');
     expect(en.settings.themeModes).toEqual({ system: 'Automatic', light: 'Light', dark: 'Dark' });
     expect(en.answer.unknown.button).toBe("I didn't know");

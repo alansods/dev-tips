@@ -2,6 +2,7 @@
   "id": "fundamentos-web",
   "title": "Fundamentos web",
   "description": "Os conceitos da web por trás de toda API: HTTP, REST, regras do navegador e segurança.",
+  "addedAt": "2026-10-02",
   "areas": [
     "fundamentos"
   ],

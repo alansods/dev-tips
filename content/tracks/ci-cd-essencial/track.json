@@ -3,6 +3,7 @@
   "title": "CI/CD essencial",
   "description": "Do commit à produção: integração contínua, pipelines, testes, artefatos e estratégias de deploy.",
   "prerequisites": ["git-e-colaboracao"],
+  "addedAt": "2026-10-05",
   "areas": [
     "devops"
   ],

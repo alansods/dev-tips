@@ -3,6 +3,7 @@ import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testin
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import AreaScreen from '../app/area/[areaId]/index';
 import TrackScreen from '../app/track/[trackId]';
 import { getTrack } from '../content/catalog';
@@ -13,6 +14,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
 };

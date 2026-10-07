@@ -25,6 +25,8 @@ type StudyData = {
   lastStudyDay: string | null;
   /** Dias com estudo (últimos 60), para a sequência de dias seguidos. Só no aparelho. */
   studyDays: string[];
+  /** Trilha e card da última resposta, para o "Continue de onde parou". Só no aparelho. */
+  lastAnswer: { trackId: string; cardId: string } | null;
 };
 
 type StudyState = StudyData & {
@@ -47,6 +49,7 @@ const savedSchema = z.object({
     .default({}),
   lastStudyDay: z.string().nullable().default(null),
   studyDays: z.array(z.string()).default([]),
+  lastAnswer: z.object({ trackId: z.string(), cardId: z.string() }).nullable().default(null),
 });
 
 /** Remove do registro as chaves da trilha (`trackId:...`). */
@@ -60,6 +63,7 @@ const initialData = (): StudyData => ({
   schedule: {},
   lastStudyDay: null,
   studyDays: [],
+  lastAnswer: null,
 });
 
 export const useStudyStore = create<StudyState>()(
@@ -75,6 +79,7 @@ export const useStudyStore = create<StudyState>()(
             schedule: { ...s.schedule, [key]: nextSchedule(s.schedule[key], result, day) },
             lastStudyDay: day,
             studyDays: recordDay(s.studyDays, day),
+            lastAnswer: { trackId, cardId },
           };
         }),
       setVariant: (trackId, variantId) =>
@@ -87,7 +92,7 @@ export const useStudyStore = create<StudyState>()(
     }),
     {
       name: STUDY_STORAGE_KEY,
-      version: 3,
+      version: 4,
       storage: safeJSONStorage<StudyData>(),
       partialize: (s): StudyData => ({
         progress: s.progress,
@@ -95,6 +100,7 @@ export const useStudyStore = create<StudyState>()(
         schedule: s.schedule,
         lastStudyDay: s.lastStudyDay,
         studyDays: s.studyDays,
+        lastAnswer: s.lastAnswer,
       }),
       // v1 não tinha agendamento: mantém o progresso e começa o agendamento vazio.
       // v2 não tinha os dias estudados: começa com o último dia de estudo, se houver.
@@ -104,6 +110,7 @@ export const useStudyStore = create<StudyState>()(
         if (version < 2) data = { ...data, schedule: {} };
         if (version < 3)
           data = { ...data, studyDays: typeof data.lastStudyDay === 'string' ? [data.lastStudyDay] : [] };
+        if (version < 4) data = { ...data, lastAnswer: null };
         return data as StudyData;
       },
       // Só aceita o que foi salvo se tiver o formato esperado.

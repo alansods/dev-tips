@@ -31,9 +31,12 @@ export default function ReviewScreen() {
   }
   return (
     <StudySession
-      track={track}
+      tracks={[track]}
       title={t.session.reviewTitle}
-      initialIds={() => dueCardIds(track, useStudyStore.getState().schedule, today())}
+      entries={() =>
+        dueCardIds(track, useStudyStore.getState().schedule, today()).map((cardId) => ({ trackId: track.id, cardId }))
+      }
+      onExit={() => leaveToTrack(track.id)}
     />
   );
 }

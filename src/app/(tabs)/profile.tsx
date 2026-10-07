@@ -2,6 +2,7 @@ import { Screen } from '../../components/Screen';
 import { RemindersSection } from '../../reminders/RemindersSection';
 import { AboutSection } from '../../settings/AboutSection';
 import { AccountSection } from '../../settings/AccountSection';
+import { InterestsSection } from '../../settings/InterestsSection';
 import { LanguageSection } from '../../settings/LanguageSection';
 import { StudySummary } from '../../settings/StudySummary';
 import { ThemeSection } from '../../settings/ThemeSection';
@@ -12,6 +13,7 @@ export default function ProfileScreen() {
     <Screen>
       <AccountSection />
       <StudySummary />
+      <InterestsSection />
       <LanguageSection />
       <RemindersSection />
       <ThemeSection />

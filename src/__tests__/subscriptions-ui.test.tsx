@@ -5,6 +5,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import ProfileScreen from '../app/(tabs)/profile';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import AccountScreen from '../app/account';
 import LoginScreen from '../app/login';
 import PaywallScreen from '../app/paywall';
@@ -35,6 +36,7 @@ const APP = {
   '(tabs)/_layout': TabsLayout,
   '(tabs)/profile': ProfileScreen,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   login: LoginScreen,
   account: AccountScreen,
   paywall: PaywallScreen,

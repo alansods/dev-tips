@@ -4,6 +4,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
@@ -18,6 +19,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -65,7 +67,7 @@ describe('Requirement: Tela da trilha', () => {
   });
 
   it('Voltar para as trilhas', async () => {
-    await open('/');
+    await open('/tracks');
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     press('Voltar');
@@ -283,7 +285,7 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
 
   it('progresso refletido na Home', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
-    await open('/');
+    await open('/tracks');
     // o card Backend soma todas as trilhas da área
     expect(within(screen.getByRole('button', { name: /^Backend,/ })).getByText(/^4\/\d+$/)).toBeOnTheScreen();
   });

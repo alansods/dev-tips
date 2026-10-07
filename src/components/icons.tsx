@@ -32,6 +32,14 @@ export function GlossaryIcon({ color, size = 22 }: IconProps) {
   );
 }
 
+export function HomeIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M4 10.5L12 4l8 6.5V20h-5v-6h-6v6H4z" />
+    </Svg>
+  );
+}
+
 export function ProfileIcon({ color, size = 22 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>

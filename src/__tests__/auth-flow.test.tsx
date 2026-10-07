@@ -5,6 +5,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AccountScreen from '../app/account';
@@ -30,6 +31,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -81,7 +83,7 @@ afterEach(() => fetchMock.mockRestore());
 describe('Requirement: Tela de login', () => {
   it('Primeiro uso', async () => {
     useSettingsStore.setState({ onboardingSeen: false });
-    await open('/');
+    await open('/tracks');
     expect(screen).toHavePathname('/login');
     expect(screen.getByText('Dev Tips')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Aprenda, reforce e relembre' })).toBeOnTheScreen();
@@ -95,14 +97,14 @@ describe('Requirement: Tela de login', () => {
 
   it('Continuar sem conta', async () => {
     useSettingsStore.setState({ onboardingSeen: false });
-    await open('/');
+    await open('/tracks');
     await press('Continuar sem conta');
     expect(screen).toHavePathname('/');
     expect(useSettingsStore.getState().onboardingSeen).toBe(true);
     expect(useAccountStore.getState().user).toBeNull();
   });
 
-  it('depois de visto, o app abre direto na aba Trilhas', async () => {
+  it('depois de visto, o app abre direto na aba Início', async () => {
     await open('/');
     expect(screen).toHavePathname('/');
   });
@@ -243,7 +245,7 @@ describe('Requirement: Aba Perfil (com Conta)', () => {
   it('Ordem das seções', async () => {
     await open('/profile');
     const headers = screen.getAllByRole('header').map((el) => String(el.props.children));
-    expect(headers).toEqual(['Conta', 'Seu estudo', 'Idioma', 'Lembretes', 'Tema', 'Sobre']);
+    expect(headers).toEqual(['Conta', 'Seu estudo', 'Áreas de interesse', 'Idioma', 'Lembretes', 'Tema', 'Sobre']);
   });
 
   it('Web sem conta', async () => {

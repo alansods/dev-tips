@@ -4,6 +4,7 @@
   "description": "O sistema de tipos no dia a dia: tipos básicos, interfaces, unions, narrowing e tsconfig.",
   "icon": { "logo": "typescript" },
   "prerequisites": ["javascript-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend",
     "backend"

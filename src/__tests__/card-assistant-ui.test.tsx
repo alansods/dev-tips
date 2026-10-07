@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import PaywallScreen from '../app/paywall';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
@@ -30,6 +31,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
   paywall: PaywallScreen,

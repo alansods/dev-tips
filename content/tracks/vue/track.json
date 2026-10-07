@@ -3,6 +3,7 @@
   "title": "Vue",
   "description": "O framework progressivo: reatividade, Composition API, componentes, Vue Router e Pinia.",
   "prerequisites": ["javascript-no-navegador"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend"
   ],

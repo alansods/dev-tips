@@ -2,6 +2,7 @@
   "id": "java-essencial",
   "title": "Java essencial",
   "description": "A base do Java: JVM, tipos, orientação a objetos, exceções e igualdade.",
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],
