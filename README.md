@@ -47,7 +47,7 @@ content/
   taxonomy.json languages and frameworks used to place tracks
 api/            API (Cloudflare Workers + D1)
 openspec/       specs (source of truth) and changes
-docs/           decisions, design backlog and legal pages
+docs/legal/     privacy policy and terms of use (GitHub Pages)
 plugins/        Expo config plugins
 ```
 
