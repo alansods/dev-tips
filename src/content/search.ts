@@ -1,7 +1,7 @@
 // Busca e filtros da aba Trilhas, como função pura. O estado de cada trilha
 // (concluída, em andamento, não iniciada) vem de quem chama.
 
-import type { Track } from './schema';
+import { AREAS, type Area, type Track } from './schema';
 import type { Taxonomy } from './taxonomy';
 import { normalize } from './text';
 
@@ -43,3 +43,10 @@ export function filterTracks(
 /** Algum critério ativo (a aba troca as áreas pela lista de resultados). */
 export const hasActiveFilter = (filter: TrackFilter) =>
   filter.query.trim() !== '' || filter.language !== null || filter.status !== 'all';
+
+/** Trilhas agrupadas pela primeira área de cada uma, na ordem das áreas (cada trilha uma vez). */
+export function groupByFirstArea(tracks: readonly Track[]): { area: Area; tracks: Track[] }[] {
+  return AREAS.map((area) => ({ area, tracks: tracks.filter((t) => t.areas[0] === area) })).filter(
+    (g) => g.tracks.length > 0,
+  );
+}
