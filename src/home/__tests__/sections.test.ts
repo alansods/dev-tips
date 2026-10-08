@@ -14,7 +14,7 @@ import {
 } from '../sections';
 
 const catalog = getCatalog('pt-BR');
-const ids = (tracks: { id: string }[]) => tracks.map((t) => t.id);
+const ids = (tracks: readonly { id: string }[]) => tracks.map((t) => t.id);
 const cards = (trackId: string) => getTrack(trackId)!.decks.flatMap((d) => d.cards.map((c) => c.id));
 const known = (trackId: string, cardIds: string[]): Progress =>
   Object.fromEntries(cardIds.map((id) => [progressKey(trackId, id), 'known' as const]));
