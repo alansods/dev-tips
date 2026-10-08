@@ -68,17 +68,17 @@
       "title": "Using Optional",
       "body": "Instead of checking for null, Optional chains the transformation and defines what to do if the value is missing."
     },
-    "thread": {
-      "term": "Thread",
-      "definition": "An independent line of execution inside the process, which shares the heap with the others. Several threads let you do things at the same time, but access to shared data needs coordination so state does not get corrupted."
+    "thread-java": {
+      "term": "Thread in Java (Runnable and start)",
+      "definition": "A thread receives a Runnable (or lambda) with the work. start() creates the new thread and runs the code on it; calling run() directly executes on the current thread, with no concurrency at all. join() waits for the thread to finish. Creating threads by hand is rare: the norm is to use an ExecutorService."
     },
     "executor-service": {
       "term": "ExecutorService",
       "definition": "A thread pool that runs tasks sent with submit, returning a Future. It avoids creating one thread per task, which is expensive. It must be shut down (shutdown, or try-with-resources since Java 19)."
     },
-    "race-condition": {
-      "term": "Race condition and synchronization",
-      "definition": "A bug in which the result depends on the order threads access shared data; count++ is not atomic. Solutions: synchronized or locks for mutual exclusion, atomic classes (AtomicInteger), concurrent collections (ConcurrentHashMap) or, better, not sharing mutable state."
+    "synchronized-volatile-locks": {
+      "term": "synchronized, volatile and locks",
+      "definition": "synchronized lets one thread at a time into the block and ensures it sees the writes made before. volatile only guarantees visibility of a field, not atomicity (count++ is still unsafe). ReentrantLock gives more control (tryLock, timeout), and the Atomic* classes (AtomicInteger) perform atomic operations without a lock."
     },
     "virtual-threads": {
       "term": "Virtual threads",

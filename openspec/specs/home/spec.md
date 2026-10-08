@@ -49,7 +49,7 @@ Sem cards para revisar hoje, o Início SHALL mostrar:
 - os últimos 7 dias, terminando hoje, com os dias estudados marcados.
 
 #### Scenario: Com revisão
-- **WHEN** 3 cards da trilha CRUD e 2 de Fundamentos web estão para revisar hoje
+- **WHEN** 3 cards da trilha CRUD e 2 de Fundamentos de programação e web estão para revisar hoje
 - **THEN** o Início mostra "5 cards para revisar", "2 trilhas · ~3 min" e o botão "Começar revisão"
 
 #### Scenario: Começar revisão
@@ -79,8 +79,8 @@ Abaixo, "Também em andamento" SHALL listar até 3 outras trilhas em andamento (
 - **THEN** a sessão do deck "Mapa mental" abre
 
 #### Scenario: Também em andamento
-- **WHEN** o usuário respondeu cards das trilhas CRUD (a última) e Fundamentos web
-- **THEN** "Também em andamento" mostra "Fundamentos web" com a sua porcentagem
+- **WHEN** o usuário respondeu cards das trilhas CRUD (a última) e Fundamentos de programação e web
+- **THEN** "Também em andamento" mostra "Fundamentos de programação e web" com a sua porcentagem
 
 ### Requirement: Próximo passo
 O Início SHALL sugerir até 3 trilhas ainda não iniciadas:
@@ -117,7 +117,7 @@ Sem nenhuma resposta registrada, o Início SHALL mostrar:
 
 #### Scenario: Sem interesse escolhido
 - **WHEN** é o primeiro acesso e nenhuma área foi escolhida
-- **THEN** "Comece por aqui" mostra "Fundamentos web"
+- **THEN** "Comece por aqui" mostra "Fundamentos de programação e web"
 
 #### Scenario: Interesse em Backend
 - **WHEN** é o primeiro acesso e o usuário marca "Backend"

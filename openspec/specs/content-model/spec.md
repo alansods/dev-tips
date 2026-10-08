@@ -377,7 +377,7 @@ O ícone de uma trilha SHALL ser, nesta ordem de prioridade:
 - **THEN** o ícone da trilha é a sigla "AWS"
 
 #### Scenario: Trilha sem marca
-- **WHEN** a trilha "Fundamentos web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
+- **WHEN** a trilha "Fundamentos de programação e web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
 - **THEN** o ícone da trilha é o ícone da área Fundamentos
 
 #### Scenario: Logo desconhecido na trilha
@@ -417,7 +417,7 @@ O catálogo do repositório SHALL ser validado pela suíte de testes.
 - **THEN** a validação rejeita o catálogo indicando o ciclo entre `a` e `b`
 
 #### Scenario: Sem pré-requisitos
-- **WHEN** a trilha "Fundamentos web" não declara `prerequisites`
+- **WHEN** a trilha "Fundamentos de programação e web" não declara `prerequisites`
 - **THEN** a validação aceita a trilha, com a lista de pré-requisitos vazia
 
 ### Requirement: Data de inclusão da trilha

@@ -1,9 +1,5 @@
-# web-fundamentals-content Specification
+## MODIFIED Requirements
 
-## Purpose
-
-Define o conteúdo da trilha "Fundamentos web" (HTTP, REST, navegador e segurança, e perguntas de entrevista) e como ele se liga ao glossário.
-## Requirements
 ### Requirement: Identidade da trilha
 A trilha SHALL estar em `content/tracks/fundamentos-web/track.json`, com id `fundamentos-web`, título "Fundamentos de programação e web" e `areas: ["fundamentos"]`, registrada no catálogo do app depois da trilha CRUD. Ela é a única trilha de fundamentos de programação do catálogo: reúne os conceitos que valem para qualquer linguagem e os conceitos de web. A trilha MUST NOT declarar `variants`, `compareColumns`, `language` nem `framework`.
 
@@ -43,24 +39,6 @@ Os quatro primeiros decks SHALL tratar conceitos independentes de linguagem, sem
 - **WHEN** os glossários das duas trilhas são comparados
 - **THEN** nenhum termo aparece nos dois
 
-### Requirement: Conteúdo autoral
-Como a trilha não deriva de um material externo, todos os seus cards SHALL ter `origin: "original"` e MUST NOT exibir o selo "Complemento".
-
-#### Scenario: Sem complementos
-- **WHEN** todos os cards da trilha são lidos
-- **THEN** nenhum tem `origin: "supplement"`
-
-### Requirement: Ligação com o glossário
-Todo card da trilha SHALL ter pelo menos um termo em `relatedTerms`, apontando para concepts da própria trilha.
-
-#### Scenario: Todos os cards ligados
-- **WHEN** os cards da trilha são lidos
-- **THEN** cada um tem `relatedTerms` não vazio
-
-#### Scenario: Pergunta ligada aos termos que cita
-- **WHEN** a pergunta "Qual a diferença entre XSS e CSRF?" é lida
-- **THEN** seus `relatedTerms` incluem os concepts de XSS e de CSRF
-
 ### Requirement: Tradução completa para inglês
 A trilha SHALL ter o arquivo `content/tracks/fundamentos-web/translations/en.json`, registrado no app. Todo texto exibido da trilha SHALL ter tradução para inglês: título e descrição da trilha, título e descrição de cada deck, e os campos de texto de cada card (`description`, `title`, `whatIs`, `whyItMatters`, `concept`, `explanation`, `term`, `definition`, `frontendAnalogy`, `body`, `question`, `answer` e `note` dos snippets). Ficam fora da cobertura: código, nomes de arquivo, `tags` (não exibidas), `aliases`. Nomes próprios e termos técnicos consagrados (ex.: HTTP, REST, Cookie, JWT) MUST ficar no original. O conteúdo em PT-BR MUST NOT mudar.
 
@@ -80,6 +58,8 @@ A trilha SHALL ter o arquivo `content/tracks/fundamentos-web/translations/en.jso
 - **WHEN** o app está em PT-BR
 - **THEN** a trilha aparece com o título "Fundamentos de programação e web" e os textos originais
 
+## ADDED Requirements
+
 ### Requirement: Conceitos gerais só em Fundamentos
 Os conceitos que valem para qualquer linguagem (variáveis, tipagem, valor e referência, controle de fluxo, funções, escopo, closure, recursão, orientação a objetos, exceções, memória, threads) SHALL ficar na trilha Fundamentos de programação e web. As trilhas de uma linguagem (com `language`) SHALL tratar só o que é particular dela e MUST NOT ter card `concept` cujo termo repita um termo da trilha de fundamentos (comparação sem diferenciar maiúsculas). As trilhas `javascript-essencial`, `java-essencial` e `python-essencial` SHALL declarar `fundamentos-web` em `prerequisites`.
 
@@ -94,4 +74,3 @@ Os conceitos que valem para qualquer linguagem (variáveis, tipagem, valor e ref
 #### Scenario: Particularidade em vez de conceito geral
 - **WHEN** o usuário estuda a trilha Java essencial
 - **THEN** ele não encontra cards que só expliquem o que são encapsulamento, herança, polimorfismo, stack e heap ou garbage collector, e sim os detalhes do Java sobre esses temas (ex.: modificadores de acesso, default methods, coletores da JVM)
-

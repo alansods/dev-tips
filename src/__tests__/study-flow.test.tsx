@@ -291,15 +291,15 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
   });
 });
 
-describe('Requirement: Identidade da trilha (Fundamentos web)', () => {
+describe('Requirement: Identidade da trilha (Fundamentos de programação e web)', () => {
   it('Trilha na área Fundamentos', async () => {
     await open('/area/fundamentos');
-    expect(screen.getByRole('button', { name: /^Fundamentos web,/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Fundamentos de programação e web,/ })).toBeOnTheScreen();
   });
 
   it('Sem frameworks', async () => {
     await open('/track/fundamentos-web');
-    expect(screen.getAllByText('Fundamentos web').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Fundamentos de programação e web').length).toBeGreaterThan(0);
     expect(screen.queryByText('Spring Boot')).toBeNull();
     expect(screen.queryByText('FastAPI')).toBeNull();
   });

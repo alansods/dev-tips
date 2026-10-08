@@ -42,13 +42,13 @@ const buttons = (names: string[]) =>
 
 beforeEach(() => resetStudyStore());
 
-const TRACKS = ['Fundamentos web', 'Git e colaboração'];
+const TRACKS = ['Fundamentos de programação e web', 'Git e colaboração'];
 
 describe('Requirement: Trilha de Git no catálogo', () => {
   it('Área Fundamentos', async () => {
     await open('/area/fundamentos');
     expect(screen.getAllByRole('header').map((h) => String(h.props.children))).toContain('Trilhas');
-    expect(buttons(TRACKS)).toEqual(['Fundamentos web', 'Git e colaboração']);
+    expect(buttons(TRACKS)).toEqual(['Fundamentos de programação e web', 'Git e colaboração']);
   });
 
   it('Só em Fundamentos', async () => {

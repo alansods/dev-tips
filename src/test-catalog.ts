@@ -1,4 +1,4 @@
-// Mock do catálogo só com as trilhas originais (CRUD e Fundamentos web), para
+// Mock do catálogo só com as trilhas originais (CRUD e Fundamentos de programação e web), para
 // os cenários de spec escritos sobre esse catálogo. Uso, no arquivo de teste:
 //
 //   jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());

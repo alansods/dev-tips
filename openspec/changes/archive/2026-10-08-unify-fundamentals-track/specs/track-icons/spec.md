@@ -1,8 +1,5 @@
-# track-icons Specification
+## MODIFIED Requirements
 
-## Purpose
-Mostra o logo da tecnologia (ou a sigla, ou o ícone da área) ao lado das trilhas, linguagens, frameworks e áreas, para o usuário reconhecer cada item sem precisar ler o título.
-## Requirements
 ### Requirement: Ícone nas listas e telas
 O app SHALL mostrar o ícone de cada item, segundo o requisito "Ícone de linguagem, framework e trilha" da capability `content-model`, nestes lugares:
 - no card de cada trilha, nas telas de área, de linguagem e de framework: o ícone da trilha;
@@ -38,26 +35,3 @@ O app SHALL mostrar o ícone de cada item, segundo o requisito "Ícone de lingua
 #### Scenario: Painel de progresso
 - **WHEN** o usuário abre a tela Progresso
 - **THEN** o painel da trilha Django mostra o logo do Django no cabeçalho
-
-### Requirement: Cores do ícone
-O logo SHALL usar a cor oficial da marca, sobre um quadrado no fundo da tela. No modo escuro, um logo cuja cor tenha contraste menor que 3:1 com esse fundo SHALL ser desenhado na cor do texto. A sigla SHALL usar a fonte mono na cor do texto. O ícone da área SHALL usar a cor de destaque, sobre o fundo de destaque suave.
-
-#### Scenario: Logo no modo claro
-- **WHEN** o tema é claro e o card da trilha React é exibido
-- **THEN** o logo do React aparece na cor da marca (#61DAFB)
-
-#### Scenario: Logo escuro no modo escuro
-- **WHEN** o tema é escuro e o card da trilha Next.js é exibido
-- **THEN** o logo do Next.js, que é preto, aparece na cor do texto do tema escuro
-
-#### Scenario: Logo colorido no modo escuro
-- **WHEN** o tema é escuro e o card da trilha React é exibido
-- **THEN** o logo do React continua na cor da marca
-
-### Requirement: Ícone decorativo
-O ícone MUST NOT ser anunciado pelo leitor de tela nem mudar o rótulo de acessibilidade do card ou da linha onde aparece.
-
-#### Scenario: Rótulo do card sem o ícone
-- **WHEN** o leitor de tela foca o card da trilha React
-- **THEN** o rótulo é o mesmo de antes (título e progresso), sem menção ao logo
-
