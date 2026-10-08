@@ -46,3 +46,6 @@ yarn-error.*
 !.env.example
 coverage/
 *.log
+
+# Chaves de conta de serviço (Play/RevenueCat): nunca commitar, o repositório é público
+secrets/
