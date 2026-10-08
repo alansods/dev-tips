@@ -2,6 +2,7 @@
   "id": "javascript-no-navegador",
   "title": "JavaScript no navegador",
   "description": "O JavaScript que roda na página: DOM, eventos, requisições, armazenamento e renderização.",
+  "prerequisites": ["javascript-essencial"],
   "areas": [
     "frontend"
   ],

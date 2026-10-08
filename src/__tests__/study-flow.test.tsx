@@ -55,7 +55,7 @@ const term = (id: string) => {
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
     await open('/area/backend');
-    press(/^O mesmo CRUD em quatro frameworks/);
+    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
       expect(screen.getByText(name)).toBeOnTheScreen();
     const titles = ['O que vamos criar', 'Passo a passo', 'Mapa mental', 'Glossário', 'Perguntas de entrevista'];
@@ -67,7 +67,7 @@ describe('Requirement: Tela da trilha', () => {
   it('Voltar para as trilhas', async () => {
     await open('/');
     press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks/);
+    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     press('Voltar');
     expect(screen).toHavePathname('/area/backend');
   });
@@ -297,7 +297,7 @@ describe('Requirement: Identidade da trilha (Fundamentos web)', () => {
 
   it('Sem frameworks', async () => {
     await open('/track/fundamentos-web');
-    expect(screen.getByText('Fundamentos web')).toBeOnTheScreen();
+    expect(screen.getAllByText('Fundamentos web').length).toBeGreaterThan(0);
     expect(screen.queryByText('Spring Boot')).toBeNull();
     expect(screen.queryByText('FastAPI')).toBeNull();
   });

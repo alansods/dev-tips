@@ -3,6 +3,7 @@
   "title": "Módulos nativos no Expo",
   "description": "Bibliotecas com código nativo no Expo: development build, prebuild, config plugins, login com Google, compras, push, permissões e como criar e manter módulos.",
   "icon": { "logo": "expo" },
+  "prerequisites": ["react-native"],
   "areas": [
     "mobile"
   ],

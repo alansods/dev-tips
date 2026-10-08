@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { LEVELS, validateTaxonomy } from '../index';
+import { LEVELS, validateCatalog, validateTaxonomy } from '../index';
 import { formatScanErrors, scanTracksDirectory } from '../node/scanTracks';
 
 // Gate de conteúdo: todo content/tracks/<track-id>/track.json do repositório
@@ -17,6 +17,17 @@ describe('conteúdo do repositório (content/tracks)', () => {
     const result = scanTracksDirectory(TRACKS_DIR);
     if (!result.ok) {
       throw new Error(`Conteúdo inválido em content/tracks:\n${formatScanErrors(result.errors)}`);
+    }
+  });
+
+  it('Pré-requisitos do catálogo do repositório', () => {
+    const inputs = fs
+      .readdirSync(TRACKS_DIR)
+      .filter((dir) => fs.existsSync(path.join(TRACKS_DIR, dir, 'track.json')))
+      .map((dir) => JSON.parse(fs.readFileSync(path.join(TRACKS_DIR, dir, 'track.json'), 'utf8')));
+    const result = validateCatalog(inputs);
+    if (!result.ok) {
+      throw new Error(`Catálogo inválido:\n${result.errors.map((e) => `${e.path}: ${e.message}`).join('\n')}`);
     }
   });
 

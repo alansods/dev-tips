@@ -125,7 +125,7 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
     fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
     press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks/);
+    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });
 });

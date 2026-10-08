@@ -2,6 +2,7 @@
   "id": "estilizacao-e-design-system",
   "title": "Estilização e design system",
   "description": "Interfaces consistentes e acessíveis na web e no mobile: Tailwind, NativeWind, design tokens, componentes com variantes, Storybook e acessibilidade.",
+  "prerequisites": ["react"],
   "areas": [
     "frontend",
     "mobile"

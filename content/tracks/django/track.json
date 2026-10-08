@@ -2,6 +2,7 @@
   "id": "django",
   "title": "Django",
   "description": "O framework web \"com baterias incluídas\": ORM e migrations, views e URLs, admin e Django REST Framework.",
+  "prerequisites": ["python-essencial"],
   "areas": [
     "backend"
   ],

@@ -3,6 +3,7 @@
   "title": "MongoDB",
   "description": "O banco de documentos mais usado: documentos e coleções, modelagem embutida ou por referência, índices e aggregation pipeline.",
   "icon": { "logo": "mongodb" },
+  "prerequisites": ["nosql"],
   "areas": [
     "banco-de-dados"
   ],

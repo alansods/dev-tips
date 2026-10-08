@@ -2,6 +2,7 @@
   "id": "react-native",
   "title": "React Native",
   "description": "Apps nativos para iOS e Android com React: componentes nativos, estilo, Expo, navegação, performance e publicação.",
+  "prerequisites": ["react"],
   "areas": [
     "mobile"
   ],

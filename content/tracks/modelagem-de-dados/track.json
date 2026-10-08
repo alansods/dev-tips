@@ -2,6 +2,7 @@
   "id": "modelagem-de-dados",
   "title": "Modelagem de dados",
   "description": "Como desenhar tabelas: chaves, relacionamentos, normalização, desnormalização e restrições.",
+  "prerequisites": ["sql-essencial"],
   "areas": [
     "banco-de-dados"
   ],

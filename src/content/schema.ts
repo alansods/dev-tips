@@ -135,6 +135,7 @@ export const trackSchema = z.object({
   language: id().optional(),
   framework: id().optional(),
   icon: trackIconSchema.optional(),
+  prerequisites: z.array(id()).default([]),
   section: z.enum(SECTIONS, { error: `seção desconhecida; use: ${SECTIONS.join(', ')}` }).optional(),
   variants: z.array(variantSchema).optional(),
   compareColumns: z.array(compareColumnSchema).optional(),

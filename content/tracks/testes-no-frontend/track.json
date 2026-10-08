@@ -2,6 +2,7 @@
   "id": "testes-no-frontend",
   "title": "Testes no frontend",
   "description": "Testes unitários e de integração em React e React Native: Jest, Testing Library, mocks, API simulada com MSW e o que vale testar.",
+  "prerequisites": ["react"],
   "areas": [
     "frontend",
     "mobile"

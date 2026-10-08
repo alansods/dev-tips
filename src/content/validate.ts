@@ -48,5 +48,59 @@ export function validateCatalog(inputs: unknown[], taxonomy: Taxonomy = repoTaxo
     }
   });
 
+  errors.push(...checkPrerequisites(inputs));
   return errors.length === 0 ? { ok: true, tracks } : { ok: false, errors };
+}
+
+/**
+ * Pré-requisitos entre trilhas: cada id precisa existir no catálogo, a trilha
+ * não pode depender de si mesma e não pode haver ciclo. Lê o input cru, para
+ * funcionar mesmo quando outra parte da trilha é inválida.
+ */
+function checkPrerequisites(inputs: unknown[]): ContentError[] {
+  const errors: ContentError[] = [];
+  const ids = inputs.map((input) => {
+    const id = typeof input === 'object' && input !== null ? (input as { id?: unknown }).id : undefined;
+    return typeof id === 'string' ? id : undefined;
+  });
+  const index = new Map(ids.flatMap((id, i) => (id === undefined ? [] : [[id, i] as const])));
+  const edges = inputs.map((input, i) => {
+    const list = typeof input === 'object' && input !== null ? (input as { prerequisites?: unknown }).prerequisites : undefined;
+    if (!Array.isArray(list)) return [];
+    return list.flatMap((pre, j) => {
+      if (typeof pre !== 'string') return [];
+      if (pre === ids[i]) {
+        errors.push({ path: `[${i}].prerequisites[${j}]`, message: 'a trilha não pode ser pré-requisito de si mesma' });
+        return [];
+      }
+      if (!index.has(pre)) {
+        errors.push({ path: `[${i}].prerequisites[${j}]`, message: `trilha inexistente no catálogo: ${pre}` });
+        return [];
+      }
+      return [index.get(pre)!];
+    });
+  });
+
+  // Busca em profundidade: chegar de novo a uma trilha que está na pilha é um ciclo.
+  const state = new Map<number, 'visiting' | 'done'>();
+  const inCycle = new Set<number>();
+  const stack: number[] = [];
+  const visit = (i: number) => {
+    state.set(i, 'visiting');
+    stack.push(i);
+    for (const next of edges[i]) {
+      if (state.get(next) === 'visiting' && !inCycle.has(next)) {
+        const cycle = stack.slice(stack.indexOf(next));
+        cycle.forEach((n) => inCycle.add(n));
+        const names = [...cycle, next].map((n) => ids[n]).join(' → ');
+        errors.push({ path: `[${next}].prerequisites`, message: `ciclo de pré-requisitos: ${names}` });
+      } else if (!state.has(next)) visit(next);
+    }
+    stack.pop();
+    state.set(i, 'done');
+  };
+  inputs.forEach((_, i) => {
+    if (!state.has(i)) visit(i);
+  });
+  return errors;
 }

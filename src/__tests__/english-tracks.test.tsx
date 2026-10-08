@@ -38,12 +38,12 @@ describe('Requirement: Tradução completa para inglês', () => {
 
   it('trilha CRUD em inglês na área Backend', async () => {
     await open('/area/backend');
-    expect(screen.getByText('The same CRUD in four frameworks')).toBeOnTheScreen();
+    expect(screen.getAllByText('The same CRUD in four frameworks').length).toBeGreaterThan(0);
   });
 
   it('trilha Fundamentos web em inglês na área Fundamentos', async () => {
     await open('/area/fundamentos');
-    expect(screen.getByText('Web fundamentals')).toBeOnTheScreen();
+    expect(screen.getAllByText('Web fundamentals').length).toBeGreaterThan(0);
   });
 
   it('Card exibido em inglês: concept CORS', async () => {

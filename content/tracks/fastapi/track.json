@@ -2,6 +2,7 @@
   "id": "fastapi",
   "title": "FastAPI",
   "description": "O framework de APIs moderno do Python: rotas tipadas, Pydantic, dependências, async, erros, segurança e testes.",
+  "prerequisites": ["python-essencial"],
   "areas": [
     "backend"
   ],

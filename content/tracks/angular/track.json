@@ -2,6 +2,7 @@
   "id": "angular",
   "title": "Angular",
   "description": "O framework completo do Google: componentes standalone, injeção de dependência, RxJS e signals.",
+  "prerequisites": ["typescript-essencial"],
   "areas": [
     "frontend"
   ],
