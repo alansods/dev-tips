@@ -4,6 +4,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
@@ -17,6 +18,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -85,7 +87,7 @@ describe('Requirement: Trilhas de JavaScript no catálogo', () => {
   });
 
   it('Frontend aparece na Home', async () => {
-    await open('/');
+    await open('/tracks');
     expect(screen.getByRole('button', { name: /^Frontend,/ })).toBeOnTheScreen();
   });
 });

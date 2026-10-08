@@ -2,6 +2,7 @@
   "id": "sql-essencial",
   "title": "SQL essencial",
   "description": "A linguagem dos bancos relacionais: consultas, filtros, JOINs, agregações, subqueries, CTEs e window functions.",
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],

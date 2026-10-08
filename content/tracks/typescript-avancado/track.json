@@ -4,6 +4,7 @@
   "description": "Tipos reutilizáveis: generics, utility types, tipos mapeados e condicionais, keyof e type guards.",
   "icon": { "logo": "typescript" },
   "prerequisites": ["typescript-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend",
     "backend"

@@ -91,7 +91,7 @@ O app SHALL refazer o agendamento, substituindo todas as notificações anterior
 - **THEN** a notificação de amanhã passa a dizer "5 minutos de estudo? Continue de onde parou."
 
 ### Requirement: Abrir pela notificação
-Tocar numa notificação de lembrete SHALL abrir o app. Se houver cards para revisar no momento do toque, o app SHALL abrir a tela da trilha com mais cards para revisar (no empate, o primeiro na ordem do catálogo). Sem cards para revisar, o app SHALL abrir a aba Trilhas.
+Tocar numa notificação de lembrete SHALL abrir o app. Se houver cards para revisar no momento do toque, o app SHALL abrir a tela da trilha com mais cards para revisar (no empate, o primeiro na ordem do catálogo). Sem cards para revisar, o app SHALL abrir a aba Início.
 
 #### Scenario: Toque com revisão pendente
 - **WHEN** a trilha CRUD tem 2 cards para revisar, Fundamentos web tem 5, e o usuário toca na notificação
@@ -99,7 +99,7 @@ Tocar numa notificação de lembrete SHALL abrir o app. Se houver cards para rev
 
 #### Scenario: Toque sem revisão
 - **WHEN** nenhum card está para revisar e o usuário toca na notificação
-- **THEN** o app abre a aba Trilhas
+- **THEN** o app abre a aba Início
 
 ### Requirement: Configuração salva no aparelho
 A escolha de ligado ou desligado e o horário SHALL ser salvos no aparelho e restaurados ao abrir o app. Se a leitura falhar ou os dados forem inválidos, o app SHALL abrir com o lembrete desligado, sem exibir erro. O último dia em que o usuário respondeu um card SHALL ser salvo junto com o progresso; dados de versões anteriores, sem esse dia, MUST continuar válidos.

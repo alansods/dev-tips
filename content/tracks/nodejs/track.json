@@ -4,6 +4,7 @@
   "description": "JavaScript no servidor: o runtime, módulos, npm, streams e processos.",
   "icon": { "logo": "nodedotjs" },
   "prerequisites": ["javascript-assincrono"],
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],

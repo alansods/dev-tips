@@ -31,9 +31,15 @@ export default function StudyScreen() {
   }
   return (
     <StudySession
-      track={track}
+      tracks={[track]}
       title={deck.title}
-      initialIds={() => sessionCardIds(track.id, deck, useStudyStore.getState().progress)}
+      entries={() =>
+        sessionCardIds(track.id, deck, useStudyStore.getState().progress).map((cardId) => ({
+          trackId: track.id,
+          cardId,
+        }))
+      }
+      onExit={() => leaveToTrack(track.id)}
     />
   );
 }

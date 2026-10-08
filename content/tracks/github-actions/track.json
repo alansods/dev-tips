@@ -4,6 +4,7 @@
   "description": "A ferramenta de CI/CD do GitHub: workflows, jobs, segredos, cache, matriz e deploy com OIDC.",
   "icon": { "logo": "githubactions" },
   "prerequisites": ["ci-cd-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "devops"
   ],

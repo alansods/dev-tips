@@ -4,6 +4,7 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import ReviewScreen from '../app/review/[trackId]';
@@ -17,6 +18,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -95,7 +97,7 @@ describe('Requirement: Interface traduzida', () => {
 
   it('Home em inglês', async () => {
     useStudyStore.getState().answer(TRACK, deckIds('glossario')[0], 'unknown');
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText('1 to review today')).toBeOnTheScreen();
   });
 });

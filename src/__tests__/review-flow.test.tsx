@@ -4,10 +4,12 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
+import TracksScreen from '../app/(tabs)/tracks';
 import ProfileScreen from '../app/(tabs)/profile';
 import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import ReviewScreen from '../app/review/[trackId]';
+import ReviewAllScreen from '../app/review/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import * as clock from '../study/clock';
@@ -18,6 +20,7 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
   '(tabs)/profile': ProfileScreen,
   progress: ProgressScreen,
@@ -25,6 +28,7 @@ const APP = {
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
   'review/[trackId]': ReviewScreen,
+  'review/index': ReviewAllScreen,
 };
 const TRACK = crudTrack.id;
 const glossaryIds = crudTrack.decks.find((d) => d.id === 'glossario')!.cards.map((c) => c.id);
@@ -73,12 +77,12 @@ describe('Requirement: Revisão de hoje na tela da trilha', () => {
 describe('Requirement: Revisão na Home', () => {
   it('Aviso na Home', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText('2 para revisar hoje')).toBeOnTheScreen();
   });
 
   it('sem aviso quando não há revisão', async () => {
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(/para revisar hoje/)).toBeNull();
   });
 });
@@ -127,5 +131,38 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Revisão de todas as trilhas', () => {
+  const WEB = 'fundamentos-web';
+
+  it('Cards de várias trilhas', async () => {
+    seed(glossaryIds.slice(0, 2), 'unknown');
+    useStudyStore.getState().answer(WEB, 'http', 'unknown');
+    await open('/review');
+    expect(screen.getByText('Revisão de hoje')).toBeOnTheScreen();
+    expect(screen.getByText('1 / 3')).toBeOnTheScreen();
+  });
+
+  it('Resposta na trilha certa', async () => {
+    useStudyStore.getState().answer(WEB, 'http', 'unknown');
+    await open('/review');
+    answer('Já sabia');
+    expect(useStudyStore.getState().progress[`${WEB}:http`]).toBe('known');
+    expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
+  });
+
+  it('Nada para revisar', async () => {
+    await open('/review');
+    expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
+    expect(screen.getByLabelText('0 já sabia')).toBeOnTheScreen();
+  });
+
+  it('sair volta para o Início', async () => {
+    useStudyStore.getState().answer(WEB, 'http', 'unknown');
+    await open('/review');
+    press('Sair da sessão');
+    expect(screen).toHavePathname('/');
   });
 });

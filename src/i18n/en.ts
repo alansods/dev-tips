@@ -6,7 +6,7 @@ import type { Messages } from './pt-BR';
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const en: Messages = {
-  tabs: { tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress', profile: 'Profile' },
+  tabs: { home: 'Home', tracks: 'Tracks', glossary: 'Glossary', progress: 'Progress', profile: 'Profile' },
   common: {
     back: 'Back',
     close: 'Close',
@@ -21,6 +21,7 @@ export const en: Messages = {
     terms: 'Terms of use',
     version: 'Version',
     versionLabel: (version) => `Version ${version}`,
+    interests: 'Areas of interest',
     theme: 'Theme',
     themeModes: { system: 'Automatic', light: 'Light', dark: 'Dark' },
     study: 'Your study',
@@ -156,6 +157,36 @@ export const en: Messages = {
   home: {
     cardLabel: (title, known, total) => `${title}, ${known} of ${total} cards you know`,
     dueBadge: (n) => `${n} to review today`,
+    greeting: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' },
+    greetingWithName: (greeting, name) => `${greeting}, ${name}`,
+    headline: 'Ready for a quick study?',
+    streak: (n) => `${n} ${plural(n, 'day', 'days')}`,
+    streakLabel: (n) => `${n} ${plural(n, 'day', 'days')} in a row`,
+    reviewKicker: "Today's review",
+    reviewCount: (n) => `${n} ${plural(n, 'card', 'cards')} to review`,
+    reviewMeta: (tracks, minutes) => `${tracks} ${plural(tracks, 'track', 'tracks')} · ~${minutes} min`,
+    startReview: 'Start review',
+    nothingToReview: 'Nothing to review today',
+    tomorrow: (n) => `Tomorrow: ${n} ${plural(n, 'card', 'cards')}`,
+    week: (n) => `Studied on ${n} of the last 7 days`,
+    weekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+    continueTitle: 'Pick up where you left off',
+    deckPosition: (position, count, deck) => `deck ${position} of ${count} · ${deck}`,
+    continueLabel: (track, deck) => `Continue ${track}, ${deck}`,
+    alsoInProgress: 'Also in progress',
+    nextAfter: (track) => `Next step after ${track}`,
+    forYou: 'Suggested for you',
+    newTracks: 'New tracks',
+    seeAll: 'See all',
+    newBadge: 'New',
+    welcomeKicker: 'Welcome to Dev Tips',
+    welcomeTitle: 'Short cards to study fullstack development',
+    welcomeBody: 'Read the front, try to answer, flip the card. The app brings back what you still don’t know.',
+    whatToStudy: 'What do you want to study?',
+    interestsHint: 'Changes the suggestions on this screen. You can change it later in Profile.',
+    startHere: 'Start here',
+    startTrack: 'Start the track',
+    then: (track) => `Next: ${track}`,
   },
   nav: {
     areas: {

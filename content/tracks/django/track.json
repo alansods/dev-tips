@@ -3,6 +3,7 @@
   "title": "Django",
   "description": "O framework web \"com baterias incluídas\": ORM e migrations, views e URLs, admin e Django REST Framework.",
   "prerequisites": ["python-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],

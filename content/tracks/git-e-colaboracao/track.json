@@ -3,6 +3,7 @@
   "title": "Git e colaboração",
   "description": "Versionar código e trabalhar em equipe: commits, branches, merge e rebase, pull requests, code review, conflitos e como desfazer erros.",
   "icon": { "logo": "git" },
+  "addedAt": "2026-10-06",
   "areas": [
     "fundamentos"
   ],

@@ -2,6 +2,7 @@
   "id": "python-essencial",
   "title": "Python essencial",
   "description": "A base do Python: tipos, mutabilidade, coleções, funções, decorators, generators e ambiente.",
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],

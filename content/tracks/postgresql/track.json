@@ -4,6 +4,7 @@
   "description": "O banco relacional open source mais completo: tipos avançados, índices, MVCC, VACUUM e extensões.",
   "icon": { "logo": "postgresql" },
   "prerequisites": ["sql-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],

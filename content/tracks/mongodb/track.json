@@ -4,6 +4,7 @@
   "description": "O banco de documentos mais usado: documentos e coleções, modelagem embutida ou por referência, índices e aggregation pipeline.",
   "icon": { "logo": "mongodb" },
   "prerequisites": ["nosql"],
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],

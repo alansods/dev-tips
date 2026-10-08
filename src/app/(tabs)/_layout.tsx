@@ -1,6 +1,6 @@
 import { Redirect, Tabs } from 'expo-router';
 
-import { GlossaryIcon, ProfileIcon, TracksIcon } from '../../components/icons';
+import { GlossaryIcon, HomeIcon, ProfileIcon, TracksIcon } from '../../components/icons';
 import { useSettingsStore, useT } from '../../i18n';
 import { useHydrated } from '../../storage/useHydrated';
 import { useFontsReady } from '../../theme/fonts';
@@ -36,6 +36,10 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
+        options={{ title: t.tabs.home, tabBarIcon: ({ color }) => <HomeIcon color={color} /> }}
+      />
+      <Tabs.Screen
+        name="tracks"
         options={{ title: t.tabs.tracks, tabBarIcon: ({ color }) => <TracksIcon color={color} /> }}
       />
       <Tabs.Screen

@@ -3,6 +3,7 @@
   "title": "JavaScript no navegador",
   "description": "O JavaScript que roda na página: DOM, eventos, requisições, armazenamento e renderização.",
   "prerequisites": ["javascript-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend"
   ],

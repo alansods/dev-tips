@@ -80,13 +80,14 @@ describe('Requirement: Progresso salvo no aparelho', () => {
     await flush();
     const saved = JSON.parse((await AsyncStorage.getItem(STUDY_STORAGE_KEY))!);
     expect(Object.keys(saved.state).sort()).toEqual([
+      'lastAnswer',
       'lastStudyDay',
       'preferredVariant',
       'progress',
       'schedule',
       'studyDays',
     ]);
-    expect(saved.version).toBe(3);
+    expect(saved.version).toBe(4);
   });
 });
 
@@ -138,5 +139,27 @@ describe('Requirement: Dias estudados (no aparelho)', () => {
     );
     await reopen();
     expect(store().studyDays).toEqual([]);
+  });
+});
+
+describe('Requirement: Continue de onde parou (última resposta)', () => {
+  it('a última resposta fica salva e é mantida ao reabrir', async () => {
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'cors', 'unknown');
+    await flush();
+    await reopen();
+    expect(store().lastAnswer).toEqual({ trackId: TRACK, cardId: 'cors' });
+  });
+
+  it('quem vem da versão 3 começa sem última resposta', async () => {
+    await AsyncStorage.setItem(
+      STUDY_STORAGE_KEY,
+      JSON.stringify({
+        state: { progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: null, studyDays: [] },
+        version: 3,
+      }),
+    );
+    await reopen();
+    expect(store().lastAnswer).toBeNull();
   });
 });

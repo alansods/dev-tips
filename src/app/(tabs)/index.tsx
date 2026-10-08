@@ -1,26 +1,30 @@
-import { router } from 'expo-router';
-
 import { Screen } from '../../components/Screen';
-import { AreaCard } from '../../components/TrackCard';
-import { areasWithTracks } from '../../content/navigation';
-import { useCatalog } from '../../content/useCatalog';
-import { useT } from '../../i18n';
+import {
+  ContinueSection,
+  FirstAccess,
+  Greeting,
+  NewTracksSection,
+  ReviewSection,
+  SuggestionsSection,
+} from '../../home/HomeSections';
+import { useStudyStore } from '../../study/store';
 
-/** Aba Trilhas: as áreas que têm trilhas, com o progresso somado de cada uma. */
+/** Aba Início: revisão do dia, continuar, sugestões e novas trilhas; boas-vindas no primeiro acesso. */
 export default function HomeScreen() {
-  const t = useT();
-  const areas = areasWithTracks(useCatalog());
+  const firstAccess = useStudyStore((s) => Object.keys(s.progress).length === 0);
   return (
     <Screen>
-      {areas.map(({ area, tracks }) => (
-        <AreaCard
-          key={area}
-          area={area}
-          name={t.nav.areas[area]}
-          tracks={tracks}
-          onPress={() => router.push(`/area/${area}`)}
-        />
-      ))}
+      {firstAccess ? (
+        <FirstAccess />
+      ) : (
+        <>
+          <Greeting />
+          <ReviewSection />
+          <ContinueSection />
+          <SuggestionsSection />
+          <NewTracksSection />
+        </>
+      )}
     </Screen>
   );
 }

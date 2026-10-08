@@ -2,6 +2,7 @@
   "id": "nosql",
   "title": "NoSQL: modelos e quando usar",
   "description": "Os tipos de banco não relacional (documento, chave-valor, colunar, grafo e busca), o teorema CAP e como escolher.",
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],
