@@ -2,7 +2,7 @@
   "id": "javascript-essencial",
   "title": "JavaScript essencial",
   "description": "A base da linguagem: tipos, variáveis, funções, escopo, objetos e protótipos.",
-  "prerequisites": ["fundamentos-web"],
+  "prerequisites": ["fundamentos-de-programacao"],
   "addedAt": "2026-10-05",
   "areas": [
     "frontend",
@@ -22,8 +22,8 @@
           "term": "Tipos primitivos",
           "definition": "Os valores mais simples da linguagem: string, number, bigint, boolean, undefined, null e symbol. São imutáveis e comparados por valor. Todo o resto (objetos, arrays, funções) é objeto e comparado por referência.",
           "relatedTerms": [
-            "referencia-vs-valor",
-            "igualdade-estrita"
+            "igualdade-estrita",
+            "object-freeze-e-const"
           ]
         },
         {
@@ -33,7 +33,7 @@
           "term": "let, const e var",
           "definition": "Formas de declarar variáveis. let e const têm escopo de bloco; const impede reatribuir (mas o objeto apontado ainda pode mudar). var tem escopo de função e sofre hoisting com valor undefined; em código moderno, prefira const e use let só quando precisar reatribuir.",
           "relatedTerms": [
-            "escopo-lexico",
+            "escopo-de-bloco-tdz",
             "hoisting"
           ]
         },
@@ -87,7 +87,7 @@
           },
           "relatedTerms": [
             "let-const-var",
-            "referencia-vs-valor"
+            "parametros-padrao-e-rest"
           ]
         }
       ]
@@ -99,13 +99,13 @@
       "cards": [
         {
           "type": "concept",
-          "id": "escopo-lexico",
+          "id": "escopo-de-bloco-tdz",
           "level": "junior",
-          "term": "Escopo léxico",
-          "definition": "Regra que define onde uma variável é visível: pelo lugar em que ela foi escrita no código, não por onde a função é chamada. Uma função enxerga as variáveis do bloco em que foi declarada e de todos os blocos de fora.",
+          "term": "Escopo de bloco e TDZ",
+          "definition": "let e const existem só dentro do bloco { } onde foram declarados; var ignora blocos e vale para a função inteira. Antes da linha da declaração, let e const ficam na temporal dead zone (TDZ): acessá-los lança ReferenceError, em vez de devolver undefined como acontece com var.",
           "relatedTerms": [
-            "closure",
-            "let-const-var"
+            "let-const-var",
+            "hoisting"
           ]
         },
         {
@@ -116,17 +116,18 @@
           "definition": "Comportamento em que declarações são registradas antes de o código rodar. Funções declaradas com function podem ser chamadas antes da linha em que aparecem; var existe como undefined; let e const existem, mas ficam na \"zona morta temporal\" (TDZ) e dão ReferenceError se usadas antes da declaração.",
           "relatedTerms": [
             "let-const-var",
-            "escopo-lexico"
+            "escopo-de-bloco-tdz"
           ]
         },
         {
           "type": "concept",
-          "id": "closure",
-          "level": "pleno",
-          "term": "Closure",
-          "definition": "Uma função que lembra as variáveis do escopo onde foi criada, mesmo depois que esse escopo terminou. É a base de estado privado, de fábricas de funções, de callbacks e de hooks como os do React.",
+          "id": "parametros-padrao-e-rest",
+          "level": "junior",
+          "term": "Parâmetros padrão e rest",
+          "definition": "function f(a, b = 10, ...resto): b usa 10 quando o argumento vem undefined (null não ativa o padrão), e resto reúne os argumentos extras num array de verdade. Substituem o antigo objeto arguments, que não existe em arrow functions. O padrão é avaliado a cada chamada e pode usar parâmetros anteriores.",
           "relatedTerms": [
-            "escopo-lexico"
+            "escopo-de-bloco-tdz",
+            "this"
           ]
         },
         {
@@ -136,8 +137,8 @@
           "term": "this",
           "definition": "Referência ao \"dono\" da chamada, definida na hora da chamada: em obj.metodo(), this é obj; numa função solta, é undefined (modo estrito); com new, é o objeto novo; call, apply e bind escolhem o this. Arrow functions não têm this próprio: usam o do escopo de fora.",
           "relatedTerms": [
-            "closure",
-            "classe"
+            "classe",
+            "parametros-padrao-e-rest"
           ]
         },
         {
@@ -152,8 +153,8 @@
             "code": "function createCounter() {\n  let count = 0;\n  return {\n    increment: () => ++count,\n    current: () => count,\n  };\n}\n\nconst counter = createCounter();\ncounter.increment();\ncounter.current(); // 1"
           },
           "relatedTerms": [
-            "closure",
-            "escopo-lexico"
+            "escopo-de-bloco-tdz",
+            "let-const-var"
           ]
         },
         {
@@ -169,7 +170,7 @@
           },
           "relatedTerms": [
             "this",
-            "closure"
+            "parametros-padrao-e-rest"
           ]
         }
       ]
@@ -181,11 +182,12 @@
       "cards": [
         {
           "type": "concept",
-          "id": "referencia-vs-valor",
-          "level": "junior",
-          "term": "Referência e valor",
-          "definition": "Primitivos são copiados por valor; objetos e arrays são acessados por referência. Atribuir um objeto a outra variável não o copia: as duas apontam para o mesmo objeto, e mudar por uma muda pela outra.",
+          "id": "object-freeze-e-const",
+          "level": "pleno",
+          "term": "Object.freeze e const",
+          "definition": "const só impede reatribuir a variável: o objeto para o qual ela aponta continua mutável (obj.x = 1 funciona). Object.freeze impede alterar as propriedades, mas é raso: objetos dentro dele continuam mutáveis. Em modo estrito, escrever num objeto congelado lança TypeError; fora dele, falha em silêncio.",
           "relatedTerms": [
+            "let-const-var",
             "tipos-primitivos"
           ]
         },
@@ -217,7 +219,7 @@
           "term": "Módulos ES",
           "definition": "Sistema de módulos padrão da linguagem: cada arquivo tem seu próprio escopo, e o que ele expõe sai com export e entra em outro com import. Os imports são estáticos (analisados antes de rodar), o que permite tree shaking.",
           "relatedTerms": [
-            "escopo-lexico"
+            "escopo-de-bloco-tdz"
           ]
         },
         {
@@ -232,7 +234,7 @@
             "code": "const original = { name: \"Ana\", address: { city: \"Recife\" } };\n\nconst shallow = { ...original };\nshallow.address.city = \"Natal\";\noriginal.address.city; // \"Natal\" (compartilhado)\n\nconst deep = structuredClone(original);\ndeep.address.city = \"Olinda\";\noriginal.address.city; // continua \"Natal\""
           },
           "relatedTerms": [
-            "referencia-vs-valor"
+            "object-freeze-e-const"
           ]
         },
         {
@@ -282,13 +284,13 @@
         },
         {
           "type": "question",
-          "id": "o-que-e-closure",
+          "id": "var-settimeout-no-laco",
           "level": "pleno",
-          "question": "O que é closure? Dê um uso real.",
-          "answer": "É uma função que guarda acesso às variáveis do escopo em que foi criada, mesmo depois que aquele escopo acabou. Usos reais: estado privado (um contador ou cache que só a função mexe), funções de configuração como debounce, callbacks de eventos que lembram um id, e os hooks do React, que dependem de closures.",
+          "question": "Por que um for com var e setTimeout imprime sempre o mesmo número?",
+          "answer": "Com var, existe uma única variável i para a função inteira. Os callbacks do setTimeout rodam depois que o laço terminou e todos leem essa mesma variável, já com o valor final. Com let, cada volta do laço cria um novo i, e cada callback guarda o seu. Antes do let, a saída era uma IIFE que recebia i como parâmetro.",
           "relatedTerms": [
-            "closure",
-            "escopo-lexico"
+            "escopo-de-bloco-tdz",
+            "let-const-var"
           ]
         },
         {
@@ -308,7 +310,7 @@
           "question": "Como copiar um objeto sem alterar o original?",
           "answer": "Para um nível, spread ({ ...obj }) ou Object.assign. Se o objeto tem objetos aninhados, essas cópias são rasas: o aninhado continua compartilhado. Para cópia profunda, structuredClone(obj), que lida com Date, Map e referências circulares; JSON.parse(JSON.stringify()) perde datas, undefined e funções.",
           "relatedTerms": [
-            "referencia-vs-valor"
+            "object-freeze-e-const"
           ]
         },
         {

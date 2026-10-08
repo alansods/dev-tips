@@ -57,9 +57,9 @@ describe('Requirement: Trilhas de DevOps e Cloud no catálogo', () => {
 });
 
 describe('Requirement: Home por áreas', () => {
-  it('Mobile e DevOps e Cloud no fim', async () => {
+  it('Git depois de Fundamentos, Mobile e DevOps e Cloud no fim', async () => {
     await open('/tracks');
-    const names = ['Fundamentos', 'Frontend', 'Backend', 'Banco de dados', 'Mobile', 'DevOps e Cloud'];
+    const names = ['Fundamentos', 'Git', 'Frontend', 'Backend', 'Banco de dados', 'Mobile', 'DevOps e Cloud'];
     expect(buttons(names)).toEqual(names);
     expect(within(screen.getByRole('button', { name: /^DevOps e Cloud,/ })).getByText('4 trilhas')).toBeOnTheScreen();
   });

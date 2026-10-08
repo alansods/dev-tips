@@ -1,0 +1,321 @@
+{
+  "id": "rails",
+  "title": "Ruby on Rails",
+  "description": "Aplicações e APIs com Rails: convenções, rotas, Active Record, jobs, testes e segurança.",
+  "prerequisites": ["ruby-essencial"],
+  "addedAt": "2026-10-08",
+  "areas": [
+    "backend"
+  ],
+  "language": "ruby",
+  "framework": "rails",
+  "decks": [
+    {
+      "id": "mvc-e-convencoes",
+      "title": "MVC e convenções",
+      "description": "Como o Rails organiza a aplicação e o caminho da requisição.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "convencao-sobre-configuracao",
+          "level": "junior",
+          "term": "Convenção sobre configuração",
+          "definition": "O Rails assume nomes e lugares padrão para quase tudo: o model Produto usa a tabela produtos (plural), o ProdutosController fica em app/controllers e a view show em app/views/produtos. Seguindo as convenções, quase não há configuração para escrever; fugir delas exige declarar tudo à mão.",
+          "relatedTerms": [
+            "rotas-resources",
+            "generators-rails"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "rotas-resources",
+          "level": "junior",
+          "term": "Rotas com resources",
+          "definition": "resources :produtos em config/routes.rb cria as sete rotas REST (index, show, new, create, edit, update, destroy) ligadas às ações do controller. only: e except: limitam as rotas, e resources aninhados geram URLs como /pedidos/:pedido_id/itens. bin/rails routes lista tudo.",
+          "relatedTerms": [
+            "convencao-sobre-configuracao",
+            "strong-parameters"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "strong-parameters",
+          "level": "pleno",
+          "term": "Strong parameters",
+          "definition": "Os parâmetros da requisição chegam em params e não podem ir direto para o model. params.require(:produto).permit(:nome, :preco) diz quais campos são aceitos; o resto é descartado. Isso impede mass assignment, como um usuário mandar admin: true no corpo da requisição.",
+          "relatedTerms": [
+            "rotas-resources",
+            "validacoes-e-callbacks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "generators-rails",
+          "level": "junior",
+          "term": "Generators do Rails",
+          "definition": "bin/rails generate cria arquivos seguindo as convenções: model (model e migration), controller, scaffold (tudo, com views e rotas) e job. rails new monta o projeto; com --api, gera uma aplicação só de API, sem views nem assets. bin/rails destroy desfaz o que o generator criou.",
+          "relatedTerms": [
+            "convencao-sobre-configuracao",
+            "migrations-rails"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "routes-exemplo",
+          "level": "junior",
+          "title": "config/routes.rb",
+          "body": "Rotas REST de produtos, itens aninhados em pedidos e um namespace de API versionada.",
+          "snippet": {
+            "file": "config/routes.rb",
+            "language": "ruby",
+            "code": "Rails.application.routes.draw do\n  resources :produtos, only: %i[index show create update destroy]\n\n  resources :pedidos, only: %i[index show create] do\n    resources :itens, only: %i[create destroy]\n  end\n\n  namespace :api do\n    namespace :v1 do\n      resources :produtos, only: %i[index show]\n    end\n  end\nend"
+          },
+          "relatedTerms": [
+            "rotas-resources"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "controller-exemplo",
+          "level": "pleno",
+          "title": "Controller REST de API",
+          "body": "before_action carrega o registro, strong parameters filtram a entrada e os erros de validação voltam como 422.",
+          "snippet": {
+            "file": "app/controllers/produtos_controller.rb",
+            "language": "ruby",
+            "code": "class ProdutosController < ApplicationController\n  before_action :set_produto, only: %i[show update destroy]\n\n  def index\n    render json: Produto.ativos.order(:nome).limit(50)\n  end\n\n  def create\n    produto = Produto.new(produto_params)\n    if produto.save\n      render json: produto, status: :created\n    else\n      render json: { errors: produto.errors }, status: :unprocessable_entity\n    end\n  end\n\n  private\n\n  def set_produto = @produto = Produto.find(params[:id])\n\n  def produto_params\n    params.require(:produto).permit(:nome, :preco, :categoria_id)\n  end\nend"
+          },
+          "relatedTerms": [
+            "strong-parameters",
+            "rotas-resources"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "active-record",
+      "title": "Active Record",
+      "description": "O ORM do Rails: models, migrations, associações e consultas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "active-record-padrao",
+          "level": "junior",
+          "term": "Active Record",
+          "definition": "O ORM do Rails, que segue o padrão de mesmo nome: cada model é uma classe que representa uma tabela, e cada objeto, uma linha, com métodos para salvar e consultar (Produto.where(ativo: true), produto.save). As colunas viram atributos sem ser declaradas, lidas do schema do banco.",
+          "relatedTerms": [
+            "migrations-rails",
+            "associacoes"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "migrations-rails",
+          "level": "junior",
+          "term": "Migrations do Rails",
+          "definition": "Classes Ruby que alteram o schema (create_table, add_column, add_index) e ficam versionadas em db/migrate. bin/rails db:migrate aplica as pendentes e atualiza db/schema.rb, que é a foto atual do banco. O método change é revertido automaticamente com db:rollback na maioria dos casos.",
+          "relatedTerms": [
+            "active-record-padrao",
+            "generators-rails"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "associacoes",
+          "level": "pleno",
+          "term": "Associações",
+          "definition": "belongs_to, has_many, has_one e has_many :through declaram os relacionamentos e criam métodos como pedido.itens e item.pedido. dependent: :destroy apaga os filhos junto. belongs_to é obrigatório por padrão: salvar um item sem pedido falha na validação.",
+          "relatedTerms": [
+            "active-record-padrao",
+            "includes-e-n-mais-1"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "validacoes-e-callbacks",
+          "level": "pleno",
+          "term": "Validações e callbacks",
+          "definition": "validates :nome, presence: true roda antes de salvar; se falhar, save devolve false e errors explica o motivo (save! lança exceção). Callbacks (before_save, after_commit) executam código em pontos do ciclo de vida. Callbacks com efeitos externos, como mandar e-mail, devem ficar em after_commit ou fora do model.",
+          "relatedTerms": [
+            "associacoes",
+            "strong-parameters"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "includes-e-n-mais-1",
+          "level": "pleno",
+          "term": "includes e N+1",
+          "definition": "Associações são carregadas sob demanda: percorrer pedidos e chamar pedido.cliente em cada um faz uma consulta por pedido. Pedido.includes(:cliente) carrega tudo em poucas consultas. preload sempre usa consultas separadas, eager_load usa JOIN. A gem Bullet e o strict_loading ajudam a detectar N+1.",
+          "relatedTerms": [
+            "associacoes",
+            "scopes"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "scopes",
+          "level": "pleno",
+          "term": "Scopes",
+          "definition": "Consultas nomeadas no model: scope :ativos, -> { where(ativo: true) }. Devolvem uma relation, então se encadeiam (Produto.ativos.baratos.order(:nome)) e só vão ao banco quando o resultado é usado. Deixam as consultas reutilizáveis e fora dos controllers.",
+          "relatedTerms": [
+            "active-record-padrao",
+            "includes-e-n-mais-1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "jobs-testes-e-seguranca",
+      "title": "Jobs, testes e segurança",
+      "description": "Trabalho em segundo plano, testes, proteções e frontend com Hotwire.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "active-job",
+          "level": "pleno",
+          "term": "Active Job",
+          "definition": "Interface comum para tarefas em segundo plano: a classe herda de ApplicationJob, define perform e é enfileirada com perform_later. O backend de fila é configurável: Solid Queue (padrão no Rails 8, usa o banco), Sidekiq (Redis) e outros. Os argumentos são serializados, por isso se passa o id ou o próprio record (via GlobalID), não objetos grandes.",
+          "relatedTerms": [
+            "credentials",
+            "validacoes-e-callbacks"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "csrf-no-rails",
+          "level": "pleno",
+          "term": "Proteção CSRF no Rails",
+          "definition": "Em aplicações com formulários e sessão por cookie, o Rails inclui um authenticity_token em cada formulário e o confere em requisições POST, PATCH e DELETE; sem ele, a requisição é rejeitada. Aplicações criadas com --api, que costumam autenticar por token no header, não usam essa proteção.",
+          "relatedTerms": [
+            "credentials",
+            "hotwire"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "credentials",
+          "level": "senior",
+          "term": "Credentials",
+          "definition": "Segredos (chaves de API, senhas) ficam em config/credentials.yml.enc, criptografado e versionado no git. A chave para abrir fica em config/master.key ou na variável RAILS_MASTER_KEY, nunca no git. bin/rails credentials:edit edita o arquivo, e o código lê com Rails.application.credentials.dig(:stripe, :secret).",
+          "relatedTerms": [
+            "active-job",
+            "csrf-no-rails"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hotwire",
+          "level": "pleno",
+          "term": "Hotwire e Turbo",
+          "definition": "O jeito padrão do Rails de ter páginas interativas sem uma SPA: o servidor manda HTML, não JSON. Turbo Drive troca a página sem recarregar, Turbo Frames atualizam só um pedaço e Turbo Streams enviam alterações (inclusive por WebSocket). Stimulus cobre o pouco de JavaScript que sobra.",
+          "relatedTerms": [
+            "csrf-no-rails"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "job-exemplo",
+          "level": "pleno",
+          "title": "Job com retentativa",
+          "body": "O job recebe o pedido, tenta de novo em falhas de rede com espera crescente e é enfileirado depois do commit.",
+          "snippet": {
+            "file": "app/jobs/enviar_nota_fiscal_job.rb",
+            "language": "ruby",
+            "code": "class EnviarNotaFiscalJob < ApplicationJob\n  queue_as :default\n  retry_on Net::ReadTimeout, wait: :polynomially_longer, attempts: 5\n  discard_on ActiveRecord::RecordNotFound\n\n  def perform(pedido)\n    NotaFiscal::Cliente.new.emitir(pedido)\n    pedido.update!(nota_emitida_em: Time.current)\n  end\nend\n\n# no model Pedido\nafter_commit -> { EnviarNotaFiscalJob.perform_later(self) }, on: :create"
+          },
+          "relatedTerms": [
+            "active-job",
+            "validacoes-e-callbacks"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "teste-request-exemplo",
+          "level": "junior",
+          "title": "Teste de request com RSpec",
+          "body": "O teste faz uma requisição de verdade pela stack do Rails e confere status, corpo e banco.",
+          "snippet": {
+            "file": "spec/requests/produtos_spec.rb",
+            "language": "ruby",
+            "code": "require \"rails_helper\"\n\nRSpec.describe \"POST /produtos\", type: :request do\n  it \"cria o produto com dados válidos\" do\n    expect {\n      post \"/produtos\", params: { produto: { nome: \"Caneca\", preco: 39.9 } }, as: :json\n    }.to change(Produto, :count).by(1)\n\n    expect(response).to have_http_status(:created)\n    expect(response.parsed_body[\"nome\"]).to eq(\"Caneca\")\n  end\n\n  it \"devolve 422 sem nome\" do\n    post \"/produtos\", params: { produto: { preco: 10 } }, as: :json\n    expect(response).to have_http_status(:unprocessable_entity)\n  end\nend"
+          },
+          "relatedTerms": [
+            "strong-parameters",
+            "validacoes-e-callbacks"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Rails que aparecem em entrevistas, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "convencao-pergunta",
+          "level": "junior",
+          "question": "O que significa \"convenção sobre configuração\" no Rails?",
+          "answer": "Que o framework decide nomes e lugares padrão, e quem segue o padrão não precisa configurar nada: o model Produto acha a tabela produtos, a rota resources :produtos acha o ProdutosController. O ganho é produtividade e projetos parecidos entre si; o custo é que fugir do padrão dá mais trabalho e a \"mágica\" precisa ser aprendida.",
+          "relatedTerms": [
+            "convencao-sobre-configuracao",
+            "rotas-resources"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "strong-params-pergunta",
+          "level": "junior",
+          "question": "Por que o Rails exige strong parameters?",
+          "answer": "Para impedir mass assignment: sem filtro, Produto.new(params[:produto]) aceitaria qualquer campo enviado, inclusive os que o usuário não deveria mudar, como admin ou preco_custo. Com require e permit, só os campos listados chegam ao model.",
+          "relatedTerms": [
+            "strong-parameters"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "n-mais-1-rails-pergunta",
+          "level": "pleno",
+          "question": "Como você encontra e resolve N+1 no Rails?",
+          "answer": "Encontro olhando o log (a mesma consulta repetida com ids diferentes), com a gem Bullet ou ligando strict_loading, que lança erro ao carregar associações sob demanda. Resolvo com includes (ou preload e eager_load) na consulta que alimenta o laço, e confiro no log que virou poucas consultas.",
+          "relatedTerms": [
+            "includes-e-n-mais-1",
+            "associacoes"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "includes-preload-pergunta",
+          "level": "senior",
+          "question": "includes, preload e eager_load: qual a diferença?",
+          "answer": "preload sempre faz uma consulta separada por associação. eager_load faz um único LEFT JOIN, necessário quando o where ou o order usa colunas da associação. includes escolhe sozinho: usa preload, a não ser que a consulta referencie a tabela associada, quando vira eager_load. Escolho explicitamente quando o desempenho importa.",
+          "relatedTerms": [
+            "includes-e-n-mais-1"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "callbacks-pergunta",
+          "level": "senior",
+          "question": "Callbacks do Active Record: quando usar e quando evitar?",
+          "answer": "Uso para regras do próprio dado, como normalizar um e-mail em before_validation. Evito para efeitos externos e fluxos de negócio (enviar e-mail, cobrar, chamar API): eles rodam escondidos em todo save, inclusive em testes e scripts, e um before_save que falha pode desfazer a transação. Para isso, prefiro um objeto de serviço explícito ou after_commit com um job.",
+          "relatedTerms": [
+            "validacoes-e-callbacks",
+            "active-job"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "tarefa-demorada-pergunta",
+          "level": "pleno",
+          "question": "Como tirar uma tarefa demorada do ciclo da requisição no Rails?",
+          "answer": "Crio um job com Active Job e enfileiro com perform_later, devolvendo a resposta na hora. Passo o record ou o id, não objetos grandes, deixo o job idempotente porque ele pode rodar de novo, configuro retry_on para falhas temporárias e, se ele depende de dados recém-salvos, enfileiro depois do commit.",
+          "relatedTerms": [
+            "active-job"
+          ]
+        }
+      ]
+    }
+  ]
+}

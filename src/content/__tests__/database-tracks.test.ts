@@ -7,7 +7,7 @@ const db = (id: string, title: string, decks: string[]) => ({ id, title, areas: 
 
 describeContentTracks({
   group: 'banco de dados',
-  after: 'django',
+  after: 'rails',
   snippetLanguages: ['sql', 'js', 'json', 'bash', 'text'],
   tracks: [
     db('sql-essencial', 'SQL essencial', ['consultas', 'joins-e-agregacoes', 'subqueries-e-janelas']),

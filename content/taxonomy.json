@@ -2,7 +2,9 @@
   "languages": [
     { "id": "javascript", "name": "JavaScript", "icon": "javascript" },
     { "id": "java", "name": "Java", "icon": "openjdk" },
-    { "id": "python", "name": "Python", "icon": "python" }
+    { "id": "python", "name": "Python", "icon": "python" },
+    { "id": "csharp", "name": "C#", "icon": "dotnet" },
+    { "id": "ruby", "name": "Ruby", "icon": "ruby" }
   ],
   "frameworks": [
     { "id": "react", "name": "React", "language": "javascript", "icon": "react" },
@@ -14,6 +16,8 @@
     { "id": "react-native", "name": "React Native", "language": "javascript", "icon": "react" },
     { "id": "spring", "name": "Spring Boot", "language": "java", "icon": "springboot" },
     { "id": "fastapi", "name": "FastAPI", "language": "python", "icon": "fastapi" },
-    { "id": "django", "name": "Django", "language": "python", "icon": "django" }
+    { "id": "django", "name": "Django", "language": "python", "icon": "django" },
+    { "id": "aspnet", "name": "ASP.NET Core", "language": "csharp", "icon": "dotnet" },
+    { "id": "rails", "name": "Ruby on Rails", "language": "ruby", "icon": "rubyonrails" }
   ]
 }

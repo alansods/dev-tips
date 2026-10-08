@@ -119,7 +119,7 @@ describe('Requirement: Próximo passo', () => {
   it('sem interesse, sugere da área Fundamentos', () => {
     const result = suggestions(catalog, {}, null, [])!;
     expect(result.kind).toBe('forYou');
-    expect(result.tracks[0].id).toBe('fundamentos-web');
+    expect(result.tracks[0].id).toBe('fundamentos-de-programacao');
   });
 });
 
@@ -138,7 +138,7 @@ describe('Requirement: Novas trilhas', () => {
 
 describe('Requirement: Primeiro acesso', () => {
   it('Sem interesse escolhido', () => {
-    expect(startHere(catalog, [])!.start.id).toBe('fundamentos-web');
+    expect(startHere(catalog, [])!.start.id).toBe('fundamentos-de-programacao');
     expect(startHere(catalog, [])!.then?.id).toBe('javascript-essencial');
   });
 

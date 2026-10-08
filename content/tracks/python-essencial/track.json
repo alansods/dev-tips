@@ -2,6 +2,7 @@
   "id": "python-essencial",
   "title": "Python essencial",
   "description": "A base do Python: tipos, mutabilidade, coleções, funções, decorators, generators e ambiente.",
+  "prerequisites": ["fundamentos-de-programacao"],
   "addedAt": "2026-10-05",
   "areas": [
     "backend"
@@ -15,20 +16,21 @@
       "cards": [
         {
           "type": "concept",
-          "id": "tipagem-dinamica",
+          "id": "duck-typing-type-hints",
           "level": "junior",
-          "term": "Tipagem dinâmica e forte",
-          "definition": "Em Python, o tipo pertence ao valor, não à variável: a mesma variável pode apontar para um int e depois para uma str (dinâmica). Mas o Python não converte tipos sozinho em operações misturadas: \"1\" + 1 dá TypeError (forte). Type hints documentam tipos e são checados por ferramentas como mypy, não em tempo de execução.",
+          "term": "Duck typing e type hints",
+          "definition": "Python não pergunta o tipo, e sim se o objeto tem o método: qualquer coisa com __iter__ serve num for (duck typing). Type hints (def f(x: int) -> str) documentam a intenção e são checados por ferramentas como mypy e pelo editor, mas o interpretador os ignora em execução. typing.Protocol descreve um \"formato\" esperado sem exigir herança.",
           "relatedTerms": [
-            "mutabilidade"
+            "hashable",
+            "list-tuple"
           ]
         },
         {
           "type": "concept",
-          "id": "mutabilidade",
+          "id": "hashable",
           "level": "junior",
-          "term": "Mutáveis e imutáveis",
-          "definition": "int, float, str, tuple e frozenset são imutáveis: \"alterar\" cria um objeto novo. list, dict e set são mutáveis: mudam no lugar, e todas as variáveis que apontam para eles veem a mudança. Só imutáveis (hashable) servem como chave de dict ou item de set.",
+          "term": "Hashable e imutáveis do Python",
+          "definition": "int, float, str, tuple, frozenset e bytes são imutáveis; list, dict e set mudam no lugar. Só valores hashable (com __hash__ estável, em geral os imutáveis) podem ser chave de dict ou item de set: uma tuple serve, uma list não. Uma tuple que contém uma list deixa de ser hashable.",
           "relatedTerms": [
             "list-tuple",
             "dict-set"
@@ -41,7 +43,7 @@
           "term": "list e tuple",
           "definition": "Sequências ordenadas. list é mutável e serve para coleções que crescem; tuple é imutável, mais leve, e serve para registros fixos (coordenadas, retornos múltiplos) e como chave de dict. O desempacotamento x, y = ponto funciona com as duas.",
           "relatedTerms": [
-            "mutabilidade",
+            "hashable",
             "comprehension"
           ]
         },
@@ -52,7 +54,7 @@
           "term": "dict e set",
           "definition": "dict mapeia chaves a valores e mantém a ordem de inserção (desde o 3.7); set guarda itens únicos sem ordem. Os dois usam tabela hash: in, inserção e busca em tempo constante na média. dict.get(chave, padrão) evita KeyError.",
           "relatedTerms": [
-            "mutabilidade",
+            "hashable",
             "comprehension"
           ]
         },
@@ -79,7 +81,7 @@
             "code": "a = [1, 2, 3]\nb = a\nb.append(4)\nprint(a)          # [1, 2, 3, 4]\nprint(a is b)     # True\n\nimport copy\nc = a.copy()      # cópia rasa\nd = copy.deepcopy([[1], [2]])"
           },
           "relatedTerms": [
-            "mutabilidade",
+            "hashable",
             "list-tuple"
           ]
         }
@@ -252,7 +254,7 @@
           "answer": "list é mutável: dá para adicionar, remover e alterar itens. tuple é imutável, ocupa menos memória e pode ser chave de dict ou item de set. Uso tuple para registros de tamanho fixo e dados que não devem mudar, e list para coleções que crescem.",
           "relatedTerms": [
             "list-tuple",
-            "mutabilidade"
+            "hashable"
           ]
         },
         {
@@ -262,7 +264,7 @@
           "question": "Qual a diferença entre is e ==?",
           "answer": "== compara valores (chama __eq__); is compara identidade, se é o mesmo objeto na memória. is serve para None (x is None) e para sentinelas. Comparar números ou strings com is pode até funcionar por causa de caches internos, mas é um bug esperando para acontecer.",
           "relatedTerms": [
-            "mutabilidade"
+            "hashable"
           ]
         },
         {
@@ -305,7 +307,7 @@
           "answer": "O valor padrão é avaliado uma vez, na definição da função, então a mesma lista é compartilhada entre todas as chamadas e acumula itens. O certo é usar None como padrão e criar a lista dentro da função. Vale para qualquer padrão mutável, como dict e set.",
           "relatedTerms": [
             "argumento-padrao-mutavel",
-            "mutabilidade"
+            "hashable"
           ]
         }
       ]

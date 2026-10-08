@@ -1,23 +1,8 @@
 # git-content Specification
 
 ## Purpose
-Define a trilha "Git e colaboração": onde ela aparece na navegação (área Fundamentos), como os decks são organizados e as regras de qualidade do conteúdo.
+Define a trilha "Git e colaboração": onde ela aparece na navegação (área Git), como os decks são organizados e as regras de qualidade do conteúdo.
 ## Requirements
-### Requirement: Trilha de Git no catálogo
-O catálogo SHALL ter a trilha `git-e-colaboracao` ("Git e colaboração"), registrada logo depois de `build-e-bundlers`, em `content/tracks/git-e-colaboracao/track.json`, com `areas: ["fundamentos"]`, sem `language`, `framework`, `variants` nem `section`.
-
-#### Scenario: Trilha registrada
-- **WHEN** o catálogo é carregado
-- **THEN** ele contém a trilha `git-e-colaboracao` logo depois de `build-e-bundlers`, na área Fundamentos, como trilha direta
-
-#### Scenario: Área Fundamentos
-- **WHEN** o usuário abre a área Fundamentos
-- **THEN** a seção "Trilhas" lista "Fundamentos web" e depois "Git e colaboração"
-
-#### Scenario: Só em Fundamentos
-- **WHEN** o usuário abre a área DevOps e Cloud
-- **THEN** a tela não lista "Git e colaboração"
-
 ### Requirement: Decks da trilha de Git
 A trilha SHALL ter exatamente 4 decks, nesta ordem: três decks de conteúdo com 6 cards cada (tipos `concept` ou `code`, com pelo menos 2 `concept` por deck) e o deck `perguntas-de-entrevista` ("Perguntas de entrevista"), com 6 cards `question`. São 24 cards. Os decks de conteúdo SHALL ser:
 
@@ -70,4 +55,19 @@ A trilha SHALL ter `translations/en.json`, registrado no app, com tradução par
 #### Scenario: Trilha em inglês
 - **WHEN** o app está em inglês e o usuário abre a área Fundamentos
 - **THEN** a trilha aparece como "Git and collaboration"
+
+### Requirement: Trilha de Git na área Git
+O catálogo SHALL ter a trilha `git-e-colaboracao` ("Git e colaboração"), registrada logo depois de `build-e-bundlers`, em `content/tracks/git-e-colaboracao/track.json`, com `areas: ["git"]`, sem `language`, `framework`, `variants` nem `section`. Git tem uma área própria, separada de Fundamentos.
+
+#### Scenario: Trilha registrada
+- **WHEN** o catálogo é carregado
+- **THEN** ele contém a trilha `git-e-colaboracao` logo depois de `build-e-bundlers`, na área Git, como trilha direta
+
+#### Scenario: Área Git
+- **WHEN** o usuário abre a área Git
+- **THEN** a seção "Trilhas" lista "Git e colaboração"
+
+#### Scenario: Fora de Fundamentos
+- **WHEN** o usuário abre a área Fundamentos ou a área DevOps e Cloud
+- **THEN** a tela não lista "Git e colaboração"
 

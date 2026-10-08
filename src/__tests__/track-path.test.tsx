@@ -55,11 +55,11 @@ describe('Requirement: Ordem sugerida na área (na tela)', () => {
   });
 
   it('Estados', async () => {
-    answer('fundamentos-web', cardIds('fundamentos-web'), 'known');
-    answer('git-e-colaboracao', ['commit'], 'known');
+    answer('fundamentos-de-programacao', cardIds('fundamentos-de-programacao'), 'known');
+    answer('fundamentos-web', ['http'], 'known');
     await open('/area/fundamentos');
-    expect(screen.getByRole('button', { name: '1. Fundamentos web, Concluída' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: '2. Git e colaboração, Em andamento' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: '1. Fundamentos de programação, Concluída' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: '2. Fundamentos web, Em andamento' })).toBeOnTheScreen();
   });
 
   it('Revisão pendente', async () => {
@@ -70,7 +70,7 @@ describe('Requirement: Ordem sugerida na área (na tela)', () => {
 
   it('Abrir pela ordem sugerida', async () => {
     await open('/area/fundamentos');
-    fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos web, Não iniciada' }));
-    expect(screen).toHavePathname('/track/fundamentos-web');
+    fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos de programação, Não iniciada' }));
+    expect(screen).toHavePathname('/track/fundamentos-de-programacao');
   });
 });

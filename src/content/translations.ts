@@ -3,6 +3,7 @@
 // catálogo falha se um arquivo de tradução ficar sem registro.
 
 import crud4FrameworksEn from '../../content/tracks/crud-4-frameworks/translations/en.json';
+import fundamentosDeProgramacaoEn from '../../content/tracks/fundamentos-de-programacao/translations/en.json';
 import fundamentosWebEn from '../../content/tracks/fundamentos-web/translations/en.json';
 import javascriptEssencialEn from '../../content/tracks/javascript-essencial/translations/en.json';
 import javascriptAssincronoEn from '../../content/tracks/javascript-assincrono/translations/en.json';
@@ -22,6 +23,10 @@ import springBootEn from '../../content/tracks/spring-boot/translations/en.json'
 import pythonEssencialEn from '../../content/tracks/python-essencial/translations/en.json';
 import fastapiEn from '../../content/tracks/fastapi/translations/en.json';
 import djangoEn from '../../content/tracks/django/translations/en.json';
+import csharpEssencialEn from '../../content/tracks/csharp-essencial/translations/en.json';
+import aspnetCoreEn from '../../content/tracks/aspnet-core/translations/en.json';
+import rubyEssencialEn from '../../content/tracks/ruby-essencial/translations/en.json';
+import railsEn from '../../content/tracks/rails/translations/en.json';
 import sqlEssencialEn from '../../content/tracks/sql-essencial/translations/en.json';
 import modelagemDeDadosEn from '../../content/tracks/modelagem-de-dados/translations/en.json';
 import transacoesEPerformanceEn from '../../content/tracks/transacoes-e-performance/translations/en.json';
@@ -46,6 +51,7 @@ import modulosNativosNoExpoEn from '../../content/tracks/modulos-nativos-no-expo
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
+  'fundamentos-de-programacao': { en: fundamentosDeProgramacaoEn },
   'fundamentos-web': { en: fundamentosWebEn },
   'javascript-essencial': { en: javascriptEssencialEn },
   'javascript-assincrono': { en: javascriptAssincronoEn },
@@ -65,6 +71,10 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'python-essencial': { en: pythonEssencialEn },
   fastapi: { en: fastapiEn },
   django: { en: djangoEn },
+  'csharp-essencial': { en: csharpEssencialEn },
+  'aspnet-core': { en: aspnetCoreEn },
+  'ruby-essencial': { en: rubyEssencialEn },
+  rails: { en: railsEn },
   'sql-essencial': { en: sqlEssencialEn },
   'modelagem-de-dados': { en: modelagemDeDadosEn },
   'transacoes-e-performance': { en: transacoesEPerformanceEn },

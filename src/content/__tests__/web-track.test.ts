@@ -13,7 +13,7 @@ const cards = () => web().decks.flatMap((d) => d.cards);
 
 describe('Requirement: Identidade da trilha', () => {
   it('Trilha no catálogo', () => {
-    expect(catalog.map((t) => t.id).slice(0, 2)).toEqual(['crud-4-frameworks', 'fundamentos-web']);
+    expect(catalog.map((t) => t.id).slice(0, 3)).toEqual(['crud-4-frameworks', 'fundamentos-de-programacao', 'fundamentos-web']);
     expect(web().title).toBe('Fundamentos web');
     expect(web().variants).toBeUndefined();
     expect(web().compareColumns).toBeUndefined();

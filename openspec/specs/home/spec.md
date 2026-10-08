@@ -117,7 +117,7 @@ Sem nenhuma resposta registrada, o Início SHALL mostrar:
 
 #### Scenario: Sem interesse escolhido
 - **WHEN** é o primeiro acesso e nenhuma área foi escolhida
-- **THEN** "Comece por aqui" mostra "Fundamentos web"
+- **THEN** "Comece por aqui" mostra "Fundamentos de programação"
 
 #### Scenario: Interesse em Backend
 - **WHEN** é o primeiro acesso e o usuário marca "Backend"

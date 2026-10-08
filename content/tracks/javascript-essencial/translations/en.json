@@ -44,17 +44,17 @@
       "title": "Destructuring and spread",
       "body": "Destructuring pulls values out of objects and arrays straight into variables, with defaults. Spread (...) copies properties or items into a new object or array without changing the original."
     },
-    "escopo-lexico": {
-      "term": "Lexical scope",
-      "definition": "The rule that defines where a variable is visible: by where it was written in the code, not by where the function is called. A function sees the variables of the block it was declared in and of every enclosing block."
+    "escopo-de-bloco-tdz": {
+      "term": "Block scope and TDZ",
+      "definition": "let and const exist only inside the { } block where they were declared; var ignores blocks and applies to the whole function. Before the declaration line, let and const are in the temporal dead zone (TDZ): accessing them throws ReferenceError, instead of returning undefined as happens with var."
     },
     "hoisting": {
       "term": "Hoisting",
       "definition": "The behavior where declarations are registered before the code runs. Functions declared with function can be called before the line where they appear; var exists as undefined; let and const exist but stay in the \"temporal dead zone\" (TDZ) and throw a ReferenceError if used before the declaration."
     },
-    "closure": {
-      "term": "Closure",
-      "definition": "A function that remembers the variables of the scope where it was created, even after that scope has finished. It is the basis of private state, function factories, callbacks and hooks like React's."
+    "parametros-padrao-e-rest": {
+      "term": "Default and rest parameters",
+      "definition": "function f(a, b = 10, ...rest): b uses 10 when the argument is undefined (null does not trigger the default), and rest gathers the extra arguments into a real array. They replace the old arguments object, which does not exist in arrow functions. The default is evaluated on each call and can use earlier parameters."
     },
     "this": {
       "term": "this",
@@ -68,9 +68,9 @@
       "title": "Arrow functions and this",
       "body": "Inside setTimeout, the regular function loses this (it becomes undefined). The arrow function uses the this of the surrounding method, so it works."
     },
-    "referencia-vs-valor": {
-      "term": "Reference and value",
-      "definition": "Primitives are copied by value; objects and arrays are accessed by reference. Assigning an object to another variable does not copy it: both point to the same object, and changing it through one changes it through the other."
+    "object-freeze-e-const": {
+      "term": "Object.freeze and const",
+      "definition": "const only prevents reassigning the variable: the object it points to stays mutable (obj.x = 1 works). Object.freeze prevents changing the properties, but it is shallow: objects inside it are still mutable. In strict mode, writing to a frozen object throws TypeError; outside it, it fails silently."
     },
     "prototipo": {
       "term": "Prototype",
@@ -100,9 +100,9 @@
       "question": "When should you use var, let and const?",
       "answer": "const by default, let when the variable needs to be reassigned, and never var in new code. var is function-scoped and hoisted as undefined, which causes bugs in loops and blocks; let and const are block-scoped and throw if used before the declaration."
     },
-    "o-que-e-closure": {
-      "question": "What is a closure? Give a real use.",
-      "answer": "It is a function that keeps access to the variables of the scope it was created in, even after that scope has ended. Real uses: private state (a counter or cache only the function touches), configured functions such as debounce, event callbacks that remember an id, and React hooks, which rely on closures."
+    "var-settimeout-no-laco": {
+      "question": "Why does a for loop with var and setTimeout always print the same number?",
+      "answer": "With var, there is a single variable i for the whole function. The setTimeout callbacks run after the loop has finished and all read that same variable, already holding the final value. With let, each loop iteration creates a new i, and each callback keeps its own. Before let, the fix was an IIFE that took i as a parameter."
     },
     "como-this-e-definido": {
       "question": "How is the value of this decided?",

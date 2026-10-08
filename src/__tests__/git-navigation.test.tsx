@@ -44,14 +44,19 @@ beforeEach(() => resetStudyStore());
 
 const TRACKS = ['Fundamentos web', 'Git e colaboração'];
 
-describe('Requirement: Trilha de Git no catálogo', () => {
-  it('Área Fundamentos', async () => {
-    await open('/area/fundamentos');
+describe('Requirement: Trilha de Git na área Git', () => {
+  it('Área Git', async () => {
+    await open('/area/git');
     expect(screen.getAllByRole('header').map((h) => String(h.props.children))).toContain('Trilhas');
-    expect(buttons(TRACKS)).toEqual(['Fundamentos web', 'Git e colaboração']);
+    expect(buttons(TRACKS)).toEqual(['Git e colaboração']);
   });
 
-  it('Só em Fundamentos', async () => {
+  it('Fora de Fundamentos', async () => {
+    await open('/area/fundamentos');
+    expect(buttons(TRACKS)).toEqual(['Fundamentos web']);
+  });
+
+  it('Fora de DevOps e Cloud', async () => {
     await open('/area/devops');
     expect(buttons(TRACKS)).toEqual([]);
   });
@@ -60,7 +65,7 @@ describe('Requirement: Trilha de Git no catálogo', () => {
 describe('Requirement: Tradução da trilha de Git', () => {
   it('Trilha em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/area/fundamentos');
+    await open('/area/git');
     expect(screen.getByRole('button', { name: /^Git and collaboration,/ })).toBeOnTheScreen();
   });
 });

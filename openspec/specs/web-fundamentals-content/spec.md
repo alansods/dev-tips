@@ -5,11 +5,11 @@
 Define o conteúdo da trilha "Fundamentos web" (HTTP, REST, navegador e segurança, e perguntas de entrevista) e como ele se liga ao glossário.
 ## Requirements
 ### Requirement: Identidade da trilha
-A trilha SHALL estar em `content/tracks/fundamentos-web/track.json`, com id `fundamentos-web`, título "Fundamentos web" e `areas: ["fundamentos"]`, registrada no catálogo do app depois da trilha CRUD. A trilha MUST NOT declarar `variants`, `compareColumns`, `language` nem `framework`.
+A trilha SHALL estar em `content/tracks/fundamentos-web/track.json`, com id `fundamentos-web`, título "Fundamentos web" e `areas: ["fundamentos"]`, registrada no catálogo do app logo depois da trilha `fundamentos-de-programacao`. A trilha MUST NOT declarar `variants`, `compareColumns`, `language` nem `framework`.
 
 #### Scenario: Trilha no catálogo
 - **WHEN** o catálogo é carregado
-- **THEN** ele contém, nesta ordem, as trilhas `crud-4-frameworks` e `fundamentos-web`
+- **THEN** ele contém, nesta ordem, as trilhas `crud-4-frameworks`, `fundamentos-de-programacao` e `fundamentos-web`
 
 #### Scenario: Trilha na área Fundamentos
 - **WHEN** o usuário abre a área Fundamentos
@@ -58,6 +58,10 @@ A trilha SHALL ter o arquivo `content/tracks/fundamentos-web/translations/en.jso
 #### Scenario: Card exibido em inglês
 - **WHEN** o app está em inglês e o usuário abre o card concept "Cookie" e uma pergunta de entrevista
 - **THEN** o card aparece em inglês
+
+#### Scenario: Trilha em inglês
+- **WHEN** o app está em inglês e o usuário abre a área Fundamentos
+- **THEN** a trilha aparece como "Web fundamentals"
 
 #### Scenario: PT-BR intacto
 - **WHEN** o app está em PT-BR

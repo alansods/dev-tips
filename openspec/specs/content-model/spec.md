@@ -99,11 +99,15 @@ Um card `step` SHALL ter `number` (inteiro ≥ 1), `title`, `whatIs`, `whyItMatt
 - **THEN** a validação rejeita a trilha indicando o número repetido
 
 ### Requirement: Snippet de código
-Todo snippet (em `step`, `code` ou `question`) SHALL ter `file` (rótulo de onde o código vive, ex.: `terminal`, `src/db.ts`), `language` e `code` não vazios. MAY ter `note`. `language` MUST pertencer à lista suportada: `bash`, `ts`, `js`, `java`, `python`, `sql`, `xml`, `properties`, `json`, `yaml`, `text`. O conteúdo de `code` SHALL ser preservado exatamente como escrito, incluindo quebras de linha e indentação.
+Todo snippet (em `step`, `code` ou `question`) SHALL ter `file` (rótulo de onde o código vive, ex.: `terminal`, `src/db.ts`), `language` e `code` não vazios. MAY ter `note`. `language` MUST pertencer à lista suportada: `bash`, `ts`, `js`, `java`, `python`, `csharp`, `ruby`, `sql`, `xml`, `properties`, `json`, `yaml`, `text`. O conteúdo de `code` SHALL ser preservado exatamente como escrito, incluindo quebras de linha e indentação.
 
 #### Scenario: Linguagem não suportada
 - **WHEN** um snippet tem `language: "cobol"`
 - **THEN** a validação rejeita a trilha com erro no campo `language` do snippet
+
+#### Scenario: Snippet em C# e Ruby
+- **WHEN** um snippet tem `language: "csharp"` ou `language: "ruby"`
+- **THEN** a validação aceita o snippet
 
 #### Scenario: Código preservado
 - **WHEN** um snippet tem código com indentação de 4 espaços e linhas em branco
@@ -233,7 +237,7 @@ Uma trilha MAY ter um arquivo de tradução para inglês em `content/tracks/<tra
 - **THEN** todo arquivo `translations/en.json` em `content/tracks/` é validado contra a trilha correspondente, e um erro faz a suíte falhar
 
 ### Requirement: Áreas da trilha
-Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `frontend` (Frontend), `backend` (Backend), `banco-de-dados` (Banco de dados), `mobile` (Mobile) e `devops` (DevOps e Cloud). Uma trilha MAY estar em mais de uma área.
+Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `git` (Git), `frontend` (Frontend), `backend` (Backend), `banco-de-dados` (Banco de dados), `mobile` (Mobile) e `devops` (DevOps e Cloud). Uma trilha MAY estar em mais de uma área.
 
 #### Scenario: Trilha sem áreas
 - **WHEN** uma trilha não declara `areas` ou declara a lista vazia
@@ -258,6 +262,10 @@ Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de á
 #### Scenario: Áreas de mobile e DevOps
 - **WHEN** uma trilha declara `areas: ["mobile"]` e outra declara `areas: ["devops"]`
 - **THEN** a validação aceita as duas trilhas
+
+#### Scenario: Área Git
+- **WHEN** uma trilha declara `areas: ["git"]`
+- **THEN** a validação aceita a trilha
 
 ### Requirement: Cadastro de linguagens e frameworks
 O conteúdo SHALL ter um cadastro único de linguagens e frameworks em `content/taxonomy.json`: `languages`, uma lista de `{id, name}`, e `frameworks`, uma lista de `{id, name, language}`. A ordem de cada lista SHALL ser a ordem de exibição. Os ids MUST estar em kebab-case e ser únicos dentro de cada lista, os nomes MUST ser não vazios e o `language` de cada framework MUST ser o id de uma linguagem do cadastro. O cadastro do repositório SHALL ser validado pela suíte de testes.

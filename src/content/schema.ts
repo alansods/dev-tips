@@ -10,7 +10,7 @@ const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const id = () => z.string().regex(KEBAB, { error: 'deve estar em kebab-case (a-z, 0-9 e -)' });
 
 /** Áreas do catálogo, na ordem de exibição. */
-export const AREAS = ['fundamentos', 'frontend', 'backend', 'banco-de-dados', 'mobile', 'devops'] as const;
+export const AREAS = ['fundamentos', 'git', 'frontend', 'backend', 'banco-de-dados', 'mobile', 'devops'] as const;
 
 /** Seções que agrupam trilhas diretas dentro de uma área, na ordem de exibição. */
 export const SECTIONS = ['relacionais', 'nao-relacionais', 'ci-cd', 'aws'] as const;
@@ -35,7 +35,7 @@ export const conceptCardSchema = z.object({
   aliases: z.array(text()).optional(),
 });
 
-export const SNIPPET_LANGUAGES = ['bash', 'ts', 'js', 'java', 'python', 'sql', 'xml', 'properties', 'json', 'yaml', 'text'] as const;
+export const SNIPPET_LANGUAGES = ['bash', 'ts', 'js', 'java', 'python', 'csharp', 'ruby', 'sql', 'xml', 'properties', 'json', 'yaml', 'text'] as const;
 
 export const snippetSchema = z.object({
   file: text(),

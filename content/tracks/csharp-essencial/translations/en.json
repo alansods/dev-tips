@@ -1,0 +1,120 @@
+{
+  "title": "C# essentials",
+  "description": "What is particular to C# and .NET: value types, nullable, records, LINQ, async and resource management.",
+  "decks": {
+    "tipos-e-runtime": {
+      "title": "Types and runtime",
+      "description": "How .NET runs code and the types specific to C#."
+    },
+    "linq-e-colecoes": {
+      "title": "LINQ and collections",
+      "description": "Queries over collections and what happens behind them."
+    },
+    "async-e-recursos": {
+      "title": "async and resources",
+      "description": "Asynchronous code with Task and releasing resources."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "C# questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "clr-e-dotnet": {
+      "term": "CLR and .NET",
+      "definition": "The C# compiler produces IL (intermediate code), and the CLR, the .NET runtime, executes it with a JIT, a garbage collector and type checks. Modern .NET (successor to .NET Framework) runs on Windows, Linux and macOS. The SDK ships the dotnet command to create, build, test and publish projects."
+    },
+    "struct-e-class": {
+      "term": "struct and class",
+      "definition": "A class is a reference type: variables point to the same object on the heap. A struct is a value type: assigning or passing it as an argument copies its whole content. Structs fit small, immutable values (a point, an amount of money). Converting a struct to object or an interface causes boxing, which allocates on the heap."
+    },
+    "nullable-reference-types": {
+      "term": "Nullable reference types",
+      "definition": "With <Nullable>enable</Nullable> in the project, string comes to mean \"never null\" and string? \"may be null\". The compiler warns when a possibly null value is used without a check. It is compile-time analysis only: at runtime, nothing stops null. The ! operator silences the warning and should be the exception."
+    },
+    "record-e-init": {
+      "term": "record and init",
+      "definition": "A record is a class (or record struct) made for data: it generates value equality, a readable ToString and deconstruction. init properties can only be set at creation, which makes the object immutable. The with expression creates a copy with some fields changed."
+    },
+    "pattern-matching": {
+      "term": "Pattern matching",
+      "definition": "is and switch test the shape of a value and pull parts out of it: type (shape is Circle c), properties ({ Status: \"paid\" }), ranges (> 100) and combinations with and, or and not. The switch expression returns a value, and the compiler warns when a case is left unhandled."
+    },
+    "record-com-switch": {
+      "title": "record with a switch expression",
+      "body": "The record gives value equality and with creates copies. The switch pulls data out by type and property."
+    },
+    "linq": {
+      "term": "LINQ",
+      "definition": "Language Integrated Query: methods such as Where, Select, OrderBy, GroupBy and First, which query any collection (and databases, through EF Core) with the same syntax. They take lambdas and chain together. There is also query syntax (from x in ... where ... select), translated into the same methods."
+    },
+    "execucao-adiada": {
+      "term": "Deferred execution",
+      "definition": "Where and Select do not run right away: they return a query that only executes when it is enumerated (foreach, ToList, Count). Each enumeration runs again from scratch, which can repeat expensive work or see changed data. ToList() or ToArray() materializes the result once."
+    },
+    "ienumerable-e-iqueryable": {
+      "term": "IEnumerable and IQueryable",
+      "definition": "IEnumerable<T> runs the query in memory, with delegates. IQueryable<T> keeps an expression tree that a provider (EF Core) translates into SQL. Calling AsEnumerable() or ToList() too early pulls the whole table into memory and filters there; keeping IQueryable until the end lets the database filter."
+    },
+    "extension-methods": {
+      "term": "Extension methods",
+      "definition": "Static methods, in a static class, whose first parameter has this: public static bool IsBlank(this string s). They can be called as if they belonged to the instance (name.IsBlank()), without changing the original type. That is how LINQ adds Where and Select to any IEnumerable."
+    },
+    "delegates-func-action": {
+      "term": "Delegates, Func and Action",
+      "definition": "A delegate is a type that represents a method signature, and a variable of it holds a function. Func<T, TResult> is the built-in delegate for functions that return a value, and Action<T> for those that do not. Lambdas (x => x * 2) become these delegates; events use delegates to notify subscribers."
+    },
+    "linq-agrupar": {
+      "title": "Filter, group and project with LINQ",
+      "body": "A chained query, materialized only once with ToList()."
+    },
+    "task-async-await": {
+      "term": "Task and async/await",
+      "definition": "A Task represents an operation in progress (Task<T>, when it returns a value). An async method can use await to wait for a Task without blocking the thread, which stays free for other work, such as serving another request. The method name usually ends in Async."
+    },
+    "bloqueio-result-wait": {
+      "term": "Blocking with .Result and .Wait()",
+      "definition": "Calling .Result or .Wait() on a Task blocks the thread until it finishes. In environments with a synchronization context (UI, old ASP.NET), this causes a deadlock: the continuation needs the thread that is blocked waiting. Even without a deadlock, it holds pool threads. The rule is async all the way."
+    },
+    "cancellation-token": {
+      "term": "CancellationToken",
+      "definition": "A signal passed from method to method to ask an operation to stop. The caller creates a CancellationTokenSource (with Cancel() or a timeout) and passes along its Token; .NET APIs (HttpClient, EF Core) accept it. In ASP.NET Core, the request already gets a token that fires when the client gives up."
+    },
+    "idisposable-using": {
+      "term": "IDisposable and using",
+      "definition": "Objects that hold resources outside the garbage collector's control (connections, files, streams) implement IDisposable. using var conn = ...; calls Dispose() at the end of the scope, even with an exception. For asynchronous resources there is IAsyncDisposable, with await using."
+    },
+    "http-com-cancelamento": {
+      "title": "HTTP call with a timeout",
+      "body": "The token combines the caller's cancellation with a 5-second timeout, and await frees the thread while waiting."
+    },
+    "throw-e-filtros": {
+      "title": "throw; and exception filters",
+      "body": "throw; rethrows keeping the original stack; throw ex; resets it and hides where the error started. when filters the exception before entering the catch."
+    },
+    "struct-ou-class-pergunta": {
+      "question": "When should you use a struct instead of a class in C#?",
+      "answer": "When the type represents a small value (few fields), immutable and with no identity of its own, like a coordinate or a money amount. That way I avoid heap allocation. For large, mutable objects or those that need inheritance, a class: copying large structs is expensive, and changing the copy instead of the original is a common bug."
+    },
+    "record-ou-class-pergunta": {
+      "question": "When should you use a record instead of a class?",
+      "answer": "For data objects, such as DTOs, events and domain values, where two objects with the same data should be considered equal and immutability helps. A class is still better for entities with identity and behavior, like an Order that changes state."
+    },
+    "nullable-pergunta": {
+      "question": "What problem do nullable reference types solve?",
+      "answer": "They make the compiler point out where a value may be null and is being used without a check, reducing NullReferenceException. The type now states the intent: string does not accept null, string? does. It is compile-time analysis, so data coming from outside (JSON, database) still needs validation."
+    },
+    "enumeracao-multipla-pergunta": {
+      "question": "Why can enumerating the same IEnumerable twice be a problem?",
+      "answer": "Because of deferred execution: each enumeration runs the query again. If the source is a database or a network call, I make two trips; if the data changes in between, the results differ. When I will use the result more than once, I materialize it with ToList()."
+    },
+    "iqueryable-pergunta": {
+      "question": "What is the difference between IEnumerable and IQueryable when querying the database with EF Core?",
+      "answer": "With IQueryable, filters become SQL and the database returns only what is needed. If the query turns into IEnumerable before the filter (an AsEnumerable, a ToList or a method that takes IEnumerable), EF brings every row and the filter runs in memory. I keep IQueryable until the final projection and materialize at the end."
+    },
+    "async-void-pergunta": {
+      "question": "Why avoid async void?",
+      "answer": "An async void method does not return a Task, so the caller cannot await it or know whether it failed. Exceptions in it crash the process instead of reaching a try/catch. It only makes sense in event handlers; everywhere else, async Task."
+    }
+  }
+}

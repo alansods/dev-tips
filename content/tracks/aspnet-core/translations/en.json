@@ -1,0 +1,120 @@
+{
+  "title": "ASP.NET Core",
+  "description": "APIs with ASP.NET Core: middleware pipeline, dependency injection, Entity Framework Core, validation, authentication and tests.",
+  "decks": {
+    "pipeline-e-di": {
+      "title": "Pipeline and dependency injection",
+      "description": "How the request travels through the app and how services are created."
+    },
+    "ef-core": {
+      "title": "Entity Framework Core",
+      "description": "The .NET ORM: context, migrations, tracking and queries."
+    },
+    "web-e-seguranca": {
+      "title": "Web and security",
+      "description": "Input data, standard errors, authentication, authorization and tests."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "ASP.NET Core questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "minimal-api-e-controllers": {
+      "term": "Minimal API and controllers",
+      "definition": "There are two endpoint styles. Minimal API maps routes directly in Program.cs (app.MapGet(\"/products\", ...)), with little ceremony. Controllers are classes with [ApiController] and one method per action, with filters and conventions. Both use the same pipeline, the same dependency injection and the same model binding."
+    },
+    "pipeline-de-middleware": {
+      "term": "Middleware pipeline",
+      "definition": "Each request goes through a sequence of middlewares registered in Program.cs, in the order they appear (UseExceptionHandler, UseHttpsRedirection, UseAuthentication, UseAuthorization...). Each one can act before and after calling the next, or respond and stop the chain. The order changes the behavior."
+    },
+    "ciclos-de-vida-da-di": {
+      "term": "Lifetimes: Singleton, Scoped and Transient",
+      "definition": "The built-in DI container creates services according to their registration. Singleton: one instance for the whole application. Scoped: one per request (that is the case for DbContext). Transient: a new one for each injection. A Singleton that receives a Scoped service holds that instance forever (captive dependency)."
+    },
+    "options-pattern": {
+      "term": "appsettings and the options pattern",
+      "definition": "Configuration comes from appsettings.json, appsettings.{Environment}.json, environment variables and user secrets, in increasing order of priority. The options pattern binds a section to a class (services.Configure<SmtpOptions>(...)) and injects it as IOptions<T>, with validation at startup."
+    },
+    "minimal-api-exemplo": {
+      "title": "Endpoints with Minimal API",
+      "body": "A service registered with a Scoped lifetime and two endpoints that get the service through injection."
+    },
+    "appsettings-exemplo": {
+      "title": "appsettings.json per environment",
+      "body": "The Smtp section becomes a class with the options pattern. The password is not in the file: it comes from an environment variable (Smtp__Senha) or user secrets."
+    },
+    "dbcontext": {
+      "term": "DbContext",
+      "definition": "The class that represents a session with the database: it exposes a DbSet<T> for each table, tracks loaded entities and saves changes with SaveChangesAsync(), in a transaction. It is registered as Scoped (AddDbContext) and is not safe to use from several threads at once."
+    },
+    "migrations-ef-core": {
+      "term": "EF Core migrations",
+      "definition": "dotnet ef migrations add Name compares the current model with the snapshot and generates a class with Up and Down. dotnet ef database update applies the pending ones. In production, the recommended way is to generate an idempotent SQL script (migrations script --idempotent) or a bundle, instead of migrating at application startup."
+    },
+    "change-tracking": {
+      "term": "Change tracking and AsNoTracking",
+      "definition": "By default, the DbContext keeps a copy of every loaded entity to find out what changed on SaveChanges. In read-only queries, that wastes memory and CPU: AsNoTracking() turns tracking off. Projecting with Select into a DTO also avoids tracking."
+    },
+    "include-e-n-mais-1": {
+      "term": "Include and N+1",
+      "definition": "EF Core does not load relationships on its own. Include(p => p.Items) brings the related data in the same query. With lazy loading on, accessing p.Items inside a loop fires one query per order (N+1). With several collection Includes, AsSplitQuery() avoids the cartesian product."
+    },
+    "dbcontext-exemplo": {
+      "title": "Entity and DbContext",
+      "body": "Setting up the relationship and an index with the Fluent API."
+    },
+    "consulta-leitura": {
+      "title": "Read query with projection",
+      "body": "Filter and projection become SQL; only the columns used are read and nothing is tracked."
+    },
+    "model-binding-e-validacao": {
+      "term": "Model binding and validation",
+      "definition": "ASP.NET Core fills the endpoint parameters from the route, the query string, the headers and the JSON body. With [ApiController], attributes such as [Required] and [Range] are checked before the action, and an invalid body becomes a 400 automatically. In Minimal API, validation is registered separately or done with libraries such as FluentValidation."
+    },
+    "problem-details": {
+      "term": "ProblemDetails",
+      "definition": "The standard error format (RFC 9457) that ASP.NET Core uses in error responses: type, title, status, detail and, for validation, errors per field. AddProblemDetails() and UseExceptionHandler() turn unhandled exceptions into a 500 ProblemDetails, without leaking the stack trace."
+    },
+    "autenticacao-jwt-aspnet": {
+      "term": "JWT authentication in ASP.NET Core",
+      "definition": "AddAuthentication().AddJwtBearer(...) validates the token in the Authorization header: signature, issuer, audience and expiry. The UseAuthentication middleware fills HttpContext.User with the token's claims. It must come before UseAuthorization, which decides whether the user may access the endpoint."
+    },
+    "policies-de-autorizacao": {
+      "term": "Authorization policies",
+      "definition": "Instead of scattering role checks, the app defines named policies (AddAuthorization(o => o.AddPolicy(\"Admin\", p => p.RequireRole(\"admin\")))) and applies them with [Authorize(Policy = ...)] or RequireAuthorization(). Richer rules, like \"only the resource owner\", use custom requirements and handlers."
+    },
+    "webapplicationfactory-exemplo": {
+      "title": "Integration test with WebApplicationFactory",
+      "body": "The factory runs the whole application in memory, with the real pipeline, and the test makes real HTTP requests against it."
+    },
+    "jwt-e-policy-exemplo": {
+      "title": "JWT and a policy in Program.cs",
+      "body": "Authentication before authorization, and the admin route group protected by a policy."
+    },
+    "minimal-ou-controllers-pergunta": {
+      "question": "Minimal API or controllers: which one should you choose?",
+      "answer": "Both run on the same pipeline, with the same practical performance. Minimal API fits small services and simple endpoints, with less code. Controllers help in large APIs, with many endpoints, filters and shared conventions. On a team, what matters is picking one style and sticking to it."
+    },
+    "ordem-middleware-pergunta": {
+      "question": "Why does the order of middlewares matter?",
+      "answer": "Because each middleware only sees what the earlier ones let through and what the later ones returned. If UseAuthorization comes before UseAuthentication, the user has not been identified yet and everything looks anonymous. Exception handling comes first to catch errors from everything else."
+    },
+    "captive-dependency-pergunta": {
+      "question": "What happens when you inject a Scoped service into a Singleton?",
+      "answer": "The Singleton is created once and keeps the Scoped instance it received, which then lives for the whole application and is shared between requests. With a DbContext, this causes stale data and concurrency errors. In development, the container's scope validation throws an exception. The fix is to inject IServiceScopeFactory and create a scope when needed."
+    },
+    "asnotracking-pergunta": {
+      "question": "When should you use AsNoTracking in EF Core?",
+      "answer": "In queries that only read data to return in the response, without changing and saving the entities. Without tracking, EF does not keep copies to compare on SaveChanges, which saves memory and CPU. If I will change and save, I need tracking (or to attach the entity again)."
+    },
+    "migrations-producao-pergunta": {
+      "question": "How do you apply EF Core migrations in production?",
+      "answer": "I avoid Database.Migrate() at startup: with several instances starting together, they compete for the migration, and the app would need permission to change the schema. I generate an idempotent script or a migration bundle in CI and apply it in a deploy step, before releasing the new version, with migrations compatible with the previous version."
+    },
+    "authn-authz-pergunta": {
+      "question": "What is the difference between UseAuthentication and UseAuthorization?",
+      "answer": "UseAuthentication finds out who the user is: it validates the token or cookie and fills HttpContext.User. UseAuthorization decides whether that user may access the endpoint, according to [Authorize] and the policies. Without the first, the second always sees an anonymous user."
+    }
+  }
+}

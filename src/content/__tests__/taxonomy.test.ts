@@ -35,6 +35,10 @@ describe('Requirement: Áreas da trilha', () => {
     expect(trackOf(input).areas).toEqual(['banco-de-dados']);
   });
 
+  it('Área Git', () => {
+    expect(trackOf({ ...minimalTrack(), areas: ['git'] }).areas).toEqual(['git']);
+  });
+
   it('Áreas de mobile e DevOps', () => {
     expect(trackOf({ ...minimalTrack(), areas: ['mobile'] }).areas).toEqual(['mobile']);
     expect(trackOf({ ...minimalTrack(), areas: ['devops'] }).areas).toEqual(['devops']);

@@ -4,7 +4,7 @@
 Define como o usuário encontra as trilhas: a aba Trilhas lista as áreas, e cada área leva às suas trilhas, linguagens, frameworks e comparativos, conforme a posição declarada em cada trilha.
 ## Requirements
 ### Requirement: Home por áreas
-A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud. Cada área SHALL aparecer como um card tocável com:
+A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud. Cada área SHALL aparecer como um card tocável com:
 - o nome da área;
 - a quantidade de trilhas ("2 trilhas", "1 trilha");
 - uma barra de progresso e o texto "sei/total", somados sobre todos os cards das trilhas da área com a mesma regra de progresso da capability `study-flow`;
@@ -29,8 +29,8 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 - **THEN** a tela da área Backend abre
 
 #### Scenario: Mobile e DevOps e Cloud no fim
-- **WHEN** o catálogo tem trilhas nas seis áreas
-- **THEN** a Home mostra Fundamentos, Frontend, Backend, Banco de dados, Mobile e DevOps e Cloud, nessa ordem
+- **WHEN** o catálogo tem trilhas nas sete áreas
+- **THEN** a Home mostra Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile e DevOps e Cloud, nessa ordem
 
 ### Requirement: Tela da área
 Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas, com botão de voltar e o nome da área como título. A tela SHALL mostrar, nesta ordem, as seções:
@@ -97,7 +97,7 @@ Os textos da navegação SHALL seguir o idioma do app:
 
 | PT-BR | Inglês |
 |---|---|
-| Fundamentos, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud | Fundamentals, Frontend, Backend, Databases, Mobile, DevOps & Cloud |
+| Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud | Fundamentals, Git, Frontend, Backend, Databases, Mobile, DevOps & Cloud |
 | Trilhas, Linguagens, Comparativos | Tracks, Languages, Comparisons |
 | Relacionais, Não relacionais, CI/CD, AWS | Relational, Non-relational, CI/CD, AWS |
 | Linguagem pura, Frameworks | Core language, Frameworks |
@@ -142,16 +142,16 @@ O marcador da linha do tempo SHALL diferenciar os três estados. Tocar numa linh
 - **THEN** React Native aparece na "Ordem sugerida" de Mobile normalmente, e React não aparece
 
 #### Scenario: Estados
-- **WHEN** na área Fundamentos todos os cards de "Fundamentos web" estão como "já sabia" e "Git e colaboração" tem um card respondido
-- **THEN** "Fundamentos web" aparece como "Concluída" e "Git e colaboração" como "Em andamento"
+- **WHEN** na área Fundamentos todos os cards de "Fundamentos de programação" estão como "já sabia" e "Fundamentos web" tem um card respondido
+- **THEN** "Fundamentos de programação" aparece como "Concluída" e "Fundamentos web" como "Em andamento"
 
 #### Scenario: Revisão pendente
 - **WHEN** 2 cards da trilha CRUD estão para revisar hoje e o usuário abre a área Backend
 - **THEN** a linha da trilha CRUD na "Ordem sugerida" mostra "2 para revisar"
 
 #### Scenario: Abrir pela ordem sugerida
-- **WHEN** o usuário toca na linha "Fundamentos web" da "Ordem sugerida"
-- **THEN** a tela da trilha "Fundamentos web" abre
+- **WHEN** o usuário toca na linha "Fundamentos de programação" da "Ordem sugerida"
+- **THEN** a tela da trilha "Fundamentos de programação" abre
 
 ### Requirement: Busca e filtros na aba Trilhas
 A aba Trilhas SHALL ter, no topo:
