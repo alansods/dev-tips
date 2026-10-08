@@ -26,10 +26,10 @@ Sem escolha salva, o app SHALL usar inglês se o idioma preferido do aparelho fo
 - **THEN** o app abre em PT-BR
 
 ### Requirement: Trocar o idioma
-Escolher um idioma em Ajustes SHALL mudar todo o app para esse idioma imediatamente, sem reiniciar e sem perder o progresso, o agendamento ou a sessão de navegação. A escolha SHALL ser salva no aparelho e prevalecer sobre o idioma do aparelho nas próximas aberturas. Se a leitura falhar ou o valor salvo for inválido, o app SHALL usar o idioma inicial pelo aparelho, sem exibir erro.
+Escolher um idioma na aba Perfil SHALL mudar todo o app para esse idioma imediatamente, sem reiniciar e sem perder o progresso, o agendamento ou a sessão de navegação. A escolha SHALL ser salva no aparelho e prevalecer sobre o idioma do aparelho nas próximas aberturas. Se a leitura falhar ou o valor salvo for inválido, o app SHALL usar o idioma inicial pelo aparelho, sem exibir erro.
 
 #### Scenario: Troca imediata
-- **WHEN** o app está em PT-BR e o usuário escolhe "English" em Ajustes
+- **WHEN** o app está em PT-BR e o usuário escolhe "English" na aba Perfil
 - **THEN** o título da tela passa a "Settings" e, ao voltar, as abas mostram "Tracks", "Glossary" e "Progress"
 
 #### Scenario: Escolha mantida ao reabrir
@@ -38,7 +38,7 @@ Escolher um idioma em Ajustes SHALL mudar todo o app para esse idioma imediatame
 
 #### Scenario: Progresso preservado
 - **WHEN** a trilha CRUD tem 4 cards como já sabidos e o usuário troca o idioma
-- **THEN** a aba Progresso continua mostrando 4 cards já sabidos
+- **THEN** a tela Progresso continua mostrando 4 cards já sabidos
 
 #### Scenario: Valor salvo inválido
 - **WHEN** o idioma salvo no aparelho não é `pt-BR` nem `en`
@@ -46,7 +46,8 @@ Escolher um idioma em Ajustes SHALL mudar todo o app para esse idioma imediatame
 
 ### Requirement: Interface traduzida
 Todo texto fixo da interface SHALL existir nos dois idiomas e ser exibido no idioma atual: títulos das abas e telas, botões, rótulos, contadores, mensagens de estado vazio, confirmações, rótulos acessíveis e textos das notificações. Os textos em inglês dos principais rótulos SHALL ser:
-- abas: "Tracks", "Glossary", "Progress"; tela de ajustes: "Settings";
+- abas: "Tracks", "Glossary", "Profile"; tela de progresso: "Progress";
+- seção de tema: "Theme", com "Automatic", "Light" e "Dark";
 - botões de resposta: "I didn't know" e "I knew it"; "Show answer";
 - ações do deck: "Study", "Continue", "Study again";
 - revisão: "Today's review", "Review now", "Nothing to review today.";

@@ -5,10 +5,10 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AccountScreen from '../app/account';
 import LoginScreen from '../app/login';
-import SettingsScreen from '../app/settings';
 import { API_URL } from '../auth/config';
 import { signInWithGoogle } from '../auth/providers';
 import { useAccountStore } from '../auth/store';
@@ -31,8 +31,8 @@ const APP = {
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
-  settings: SettingsScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   login: LoginScreen,
   account: AccountScreen,
 };
@@ -112,11 +112,11 @@ describe('Requirement: Entrar pelo app', () => {
   it('Login com sucesso', async () => {
     google.mockResolvedValue({ type: 'success', idToken: 'id-token-do-google' });
     api({ 'POST /auth/google': () => json(200, session) });
-    await open('/settings');
+    await open('/profile');
     await press('Entrar');
     expect(screen).toHavePathname('/login');
     await press('Continuar com o Google');
-    expect(screen).toHavePathname('/settings');
+    expect(screen).toHavePathname('/profile');
     expect(screen.getByText('Ana Souza')).toBeOnTheScreen();
     expect(screen.getByText('ana@example.com')).toBeOnTheScreen();
     expect(await readTokens()).toEqual({ accessToken: 'a1', refreshToken: 'r1' });
@@ -164,14 +164,14 @@ describe('Requirement: Entrar pelo app', () => {
 
 describe('Requirement: Conta no app', () => {
   it('Convite para entrar', async () => {
-    await open('/settings');
+    await open('/profile');
     expect(screen.getByText('Salve seu progresso na nuvem')).toBeOnTheScreen();
     expect(button('Entrar')).toBeOnTheScreen();
   });
 
   it('tela Conta', async () => {
     await signedIn();
-    await open('/settings');
+    await open('/profile');
     await press(/Ana Souza/);
     expect(screen).toHavePathname('/account');
     expect(screen.getByText('Conectado com Google')).toBeOnTheScreen();
@@ -183,12 +183,12 @@ describe('Requirement: Conta no app', () => {
     await signedIn();
     useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
     api({ 'POST /auth/logout': () => json(204) });
-    await open('/settings');
+    await open('/profile');
     await press(/Ana Souza/);
     await press('Sair');
     expect(screen.getByRole('header', { name: 'Sair da conta?' })).toBeOnTheScreen();
     await press('Sair');
-    expect(screen).toHavePathname('/settings');
+    expect(screen).toHavePathname('/profile');
     expect(screen.getByText('Salve seu progresso na nuvem')).toBeOnTheScreen();
     expect(await readTokens()).toBeNull();
     expect(useStudyStore.getState().progress[progressKey('crud-4-frameworks', 'cors')]).toBe('known');
@@ -207,12 +207,12 @@ describe('Requirement: Conta no app', () => {
     await signedIn();
     useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
     api({ 'DELETE /me': () => json(204) });
-    await open('/settings');
+    await open('/profile');
     await press(/Ana Souza/);
     await press('Apagar conta');
     expect(screen.getByRole('header', { name: 'Apagar sua conta?' })).toBeOnTheScreen();
     await press('Apagar minha conta');
-    expect(screen).toHavePathname('/settings');
+    expect(screen).toHavePathname('/profile');
     expect(screen.getByText('Salve seu progresso na nuvem')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey('crud-4-frameworks', 'cors')]).toBe('known');
   });
@@ -239,18 +239,18 @@ describe('Requirement: Conta no app', () => {
   });
 });
 
-describe('Requirement: Tela Ajustes (com Conta)', () => {
+describe('Requirement: Aba Perfil (com Conta)', () => {
   it('Ordem das seções', async () => {
-    await open('/settings');
+    await open('/profile');
     const headers = screen.getAllByRole('header').map((el) => String(el.props.children));
-    expect(headers).toEqual(['Ajustes', 'Conta', 'Idioma', 'Lembretes', 'Sobre']);
+    expect(headers).toEqual(['Conta', 'Seu estudo', 'Idioma', 'Lembretes', 'Tema', 'Sobre']);
   });
 
   it('Web sem conta', async () => {
     const os = Platform.OS;
     Object.defineProperty(Platform, 'OS', { value: 'web', configurable: true });
     try {
-      await open('/settings');
+      await open('/profile');
       expect(screen.queryByText('Conta')).toBeNull();
     } finally {
       Object.defineProperty(Platform, 'OS', { value: os, configurable: true });

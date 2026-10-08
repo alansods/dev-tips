@@ -6,8 +6,8 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
-import SettingsScreen from '../app/settings';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import TrackScreen from '../app/track/[trackId]';
 import { resetRemindersStore, useRemindersStore } from '../reminders/store';
 import { getTrack } from '../content/catalog';
@@ -19,9 +19,9 @@ const APP = {
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'track/[trackId]': TrackScreen,
-  settings: SettingsScreen,
 };
 
 /** Espera as etapas assíncronas do agendamento (só microtarefas: o roteador usa timers falsos). */
@@ -48,14 +48,14 @@ beforeEach(() => {
 
 describe('Requirement: Seção Lembretes', () => {
   it('Estado inicial', async () => {
-    await open('/settings');
+    await open('/profile');
     expect(screen.getByText('Lembretes')).toBeOnTheScreen();
     expect(toggle()).toHaveProp('value', false);
     expect(N.scheduleNotificationAsync).not.toHaveBeenCalled();
   });
 
   it('Horário só com o lembrete ligado', async () => {
-    await open('/settings');
+    await open('/profile');
     expect(radio('Noite 20:00')).toBeNull();
     expect(radio('Manhã 08:00')).toBeNull();
   });
@@ -64,7 +64,7 @@ describe('Requirement: Seção Lembretes', () => {
     const os = Platform.OS;
     Object.defineProperty(Platform, 'OS', { value: 'web', configurable: true });
     try {
-      await open('/settings');
+      await open('/profile');
       expect(screen.queryByText('Lembretes')).toBeNull();
       expect(screen.queryByRole('switch', { name: 'Lembrete diário' })).toBeNull();
     } finally {
@@ -82,7 +82,7 @@ describe('Requirement: Permissão sob demanda', () => {
   it('Permissão concedida', async () => {
     N.requestPermissionsAsync.mockResolvedValue(grant(true));
     N.getPermissionsAsync.mockResolvedValueOnce(grant(false)).mockResolvedValue(grant(true));
-    await open('/settings');
+    await open('/profile');
     fireEvent(toggle(), 'valueChange', true);
     await flush();
     expect(N.requestPermissionsAsync).toHaveBeenCalledTimes(1);
@@ -97,7 +97,7 @@ describe('Requirement: Permissão sob demanda', () => {
 
   it('Permissão negada', async () => {
     const openSettings = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
-    await open('/settings');
+    await open('/profile');
     fireEvent(toggle(), 'valueChange', true);
     await flush();
     expect(toggle()).toHaveProp('value', false);
@@ -113,7 +113,7 @@ describe('Requirement: Configuração salva no aparelho', () => {
   it('Configuração mantida ao reabrir (seção reflete o salvo)', async () => {
     N.getPermissionsAsync.mockResolvedValue(grant(true));
     useRemindersStore.setState({ enabled: true, time: '08:00' });
-    await open('/settings');
+    await open('/profile');
     expect(toggle()).toHaveProp('value', true);
     expect(radio('Manhã 08:00')).toBeChecked();
     expect(radio('Noite 20:00')).not.toBeChecked();
@@ -124,7 +124,7 @@ describe('Requirement: Reagendamento', () => {
   it('Trocar o horário pela tela', async () => {
     N.getPermissionsAsync.mockResolvedValue(grant(true));
     useRemindersStore.setState({ enabled: true });
-    await open('/settings');
+    await open('/profile');
     N.scheduleNotificationAsync.mockClear();
     fireEvent.press(radio('Almoço 12:30')!);
     await flush();
@@ -139,7 +139,7 @@ describe('Requirement: Reagendamento', () => {
   it('Desligar pela tela', async () => {
     N.getPermissionsAsync.mockResolvedValue(grant(true));
     useRemindersStore.setState({ enabled: true });
-    await open('/settings');
+    await open('/profile');
     N.cancelAllScheduledNotificationsAsync.mockClear();
     fireEvent(toggle(), 'valueChange', false);
     await flush();
@@ -168,14 +168,14 @@ describe('Requirement: Abrir pela notificação', () => {
 
   it('Toque sem revisão', async () => {
     N.useLastNotificationResponse.mockReturnValue(tap('n2'));
-    await open('/settings');
+    await open('/profile');
     expect(screen).toHavePathname('/');
   });
 
   it('notificação que não é lembrete não navega', async () => {
     N.useLastNotificationResponse.mockReturnValue(tap('n3', 'outro'));
-    await open('/settings');
-    expect(screen).toHavePathname('/settings');
+    await open('/profile');
+    expect(screen).toHavePathname('/profile');
   });
 
   afterEach(() => N.useLastNotificationResponse.mockReturnValue(undefined as never));

@@ -5,7 +5,7 @@
 Define a estrutura comum do app (navegação por abas, tema visual claro/escuro, fontes e acesso ao catálogo de trilhas) sobre a qual as telas de estudo são construídas.
 ## Requirements
 ### Requirement: Navegação por abas
-O app SHALL ter 3 abas inferiores, nesta ordem: **Trilhas**, **Glossário** e **Progresso**. Cada aba SHALL ter um rótulo de texto e um ícone. Ao abrir, o app SHALL mostrar a aba Trilhas. A aba ativa MUST ser indicada visualmente e para leitores de tela.
+O app SHALL ter 3 abas inferiores, nesta ordem: **Trilhas**, **Glossário** e **Perfil**. Cada aba SHALL ter um rótulo de texto e um ícone. Ao abrir, o app SHALL mostrar a aba Trilhas. A aba ativa MUST ser indicada visualmente e para leitores de tela. O cabeçalho das abas SHALL mostrar só o título da aba, sem botões.
 
 #### Scenario: App abre na aba Trilhas
 - **WHEN** o app é aberto
@@ -17,22 +17,35 @@ O app SHALL ter 3 abas inferiores, nesta ordem: **Trilhas**, **Glossário** e **
 
 #### Scenario: Abas na ordem do design
 - **WHEN** a barra de abas é exibida
-- **THEN** as abas aparecem na ordem Trilhas, Glossário, Progresso, cada uma com rótulo visível
+- **THEN** as abas aparecem na ordem Trilhas, Glossário, Perfil, cada uma com rótulo visível
+
+#### Scenario: Cabeçalho sem botões
+- **WHEN** a aba Trilhas é exibida
+- **THEN** o cabeçalho não tem o botão de tema nem o botão "Ajustes"
 
 ### Requirement: Tema claro e escuro
-O app SHALL ter um modo claro e um modo escuro, com as cores do design aprovado. Por padrão, o modo SHALL seguir a configuração do sistema. O cabeçalho SHALL ter um botão para alternar o modo manualmente. A escolha manual SHALL prevalecer sobre o sistema e SHALL ser lembrada entre aberturas do app. O botão MUST ter rótulo de acessibilidade que diga para qual modo ele muda.
+O app SHALL ter um modo claro e um modo escuro, com as cores do design aprovado. A aba Perfil SHALL ter a seção "Tema" com três opções, e a atual marcada:
+- **Automático**, o padrão, que segue a configuração do sistema;
+- **Claro**;
+- **Escuro**.
+
+A escolha SHALL ser lembrada entre aberturas do app. "Claro" e "Escuro" SHALL prevalecer sobre o sistema, e voltar para "Automático" SHALL fazer o app seguir o sistema de novo. Se a leitura da escolha salva falhar, o app SHALL seguir o sistema, sem exibir erro.
 
 #### Scenario: Segue o sistema por padrão
 - **WHEN** não há escolha salva e o sistema está em modo escuro
-- **THEN** o app abre no modo escuro
+- **THEN** o app abre no modo escuro, e a seção "Tema" mostra "Automático" marcado
 
 #### Scenario: Alternar manualmente
-- **WHEN** o app está no modo claro e o usuário toca no botão de tema
-- **THEN** o app passa para o modo escuro e o botão passa a se chamar "Usar tema claro"
+- **WHEN** o sistema está em modo claro e o usuário escolhe "Escuro" na seção "Tema"
+- **THEN** o app passa para o modo escuro, e "Escuro" fica marcado
 
 #### Scenario: Escolha lembrada
-- **WHEN** o usuário escolheu o modo escuro e reabre o app com o sistema em modo claro
+- **WHEN** o usuário escolheu "Escuro" e reabre o app com o sistema em modo claro
 - **THEN** o app abre no modo escuro
+
+#### Scenario: Voltar para o automático
+- **WHEN** o usuário tinha escolhido "Escuro", o sistema está em modo claro e ele escolhe "Automático"
+- **THEN** o app passa para o modo claro e continua seguindo o sistema nas próximas aberturas
 
 #### Scenario: Preferência indisponível
 - **WHEN** a leitura da preferência salva falha
@@ -67,27 +80,8 @@ O app SHALL acessar as trilhas empacotadas por um catálogo único. Toda trilha 
 - **WHEN** um card do catálogo omitia `tags` no `track.json`
 - **THEN** o card exposto pelo catálogo tem `tags` igual a lista vazia
 
-### Requirement: Tela Ajustes
-O cabeçalho das abas SHALL ter, ao lado do botão de tema claro/escuro, um botão de engrenagem com rótulo acessível "Ajustes" ("Settings" em inglês). Tocar nele SHALL abrir a tela "Ajustes" em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL ter, nesta ordem, a seção "Conta" (quando disponível na plataforma), a seção "Idioma", com as opções de idioma e a atual marcada, a seção "Lembretes" (quando disponível na plataforma) e a seção "Sobre".
-
-#### Scenario: Abrir Ajustes
-- **WHEN** o usuário está na aba Trilhas e toca no botão "Ajustes"
-- **THEN** a tela "Ajustes" abre sem a barra de abas e mostra a seção "Idioma" com o idioma atual marcado
-
-#### Scenario: Voltar
-- **WHEN** o usuário está em Ajustes e toca em voltar
-- **THEN** volta para a aba de onde saiu
-
-#### Scenario: Ordem das seções
-- **WHEN** o usuário abre Ajustes no celular
-- **THEN** as seções aparecem na ordem "Conta", "Idioma", "Lembretes" e "Sobre"
-
-#### Scenario: Web sem conta
-- **WHEN** o app roda na web
-- **THEN** a tela Ajustes não mostra a seção "Conta"
-
 ### Requirement: Seção Sobre
-A seção "Sobre" de Ajustes SHALL mostrar o link "Política de privacidade", o link "Termos de uso" e a versão do app. Tocar num link SHALL abrir o endereço configurado no navegador do aparelho. A versão SHALL ser a versão configurada do app (ex.: "1.0.0").
+A seção "Sobre" da aba Perfil SHALL mostrar o link "Política de privacidade", o link "Termos de uso" e a versão do app. Tocar num link SHALL abrir o endereço configurado no navegador do aparelho. A versão SHALL ser a versão configurada do app (ex.: "1.0.0").
 
 #### Scenario: Abrir a política de privacidade
 - **WHEN** o usuário toca em "Política de privacidade"
@@ -122,4 +116,31 @@ Uma rota que não existe no app SHALL mostrar a tela "Não encontramos esta pág
 #### Scenario: Ir para Trilhas
 - **WHEN** o usuário toca em "Ir para Trilhas"
 - **THEN** o app abre a aba Trilhas
+
+### Requirement: Aba Perfil
+A aba Perfil SHALL mostrar, nesta ordem:
+1. a seção "Conta" (quando disponível na plataforma);
+2. a seção "Seu estudo", com o resumo do estudo e a linha "Progresso por trilha", que abre a tela Progresso;
+3. a seção "Idioma", com as opções de idioma e a atual marcada;
+4. a seção "Lembretes" (quando disponível na plataforma);
+5. a seção "Tema";
+6. a seção "Sobre".
+
+Telas abertas a partir da aba Perfil (Conta, Paywall, Progresso) SHALL voltar para a aba Perfil.
+
+#### Scenario: Abrir o Perfil
+- **WHEN** o usuário toca na aba Perfil
+- **THEN** a aba Perfil é exibida, com a barra de abas, e mostra a seção "Idioma" com o idioma atual marcado
+
+#### Scenario: Ordem das seções
+- **WHEN** o usuário abre a aba Perfil no celular
+- **THEN** as seções aparecem na ordem "Conta", "Seu estudo", "Idioma", "Lembretes", "Tema" e "Sobre"
+
+#### Scenario: Web sem conta
+- **WHEN** o app roda na web
+- **THEN** a aba Perfil não mostra a seção "Conta"
+
+#### Scenario: Abrir o progresso por trilha
+- **WHEN** o usuário toca em "Progresso por trilha"
+- **THEN** a tela Progresso abre, e voltar retorna para a aba Perfil
 

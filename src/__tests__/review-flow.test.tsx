@@ -4,7 +4,8 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import ReviewScreen from '../app/review/[trackId]';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
@@ -18,7 +19,8 @@ const APP = {
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
@@ -119,6 +121,8 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
     const crud = within(screen.getByTestId(`track-progress-${TRACK}`));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
     fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
+    // o Progresso é tela cheia: volta para o Perfil e vai para a aba Trilhas
+    fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
     fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
     press(/^Backend,/);
     press(/^O mesmo CRUD em quatro frameworks/);
