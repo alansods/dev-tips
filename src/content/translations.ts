@@ -22,6 +22,10 @@ import springBootEn from '../../content/tracks/spring-boot/translations/en.json'
 import pythonEssencialEn from '../../content/tracks/python-essencial/translations/en.json';
 import fastapiEn from '../../content/tracks/fastapi/translations/en.json';
 import djangoEn from '../../content/tracks/django/translations/en.json';
+import csharpEssencialEn from '../../content/tracks/csharp-essencial/translations/en.json';
+import aspnetCoreEn from '../../content/tracks/aspnet-core/translations/en.json';
+import rubyEssencialEn from '../../content/tracks/ruby-essencial/translations/en.json';
+import railsEn from '../../content/tracks/rails/translations/en.json';
 import sqlEssencialEn from '../../content/tracks/sql-essencial/translations/en.json';
 import modelagemDeDadosEn from '../../content/tracks/modelagem-de-dados/translations/en.json';
 import transacoesEPerformanceEn from '../../content/tracks/transacoes-e-performance/translations/en.json';
@@ -65,6 +69,10 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'python-essencial': { en: pythonEssencialEn },
   fastapi: { en: fastapiEn },
   django: { en: djangoEn },
+  'csharp-essencial': { en: csharpEssencialEn },
+  'aspnet-core': { en: aspnetCoreEn },
+  'ruby-essencial': { en: rubyEssencialEn },
+  rails: { en: railsEn },
   'sql-essencial': { en: sqlEssencialEn },
   'modelagem-de-dados': { en: modelagemDeDadosEn },
   'transacoes-e-performance': { en: transacoesEPerformanceEn },

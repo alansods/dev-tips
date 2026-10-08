@@ -35,7 +35,7 @@ export const conceptCardSchema = z.object({
   aliases: z.array(text()).optional(),
 });
 
-export const SNIPPET_LANGUAGES = ['bash', 'ts', 'js', 'java', 'python', 'sql', 'xml', 'properties', 'json', 'yaml', 'text'] as const;
+export const SNIPPET_LANGUAGES = ['bash', 'ts', 'js', 'java', 'python', 'csharp', 'ruby', 'sql', 'xml', 'properties', 'json', 'yaml', 'text'] as const;
 
 export const snippetSchema = z.object({
   file: text(),

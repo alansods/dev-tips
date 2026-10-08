@@ -1,0 +1,120 @@
+{
+  "title": "Ruby essentials",
+  "description": "What is particular to Ruby: everything is an object, symbols, blocks, Enumerable, mixins and metaprogramming.",
+  "decks": {
+    "objetos-e-simbolos": {
+      "title": "Objects and symbols",
+      "description": "Ruby's object model and its own kinds of values."
+    },
+    "blocos-e-enumerable": {
+      "title": "Blocks and Enumerable",
+      "description": "Blocks, procs and lambdas, and the collection methods."
+    },
+    "modulos-e-metaprogramacao": {
+      "title": "Modules and metaprogramming",
+      "description": "Mixins, code that writes code and the gem ecosystem."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Ruby questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "tudo-e-objeto": {
+      "term": "Everything is an object",
+      "definition": "In Ruby, even numbers, nil, true and classes are objects with methods: 5.times, nil.to_a, 3.14.round. Operators are methods too (1 + 2 is 1.+(2)), so a class can define its own +. Calling a method means sending a message to the object, and parentheses are optional."
+    },
+    "simbolos": {
+      "term": "Symbols",
+      "definition": "A symbol (:status) is an immutable and unique name: every :status is the same object in memory, unlike strings, which can be different objects with the same text. They are used as hash keys, method names and options ({ status: :paid })."
+    },
+    "nil-e-truthiness": {
+      "term": "nil and truthiness",
+      "definition": "Only nil and false are falsy in Ruby. 0, \"\" and [] are truthy, unlike JavaScript and Python. nil is an object (of class NilClass) and responds to methods such as nil? and to_s. That is why value || default works for nil but does not handle an empty string."
+    },
+    "frozen-string-literal": {
+      "term": "Mutable strings and frozen_string_literal",
+      "definition": "Strings in Ruby are mutable: name << \"!\" changes the object itself. The magic comment # frozen_string_literal: true at the top of the file freezes literals, avoiding repeated allocations and accidental changes. freeze freezes any object; changing it afterwards raises FrozenError."
+    },
+    "respond-to": {
+      "term": "Duck typing with respond_to?",
+      "definition": "Ruby does not check types: if the object responds to the method, it works. respond_to?(:each) asks whether it knows how to respond before calling. In practice, idiomatic Ruby rarely checks is_a?; it trusts the contract and lets NoMethodError show up if something comes in wrong."
+    },
+    "safe-navigation-exemplo": {
+      "title": "The &. operator and default values",
+      "body": "&. only calls the method if the object is not nil. ||= assigns only when the variable is nil or false."
+    },
+    "blocos-e-yield": {
+      "term": "Blocks and yield",
+      "definition": "A block is a piece of code passed to a method, between do...end or braces: list.each { |x| puts x }. Inside the method, yield runs the block, and block_given? tells whether one was passed. It is the idiomatic way to iterate, open and close resources (File.open with a block) and configure objects."
+    },
+    "proc-e-lambda": {
+      "term": "Proc and lambda",
+      "definition": "Procs and lambdas turn a block into an object that can be stored and called with call. A lambda checks the number of arguments and its return comes back only from the lambda. A proc accepts extra or missing arguments and its return leaves the method where it was created. &block in the parameter list turns the received block into a proc."
+    },
+    "enumerable": {
+      "term": "Enumerable",
+      "definition": "A module that gives dozens of methods (map, select, reject, reduce, group_by, each_with_object, sort_by...) to any class that defines each. Array and Hash already include it. lazy creates a lazy version, useful for large or infinite sequences."
+    },
+    "hash-ruby": {
+      "term": "Hash",
+      "definition": "Ruby's dictionary, which keeps insertion order. With symbol keys, the short syntax is { name: \"Ana\" }. hash[:x] returns nil if the key does not exist; fetch(:x) raises KeyError or uses a default. Methods like transform_values, slice and dig make everyday work easier."
+    },
+    "map-select-reduce": {
+      "title": "Chaining select, map and sum",
+      "body": "Each method takes a block and returns a new collection. &:method is the shortcut for { |x| x.method }."
+    },
+    "metodo-com-bloco": {
+      "title": "A method that takes a block",
+      "body": "The method takes care of timing and logging, and the block decides the work. Without a block, it raises a clear error."
+    },
+    "mixins": {
+      "term": "Mixins: include and extend",
+      "definition": "Ruby has only single inheritance, but a module can be mixed into many classes. include adds the module's methods as instance methods; extend, as class methods (or to a single object). prepend inserts the module before the class, to wrap existing methods. Comparable and Enumerable are mixins."
+    },
+    "method-missing": {
+      "term": "method_missing",
+      "definition": "When an object receives a message with no matching method, Ruby calls method_missing before raising NoMethodError. Overriding it lets you respond to methods created on the fly, like Rails' old dynamic finders. It should come with respond_to_missing?, so respond_to? stays true, and call super for unhandled cases."
+    },
+    "monkey-patching": {
+      "term": "Monkey patching and refinements",
+      "definition": "Classes in Ruby are open: you can reopen String and add or replace a method anywhere in the code. It is powerful (Rails adds 2.days.ago to Integer), but the change is global and can clash with other gems. Refinements (refine String do ... end, enabled with using) limit the change to one file."
+    },
+    "attr-accessor": {
+      "term": "attr_accessor and friends",
+      "definition": "Instance variables (@name) are always private. attr_reader :name generates the reader method, attr_writer the writer and attr_accessor both. They are class methods that define methods: a simple example of metaprogramming used all the time."
+    },
+    "bundler-e-gems": {
+      "term": "Bundler and gems",
+      "definition": "A gem is Ruby's library package. The Gemfile lists dependencies with version ranges, and Bundler resolves the versions and writes the exact ones into Gemfile.lock, which goes into git. bundle install installs them; bundle exec runs a command with the locked versions."
+    },
+    "comparable-exemplo": {
+      "title": "Comparable with <=>",
+      "body": "By defining only <=>, the Comparable mixin provides <, >, ==, between? and clamp, and sort starts working."
+    },
+    "simbolo-ou-string-pergunta": {
+      "question": "What is the difference between a symbol and a string in Ruby?",
+      "answer": "A symbol is immutable and exists only once in memory: every :active is the same object. Strings are mutable and each literal may create a new object. I use symbols for internal identifiers (hash keys, states, method names) and strings for text that comes from outside or is displayed."
+    },
+    "zero-verdadeiro-pergunta": {
+      "question": "Why does if 0 enter the block in Ruby?",
+      "answer": "Because in Ruby only nil and false are falsy; any other value, including 0, an empty string and an empty array, is truthy. To test those cases I use explicit methods: zero?, empty? or, in Rails, blank? and present?."
+    },
+    "proc-ou-lambda-pergunta": {
+      "question": "What is the difference between a proc and a lambda?",
+      "answer": "Two differences: a lambda requires the right number of arguments, while a proc fills in nil or ignores extras; and return inside a lambda leaves only the lambda, while inside a proc it leaves the method that created it. That is why lambdas behave like methods, and procs like blocks."
+    },
+    "include-ou-extend-pergunta": {
+      "question": "What is the difference between include and extend?",
+      "answer": "include puts the module's methods in the class's ancestor chain, as instance methods. extend adds them to the very object receiving the call: on a class, they become class methods. A common pattern is the self.included hook, which extends the class with class methods when the module is included (that is what ActiveSupport::Concern organizes)."
+    },
+    "monkey-patching-pergunta": {
+      "question": "What are the risks of monkey patching and how do you reduce them?",
+      "answer": "The change applies to the whole process: it can break other gems that expect the original behavior, clash with a similar patch from another library and confuse whoever reads the code. I reduce it by using refinements to limit the scope, preferring my own module or a service object, and, when the patch is unavoidable, keeping it in a single file, with tests."
+    },
+    "method-missing-pergunta": {
+      "question": "When should you use method_missing and what care should you take?",
+      "answer": "When method names are only known at runtime, like proxies and API wrappers. Care: implement respond_to_missing?, call super for unhandled names (otherwise typos vanish) and remember it is slower and hard to find in the code. Often define_method at class load time solves it better."
+    }
+  }
+}

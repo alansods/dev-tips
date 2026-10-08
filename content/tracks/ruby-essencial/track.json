@@ -1,0 +1,319 @@
+{
+  "id": "ruby-essencial",
+  "title": "Ruby essencial",
+  "description": "O que é particular do Ruby: tudo é objeto, símbolos, blocos, Enumerable, mixins e metaprogramação.",
+  "prerequisites": ["fundamentos-web"],
+  "addedAt": "2026-10-08",
+  "areas": [
+    "backend"
+  ],
+  "language": "ruby",
+  "decks": [
+    {
+      "id": "objetos-e-simbolos",
+      "title": "Objetos e símbolos",
+      "description": "O modelo de objetos do Ruby e seus valores próprios.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "tudo-e-objeto",
+          "level": "junior",
+          "term": "Tudo é objeto",
+          "definition": "Em Ruby, até números, nil, true e classes são objetos com métodos: 5.times, nil.to_a, 3.14.round. Operadores também são métodos (1 + 2 é 1.+(2)), por isso uma classe pode definir o próprio +. Chamar um método é enviar uma mensagem ao objeto, e parênteses são opcionais.",
+          "relatedTerms": [
+            "simbolos",
+            "nil-e-truthiness"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "simbolos",
+          "level": "junior",
+          "term": "Símbolos",
+          "definition": "Um símbolo (:status) é um nome imutável e único: todo :status é o mesmo objeto na memória, ao contrário de strings, que podem ser objetos diferentes com o mesmo texto. São usados como chaves de hash, nomes de métodos e opções ({ status: :pago }).",
+          "relatedTerms": [
+            "tudo-e-objeto",
+            "hash-ruby"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "nil-e-truthiness",
+          "level": "junior",
+          "term": "nil e truthiness",
+          "definition": "Só nil e false são falsos em Ruby. 0, \"\" e [] são verdadeiros, ao contrário de JavaScript e Python. nil é um objeto (da classe NilClass) e responde a métodos como nil? e to_s. Por isso valor || padrao funciona para nil, mas não trata string vazia.",
+          "relatedTerms": [
+            "tudo-e-objeto",
+            "respond-to"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "frozen-string-literal",
+          "level": "pleno",
+          "term": "Strings mutáveis e frozen_string_literal",
+          "definition": "Strings em Ruby são mutáveis: nome << \"!\" altera o próprio objeto. O comentário mágico # frozen_string_literal: true no topo do arquivo congela os literais, evitando alocações repetidas e alterações acidentais. freeze congela qualquer objeto; alterá-lo depois lança FrozenError.",
+          "relatedTerms": [
+            "simbolos",
+            "tudo-e-objeto"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "respond-to",
+          "level": "pleno",
+          "term": "Duck typing com respond_to?",
+          "definition": "Ruby não verifica tipos: se o objeto responde ao método, serve. respond_to?(:each) pergunta se ele sabe responder antes de chamar. Na prática, código Ruby idiomático raramente checa is_a?; confia no contrato e deixa NoMethodError aparecer se algo vier errado.",
+          "relatedTerms": [
+            "tudo-e-objeto",
+            "enumerable"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "safe-navigation-exemplo",
+          "level": "junior",
+          "title": "Operador &. e valores padrão",
+          "body": "&. só chama o método se o objeto não for nil. ||= atribui só quando a variável é nil ou false.",
+          "snippet": {
+            "file": "exemplo.rb",
+            "language": "ruby",
+            "code": "# frozen_string_literal: true\n\ncidade = usuario&.endereco&.cidade   # nil se qualquer parte for nil\n\nconfig = {}\nconfig[:timeout] ||= 5               # só atribui se não houver valor\n\nquantidade = 0\nputs \"tem itens\" if quantidade      # imprime: 0 é verdadeiro em Ruby\nputs \"vazio\" if quantidade.zero?"
+          },
+          "relatedTerms": [
+            "nil-e-truthiness"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blocos-e-enumerable",
+      "title": "Blocos e Enumerable",
+      "description": "Blocos, procs e lambdas, e os métodos de coleção.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "blocos-e-yield",
+          "level": "junior",
+          "term": "Blocos e yield",
+          "definition": "Bloco é um trecho de código passado para um método, entre do...end ou chaves: lista.each { |x| puts x }. Dentro do método, yield executa o bloco, e block_given? diz se ele foi passado. É o jeito idiomático de iterar, abrir e fechar recursos (File.open com bloco) e configurar objetos.",
+          "relatedTerms": [
+            "proc-e-lambda",
+            "enumerable"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "proc-e-lambda",
+          "level": "pleno",
+          "term": "Proc e lambda",
+          "definition": "Proc e lambda transformam um bloco em objeto, que pode ser guardado e chamado com call. A lambda confere o número de argumentos e seu return volta só da lambda. A proc aceita argumentos a mais ou a menos e seu return sai do método onde ela foi criada. &bloco no parâmetro converte o bloco recebido em proc.",
+          "relatedTerms": [
+            "blocos-e-yield"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "enumerable",
+          "level": "pleno",
+          "term": "Enumerable",
+          "definition": "Módulo que dá dezenas de métodos (map, select, reject, reduce, group_by, each_with_object, sort_by...) a qualquer classe que defina each. Array e Hash já o incluem. lazy cria uma versão preguiçosa, útil para sequências grandes ou infinitas.",
+          "relatedTerms": [
+            "blocos-e-yield",
+            "mixins"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "hash-ruby",
+          "level": "junior",
+          "term": "Hash",
+          "definition": "O dicionário do Ruby, que mantém a ordem de inserção. Com chaves símbolo, a sintaxe curta é { nome: \"Ana\" }. hash[:x] devolve nil se a chave não existe; fetch(:x) lança KeyError ou usa um padrão. Métodos como transform_values, slice e dig facilitam o dia a dia.",
+          "relatedTerms": [
+            "simbolos",
+            "enumerable"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "map-select-reduce",
+          "level": "junior",
+          "title": "select, map e sum em cadeia",
+          "body": "Cada método recebe um bloco e devolve uma coleção nova. &:metodo é o atalho para { |x| x.metodo }.",
+          "snippet": {
+            "file": "relatorio.rb",
+            "language": "ruby",
+            "code": "pedidos = [\n  { cliente: \"ana\", valor: 120, pago: true },\n  { cliente: \"bia\", valor: 80, pago: false },\n  { cliente: \"ana\", valor: 50, pago: true },\n]\n\ntotal_pago = pedidos.select { |p| p[:pago] }.sum { |p| p[:valor] }   # 170\nclientes   = pedidos.map { |p| p[:cliente] }.uniq                      # [\"ana\", \"bia\"]\npor_cliente = pedidos.group_by { |p| p[:cliente] }\n                     .transform_values { |ps| ps.sum { |p| p[:valor] } }\nnomes = clientes.map(&:capitalize)                                     # [\"Ana\", \"Bia\"]"
+          },
+          "relatedTerms": [
+            "enumerable",
+            "hash-ruby"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "metodo-com-bloco",
+          "level": "pleno",
+          "title": "Método que recebe bloco",
+          "body": "O método garante a medição e o log, e o bloco decide o trabalho. Sem bloco, devolve um erro claro.",
+          "snippet": {
+            "file": "medicao.rb",
+            "language": "ruby",
+            "code": "def medir(nome)\n  raise ArgumentError, \"passe um bloco\" unless block_given?\n\n  inicio = Process.clock_gettime(Process::CLOCK_MONOTONIC)\n  resultado = yield\n  duracao = Process.clock_gettime(Process::CLOCK_MONOTONIC) - inicio\n  puts \"#{nome} levou #{duracao.round(3)}s\"\n  resultado\nend\n\nrelatorio = medir(\"relatório\") { Pedido.gerar_relatorio(2026) }"
+          },
+          "relatedTerms": [
+            "blocos-e-yield",
+            "proc-e-lambda"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "modulos-e-metaprogramacao",
+      "title": "Módulos e metaprogramação",
+      "description": "Mixins, código que escreve código e o ecossistema de gems.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "mixins",
+          "level": "junior",
+          "term": "Mixins: include e extend",
+          "definition": "Ruby só tem herança simples, mas um módulo pode ser misturado em várias classes. include adiciona os métodos do módulo como métodos de instância; extend, como métodos da classe (ou de um objeto só). prepend insere o módulo antes da classe, para envolver métodos existentes. Comparable e Enumerable são mixins.",
+          "relatedTerms": [
+            "enumerable",
+            "attr-accessor"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "method-missing",
+          "level": "senior",
+          "term": "method_missing",
+          "definition": "Quando um objeto recebe uma mensagem sem método correspondente, o Ruby chama method_missing antes de lançar NoMethodError. Sobrescrevê-lo permite responder a métodos criados na hora, como os finders dinâmicos antigos do Rails. Deve vir com respond_to_missing?, para respond_to? continuar verdadeiro, e chamar super nos casos não tratados.",
+          "relatedTerms": [
+            "monkey-patching",
+            "attr-accessor"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "monkey-patching",
+          "level": "senior",
+          "term": "Monkey patching e refinements",
+          "definition": "Classes em Ruby são abertas: dá para reabrir String e acrescentar ou trocar um método em qualquer lugar do código. É poderoso (o Rails acrescenta 2.days.ago a Integer), mas a mudança é global e pode colidir com outras gems. Refinements (refine String do ... end, ativado com using) limitam a alteração a um arquivo.",
+          "relatedTerms": [
+            "method-missing",
+            "mixins"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "attr-accessor",
+          "level": "junior",
+          "term": "attr_accessor e companhia",
+          "definition": "Variáveis de instância (@nome) são sempre privadas. attr_reader :nome gera o método de leitura, attr_writer o de escrita e attr_accessor os dois. São métodos de classe que definem métodos: um exemplo simples de metaprogramação usado o tempo todo.",
+          "relatedTerms": [
+            "method-missing",
+            "mixins"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "bundler-e-gems",
+          "level": "junior",
+          "term": "Bundler e gems",
+          "definition": "Gem é o pacote de bibliotecas do Ruby. O Gemfile lista as dependências com faixas de versão, e o Bundler resolve as versões e grava as exatas no Gemfile.lock, que vai para o git. bundle install instala; bundle exec roda um comando com as versões do lock.",
+          "relatedTerms": [
+            "mixins"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "comparable-exemplo",
+          "level": "pleno",
+          "title": "Comparable com <=>",
+          "body": "Definindo só o <=>, o mixin Comparable dá <, >, ==, between? e clamp, e sort passa a funcionar.",
+          "snippet": {
+            "file": "versao.rb",
+            "language": "ruby",
+            "code": "class Versao\n  include Comparable\n  attr_reader :partes\n\n  def initialize(texto)\n    @partes = texto.split(\".\").map(&:to_i)\n  end\n\n  def <=>(outra)\n    partes <=> outra.partes\n  end\n\n  def to_s = partes.join(\".\")\nend\n\nVersao.new(\"1.10.0\") > Versao.new(\"1.9.3\")   # true\n[\"2.0\", \"1.10\", \"1.9\"].map { Versao.new(_1) }.max.to_s  # \"2.0\""
+          },
+          "relatedTerms": [
+            "mixins",
+            "attr-accessor"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de Ruby que aparecem em entrevistas, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "simbolo-ou-string-pergunta",
+          "level": "junior",
+          "question": "Qual a diferença entre símbolo e string em Ruby?",
+          "answer": "Um símbolo é imutável e existe uma única vez na memória: todo :ativo é o mesmo objeto. Strings são mutáveis e cada literal pode criar um objeto novo. Uso símbolos para identificadores internos (chaves de hash, estados, nomes de método) e strings para texto que vem de fora ou é exibido.",
+          "relatedTerms": [
+            "simbolos",
+            "frozen-string-literal"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "zero-verdadeiro-pergunta",
+          "level": "junior",
+          "question": "Por que if 0 entra no bloco em Ruby?",
+          "answer": "Porque em Ruby só nil e false são falsos; qualquer outro valor, incluindo 0, string vazia e array vazio, é verdadeiro. Para testar esses casos uso métodos explícitos: zero?, empty? ou, no Rails, blank? e present?.",
+          "relatedTerms": [
+            "nil-e-truthiness"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "proc-ou-lambda-pergunta",
+          "level": "pleno",
+          "question": "Qual a diferença entre proc e lambda?",
+          "answer": "Duas diferenças: a lambda exige o número certo de argumentos, e a proc completa com nil ou ignora os extras; e return numa lambda sai só dela, enquanto numa proc sai do método que a criou. Por isso lambdas se comportam como métodos, e procs como blocos.",
+          "relatedTerms": [
+            "proc-e-lambda",
+            "blocos-e-yield"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "include-ou-extend-pergunta",
+          "level": "pleno",
+          "question": "Qual a diferença entre include e extend?",
+          "answer": "include coloca os métodos do módulo na cadeia de ancestrais da classe, como métodos de instância. extend os adiciona ao próprio objeto que recebe a chamada: numa classe, viram métodos de classe. Um padrão comum é o hook self.included, que estende a classe com métodos de classe ao ser incluído (é o que o ActiveSupport::Concern organiza).",
+          "relatedTerms": [
+            "mixins"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "monkey-patching-pergunta",
+          "level": "senior",
+          "question": "Quais os riscos de monkey patching e como reduzi-los?",
+          "answer": "A alteração vale para o processo inteiro: pode quebrar outras gems que esperam o comportamento original, colidir com um patch igual de outra biblioteca e confundir quem lê o código. Reduzo usando refinements para limitar o escopo, preferindo um módulo próprio ou um objeto de serviço, e, quando o patch é inevitável, deixando-o num arquivo único, com testes.",
+          "relatedTerms": [
+            "monkey-patching"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "method-missing-pergunta",
+          "level": "senior",
+          "question": "Quando usar method_missing e que cuidados tomar?",
+          "answer": "Quando os nomes dos métodos só são conhecidos em execução, como proxies e wrappers de API. Cuidados: implementar respond_to_missing?, chamar super para nomes não tratados (senão erros de digitação somem) e lembrar que é mais lento e difícil de achar no código. Muitas vezes define_method na carga da classe resolve melhor.",
+          "relatedTerms": [
+            "method-missing",
+            "attr-accessor"
+          ]
+        }
+      ]
+    }
+  ]
+}

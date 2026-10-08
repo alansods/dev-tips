@@ -37,6 +37,12 @@ describe('Requirement: Snippet de código', () => {
     expectErrorAt(input, 'decks[1].cards[1].snippet.language');
   });
 
+  it.each(['csharp', 'ruby'])('Snippet em %s aceito', (language) => {
+    const input = fullTrack();
+    cardAt(input, 1, 1).snippet = snippet('x', { language });
+    expect((cardAt(trackOf(input), 1, 1) as CodeCard).snippet.language).toBe(language);
+  });
+
   it('Código preservado', () => {
     const code = '\n    def f():\n\n        return 1\n  ';
     const input = fullTrack();

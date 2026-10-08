@@ -1,0 +1,120 @@
+{
+  "title": "Ruby on Rails",
+  "description": "Apps and APIs with Rails: conventions, routes, Active Record, jobs, tests and security.",
+  "decks": {
+    "mvc-e-convencoes": {
+      "title": "MVC and conventions",
+      "description": "How Rails organizes the app and the path of a request."
+    },
+    "active-record": {
+      "title": "Active Record",
+      "description": "The Rails ORM: models, migrations, associations and queries."
+    },
+    "jobs-testes-e-seguranca": {
+      "title": "Jobs, tests and security",
+      "description": "Background work, tests, protections and frontend with Hotwire."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Rails questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "convencao-sobre-configuracao": {
+      "term": "Convention over configuration",
+      "definition": "Rails assumes default names and places for almost everything: the Product model uses the products table (plural), ProductsController lives in app/controllers and the show view in app/views/products. Following the conventions, there is almost no configuration to write; going against them means declaring everything by hand."
+    },
+    "rotas-resources": {
+      "term": "Routes with resources",
+      "definition": "resources :products in config/routes.rb creates the seven REST routes (index, show, new, create, edit, update, destroy) wired to the controller actions. only: and except: limit the routes, and nested resources generate URLs like /orders/:order_id/items. bin/rails routes lists them all."
+    },
+    "strong-parameters": {
+      "term": "Strong parameters",
+      "definition": "Request parameters arrive in params and cannot go straight to the model. params.require(:product).permit(:name, :price) says which fields are accepted; the rest is discarded. This prevents mass assignment, like a user sending admin: true in the request body."
+    },
+    "generators-rails": {
+      "term": "Rails generators",
+      "definition": "bin/rails generate creates files following the conventions: model (model and migration), controller, scaffold (everything, with views and routes) and job. rails new sets up the project; with --api, it generates an API-only app, without views or assets. bin/rails destroy undoes what the generator created."
+    },
+    "routes-exemplo": {
+      "title": "config/routes.rb",
+      "body": "REST routes for products, items nested under orders and a versioned API namespace."
+    },
+    "controller-exemplo": {
+      "title": "API REST controller",
+      "body": "before_action loads the record, strong parameters filter the input and validation errors come back as 422."
+    },
+    "active-record-padrao": {
+      "term": "Active Record",
+      "definition": "The Rails ORM, which follows the pattern of the same name: each model is a class that represents a table, and each object, a row, with methods to save and query (Product.where(active: true), product.save). Columns become attributes without being declared, read from the database schema."
+    },
+    "migrations-rails": {
+      "term": "Rails migrations",
+      "definition": "Ruby classes that change the schema (create_table, add_column, add_index) and are versioned in db/migrate. bin/rails db:migrate applies the pending ones and updates db/schema.rb, the current snapshot of the database. The change method is reverted automatically with db:rollback in most cases."
+    },
+    "associacoes": {
+      "term": "Associations",
+      "definition": "belongs_to, has_many, has_one and has_many :through declare the relationships and create methods such as order.items and item.order. dependent: :destroy deletes the children along with it. belongs_to is required by default: saving an item without an order fails validation."
+    },
+    "validacoes-e-callbacks": {
+      "term": "Validations and callbacks",
+      "definition": "validates :name, presence: true runs before saving; if it fails, save returns false and errors explains why (save! raises an exception). Callbacks (before_save, after_commit) run code at points in the lifecycle. Callbacks with external effects, like sending email, should go in after_commit or out of the model."
+    },
+    "includes-e-n-mais-1": {
+      "term": "includes and N+1",
+      "definition": "Associations are loaded on demand: looping over orders and calling order.customer on each makes one query per order. Order.includes(:customer) loads everything in a few queries. preload always uses separate queries, eager_load uses a JOIN. The Bullet gem and strict_loading help detect N+1."
+    },
+    "scopes": {
+      "term": "Scopes",
+      "definition": "Named queries in the model: scope :active, -> { where(active: true) }. They return a relation, so they chain (Product.active.cheap.order(:name)) and only hit the database when the result is used. They keep queries reusable and out of controllers."
+    },
+    "active-job": {
+      "term": "Active Job",
+      "definition": "A common interface for background tasks: the class inherits from ApplicationJob, defines perform and is enqueued with perform_later. The queue backend is configurable: Solid Queue (default in Rails 8, uses the database), Sidekiq (Redis) and others. Arguments are serialized, so you pass the id or the record itself (via GlobalID), not large objects."
+    },
+    "csrf-no-rails": {
+      "term": "CSRF protection in Rails",
+      "definition": "In apps with forms and cookie sessions, Rails includes an authenticity_token in every form and checks it on POST, PATCH and DELETE requests; without it, the request is rejected. Apps created with --api, which usually authenticate with a token in the header, do not use this protection."
+    },
+    "credentials": {
+      "term": "Credentials",
+      "definition": "Secrets (API keys, passwords) live in config/credentials.yml.enc, encrypted and versioned in git. The key to open it lives in config/master.key or the RAILS_MASTER_KEY variable, never in git. bin/rails credentials:edit edits the file, and code reads it with Rails.application.credentials.dig(:stripe, :secret)."
+    },
+    "hotwire": {
+      "term": "Hotwire and Turbo",
+      "definition": "The default Rails way to have interactive pages without an SPA: the server sends HTML, not JSON. Turbo Drive swaps the page without reloading, Turbo Frames update only one part and Turbo Streams send changes (including over WebSocket). Stimulus covers the little JavaScript that is left."
+    },
+    "job-exemplo": {
+      "title": "Job with retries",
+      "body": "The job receives the order, retries on network failures with increasing waits and is enqueued after the commit."
+    },
+    "teste-request-exemplo": {
+      "title": "Request spec with RSpec",
+      "body": "The test makes a real request through the Rails stack and checks the status, body and database."
+    },
+    "convencao-pergunta": {
+      "question": "What does \"convention over configuration\" mean in Rails?",
+      "answer": "That the framework decides default names and places, and whoever follows the default does not need to configure anything: the Product model finds the products table, the resources :products route finds ProductsController. The gain is productivity and projects that look alike; the cost is that going against the default takes more work and the \"magic\" has to be learned."
+    },
+    "strong-params-pergunta": {
+      "question": "Why does Rails require strong parameters?",
+      "answer": "To prevent mass assignment: without a filter, Product.new(params[:product]) would accept any field sent, including ones the user should not change, like admin or cost_price. With require and permit, only the listed fields reach the model."
+    },
+    "n-mais-1-rails-pergunta": {
+      "question": "How do you find and fix N+1 in Rails?",
+      "answer": "I find it by reading the log (the same query repeated with different ids), with the Bullet gem or by turning on strict_loading, which raises an error when associations load on demand. I fix it with includes (or preload and eager_load) on the query that feeds the loop, and check in the log that it became a few queries."
+    },
+    "includes-preload-pergunta": {
+      "question": "includes, preload and eager_load: what is the difference?",
+      "answer": "preload always makes a separate query per association. eager_load makes a single LEFT JOIN, needed when where or order uses the association's columns. includes chooses on its own: it uses preload, unless the query references the associated table, in which case it becomes eager_load. I choose explicitly when performance matters."
+    },
+    "callbacks-pergunta": {
+      "question": "Active Record callbacks: when to use them and when to avoid them?",
+      "answer": "I use them for rules about the data itself, like normalizing an email in before_validation. I avoid them for external effects and business flows (sending email, charging, calling an API): they run hidden on every save, including in tests and scripts, and a failing before_save can roll back the transaction. For that, I prefer an explicit service object or after_commit with a job."
+    },
+    "tarefa-demorada-pergunta": {
+      "question": "How do you move a slow task out of the request cycle in Rails?",
+      "answer": "I create a job with Active Job and enqueue it with perform_later, returning the response right away. I pass the record or the id, not large objects, make the job idempotent because it may run again, set retry_on for temporary failures and, if it depends on freshly saved data, enqueue it after the commit."
+    }
+  }
+}
