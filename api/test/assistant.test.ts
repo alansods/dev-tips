@@ -82,7 +82,7 @@ describe('Requirement: Perguntar sobre o card na API', () => {
     expect(await res.json()).toEqual({
       answer: 'Porque createCounter roda uma vez.',
       inScope: true,
-      questions: { used: 31, limit: 100 },
+      questions: { used: 31, limit: 200 },
     });
     expect(await questionUsage(env.DB, userId, PERIOD)).toBe(31);
   });
@@ -96,7 +96,7 @@ describe('Requirement: Perguntar sobre o card na API', () => {
   });
 
   it('Cota esgotada', async () => {
-    const { ask, gemini } = await setup({ used: 100 });
+    const { ask, gemini } = await setup({ used: 200 });
     const res = await ask(body());
     expect(res.status).toBe(429);
     expect(await errorCode(res)).toBe('quota_exceeded');
@@ -117,9 +117,18 @@ describe('Requirement: Perguntar sobre o card na API', () => {
   });
 
   it('Histórico longo demais', async () => {
+    const { ask, gemini } = await setup();
+    const history = Array.from({ length: 7 }, () => ({ role: 'user', text: 'oi' }));
+    const res = await ask(body({ history }));
+    expect(res.status).toBe(400);
+    expect(await errorCode(res)).toBe('invalid_body');
+    expect(gemini.calls).toHaveLength(0);
+  });
+
+  it('Histórico com 6 mensagens é aceito', async () => {
     const { ask } = await setup();
-    const history = Array.from({ length: 11 }, () => ({ role: 'user', text: 'oi' }));
-    expect((await ask(body({ history }))).status).toBe(400);
+    const history = Array.from({ length: 6 }, () => ({ role: 'user', text: 'oi' }));
+    expect((await ask(body({ history }))).status).toBe(200);
   });
 
   it('Sem sessão', async () => {
@@ -166,7 +175,7 @@ describe('Requirement: Respostas só sobre o card', () => {
       inScope: false,
       answer:
         'Só consigo ajudar com o conteúdo deste card: Closure com estado privado. Quer que eu explique algum ponto dele?',
-      questions: { used: 30, limit: 100 },
+      questions: { used: 30, limit: 200 },
     });
     expect(await questionUsage(env.DB, userId, PERIOD)).toBe(30);
   });

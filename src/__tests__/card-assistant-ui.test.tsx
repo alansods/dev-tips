@@ -44,10 +44,10 @@ const PRO = {
   source: 'store' as const,
   expiresAt: '2026-11-12T12:00:00.000Z',
   willRenew: true,
-  questions: { used: 30, limit: 100 },
+  questions: { used: 30, limit: 200 },
 };
 const answer = (text: string, inScope = true) =>
-  ({ ok: true, answer: text, inScope, questions: { used: 31, limit: 100 } }) as const;
+  ({ ok: true, answer: text, inScope, questions: { used: 31, limit: 200 } }) as const;
 
 const flush = () =>
   act(async () => {
@@ -289,8 +289,8 @@ describe('Requirement: Erros e cota no chat', () => {
     await open();
     await press('Perguntar sobre este card');
     await typeAndSend('Oi');
-    expect(screen.getByText('Você usou as 100 perguntas do mês')).toBeOnTheScreen();
-    expect(screen.getByText('100 de 100 · renova em 12/11/2026')).toBeOnTheScreen();
+    expect(screen.getByText('Você usou as 200 perguntas do mês')).toBeOnTheScreen();
+    expect(screen.getByText('200 de 200 · renova em 12/11/2026')).toBeOnTheScreen();
     expect(screen.queryByLabelText('Sua pergunta')).toBeNull();
     expect(screen.getByText('Oi')).toBeOnTheScreen();
   });

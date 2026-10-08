@@ -1,6 +1,8 @@
 // Textos da interface em PT-BR. É a fonte das chaves: `Messages` sai daqui e o
 // dicionário em inglês precisa ter exatamente a mesma forma.
 
+import { PRO_QUESTION_LIMIT } from '../subscriptions/limits';
+
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export const ptBR = {
@@ -86,7 +88,7 @@ export const ptBR = {
       'Respostas focadas só no conteúdo do card, sem desvio de assunto',
     ],
     planName: 'Pro mensal',
-    quotaAmount: '100',
+    quotaAmount: String(PRO_QUESTION_LIMIT),
     quotaUnit: 'perguntas por mês',
     quotaScope: 'sobre qualquer card, em qualquer trilha',
     quotaRules: [
@@ -125,7 +127,7 @@ export const ptBR = {
     resetsOn: (date: string) => `Zera em ${date}`,
     howTitle: 'Como a cota funciona',
     howRules: [
-      '100 perguntas por ciclo da assinatura.',
+      `${PRO_QUESTION_LIMIT} perguntas por ciclo da assinatura.`,
       'Só conta pergunta respondida.',
       'Na renovação, o contador volta a zero.',
     ],
@@ -148,10 +150,10 @@ export const ptBR = {
     offline: 'Sem conexão. Tente de novo quando estiver online.',
     error: 'Não consegui responder agora.',
     retry: 'Tentar de novo',
-    quotaTitle: 'Você usou as 100 perguntas do mês',
+    quotaTitle: `Você usou as ${PRO_QUESTION_LIMIT} perguntas do mês`,
     quotaBody: 'Sua cota renova junto com a assinatura.',
-    quotaUsage: '100 de 100',
-    quotaRenews: (date: string) => `100 de 100 · renova em ${date}`,
+    quotaUsage: `${PRO_QUESTION_LIMIT} de ${PRO_QUESTION_LIMIT}`,
+    quotaRenews: (date: string) => `${PRO_QUESTION_LIMIT} de ${PRO_QUESTION_LIMIT} · renova em ${date}`,
     disclaimer: 'Respostas geradas por IA podem conter erros.',
   },
   sync: {

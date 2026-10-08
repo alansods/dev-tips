@@ -50,7 +50,7 @@ const PRO = {
   source: 'store',
   expiresAt: '2026-11-12T12:00:00.000Z',
   willRenew: true,
-  questions: { used: 30, limit: 100 },
+  questions: { used: 30, limit: 200 },
 };
 const ADMIN = { plan: 'pro', source: 'admin', expiresAt: null, willRenew: false, questions: { used: 3, limit: null } };
 
@@ -117,7 +117,7 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     expect(button(/Dev Tips Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
   });
 
-  const withUsed = (used: number, extra = {}) => ({ ...PRO, ...extra, questions: { used, limit: 100 } });
+  const withUsed = (used: number, extra = {}) => ({ ...PRO, ...extra, questions: { used, limit: 200 } });
   async function profileWith(plan: unknown) {
     await signedIn(plan);
     api(plan);
@@ -129,28 +129,28 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     const row = await profileWith(withUsed(37));
     expect(row).toHaveTextContent(/Renova em 12\/11\/2026/);
     expect(row).toHaveTextContent(/Perguntas neste mês/);
-    expect(row).toHaveTextContent(/37 \/ 100/);
-    expect(row).toHaveTextContent(/Restam 63 perguntas/);
-    expect(row).toHaveAccessibleName(/37 de 100 perguntas usadas/);
+    expect(row).toHaveTextContent(/37 \/ 200/);
+    expect(row).toHaveTextContent(/Restam 163 perguntas/);
+    expect(row).toHaveAccessibleName(/37 de 200 perguntas usadas/);
     expect(screen.getByTestId('quota-bar')).toBeOnTheScreen();
     await press(/Dev Tips Pro/);
     expect(screen).toHavePathname('/account');
   });
 
   it('Quase no fim', async () => {
-    const row = await profileWith(withUsed(86));
-    expect(row).toHaveTextContent(/86 \/ 100/);
-    expect(screen.getByText('Restam 14 perguntas')).toHaveStyle({ color: palettes.light.warn });
+    const row = await profileWith(withUsed(172));
+    expect(row).toHaveTextContent(/172 \/ 200/);
+    expect(screen.getByText('Restam 28 perguntas')).toHaveStyle({ color: palettes.light.warn });
   });
 
   it('Última pergunta', async () => {
-    const row = await profileWith(withUsed(99));
+    const row = await profileWith(withUsed(199));
     expect(row).toHaveTextContent(/Resta 1 pergunta/);
   });
 
   it('Cota esgotada', async () => {
-    const row = await profileWith(withUsed(100));
-    expect(row).toHaveTextContent(/100 \/ 100/);
+    const row = await profileWith(withUsed(200));
+    expect(row).toHaveTextContent(/200 \/ 200/);
     expect(row).toHaveTextContent(/Cota esgotada\. Renova em 12\/11\/2026\./);
     expect(row).toHaveStyle({ backgroundColor: palettes.light.warnSoft });
   });
@@ -172,9 +172,9 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     // o chat grava o `questions` da resposta no plano guardado
     act(() => {
       const plan = useSubscriptionStore.getState().plan!;
-      useSubscriptionStore.getState().setPlan({ ...plan, questions: { used: 38, limit: 100 } });
+      useSubscriptionStore.getState().setPlan({ ...plan, questions: { used: 38, limit: 200 } });
     });
-    expect(button(/Dev Tips Pro/)).toHaveTextContent(/38 \/ 100/);
+    expect(button(/Dev Tips Pro/)).toHaveTextContent(/38 \/ 200/);
   });
 
   it('iOS', async () => {
@@ -193,7 +193,7 @@ describe('Requirement: Paywall', () => {
     expect(screen.getByRole('header', { name: 'Travou num card? Pergunte.' })).toBeOnTheScreen();
     expect(screen.getByText('Novos exemplos de código sobre o mesmo conceito')).toBeOnTheScreen();
     expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
-    expect(screen.getByText('100')).toBeOnTheScreen();
+    expect(screen.getByText('200')).toBeOnTheScreen();
     expect(screen.getByText('perguntas por mês')).toBeOnTheScreen();
     expect(screen.getByText('R$ 14,90/mês')).toBeOnTheScreen();
     expect(
@@ -366,12 +366,12 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
     await open('/account');
     expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
     expect(screen.getByText('Ativo')).toBeOnTheScreen();
-    expect(screen.getByText('70')).toBeOnTheScreen();
+    expect(screen.getByText('170')).toBeOnTheScreen();
     expect(screen.getByText('perguntas restantes')).toBeOnTheScreen();
-    expect(screen.getByText('30 / 100 usadas')).toBeOnTheScreen();
+    expect(screen.getByText('30 / 200 usadas')).toBeOnTheScreen();
     expect(screen.getByText('Zera em 12/11/2026')).toBeOnTheScreen();
     expect(screen.getByText('Como a cota funciona')).toBeOnTheScreen();
-    expect(screen.getByText('100 perguntas por ciclo da assinatura.')).toBeOnTheScreen();
+    expect(screen.getByText('200 perguntas por ciclo da assinatura.')).toBeOnTheScreen();
     expect(screen.getByText('Só conta pergunta respondida.')).toBeOnTheScreen();
     expect(screen.getByText('Na renovação, o contador volta a zero.')).toBeOnTheScreen();
     expect(screen.getByText('Renova em 12/11/2026')).toBeOnTheScreen();
@@ -380,7 +380,7 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
   });
 
   it('Uma pergunta restante na Conta', async () => {
-    const almost = { ...PRO, questions: { used: 99, limit: 100 } };
+    const almost = { ...PRO, questions: { used: 199, limit: 200 } };
     await signedIn(almost);
     api(almost);
     await open('/account');
@@ -411,7 +411,7 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
     api(PRO);
     await open('/account');
     expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
-    expect(screen.getByText('30 / 100 usadas')).toBeOnTheScreen();
+    expect(screen.getByText('30 / 200 usadas')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Gerenciar assinatura' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Restaurar compras' })).toBeNull();
   });
