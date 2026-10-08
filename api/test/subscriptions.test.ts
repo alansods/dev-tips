@@ -122,7 +122,7 @@ describe('Requirement: Consultar plano e uso', () => {
       source: 'store',
       expiresAt: new Date(NOW + 12 * DAY).toISOString(),
       willRenew: true,
-      questions: { used: 30, limit: 100 },
+      questions: { used: 30, limit: 200 },
     });
   });
 
@@ -180,11 +180,18 @@ describe('Requirement: Cota de perguntas', () => {
   it('Cota esgotada', async () => {
     const u = await user();
     await subscribe(u.id);
-    await setUsed(u.id, 100);
+    await setUsed(u.id, 200);
     await expect(assertCanAsk(env.DB, u, ADMINS, NOW)).rejects.toMatchObject({
       status: 429,
       code: 'quota_exceeded',
     });
+  });
+
+  it('Última pergunta da cota é aceita', async () => {
+    const u = await user();
+    await subscribe(u.id);
+    await setUsed(u.id, 199);
+    await expect(assertCanAsk(env.DB, u, ADMINS, NOW)).resolves.toBeDefined();
   });
 
   it('Pergunta respondida conta', async () => {
@@ -206,7 +213,7 @@ describe('Requirement: Cota de perguntas', () => {
   it('Renovação zera', async () => {
     const u = await user();
     await subscribe(u.id, NOW - 30 * DAY, NOW);
-    await setUsed(u.id, 100, NOW - 30 * DAY);
+    await setUsed(u.id, 200, NOW - 30 * DAY);
     // RENEWAL: período novo começando agora
     await env.DB.prepare('UPDATE subscriptions SET period_start = ?, expires_at = ? WHERE user_id = ?')
       .bind(NOW, NOW + 30 * DAY, u.id)
@@ -220,7 +227,7 @@ describe('Requirement: Cota de perguntas', () => {
     const u = await user('admin@example.com');
     const d = new Date(NOW);
     const month = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), 1);
-    await setUsed(u.id, 150, month);
+    await setUsed(u.id, 250, month);
     await expect(assertCanAsk(env.DB, u, ADMINS, NOW)).resolves.toEqual({ periodStart: month });
   });
 });

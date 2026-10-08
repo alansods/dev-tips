@@ -1,6 +1,6 @@
 # Chat "Perguntar": configuração (Gemini)
 
-O chat do card (change `add-card-assistant`) é respondido pela API com o **Gemini Flash**. Só usuários Pro (ou admins) podem perguntar, dentro da cota de 100 perguntas por ciclo. A cota está descrita em [assinaturas.md](assinaturas.md).
+O chat do card (change `add-card-assistant`) é respondido pela API com o **Gemini Flash**. Só usuários Pro (ou admins) podem perguntar, dentro da cota de 200 perguntas por ciclo. A cota está descrita em [assinaturas.md](assinaturas.md).
 
 ## Como funciona
 

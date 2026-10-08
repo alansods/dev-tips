@@ -6,7 +6,7 @@ const pro = (used: number): SubscriptionPlan => ({
   source: 'store',
   expiresAt: '2026-11-12T12:00:00.000Z',
   willRenew: true,
-  questions: { used, limit: 100 },
+  questions: { used, limit: 200 },
 });
 
 describe('quotaStatus', () => {
@@ -27,18 +27,18 @@ describe('quotaStatus', () => {
   });
 
   it('uso normal abaixo de 80%', () => {
-    expect(quotaStatus(pro(37))).toEqual({ used: 37, limit: 100, left: 63, ratio: 0.37, level: 'normal' });
-    expect(quotaStatus(pro(79))?.level).toBe('normal');
+    expect(quotaStatus(pro(74))).toEqual({ used: 74, limit: 200, left: 126, ratio: 0.37, level: 'normal' });
+    expect(quotaStatus(pro(159))?.level).toBe('normal');
   });
 
   it('quase no fim a partir de 80%', () => {
-    expect(quotaStatus(pro(80))?.level).toBe('low');
-    expect(quotaStatus(pro(86))).toMatchObject({ left: 14, level: 'low' });
-    expect(quotaStatus(pro(99))).toMatchObject({ left: 1, level: 'low' });
+    expect(quotaStatus(pro(160))?.level).toBe('low');
+    expect(quotaStatus(pro(172))).toMatchObject({ left: 28, level: 'low' });
+    expect(quotaStatus(pro(199))).toMatchObject({ left: 1, level: 'low' });
   });
 
   it('esgotada com o limite atingido, sem passar de 100%', () => {
-    expect(quotaStatus(pro(100))).toEqual({ used: 100, limit: 100, left: 0, ratio: 1, level: 'out' });
-    expect(quotaStatus(pro(105))).toMatchObject({ left: 0, ratio: 1, level: 'out' });
+    expect(quotaStatus(pro(200))).toEqual({ used: 200, limit: 200, left: 0, ratio: 1, level: 'out' });
+    expect(quotaStatus(pro(210))).toMatchObject({ left: 0, ratio: 1, level: 'out' });
   });
 });
