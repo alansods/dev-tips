@@ -151,6 +151,23 @@ export function CheckIcon({ color, size = 18 }: IconProps) {
   );
 }
 
+export function RefreshIcon({ color, size = 18 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M3 12a9 9 0 1 0 3-6.7" {...stroke(color)} />
+      <Path d="M3 4v5h5" {...stroke(color)} />
+    </Svg>
+  );
+}
+
+export function ChartIcon({ color, size = 18 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M4 20V10M10 20V4M16 20v-7M22 20H2" {...stroke(color)} />
+    </Svg>
+  );
+}
+
 export function ChevronRightIcon({ color, size = 18 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">

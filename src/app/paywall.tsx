@@ -11,7 +11,7 @@ import { useAccountStore } from '../auth/store';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
 import { IconButton } from '../components/IconButton';
-import { CheckIcon, CloseIcon } from '../components/icons';
+import { ChartIcon, CheckIcon, CloseIcon, RefreshIcon } from '../components/icons';
 import { useT } from '../i18n';
 import { legalUrls } from '../settings/legal';
 import { restore, subscribe } from '../subscriptions/actions';
@@ -19,6 +19,9 @@ import { ProBadge } from '../subscriptions/ProBadge';
 import { monthlyPrice } from '../subscriptions/purchases';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
+
+/** Ícones das regras da cota, na ordem de `t.pro.quotaRules`. */
+const RULE_ICONS = [RefreshIcon, CheckIcon, ChartIcon];
 
 /** Tempo para ler a mensagem de sucesso antes de fechar. */
 const CLOSE_DELAY_MS = 800;
@@ -105,6 +108,45 @@ export default function PaywallScreen() {
           </AppText>
         </View>
 
+        <View style={[styles.plan, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
+          <View style={styles.planHead}>
+            <AppText font="semibold" size={16} style={{ flex: 1 }}>
+              {t.pro.planName}
+            </AppText>
+            {price ? (
+              <AppText font="bold" size={18}>
+                {t.pro.perMonth(price)}
+              </AppText>
+            ) : null}
+          </View>
+          <View style={[styles.quota, { backgroundColor: colors.accentSoft }]}>
+            <AppText font="monoMedium" size={30} tone="accentText" style={{ lineHeight: 34 }}>
+              {t.pro.quotaAmount}
+            </AppText>
+            <View style={{ flex: 1, gap: 2 }}>
+              <AppText font="semibold" size={15}>
+                {t.pro.quotaUnit}
+              </AppText>
+              <AppText size={13} tone="muted">
+                {t.pro.quotaScope}
+              </AppText>
+            </View>
+          </View>
+          <View style={{ gap: 10 }}>
+            {t.pro.quotaRules.map((rule, i) => {
+              const Icon = RULE_ICONS[i] ?? CheckIcon;
+              return (
+                <View key={rule} style={styles.rule}>
+                  <Icon color={colors.accentText} size={18} />
+                  <AppText size={14} style={{ flex: 1, lineHeight: 20 }}>
+                    {rule}
+                  </AppText>
+                </View>
+              );
+            })}
+          </View>
+        </View>
+
         <View style={{ gap: 14 }}>
           {t.pro.benefits.map((benefit) => (
             <View key={benefit} style={styles.benefit}>
@@ -116,22 +158,6 @@ export default function PaywallScreen() {
               </AppText>
             </View>
           ))}
-        </View>
-
-        <View style={[styles.plan, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <AppText font="semibold" size={16}>
-              {t.pro.planName}
-            </AppText>
-            <AppText size={13} tone="muted">
-              {t.pro.planQuota}
-            </AppText>
-          </View>
-          {price ? (
-            <AppText font="bold" size={18}>
-              {t.pro.perMonth(price)}
-            </AppText>
-          ) : null}
         </View>
       </ScrollView>
 
@@ -200,14 +226,17 @@ const styles = StyleSheet.create({
   content: { flexGrow: 1, paddingHorizontal: spacing.xl, gap: spacing.xl, paddingBottom: spacing.lg },
   benefit: { flexDirection: 'row', gap: spacing.md, alignItems: 'flex-start' },
   check: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  plan: {
+  plan: { gap: 14, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 2 },
+  planHead: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.md },
+  quota: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: radius.lg,
-    borderWidth: 2,
+    gap: 14,
+    paddingVertical: spacing.md,
+    paddingHorizontal: 14,
+    borderRadius: radius.md,
   },
+  rule: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   footer: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, gap: spacing.md },
   alert: { padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   center: { textAlign: 'center', lineHeight: 17 },
