@@ -229,6 +229,18 @@ export function FundamentalsIcon({ color, size = 22 }: IconProps) {
   );
 }
 
+/** Uma branch saindo da linha principal. */
+export function GitIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Circle cx={6} cy={5} r={2} />
+      <Circle cx={6} cy={19} r={2} />
+      <Circle cx={18} cy={7} r={2} />
+      <Path d="M6 7v10M18 9c0 5-6 4-12 8" />
+    </Svg>
+  );
+}
+
 export function FrontendIcon({ color, size = 22 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
@@ -277,6 +289,7 @@ export function CloudIcon({ color, size = 22 }: IconProps) {
 /** Ícone de traço de cada área do catálogo. */
 export const AREA_ICONS: Record<Area, (props: IconProps) => React.JSX.Element> = {
   fundamentos: FundamentalsIcon,
+  git: GitIcon,
   frontend: FrontendIcon,
   backend: BackendIcon,
   'banco-de-dados': DatabaseIcon,

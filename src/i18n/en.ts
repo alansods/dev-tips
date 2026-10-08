@@ -211,6 +211,7 @@ export const en: Messages = {
   nav: {
     areas: {
       fundamentos: 'Fundamentals',
+      git: 'Git',
       frontend: 'Frontend',
       backend: 'Backend',
       'banco-de-dados': 'Databases',

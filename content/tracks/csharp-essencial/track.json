@@ -2,7 +2,7 @@
   "id": "csharp-essencial",
   "title": "C# essencial",
   "description": "O que é particular do C# e do .NET: tipos de valor, nullable, records, LINQ, async e gerenciamento de recursos.",
-  "prerequisites": ["fundamentos-web"],
+  "prerequisites": ["fundamentos-de-programacao"],
   "addedAt": "2026-10-08",
   "areas": [
     "backend"

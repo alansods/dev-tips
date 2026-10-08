@@ -2,7 +2,7 @@
   "id": "ruby-essencial",
   "title": "Ruby essencial",
   "description": "O que é particular do Ruby: tudo é objeto, símbolos, blocos, Enumerable, mixins e metaprogramação.",
-  "prerequisites": ["fundamentos-web"],
+  "prerequisites": ["fundamentos-de-programacao"],
   "addedAt": "2026-10-08",
   "areas": [
     "backend"

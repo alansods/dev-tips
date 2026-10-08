@@ -39,15 +39,17 @@ describe('Requirement: Home por áreas', () => {
     ]);
   });
 
-  it('Mobile e DevOps e Cloud no fim', () => {
+  it('Git depois de Fundamentos, Mobile e DevOps e Cloud no fim', () => {
     const all = [
       make('ci', { areas: ['devops'] }),
+      make('git', { areas: ['git'] }),
       make('rn', { areas: ['mobile'] }),
       ...catalog(),
       make('sql', { areas: ['banco-de-dados'] }),
     ];
     expect(areasWithTracks(all).map((a) => a.area)).toEqual([
       'fundamentos',
+      'git',
       'frontend',
       'backend',
       'banco-de-dados',

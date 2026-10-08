@@ -185,6 +185,6 @@ describe('Requirement: Origem do card na sessão', () => {
   it('Card de outra trilha', () => {
     const card = webTrack.decks[0].cards[0];
     renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
-    expect(screen.getByText(`Fundamentos de programação e web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
+    expect(screen.getByText(`Fundamentos web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
   });
 });

@@ -237,7 +237,7 @@ Uma trilha MAY ter um arquivo de tradução para inglês em `content/tracks/<tra
 - **THEN** todo arquivo `translations/en.json` em `content/tracks/` é validado contra a trilha correspondente, e um erro faz a suíte falhar
 
 ### Requirement: Áreas da trilha
-Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `frontend` (Frontend), `backend` (Backend), `banco-de-dados` (Banco de dados), `mobile` (Mobile) e `devops` (DevOps e Cloud). Uma trilha MAY estar em mais de uma área.
+Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de áreas. As áreas válidas são, nesta ordem de exibição: `fundamentos` (Fundamentos), `git` (Git), `frontend` (Frontend), `backend` (Backend), `banco-de-dados` (Banco de dados), `mobile` (Mobile) e `devops` (DevOps e Cloud). Uma trilha MAY estar em mais de uma área.
 
 #### Scenario: Trilha sem áreas
 - **WHEN** uma trilha não declara `areas` ou declara a lista vazia
@@ -262,6 +262,10 @@ Toda trilha SHALL declarar `areas`, uma lista não vazia e sem repetição de á
 #### Scenario: Áreas de mobile e DevOps
 - **WHEN** uma trilha declara `areas: ["mobile"]` e outra declara `areas: ["devops"]`
 - **THEN** a validação aceita as duas trilhas
+
+#### Scenario: Área Git
+- **WHEN** uma trilha declara `areas: ["git"]`
+- **THEN** a validação aceita a trilha
 
 ### Requirement: Cadastro de linguagens e frameworks
 O conteúdo SHALL ter um cadastro único de linguagens e frameworks em `content/taxonomy.json`: `languages`, uma lista de `{id, name}`, e `frameworks`, uma lista de `{id, name, language}`. A ordem de cada lista SHALL ser a ordem de exibição. Os ids MUST estar em kebab-case e ser únicos dentro de cada lista, os nomes MUST ser não vazios e o `language` de cada framework MUST ser o id de uma linguagem do cadastro. O cadastro do repositório SHALL ser validado pela suíte de testes.
@@ -381,7 +385,7 @@ O ícone de uma trilha SHALL ser, nesta ordem de prioridade:
 - **THEN** o ícone da trilha é a sigla "AWS"
 
 #### Scenario: Trilha sem marca
-- **WHEN** a trilha "Fundamentos de programação e web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
+- **WHEN** a trilha "Fundamentos web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
 - **THEN** o ícone da trilha é o ícone da área Fundamentos
 
 #### Scenario: Logo desconhecido na trilha
@@ -421,7 +425,7 @@ O catálogo do repositório SHALL ser validado pela suíte de testes.
 - **THEN** a validação rejeita o catálogo indicando o ciclo entre `a` e `b`
 
 #### Scenario: Sem pré-requisitos
-- **WHEN** a trilha "Fundamentos de programação e web" não declara `prerequisites`
+- **WHEN** a trilha "Fundamentos web" não declara `prerequisites`
 - **THEN** a validação aceita a trilha, com a lista de pré-requisitos vazia
 
 ### Requirement: Data de inclusão da trilha

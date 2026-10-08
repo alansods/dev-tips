@@ -27,6 +27,6 @@ describeContentTracks({
 });
 
 it('pré-requisitos das trilhas de Ruby', () => {
-  expect(getTrack('ruby-essencial')?.prerequisites).toEqual(['fundamentos-web']);
+  expect(getTrack('ruby-essencial')?.prerequisites).toEqual(['fundamentos-de-programacao']);
   expect(getTrack('rails')?.prerequisites).toEqual(['ruby-essencial']);
 });

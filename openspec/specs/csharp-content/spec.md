@@ -8,7 +8,7 @@ O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem logo depois das
 
 | id | Título | Áreas | Linguagem | Framework | Pré-requisito |
 |---|---|---|---|---|---|
-| `csharp-essencial` | C# essencial | backend | csharp | — | fundamentos-web |
+| `csharp-essencial` | C# essencial | backend | csharp | — | fundamentos-de-programacao |
 | `aspnet-core` | ASP.NET Core | backend | csharp | aspnet | csharp-essencial |
 
 O cadastro SHALL ter a linguagem `csharp` (C#) depois de Python, e o framework `aspnet` (ASP.NET Core) nessa linguagem, depois de Django.
@@ -44,7 +44,7 @@ Todo card das trilhas de C# SHALL:
 - ter `origin: "original"`;
 - ter pelo menos um termo em `relatedTerms`, apontando para concepts da própria trilha.
 
-Cada trilha SHALL ter pelo menos um card de cada nível (Júnior, Pleno e Sênior) e MUST tratar só o que é particular de C# e do framework, sem repetir os conceitos gerais da trilha Fundamentos de programação e web.
+Cada trilha SHALL ter pelo menos um card de cada nível (Júnior, Pleno e Sênior) e MUST tratar só o que é particular de C# e do framework, sem repetir os conceitos gerais da trilha Fundamentos de programação.
 
 #### Scenario: Sem complementos
 - **WHEN** os cards das trilhas de C# são lidos
