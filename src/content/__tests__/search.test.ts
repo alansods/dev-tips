@@ -1,6 +1,6 @@
 import { getCatalog } from '../catalog';
 import { repoTaxonomy } from '../repoTaxonomy';
-import { filterTracks, type TrackFilter } from '../search';
+import { filterTracks, groupByFirstArea, type TrackFilter } from '../search';
 
 const catalog = getCatalog('pt-BR');
 const ids = (tracks: readonly { id: string }[]) => tracks.map((t) => t.id);
@@ -48,5 +48,20 @@ describe('Requirement: Busca e filtros na aba Trilhas', () => {
 
   it('Busca e filtro juntos', () => {
     expect(run({ language: 'python', query: 'api' })).toEqual(['fastapi']);
+  });
+});
+
+describe('Requirement: Busca e filtros na aba Trilhas (agrupamento)', () => {
+  it('Resultado agrupado por área', () => {
+    const groups = groupByFirstArea(filterTracks(catalog, repoTaxonomy, { ...none, language: 'javascript' }, statusOf));
+    expect(groups.map((g) => g.area)).toEqual(['frontend', 'backend', 'mobile']);
+    const all = groups.flatMap((g) => ids(g.tracks));
+    expect(new Set(all).size).toBe(all.length);
+    expect(ids(groups[0].tracks)).toContain('javascript-essencial');
+    expect(ids(groups[1].tracks)).not.toContain('javascript-essencial');
+  });
+
+  it('lista vazia não tem grupos', () => {
+    expect(groupByFirstArea([])).toEqual([]);
   });
 });

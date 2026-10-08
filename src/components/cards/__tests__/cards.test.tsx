@@ -132,7 +132,7 @@ describe('Requirement: Frente e verso por tipo de card (pergunta)', () => {
     expect(screen.getByText('Qual a diferença entre PUT e PATCH?')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.question)).toBeOnTheScreen();
     expect(screen.getByText('Complemento')).toBeOnTheScreen();
-    expect(screen.getByText('Entrevista')).toBeOnTheScreen();
+    expect(screen.getByText('O mesmo CRUD em quatro frameworks · Perguntas de entrevista')).toBeOnTheScreen();
     screen.unmount();
 
     show('put-vs-patch', 'back');
@@ -162,5 +162,29 @@ describe('Requirement: Nível no card', () => {
   it('Nível em inglês', () => {
     renderWithTheme(<Harness card={cardById('step-05')} side="front" />, { language: 'en' });
     expect(screen.getByText('Mid-level')).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Origem do card na sessão', () => {
+  it('Card de conceito', () => {
+    show('cors', 'front');
+    expect(screen.getByText('O mesmo CRUD em quatro frameworks · Glossário')).toBeOnTheScreen();
+    // o tipo do card não aparece mais como selo
+    expect(screen.queryByText(ptBR.card.types.concept)).toBeNull();
+    screen.unmount();
+    show('cors', 'back');
+    expect(screen.getByText('O mesmo CRUD em quatro frameworks · Glossário')).toBeOnTheScreen();
+  });
+
+  it('Card de passo', () => {
+    show('step-03', 'front');
+    expect(screen.getByText('O mesmo CRUD em quatro frameworks · Passo a passo')).toBeOnTheScreen();
+    expect(screen.getByText('Passo 3')).toBeOnTheScreen();
+  });
+
+  it('Card de outra trilha', () => {
+    const card = webTrack.decks[0].cards[0];
+    renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
+    expect(screen.getByText(`Fundamentos web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
   });
 });

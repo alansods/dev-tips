@@ -154,10 +154,11 @@ O marcador da linha do tempo SHALL diferenciar os três estados. Tocar numa linh
 - **THEN** a tela da trilha "Fundamentos web" abre
 
 ### Requirement: Busca e filtros na aba Trilhas
-A aba Trilhas SHALL ter, acima das áreas:
+A aba Trilhas SHALL ter, no topo:
 - o campo de busca "Buscar trilha, linguagem ou tema";
-- os filtros de estado "Todas" (o padrão), "Em andamento", "Não iniciadas" e "Concluídas". "Em andamento" mostra quantas trilhas estão nesse estado;
-- a seção "Por linguagem", com cada linguagem do cadastro que tem trilhas, com o logo e o nome.
+- os filtros de estado "Todas" (o padrão), "Em andamento", "Não iniciadas" e "Concluídas", numa única linha que rola para o lado. "Em andamento" mostra quantas trilhas estão nesse estado.
+
+Abaixo deles, a aba SHALL ter a seção "Por linguagem", com cada linguagem do cadastro que tem trilhas, com o logo e o nome.
 
 Os estados seguem a ordem sugerida da área:
 - **Concluída:** todos os cards como "já sabia".
@@ -166,7 +167,9 @@ Os estados seguem a ordem sugerida da área:
 
 A busca SHALL ignorar acentos e maiúsculas e procurar, no idioma exibido, no título e na descrição da trilha e nos nomes da sua linguagem e do seu framework. Tocar numa linguagem SHALL filtrar as trilhas dessa linguagem (pura ou de algum framework dela), e tocar de novo SHALL tirar o filtro.
 
-Com busca, filtro de estado ou linguagem ativos, a aba SHALL mostrar, no lugar das áreas, os cards das trilhas que atendem a todos os critérios, na ordem do catálogo. Sem nenhuma, SHALL mostrar "Nenhuma trilha encontrada.". Sem critério ativo, a aba SHALL mostrar as áreas, conforme o requisito "Home por áreas".
+Sem critério ativo, a aba SHALL mostrar a seção "Por área", com as áreas conforme o requisito "Home por áreas", e só depois a seção "Por linguagem".
+
+Com busca, filtro de estado ou linguagem ativos, a aba SHALL mostrar a seção "Por linguagem", para trocar ou tirar o filtro, e depois as trilhas que atendem a todos os critérios. Essas trilhas SHALL vir agrupadas pela primeira área de cada uma, com o nome da área como título, na ordem das áreas, e dentro de cada grupo na ordem do catálogo. Cada trilha MUST aparecer uma única vez. Sem nenhuma trilha, a aba SHALL mostrar "Nenhuma trilha encontrada.".
 
 #### Scenario: Buscar sem acento
 - **WHEN** o usuário digita "estilizacao" na busca
@@ -199,4 +202,12 @@ Com busca, filtro de estado ou linguagem ativos, a aba SHALL mostrar, no lugar d
 #### Scenario: Busca e filtro juntos
 - **WHEN** o filtro de Python está ativo e o usuário digita "api"
 - **THEN** a lista mostra só "FastAPI"
+
+#### Scenario: Áreas antes das linguagens
+- **WHEN** a aba Trilhas é exibida sem critério ativo
+- **THEN** a seção "Por área" aparece antes da seção "Por linguagem"
+
+#### Scenario: Resultado agrupado por área
+- **WHEN** o usuário toca em "JavaScript" em "Por linguagem"
+- **THEN** as trilhas aparecem sob os títulos "Frontend", "Backend" e "Mobile", e "JavaScript essencial" aparece uma única vez, em "Frontend"
 

@@ -92,3 +92,27 @@ describe('Requirement: Busca e filtros na aba Trilhas (na tela)', () => {
     expect(trackCard('Django')).toBeNull();
   });
 });
+
+describe('Requirement: Busca e filtros na aba Trilhas (ordem e grupos)', () => {
+  const headers = () => screen.getAllByRole('header').map((h) => String(h.props.children));
+
+  it('Áreas antes das linguagens', async () => {
+    await open();
+    const list = headers();
+    expect(list.indexOf('Por área')).toBeGreaterThanOrEqual(0);
+    expect(list.indexOf('Por área')).toBeLessThan(list.indexOf('Por linguagem'));
+  });
+
+  it('Resultado agrupado por área', async () => {
+    await open();
+    press('JavaScript');
+    const list = headers();
+    expect(list.indexOf('Por linguagem')).toBeLessThan(list.indexOf('Frontend'));
+    expect(list.filter((h) => ['Frontend', 'Backend', 'Mobile'].includes(h))).toEqual([
+      'Frontend',
+      'Backend',
+      'Mobile',
+    ]);
+    expect(screen.getAllByRole('button', { name: /^JavaScript essencial, \d+ de/ })).toHaveLength(1);
+  });
+});

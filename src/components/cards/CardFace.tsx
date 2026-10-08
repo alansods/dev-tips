@@ -17,7 +17,9 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
 import { TermChips } from '../../glossary/TermChips';
-import { CodeBlock, LevelChip, SupplementBadge, TypeChip, VariantTabs } from './parts';
+import { repoTaxonomy } from '../../content';
+import { trackIcon } from '../../content/icons';
+import { CodeBlock, LevelChip, OriginChip, SupplementBadge, TypeChip, VariantTabs } from './parts';
 
 export type Side = 'front' | 'back';
 
@@ -34,11 +36,12 @@ type Props = {
 
 export function CardFace({ card, track, side, variantId, onSelectVariant, onOpenTerm }: Props) {
   const t = useT();
-  const label = card.type === 'step' ? t.card.stepNumber(card.number) : t.card.types[card.type];
+  const deck = track.decks.find((d) => d.cards.some((c) => c.id === card.id));
   return (
     <View style={styles.face}>
       <View style={styles.chips}>
-        <TypeChip label={label} />
+        <OriginChip icon={trackIcon(track, repoTaxonomy)} label={t.card.origin(track.title, deck?.title ?? '')} />
+        {card.type === 'step' ? <TypeChip label={t.card.stepNumber(card.number)} /> : null}
         <LevelChip label={t.card.levels[card.level]} />
         {card.origin === 'supplement' && <SupplementBadge label={t.card.supplement} />}
       </View>

@@ -306,39 +306,41 @@ export function FirstAccess() {
   const interests = useSettingsStore((s) => s.interests);
   const start = startHere(catalog, interests);
   return (
-    <>
+    <View style={styles.firstAccess}>
       <View style={{ gap: spacing.sm }}>
-        <AppText font="mono" size={11} tone="accentText" style={styles.kicker}>
+        <AppText font="semibold" size={16} tone="accentText">
           {t.home.welcomeKicker}
         </AppText>
-        <AppText font="bold" size={24} accessibilityRole="header" style={{ lineHeight: 30 }}>
+        <AppText font="bold" size={22} accessibilityRole="header" style={{ lineHeight: 28 }}>
           {t.home.welcomeTitle}
         </AppText>
-        <AppText size={15} tone="muted" style={{ lineHeight: 21 }}>
+        <AppText size={15} tone="muted" style={{ lineHeight: 22 }}>
           {t.home.welcomeBody}
         </AppText>
       </View>
-      <View style={styles.section}>
+      <View style={styles.firstSection}>
         <SectionTitle>{t.home.whatToStudy}</SectionTitle>
         <InterestChips />
-        <AppText size={12} tone="muted">
+        <AppText size={13} tone="muted" style={{ lineHeight: 19 }}>
           {t.home.interestsHint}
         </AppText>
       </View>
       {start ? (
-        <View style={styles.section}>
+        <View style={styles.firstSection}>
           <SectionTitle>{t.home.startHere}</SectionTitle>
-          <View style={[styles.surface, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <View
+            style={[styles.surface, styles.startCard, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          >
             <View style={styles.row}>
               <TechIcon icon={trackIcon(start.start, repoTaxonomy)} size={40} />
               <AppText font="bold" size={18} style={{ flex: 1 }}>
                 {start.start.title}
               </AppText>
             </View>
-            <AppText size={14} tone="muted">
+            <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
               {start.start.description}
             </AppText>
-            <View style={{ flexDirection: 'row' }}>
+            <View style={{ flexDirection: 'row', marginTop: spacing.xs }}>
               <Button title={t.home.startTrack} onPress={() => openTrack(start.start)} />
             </View>
           </View>
@@ -355,13 +357,16 @@ export function FirstAccess() {
           ) : null}
         </View>
       ) : null}
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   section: { gap: spacing.sm },
+  firstAccess: { gap: 32, paddingTop: spacing.sm },
+  firstSection: { gap: spacing.md },
+  startCard: { gap: spacing.md },
   surface: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   greeting: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },

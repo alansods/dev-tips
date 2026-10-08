@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { AppText } from '../../components/AppText';
 import { Screen } from '../../components/Screen';
@@ -9,7 +9,13 @@ import { AreaCard, TrackCard } from '../../components/TrackCard';
 import { repoTaxonomy } from '../../content';
 import { languageIcon } from '../../content/icons';
 import { areasWithTracks } from '../../content/navigation';
-import { filterTracks, hasActiveFilter, type TrackFilter, type TrackStatusFilter } from '../../content/search';
+import {
+  filterTracks,
+  groupByFirstArea,
+  hasActiveFilter,
+  type TrackFilter,
+  type TrackStatusFilter,
+} from '../../content/search';
 import { useCatalog } from '../../content/useCatalog';
 import { useT } from '../../i18n';
 import { trackStats, trackStatus } from '../../study/rules';
@@ -42,6 +48,37 @@ export default function TracksScreen() {
   const languages = repoTaxonomy.languages.filter((l) => catalog.some((track) => track.language === l.id));
   const results = filterTracks(catalog, repoTaxonomy, filter, statusOf);
 
+  const languageSection = (
+    <>
+      <SectionTitle>{t.nav.byLanguage}</SectionTitle>
+      <View style={styles.grid}>
+        {languages.map((language) => {
+          const selected = filter.language === language.id;
+          return (
+            <Pressable
+              key={language.id}
+              accessibilityRole="button"
+              accessibilityLabel={language.name}
+              accessibilityState={{ selected }}
+              onPress={() => setFilter((f) => ({ ...f, language: selected ? null : language.id }))}
+              style={({ pressed }) => [
+                styles.language,
+                {
+                  backgroundColor: selected ? colors.accentSoft : colors.surface,
+                  borderColor: selected ? colors.accent : colors.line,
+                  opacity: pressed ? 0.8 : 1,
+                },
+              ]}
+            >
+              <TechIcon icon={languageIcon(language)} size={40} />
+              <AppText size={12}>{language.name}</AppText>
+            </Pressable>
+          );
+        })}
+      </View>
+    </>
+  );
+
   return (
     <Screen>
       <View style={[styles.search, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -58,7 +95,12 @@ export default function TracksScreen() {
         />
       </View>
 
-      <View style={styles.chips}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.chipsScroll}
+        contentContainerStyle={styles.chips}
+      >
         {STATUSES.map((status) => {
           const selected = filter.status === status;
           const label =
@@ -89,43 +131,28 @@ export default function TracksScreen() {
             </Pressable>
           );
         })}
-      </View>
-
-      <SectionTitle>{t.nav.byLanguage}</SectionTitle>
-      <View style={styles.grid}>
-        {languages.map((language) => {
-          const selected = filter.language === language.id;
-          return (
-            <Pressable
-              key={language.id}
-              accessibilityRole="button"
-              accessibilityLabel={language.name}
-              accessibilityState={{ selected }}
-              onPress={() => setFilter((f) => ({ ...f, language: selected ? null : language.id }))}
-              style={({ pressed }) => [
-                styles.language,
-                {
-                  backgroundColor: selected ? colors.accentSoft : colors.surface,
-                  borderColor: selected ? colors.accent : colors.line,
-                  opacity: pressed ? 0.8 : 1,
-                },
-              ]}
-            >
-              <TechIcon icon={languageIcon(language)} size={40} />
-              <AppText size={12}>{language.name}</AppText>
-            </Pressable>
-          );
-        })}
-      </View>
+      </ScrollView>
 
       {hasActiveFilter(filter) ? (
-        results.length === 0 ? (
-          <AppText tone="muted" style={styles.empty}>
-            {t.nav.noResults}
-          </AppText>
-        ) : (
-          results.map((track) => <TrackCard key={track.id} track={track} />)
-        )
+        <>
+          {languageSection}
+          {results.length === 0 ? (
+            <AppText tone="muted" style={styles.empty}>
+              {t.nav.noResults}
+            </AppText>
+          ) : (
+            groupByFirstArea(results).map(({ area, tracks }) => (
+              <View key={area} style={styles.group}>
+                <AppText font="bold" size={17} accessibilityRole="header">
+                  {t.nav.areas[area]}
+                </AppText>
+                {tracks.map((track) => (
+                  <TrackCard key={track.id} track={track} />
+                ))}
+              </View>
+            ))
+          )}
+        </>
       ) : (
         <>
           <SectionTitle>{t.nav.byArea}</SectionTitle>
@@ -142,6 +169,7 @@ export default function TracksScreen() {
               </View>
             ))}
           </View>
+          {languageSection}
         </>
       )}
     </Screen>
@@ -151,7 +179,9 @@ export default function TracksScreen() {
 const styles = StyleSheet.create({
   search: { borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md },
   input: { minHeight: 48, fontSize: 15 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  chipsScroll: { flexGrow: 0, marginHorizontal: -spacing.lg },
+  chips: { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: spacing.lg },
+  group: { gap: spacing.md, marginTop: spacing.sm },
   chip: { minHeight: 40, paddingHorizontal: spacing.md, borderRadius: 999, borderWidth: 1, justifyContent: 'center' },
   kicker: { textTransform: 'uppercase', letterSpacing: 0.8, marginTop: spacing.xs },
   grid: { flexDirection: 'row', gap: spacing.sm },

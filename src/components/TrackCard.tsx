@@ -19,7 +19,18 @@ import { ChevronRightIcon } from './icons';
 import { TechIcon } from './TechIcon';
 import { ProgressBar } from './ProgressBar';
 
-function Card({ label, onPress, children }: { label: string; onPress: () => void; children: ReactNode }) {
+function Card({
+  label,
+  onPress,
+  fill = false,
+  children,
+}: {
+  label: string;
+  onPress: () => void;
+  /** Ocupa toda a altura disponível (cards lado a lado com a mesma altura). */
+  fill?: boolean;
+  children: ReactNode;
+}) {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -28,6 +39,7 @@ function Card({ label, onPress, children }: { label: string; onPress: () => void
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
+        fill && styles.fill,
         { backgroundColor: colors.surface, borderColor: colors.line, opacity: pressed ? 0.85 : 1 },
       ]}
     >
@@ -103,7 +115,7 @@ export function AreaCard({
   const due = useDue(tracks);
   const count = t.nav.trackCount(tracks.length);
   return (
-    <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress}>
+    <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress} fill={compact}>
       <View style={compact ? { gap: spacing.sm } : styles.row}>
         <TechIcon icon={{ kind: 'area', area }} size={40} />
         <View style={{ flex: 1, gap: 2 }}>
@@ -160,6 +172,7 @@ export function NavRow({
 
 const styles = StyleSheet.create({
   card: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.sm },
+  fill: { flex: 1 },
   progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.xs },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 });

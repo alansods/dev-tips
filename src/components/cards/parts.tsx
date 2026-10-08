@@ -2,15 +2,30 @@
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { Snippet, Variant } from '../../content';
+import type { ItemIcon } from '../../content/icons';
 import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
+import { TechIcon } from '../TechIcon';
 
 export function TypeChip({ label }: { label: string }) {
   const { colors } = useTheme();
   return (
     <View style={[styles.chip, { backgroundColor: colors.accentSoft }]}>
       <AppText font="mono" size={11} tone="accentText" style={styles.caps}>
+        {label}
+      </AppText>
+    </View>
+  );
+}
+
+/** De onde o card vem: ícone da trilha e "Trilha · Deck" (só informativo). */
+export function OriginChip({ icon, label }: { icon: ItemIcon; label: string }) {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.chip, styles.origin, { backgroundColor: colors.accentSoft }]}>
+      <TechIcon icon={icon} size={20} />
+      <AppText font="semibold" size={12} tone="accentText" numberOfLines={1} style={{ flexShrink: 1 }}>
         {label}
       </AppText>
     </View>
@@ -95,6 +110,7 @@ export function VariantTabs({ variants, selected, onSelect }: TabsProps) {
 
 const styles = StyleSheet.create({
   chip: { alignSelf: 'flex-start', paddingHorizontal: spacing.sm, paddingVertical: 3, borderRadius: 6 },
+  origin: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingLeft: 4, maxWidth: '100%' },
   outlined: { borderWidth: 1, paddingVertical: 2 },
   caps: { textTransform: 'uppercase', letterSpacing: 0.6 },
   code: { borderRadius: radius.lg, overflow: 'hidden' },

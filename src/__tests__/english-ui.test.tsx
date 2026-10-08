@@ -44,6 +44,8 @@ describe('Requirement: Interface traduzida', () => {
   it('Sessão em inglês', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
     expect(screen.getByText('Tap to see the answer')).toBeOnTheScreen();
+    // Origem do card na sessão: em inglês
+    expect(screen.getByText("The same CRUD in four frameworks · What we'll build")).toBeOnTheScreen();
     press('Show answer');
     expect(screen.getByRole('button', { name: "I didn't know" })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'I knew it' })).toBeOnTheScreen();

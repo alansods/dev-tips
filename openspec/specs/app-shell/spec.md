@@ -5,7 +5,7 @@
 Define a estrutura comum do app (navegação por abas, tema visual claro/escuro, fontes e acesso ao catálogo de trilhas) sobre a qual as telas de estudo são construídas.
 ## Requirements
 ### Requirement: Navegação por abas
-O app SHALL ter 4 abas inferiores, nesta ordem: **Início**, **Trilhas**, **Glossário** e **Perfil**. Cada aba SHALL ter um rótulo de texto e um ícone. Ao abrir, o app SHALL mostrar a aba Início. A aba ativa MUST ser indicada visualmente e para leitores de tela. O cabeçalho das abas SHALL mostrar só o título da aba, sem botões.
+O app SHALL ter 4 abas inferiores, nesta ordem: **Início**, **Trilhas**, **Glossário** e **Perfil**. Cada aba SHALL ter um rótulo de texto e um ícone. Ao abrir, o app SHALL mostrar a aba Início. A aba ativa MUST ser indicada visualmente e para leitores de tela. As abas MUST NOT ter cabeçalho com o título da tela, porque o nome da aba já aparece na barra de abas. O conteúdo de cada aba SHALL começar logo abaixo da barra de status do aparelho, sem ficar escondido por ela.
 
 #### Scenario: App abre na aba Trilhas
 - **WHEN** o app é aberto
@@ -21,7 +21,7 @@ O app SHALL ter 4 abas inferiores, nesta ordem: **Início**, **Trilhas**, **Glos
 
 #### Scenario: Cabeçalho sem botões
 - **WHEN** a aba Trilhas é exibida
-- **THEN** o cabeçalho não tem o botão de tema nem o botão "Ajustes"
+- **THEN** não há cabeçalho com o título "Trilhas" nem botões de tema ou "Ajustes"; o título só aparece na barra de abas
 
 ### Requirement: Tema claro e escuro
 O app SHALL ter um modo claro e um modo escuro, com as cores do design aprovado. A aba Perfil SHALL ter a seção "Tema" com três opções, e a atual marcada:
