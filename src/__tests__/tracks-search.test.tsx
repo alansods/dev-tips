@@ -66,7 +66,7 @@ describe('Requirement: Busca e filtros na aba Trilhas (na tela)', () => {
     cards('fundamentos-web').forEach((id) => useStudyStore.getState().answer('fundamentos-web', id, 'known'));
     await open();
     press('Concluídas');
-    expect(trackCard('Fundamentos web')).toBeOnTheScreen();
+    expect(trackCard('Fundamentos de programação e web')).toBeOnTheScreen();
     expect(trackCard('React')).toBeNull();
   });
 

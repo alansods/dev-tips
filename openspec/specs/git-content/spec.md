@@ -12,7 +12,7 @@ O catálogo SHALL ter a trilha `git-e-colaboracao` ("Git e colaboração"), regi
 
 #### Scenario: Área Fundamentos
 - **WHEN** o usuário abre a área Fundamentos
-- **THEN** a seção "Trilhas" lista "Fundamentos web" e depois "Git e colaboração"
+- **THEN** a seção "Trilhas" lista "Fundamentos de programação e web" e depois "Git e colaboração"
 
 #### Scenario: Só em Fundamentos
 - **WHEN** o usuário abre a área DevOps e Cloud

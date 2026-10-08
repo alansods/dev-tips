@@ -8,7 +8,7 @@
     },
     "orientacao-a-objetos": {
       "title": "Object orientation",
-      "description": "Classes, interfaces, inheritance and records."
+      "description": "Modifiers, interfaces, overriding and records."
     },
     "excecoes-e-igualdade": {
       "title": "Exceptions and equality",
@@ -28,13 +28,13 @@
       "term": "Primitives and wrappers",
       "definition": "Java has 8 primitive types (int, long, double, boolean, char, byte, short, float), stored directly as values, and their matching wrapper classes (Integer, Long...), which are objects and can be null. Collections only accept objects, so autoboxing converts between the two."
     },
-    "heap-e-stack": {
-      "term": "Heap and stack",
-      "definition": "Each thread has its own stack, with local variables and method calls; objects live on the shared heap. An object variable on the stack only holds the reference. StackOverflowError comes from recursion that is too deep; OutOfMemoryError, from a full heap."
+    "generics-type-erasure": {
+      "term": "Generics and type erasure",
+      "definition": "Generics let List<String> check the type at compile time. At runtime, however, the type disappears (type erasure): List<String> and List<Integer> become the same List. That is why you cannot write new T(), instanceof List<String> or use primitives as a type parameter (List<int>)."
     },
-    "garbage-collector": {
-      "term": "Garbage collector",
-      "definition": "Automatically frees objects that are no longer reachable. It splits the heap into generations, because most objects die young. The current default is G1; ZGC and Shenandoah have millisecond pauses for large heaps. A leak in Java is a forgotten reference, such as a static cache that only grows."
+    "coletores-da-jvm": {
+      "term": "JVM collectors (G1, ZGC)",
+      "definition": "The JVM offers more than one garbage collector. G1, the default, splits the heap into regions and aims for predictable pauses. ZGC does almost all its work alongside the application, with millisecond pauses even on large heaps. Common settings: -Xmx (maximum heap), -XX:+UseZGC and GC logs (-Xlog:gc) to investigate pauses."
     },
     "autoboxing-armadilha": {
       "title": "Autoboxing pitfalls",
@@ -44,21 +44,21 @@
       "title": "var, text blocks and modern switch",
       "body": "var infers the type of local variables (Java 10), text blocks write multi-line strings (Java 15) and the switch expression returns a value without break (Java 14)."
     },
-    "encapsulamento": {
-      "term": "Encapsulation",
-      "definition": "Hiding an object's internal state (private fields) and exposing only operations that keep the object valid. Instead of setBalance, a withdraw method that checks the limit. The modifiers are private, (package), protected and public."
+    "modificadores-de-acesso": {
+      "term": "Access modifiers and packages",
+      "definition": "Java has four levels: private (the class only), no modifier (the package), protected (package and subclasses) and public. The package is the unit of organization, and with modules (module-info.java) you can hide whole packages from library users. Fields are usually private, with public methods controlling access."
     },
-    "interface-java": {
-      "term": "Interface",
-      "definition": "A contract that says what a class does without saying how. A class can implement several interfaces. Since Java 8, interfaces can have default methods (with an implementation) and static methods. It is the basis of polymorphism and dependency injection."
+    "default-methods": {
+      "term": "Interface with default method",
+      "definition": "Since Java 8, an interface can have default methods (with a body), static ones and, since 9, private ones. This lets an interface evolve without breaking its implementers. If two interfaces bring the same default, the class must override it and choose, with Interface.super.method()."
     },
-    "heranca": {
-      "term": "Inheritance and abstract class",
-      "definition": "A class extends another (only one) with extends, inheriting fields and methods. An abstract class cannot be instantiated and can have abstract methods, implemented by subclasses. Inheritance creates strong coupling: prefer composition when the relationship is not clearly \"is a\"."
+    "static-final-aninhadas": {
+      "term": "static, final and nested classes",
+      "definition": "static belongs to the class, not the object. final prevents reassigning a variable, overriding a method or inheriting from a class. Static nested classes have no access to the outer instance; inner ones (non-static) keep a reference to it, which may hold memory by accident."
     },
-    "polimorfismo": {
-      "term": "Polymorphism",
-      "definition": "Using objects of different classes through the same interface, each responding in its own way. A List<Shape> calls area() on circles and squares without knowing which is which. The method that runs is chosen at runtime (dynamic dispatch)."
+    "sobrecarga-e-override": {
+      "term": "Overloading and @Override",
+      "definition": "Overloading is having methods with the same name and different parameters, chosen at compile time. Overriding is a subclass redefining a parent method, chosen at runtime. @Override makes the compiler check that the method really overrides something, catching typos in the signature."
     },
     "record": {
       "title": "Record",
@@ -100,9 +100,9 @@
       "question": "What is the difference between == and equals?",
       "answer": "With primitives, == compares values. With objects, == checks whether they are the same reference in memory, and equals compares content as the class defined it. That is why Strings and wrappers must be compared with equals. If I override equals, I override hashCode too."
     },
-    "interface-vs-abstrata": {
-      "question": "When should you use an interface and when an abstract class?",
-      "answer": "An interface to define a contract that unrelated classes can fulfill; a class implements many. An abstract class when there is state or implementation shared by a family of classes, knowing each class can extend only one. When in doubt, an interface with default methods, and composition over inheritance."
+    "abstrata-com-default-methods": {
+      "question": "With default methods, does an abstract class still make sense in Java?",
+      "answer": "Yes, in specific cases. Interfaces with default methods cover shared behavior without state, and a class can implement several. An abstract class is still useful when subclasses share state (fields), need a constructor or protected methods. I prefer an interface and use an abstract class only when there is common state."
     },
     "checked-vs-unchecked-pergunta": {
       "question": "Checked or unchecked: which should your exceptions be?",

@@ -1,0 +1,321 @@
+{
+  "id": "csharp-essencial",
+  "title": "C# essencial",
+  "description": "O que é particular do C# e do .NET: tipos de valor, nullable, records, LINQ, async e gerenciamento de recursos.",
+  "prerequisites": ["fundamentos-web"],
+  "addedAt": "2026-10-08",
+  "areas": [
+    "backend"
+  ],
+  "language": "csharp",
+  "decks": [
+    {
+      "id": "tipos-e-runtime",
+      "title": "Tipos e runtime",
+      "description": "Como o .NET executa o código e os tipos próprios do C#.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "clr-e-dotnet",
+          "level": "junior",
+          "term": "CLR e .NET",
+          "definition": "O compilador do C# gera IL (código intermediário), e o CLR, o runtime do .NET, o executa com JIT, garbage collector e checagem de tipos. O .NET atual (sucessor do .NET Framework) roda em Windows, Linux e macOS. O SDK traz o comando dotnet para criar, compilar, testar e publicar projetos.",
+          "relatedTerms": [
+            "struct-e-class",
+            "nullable-reference-types"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "struct-e-class",
+          "level": "pleno",
+          "term": "struct e class",
+          "definition": "class é tipo de referência: variáveis apontam para o mesmo objeto no heap. struct é tipo de valor: atribuir ou passar como argumento copia o conteúdo inteiro. Structs servem para valores pequenos e imutáveis (um ponto, um dinheiro). Converter um struct para object ou interface faz boxing, que aloca no heap.",
+          "relatedTerms": [
+            "record-e-init",
+            "clr-e-dotnet"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "nullable-reference-types",
+          "level": "pleno",
+          "term": "Nullable reference types",
+          "definition": "Com <Nullable>enable</Nullable> no projeto, string passa a significar \"nunca nulo\" e string? \"pode ser nulo\". O compilador avisa quando um valor possivelmente nulo é usado sem checagem. São só análises de compilação: em execução, nada impede o null. O operador ! silencia o aviso e deve ser exceção.",
+          "relatedTerms": [
+            "struct-e-class",
+            "record-e-init"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "record-e-init",
+          "level": "junior",
+          "term": "record e init",
+          "definition": "record é uma classe (ou record struct) feita para dados: gera igualdade por valor, ToString legível e desconstrução. Propriedades init só podem receber valor na criação, o que deixa o objeto imutável. A expressão with cria uma cópia alterando alguns campos.",
+          "relatedTerms": [
+            "struct-e-class",
+            "pattern-matching"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pattern-matching",
+          "level": "pleno",
+          "term": "Pattern matching",
+          "definition": "is e switch testam o formato de um valor e extraem partes dele: tipo (shape is Circle c), propriedades ({ Status: \"pago\" }), faixas (> 100) e combinações com and, or e not. A expressão switch devolve um valor, e o compilador avisa quando um caso fica sem tratamento.",
+          "relatedTerms": [
+            "record-e-init",
+            "nullable-reference-types"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "record-com-switch",
+          "level": "pleno",
+          "title": "record com switch expression",
+          "body": "O record dá igualdade por valor e o with cria cópias. O switch extrai dados por tipo e propriedade.",
+          "snippet": {
+            "file": "Pedido.cs",
+            "language": "csharp",
+            "code": "public abstract record Pagamento;\npublic record Pix(string Chave) : Pagamento;\npublic record Cartao(string Bandeira, int Parcelas) : Pagamento;\n\ndecimal Taxa(Pagamento p) => p switch\n{\n    Pix => 0m,\n    Cartao { Parcelas: 1 } => 0.02m,\n    Cartao { Parcelas: > 1 and <= 6 } => 0.04m,\n    Cartao => 0.06m,\n    _ => throw new ArgumentOutOfRangeException(nameof(p)),\n};\n\nvar a = new Cartao(\"visa\", 3);\nvar b = a with { Parcelas = 1 };\nConsole.WriteLine(a == new Cartao(\"visa\", 3)); // True"
+          },
+          "relatedTerms": [
+            "record-e-init",
+            "pattern-matching"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "linq-e-colecoes",
+      "title": "LINQ e coleções",
+      "description": "Consultas sobre coleções e o que acontece por trás delas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "linq",
+          "level": "junior",
+          "term": "LINQ",
+          "definition": "Language Integrated Query: métodos como Where, Select, OrderBy, GroupBy e First, que consultam qualquer coleção (e bancos, via EF Core) com a mesma sintaxe. Recebem lambdas e se encadeiam. Existe também a sintaxe de consulta (from x in ... where ... select), traduzida para os mesmos métodos.",
+          "relatedTerms": [
+            "execucao-adiada",
+            "delegates-func-action"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "execucao-adiada",
+          "level": "pleno",
+          "term": "Execução adiada",
+          "definition": "Where e Select não rodam na hora: devolvem uma consulta que só executa quando é enumerada (foreach, ToList, Count). Cada enumeração roda de novo do zero, o que pode repetir trabalho caro ou ver dados alterados. ToList() ou ToArray() materializa o resultado uma vez.",
+          "relatedTerms": [
+            "linq",
+            "ienumerable-e-iqueryable"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ienumerable-e-iqueryable",
+          "level": "senior",
+          "term": "IEnumerable e IQueryable",
+          "definition": "IEnumerable<T> executa a consulta em memória, com delegates. IQueryable<T> guarda uma árvore de expressão que um provedor (EF Core) traduz para SQL. Chamar AsEnumerable() ou ToList() cedo demais traz a tabela inteira para a memória e filtra lá; manter IQueryable até o fim deixa o banco filtrar.",
+          "relatedTerms": [
+            "execucao-adiada",
+            "linq"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "extension-methods",
+          "level": "pleno",
+          "term": "Extension methods",
+          "definition": "Métodos static, numa classe static, cujo primeiro parâmetro tem this: public static bool IsBlank(this string s). Podem ser chamados como se fossem da instância (nome.IsBlank()), sem mudar o tipo original. É assim que o LINQ adiciona Where e Select a qualquer IEnumerable.",
+          "relatedTerms": [
+            "linq",
+            "delegates-func-action"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "delegates-func-action",
+          "level": "junior",
+          "term": "Delegates, Func e Action",
+          "definition": "Delegate é um tipo que representa uma assinatura de método, e uma variável dele guarda uma função. Func<T, TResult> é o delegate pronto para funções que devolvem valor e Action<T> para as que não devolvem. Lambdas (x => x * 2) viram esses delegates; events usam delegates para avisar inscritos.",
+          "relatedTerms": [
+            "linq",
+            "extension-methods"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "linq-agrupar",
+          "level": "pleno",
+          "title": "Filtrar, agrupar e projetar com LINQ",
+          "body": "Uma consulta encadeada, materializada uma vez só com ToList().",
+          "snippet": {
+            "file": "Relatorio.cs",
+            "language": "csharp",
+            "code": "var vendasPorCliente = pedidos\n    .Where(p => p.Status == Status.Pago && p.Data.Year == 2026)\n    .GroupBy(p => p.ClienteId)\n    .Select(g => new\n    {\n        ClienteId = g.Key,\n        Total = g.Sum(p => p.Valor),\n        Pedidos = g.Count(),\n    })\n    .OrderByDescending(x => x.Total)\n    .Take(10)\n    .ToList();"
+          },
+          "relatedTerms": [
+            "linq",
+            "execucao-adiada"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "async-e-recursos",
+      "title": "async e recursos",
+      "description": "Código assíncrono com Task e liberação de recursos.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "task-async-await",
+          "level": "junior",
+          "term": "Task e async/await",
+          "definition": "Task representa uma operação em andamento (Task<T>, quando devolve valor). Um método async pode usar await para esperar uma Task sem bloquear a thread, que fica livre para outro trabalho, como atender outra requisição. O nome do método costuma terminar em Async.",
+          "relatedTerms": [
+            "bloqueio-result-wait",
+            "cancellation-token"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "bloqueio-result-wait",
+          "level": "senior",
+          "term": "Bloquear com .Result e .Wait()",
+          "definition": "Chamar .Result ou .Wait() numa Task bloqueia a thread até ela terminar. Em ambientes com contexto de sincronização (UI, ASP.NET antigo), isso causa deadlock: a continuação precisa da thread que está bloqueada esperando. Mesmo sem deadlock, segura threads do pool. A regra é async de ponta a ponta.",
+          "relatedTerms": [
+            "task-async-await"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cancellation-token",
+          "level": "pleno",
+          "term": "CancellationToken",
+          "definition": "Sinal passado de método em método para pedir que uma operação pare. Quem chama cria um CancellationTokenSource (com Cancel() ou um timeout) e repassa o Token; as APIs do .NET (HttpClient, EF Core) o aceitam. No ASP.NET Core, a requisição já recebe um token que dispara quando o cliente desiste.",
+          "relatedTerms": [
+            "task-async-await",
+            "idisposable-using"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "idisposable-using",
+          "level": "junior",
+          "term": "IDisposable e using",
+          "definition": "Objetos que seguram recursos fora do controle do garbage collector (conexões, arquivos, streams) implementam IDisposable. using var conn = ...; chama Dispose() no fim do escopo, mesmo com exceção. Para recursos assíncronos existe IAsyncDisposable, com await using.",
+          "relatedTerms": [
+            "cancellation-token",
+            "task-async-await"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "http-com-cancelamento",
+          "level": "pleno",
+          "title": "Chamada HTTP com timeout",
+          "body": "O token combina o cancelamento de quem chamou com um timeout de 5 segundos, e o await libera a thread durante a espera.",
+          "snippet": {
+            "file": "CotacaoClient.cs",
+            "language": "csharp",
+            "code": "public async Task<decimal> BuscarCotacaoAsync(string moeda, CancellationToken ct)\n{\n    using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);\n    cts.CancelAfter(TimeSpan.FromSeconds(5));\n\n    var resposta = await _http.GetFromJsonAsync<Cotacao>(\n        $\"/cotacoes/{moeda}\", cts.Token);\n\n    return resposta?.Valor ?? throw new InvalidOperationException(\"Cotação vazia\");\n}"
+          },
+          "relatedTerms": [
+            "cancellation-token",
+            "task-async-await"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "throw-e-filtros",
+          "level": "pleno",
+          "title": "throw; e exception filters",
+          "body": "throw; relança mantendo a pilha original; throw ex; a reinicia e esconde onde o erro nasceu. when filtra a exceção antes de entrar no catch.",
+          "snippet": {
+            "file": "Importador.cs",
+            "language": "csharp",
+            "code": "try\n{\n    await ImportarAsync(arquivo, ct);\n}\ncatch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)\n{\n    await Task.Delay(TimeSpan.FromSeconds(30), ct);\n}\ncatch (Exception ex)\n{\n    _logger.LogError(ex, \"Falha ao importar {Arquivo}\", arquivo);\n    throw; // não use throw ex;\n}"
+          },
+          "relatedTerms": [
+            "task-async-await",
+            "idisposable-using"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de C# que aparecem em entrevistas, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "struct-ou-class-pergunta",
+          "level": "pleno",
+          "question": "Quando usar struct em vez de class em C#?",
+          "answer": "Quando o tipo representa um valor pequeno (poucos campos), imutável e sem identidade própria, como uma coordenada ou um valor monetário. Assim evito alocação no heap. Para objetos grandes, mutáveis ou que precisam de herança, class: copiar structs grandes custa caro, e alterar a cópia em vez do original é um bug comum.",
+          "relatedTerms": [
+            "struct-e-class"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "record-ou-class-pergunta",
+          "level": "junior",
+          "question": "Quando usar record em vez de class?",
+          "answer": "Para objetos de dados, como DTOs, eventos e valores de domínio, em que dois objetos com os mesmos dados devem ser considerados iguais e a imutabilidade ajuda. Class continua melhor para entidades com identidade e comportamento, como um Pedido que muda de estado.",
+          "relatedTerms": [
+            "record-e-init"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "nullable-pergunta",
+          "level": "junior",
+          "question": "O que os nullable reference types resolvem?",
+          "answer": "Eles fazem o compilador apontar onde um valor pode ser nulo e está sendo usado sem checagem, reduzindo NullReferenceException. O tipo passa a dizer a intenção: string não aceita null, string? aceita. É uma análise de compilação, então dados vindos de fora (JSON, banco) ainda precisam de validação.",
+          "relatedTerms": [
+            "nullable-reference-types"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "enumeracao-multipla-pergunta",
+          "level": "pleno",
+          "question": "Por que enumerar o mesmo IEnumerable duas vezes pode ser um problema?",
+          "answer": "Por causa da execução adiada: cada enumeração roda a consulta de novo. Se a origem for um banco ou uma chamada de rede, faço duas idas; se os dados mudarem no meio, os resultados divergem. Quando vou usar o resultado mais de uma vez, materializo com ToList().",
+          "relatedTerms": [
+            "execucao-adiada",
+            "linq"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "iqueryable-pergunta",
+          "level": "senior",
+          "question": "Qual a diferença entre IEnumerable e IQueryable ao consultar o banco com EF Core?",
+          "answer": "Com IQueryable, os filtros viram SQL e o banco devolve só o necessário. Se a consulta passa a IEnumerable antes do filtro (um AsEnumerable, um ToList ou um método que recebe IEnumerable), o EF traz todas as linhas e o filtro roda em memória. Mantenho IQueryable até a projeção final e materializo no fim.",
+          "relatedTerms": [
+            "ienumerable-e-iqueryable",
+            "execucao-adiada"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "async-void-pergunta",
+          "level": "pleno",
+          "question": "Por que evitar async void?",
+          "answer": "Um método async void não devolve Task, então quem chama não consegue esperar nem saber se deu erro. Exceções nele derrubam o processo em vez de chegar a um try/catch. Só faz sentido em event handlers; no resto, async Task.",
+          "relatedTerms": [
+            "task-async-await",
+            "bloqueio-result-wait"
+          ]
+        }
+      ]
+    }
+  ]
+}

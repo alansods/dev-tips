@@ -58,7 +58,7 @@ describe('Requirement: Ordem sugerida na área (na tela)', () => {
     answer('fundamentos-web', cardIds('fundamentos-web'), 'known');
     answer('git-e-colaboracao', ['commit'], 'known');
     await open('/area/fundamentos');
-    expect(screen.getByRole('button', { name: '1. Fundamentos web, Concluída' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: '1. Fundamentos de programação e web, Concluída' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: '2. Git e colaboração, Em andamento' })).toBeOnTheScreen();
   });
 
@@ -70,7 +70,7 @@ describe('Requirement: Ordem sugerida na área (na tela)', () => {
 
   it('Abrir pela ordem sugerida', async () => {
     await open('/area/fundamentos');
-    fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos web, Não iniciada' }));
+    fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos de programação e web, Não iniciada' }));
     expect(screen).toHavePathname('/track/fundamentos-web');
   });
 });

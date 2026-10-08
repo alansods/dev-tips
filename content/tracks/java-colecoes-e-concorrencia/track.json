@@ -176,13 +176,13 @@
       "cards": [
         {
           "type": "concept",
-          "id": "thread",
+          "id": "thread-java",
           "level": "junior",
-          "term": "Thread",
-          "definition": "Linha de execução independente dentro do processo, que compartilha o heap com as outras. Várias threads permitem fazer coisas ao mesmo tempo, mas o acesso a dados compartilhados precisa de coordenação para não corromper o estado.",
+          "term": "Thread em Java (Runnable e start)",
+          "definition": "Uma thread recebe um Runnable (ou lambda) com o trabalho. start() cria a nova thread e roda o código nela; chamar run() direto executa na thread atual, sem concorrência nenhuma. join() espera a thread terminar. Criar threads à mão é raro: o normal é usar um ExecutorService.",
           "relatedTerms": [
             "executor-service",
-            "race-condition"
+            "synchronized-volatile-locks"
           ]
         },
         {
@@ -192,18 +192,18 @@
           "term": "ExecutorService",
           "definition": "Pool de threads que executa tarefas enviadas com submit, devolvendo um Future. Evita criar uma thread por tarefa, que é caro. Deve ser encerrado (shutdown ou try-with-resources a partir do Java 19).",
           "relatedTerms": [
-            "thread",
+            "thread-java",
             "completable-future"
           ]
         },
         {
           "type": "concept",
-          "id": "race-condition",
+          "id": "synchronized-volatile-locks",
           "level": "pleno",
-          "term": "Condição de corrida e sincronização",
-          "definition": "Erro em que o resultado depende da ordem em que threads acessam um dado compartilhado; count++ não é atômico. Soluções: synchronized ou locks para exclusão mútua, classes atômicas (AtomicInteger), coleções concorrentes (ConcurrentHashMap) ou, melhor, não compartilhar estado mutável.",
+          "term": "synchronized, volatile e locks",
+          "definition": "synchronized deixa uma thread por vez entrar no bloco e garante que ela veja as escritas feitas antes. volatile só garante visibilidade de um campo, não atomicidade (count++ continua inseguro). ReentrantLock dá mais controle (tryLock, timeout), e as classes Atomic* (AtomicInteger) fazem operações atômicas sem lock.",
           "relatedTerms": [
-            "thread"
+            "thread-java"
           ]
         },
         {
@@ -213,7 +213,7 @@
           "term": "Virtual threads",
           "definition": "Threads leves gerenciadas pela JVM (Java 21), não pelo sistema operacional. Quando uma bloqueia em I/O, libera a thread real para outra. Permitem uma thread por requisição com milhões de threads, mantendo código bloqueante simples. Não aceleram trabalho de CPU.",
           "relatedTerms": [
-            "thread",
+            "thread-java",
             "executor-service"
           ]
         },
@@ -239,7 +239,7 @@
             "code": "var count = new AtomicInteger();\n\ntry (var executor = Executors.newVirtualThreadPerTaskExecutor()) {\n    for (int i = 0; i < 1000; i++) {\n        executor.submit(count::incrementAndGet);\n    }\n} // espera todas as tarefas\n\nSystem.out.println(count.get()); // 1000"
           },
           "relatedTerms": [
-            "race-condition",
+            "synchronized-volatile-locks",
             "virtual-threads"
           ]
         }
@@ -288,7 +288,7 @@
           "answer": "Raramente num servidor. Ele usa o ForkJoinPool comum, compartilhado com o resto da aplicação, e só compensa com muitos dados, trabalho de CPU por elemento e operações sem estado. Para I/O piora, e lambdas com efeito colateral viram condição de corrida. Meço antes de usar.",
           "relatedTerms": [
             "stream",
-            "race-condition"
+            "synchronized-volatile-locks"
           ]
         },
         {
@@ -298,7 +298,7 @@
           "question": "Como deixar um mapa seguro entre threads?",
           "answer": "Uso ConcurrentHashMap, que permite leituras sem bloqueio e travas finas por bucket, e oferece operações atômicas como computeIfAbsent e merge. Collections.synchronizedMap trava o mapa inteiro a cada acesso, e checar e depois inserir em dois passos continua sendo uma condição de corrida em qualquer um deles.",
           "relatedTerms": [
-            "race-condition",
+            "synchronized-volatile-locks",
             "map"
           ]
         },

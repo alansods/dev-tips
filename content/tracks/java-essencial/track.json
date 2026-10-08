@@ -2,6 +2,7 @@
   "id": "java-essencial",
   "title": "Java essencial",
   "description": "A base do Java: JVM, tipos, orientação a objetos, exceções e igualdade.",
+  "prerequisites": ["fundamentos-web"],
   "addedAt": "2026-10-05",
   "areas": [
     "backend"
@@ -20,8 +21,8 @@
           "term": "JVM",
           "definition": "Java Virtual Machine: executa o bytecode (.class) gerado pelo compilador javac. É o que permite \"escrever uma vez e rodar em qualquer lugar\". Inclui o compilador JIT, que transforma em código nativo os trechos mais executados, e o garbage collector.",
           "relatedTerms": [
-            "heap-e-stack",
-            "garbage-collector"
+            "coletores-da-jvm",
+            "generics-type-erasure"
           ]
         },
         {
@@ -31,28 +32,27 @@
           "term": "Primitivos e wrappers",
           "definition": "Java tem 8 tipos primitivos (int, long, double, boolean, char, byte, short, float), guardados direto como valor, e as classes wrapper correspondentes (Integer, Long...), que são objetos e podem ser null. Coleções só aceitam objetos, por isso o autoboxing converte entre os dois.",
           "relatedTerms": [
-            "heap-e-stack"
+            "generics-type-erasure"
           ]
         },
         {
           "type": "concept",
-          "id": "heap-e-stack",
+          "id": "generics-type-erasure",
           "level": "pleno",
-          "term": "Heap e stack",
-          "definition": "Cada thread tem sua stack, com as variáveis locais e as chamadas de método; objetos ficam no heap, compartilhado. Uma variável de objeto na stack guarda só a referência. StackOverflowError vem de recursão funda demais; OutOfMemoryError, de heap cheio.",
+          "term": "Generics e type erasure",
+          "definition": "Generics deixam List<String> checar o tipo na compilação. Em tempo de execução, porém, o tipo some (type erasure): List<String> e List<Integer> viram a mesma List. Por isso não dá para fazer new T(), instanceof List<String> nem usar primitivos como parâmetro de tipo (List<int>).",
           "relatedTerms": [
-            "jvm",
-            "garbage-collector"
+            "primitivos-e-wrappers",
+            "jvm"
           ]
         },
         {
           "type": "concept",
-          "id": "garbage-collector",
+          "id": "coletores-da-jvm",
           "level": "senior",
-          "term": "Garbage collector",
-          "definition": "Libera automaticamente objetos que não são mais alcançáveis. Divide o heap em gerações, porque a maioria dos objetos morre cedo. O padrão atual é o G1; ZGC e Shenandoah têm pausas de milissegundos para heaps grandes. Vazamento em Java é referência esquecida, como um cache estático que só cresce.",
+          "term": "Coletores da JVM (G1, ZGC)",
+          "definition": "A JVM oferece mais de um garbage collector. O G1, padrão, divide o heap em regiões e mira pausas previsíveis. O ZGC faz quase todo o trabalho junto com a aplicação, com pausas de milissegundos mesmo em heaps grandes. Ajustes comuns: -Xmx (heap máximo), -XX:+UseZGC e os logs de GC (-Xlog:gc) para investigar pausas.",
           "relatedTerms": [
-            "heap-e-stack",
             "jvm"
           ]
         },
@@ -91,49 +91,50 @@
     {
       "id": "orientacao-a-objetos",
       "title": "Orientação a objetos",
-      "description": "Classes, interfaces, herança e records.",
+      "description": "Modificadores, interfaces, sobrescrita e records.",
       "cards": [
         {
           "type": "concept",
-          "id": "encapsulamento",
+          "id": "modificadores-de-acesso",
           "level": "junior",
-          "term": "Encapsulamento",
-          "definition": "Esconder o estado interno de um objeto (campos private) e expor só operações que mantêm o objeto válido. Em vez de setSaldo, um método sacar que checa o limite. Os modificadores são private, (pacote), protected e public.",
+          "term": "Modificadores de acesso e pacotes",
+          "definition": "Java tem quatro níveis: private (só a classe), sem modificador (o pacote), protected (pacote e subclasses) e public. O pacote é a unidade de organização, e com módulos (module-info.java) dá para esconder pacotes inteiros de quem usa a biblioteca. Campos costumam ser private, com métodos public controlando o acesso.",
           "relatedTerms": [
-            "interface-java",
-            "heranca"
+            "sobrecarga-e-override",
+            "static-final-aninhadas"
           ]
         },
         {
           "type": "concept",
-          "id": "interface-java",
-          "level": "junior",
-          "term": "Interface",
-          "definition": "Contrato que diz o que uma classe faz, sem dizer como. Uma classe pode implementar várias interfaces. Desde o Java 8, interfaces podem ter métodos default (com implementação) e static. É a base do polimorfismo e da injeção de dependência.",
+          "id": "default-methods",
+          "level": "pleno",
+          "term": "Interface com default method",
+          "definition": "Desde o Java 8, uma interface pode ter métodos default (com corpo), static e, desde o 9, private. Isso permite evoluir uma interface sem quebrar quem a implementa. Se duas interfaces trazem o mesmo default, a classe é obrigada a sobrescrevê-lo e escolher, com Interface.super.metodo().",
           "relatedTerms": [
-            "polimorfismo",
-            "heranca"
+            "sobrecarga-e-override",
+            "static-final-aninhadas"
           ]
         },
         {
           "type": "concept",
-          "id": "heranca",
-          "level": "junior",
-          "term": "Herança e classe abstrata",
-          "definition": "Uma classe estende outra (só uma) com extends, herdando campos e métodos. Classe abstrata não pode ser instanciada e pode ter métodos abstratos, implementados pelas filhas. Herança cria acoplamento forte: prefira composição quando a relação não é claramente \"é um\".",
+          "id": "static-final-aninhadas",
+          "level": "pleno",
+          "term": "static, final e classes aninhadas",
+          "definition": "static pertence à classe, não ao objeto. final impede reatribuir uma variável, sobrescrever um método ou herdar de uma classe. Classes aninhadas static não têm acesso à instância de fora; as internas (sem static) guardam uma referência a ela, o que pode segurar memória sem querer.",
           "relatedTerms": [
-            "interface-java",
-            "polimorfismo"
+            "modificadores-de-acesso",
+            "default-methods"
           ]
         },
         {
           "type": "concept",
-          "id": "polimorfismo",
+          "id": "sobrecarga-e-override",
           "level": "junior",
-          "term": "Polimorfismo",
-          "definition": "Usar objetos de classes diferentes pela mesma interface, com cada um respondendo do seu jeito. Uma List<Forma> chama area() em círculos e quadrados sem saber qual é qual. O método executado é escolhido em tempo de execução (dynamic dispatch).",
+          "term": "Sobrecarga e @Override",
+          "definition": "Sobrecarga é ter métodos com o mesmo nome e parâmetros diferentes, escolhidos na compilação. Sobrescrita é a subclasse redefinir um método da mãe, escolhido em tempo de execução. @Override faz o compilador conferir que o método de fato sobrescreve algo, pegando erros de digitação na assinatura.",
           "relatedTerms": [
-            "interface-java"
+            "default-methods",
+            "modificadores-de-acesso"
           ]
         },
         {
@@ -148,7 +149,8 @@
             "code": "public record Money(BigDecimal amount, String currency) {\n    public Money {\n        if (amount.signum() < 0) throw new IllegalArgumentException(\"valor negativo\");\n    }\n}\n\nvar price = new Money(new BigDecimal(\"29.90\"), \"BRL\");\nprice.amount();                         // 29.90\nprice.equals(new Money(new BigDecimal(\"29.90\"), \"BRL\")); // true"
           },
           "relatedTerms": [
-            "encapsulamento"
+            "equals-hashcode",
+            "imutabilidade"
           ]
         },
         {
@@ -163,8 +165,8 @@
             "code": "sealed interface Shape permits Circle, Square {}\nrecord Circle(double radius) implements Shape {}\nrecord Square(double side) implements Shape {}\n\ndouble area(Shape shape) {\n    return switch (shape) {\n        case Circle c -> Math.PI * c.radius() * c.radius();\n        case Square s -> s.side() * s.side();\n    };\n}"
           },
           "relatedTerms": [
-            "polimorfismo",
-            "interface-java"
+            "default-methods",
+            "static-final-aninhadas"
           ]
         }
       ]
@@ -275,13 +277,13 @@
         },
         {
           "type": "question",
-          "id": "interface-vs-abstrata",
+          "id": "abstrata-com-default-methods",
           "level": "pleno",
-          "question": "Quando usar interface e quando usar classe abstrata?",
-          "answer": "Interface para definir um contrato que classes sem relação entre si podem cumprir; uma classe implementa várias. Classe abstrata quando há estado ou implementação comum a uma família de classes, sabendo que cada classe só estende uma. Na dúvida, interface com métodos default, e composição em vez de herança.",
+          "question": "Com default methods, ainda faz sentido usar classe abstrata em Java?",
+          "answer": "Sim, em casos específicos. Interfaces com default methods cobrem comportamento compartilhado sem estado, e uma classe pode implementar várias. A classe abstrata continua útil quando as subclasses compartilham estado (campos), precisam de construtor ou de métodos protected. Prefiro interface e uso classe abstrata só quando há estado comum.",
           "relatedTerms": [
-            "interface-java",
-            "heranca"
+            "default-methods",
+            "modificadores-de-acesso"
           ]
         },
         {
@@ -311,8 +313,8 @@
           "question": "Como você investigaria um vazamento de memória numa aplicação Java?",
           "answer": "Primeiro confirmo pelo gráfico de heap depois de cada GC: se a base só sobe, há vazamento. Gero um heap dump (jcmd ou -XX:+HeapDumpOnOutOfMemoryError) e abro no Eclipse MAT ou VisualVM para ver quais objetos dominam a memória e quem os referencia. Causas comuns: caches e coleções estáticas sem limite, listeners não removidos e ThreadLocal sem remove.",
           "relatedTerms": [
-            "garbage-collector",
-            "heap-e-stack"
+            "coletores-da-jvm",
+            "jvm"
           ]
         }
       ]

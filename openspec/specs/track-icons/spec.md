@@ -25,7 +25,7 @@ O app SHALL mostrar o ícone de cada item, segundo o requisito "Ícone de lingua
 
 #### Scenario: Trilha sem marca
 - **WHEN** o usuário abre a área Fundamentos
-- **THEN** o card da trilha "Fundamentos web" mostra o ícone da área Fundamentos
+- **THEN** o card da trilha "Fundamentos de programação e web" mostra o ícone da área Fundamentos
 
 #### Scenario: Card de área
 - **WHEN** a aba Trilhas é exibida

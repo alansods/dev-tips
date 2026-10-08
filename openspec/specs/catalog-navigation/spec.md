@@ -13,7 +13,7 @@ A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo
 Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tela da área.
 
 #### Scenario: Áreas com o conteúdo atual
-- **WHEN** a aba Trilhas é exibida com as trilhas Fundamentos web (área Fundamentos) e O mesmo CRUD em quatro frameworks (área Backend)
+- **WHEN** a aba Trilhas é exibida com as trilhas Fundamentos de programação e web (área Fundamentos) e O mesmo CRUD em quatro frameworks (área Backend)
 - **THEN** aparecem os cards "Fundamentos" e "Backend", nessa ordem, e não aparece "Frontend"
 
 #### Scenario: Progresso somado da área
@@ -48,7 +48,7 @@ Seções sem itens MUST NOT aparecer. Nas seções 2 a 5, as trilhas SHALL apare
 
 #### Scenario: Fundamentos com o conteúdo atual
 - **WHEN** o usuário abre a área Fundamentos
-- **THEN** a tela mostra a seção "Ordem sugerida" e, abaixo dela, só a seção "Trilhas", com a trilha "Fundamentos web"
+- **THEN** a tela mostra a seção "Ordem sugerida" e, abaixo dela, só a seção "Trilhas", com a trilha "Fundamentos de programação e web"
 
 #### Scenario: Área com linguagens
 - **WHEN** a área Backend tem uma trilha de linguagem pura Java e uma trilha do framework Spring Boot
@@ -142,16 +142,16 @@ O marcador da linha do tempo SHALL diferenciar os três estados. Tocar numa linh
 - **THEN** React Native aparece na "Ordem sugerida" de Mobile normalmente, e React não aparece
 
 #### Scenario: Estados
-- **WHEN** na área Fundamentos todos os cards de "Fundamentos web" estão como "já sabia" e "Git e colaboração" tem um card respondido
-- **THEN** "Fundamentos web" aparece como "Concluída" e "Git e colaboração" como "Em andamento"
+- **WHEN** na área Fundamentos todos os cards de "Fundamentos de programação e web" estão como "já sabia" e "Git e colaboração" tem um card respondido
+- **THEN** "Fundamentos de programação e web" aparece como "Concluída" e "Git e colaboração" como "Em andamento"
 
 #### Scenario: Revisão pendente
 - **WHEN** 2 cards da trilha CRUD estão para revisar hoje e o usuário abre a área Backend
 - **THEN** a linha da trilha CRUD na "Ordem sugerida" mostra "2 para revisar"
 
 #### Scenario: Abrir pela ordem sugerida
-- **WHEN** o usuário toca na linha "Fundamentos web" da "Ordem sugerida"
-- **THEN** a tela da trilha "Fundamentos web" abre
+- **WHEN** o usuário toca na linha "Fundamentos de programação e web" da "Ordem sugerida"
+- **THEN** a tela da trilha "Fundamentos de programação e web" abre
 
 ### Requirement: Busca e filtros na aba Trilhas
 A aba Trilhas SHALL ter, no topo:
@@ -188,8 +188,8 @@ Com busca, filtro de estado ou linguagem ativos, a aba SHALL mostrar a seção "
 - **THEN** o filtro mostra "Em andamento · 1" e a lista mostra só a trilha React
 
 #### Scenario: Filtro concluídas
-- **WHEN** todos os cards de "Fundamentos web" estão como "já sabia" e o usuário toca em "Concluídas"
-- **THEN** a lista mostra só "Fundamentos web"
+- **WHEN** todos os cards de "Fundamentos de programação e web" estão como "já sabia" e o usuário toca em "Concluídas"
+- **THEN** a lista mostra só "Fundamentos de programação e web"
 
 #### Scenario: Filtro por linguagem
 - **WHEN** o usuário toca em "Python" em "Por linguagem"

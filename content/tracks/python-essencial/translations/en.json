@@ -20,13 +20,13 @@
     }
   },
   "cards": {
-    "tipagem-dinamica": {
-      "term": "Dynamic and strong typing",
-      "definition": "In Python, the type belongs to the value, not the variable: the same variable can point to an int and later to a str (dynamic). But Python does not convert types on its own in mixed operations: \"1\" + 1 raises TypeError (strong). Type hints document types and are checked by tools such as mypy, not at runtime."
+    "duck-typing-type-hints": {
+      "term": "Duck typing and type hints",
+      "definition": "Python does not ask for the type, but whether the object has the method: anything with __iter__ works in a for (duck typing). Type hints (def f(x: int) -> str) document intent and are checked by tools such as mypy and by the editor, but the interpreter ignores them at runtime. typing.Protocol describes an expected \"shape\" without requiring inheritance."
     },
-    "mutabilidade": {
-      "term": "Mutable and immutable",
-      "definition": "int, float, str, tuple and frozenset are immutable: \"changing\" them creates a new object. list, dict and set are mutable: they change in place, and every variable pointing to them sees the change. Only immutable (hashable) values can be dict keys or set items."
+    "hashable": {
+      "term": "Hashable and Python's immutables",
+      "definition": "int, float, str, tuple, frozenset and bytes are immutable; list, dict and set change in place. Only hashable values (with a stable __hash__, usually the immutable ones) can be dict keys or set items: a tuple works, a list does not. A tuple that contains a list stops being hashable."
     },
     "list-tuple": {
       "term": "list and tuple",

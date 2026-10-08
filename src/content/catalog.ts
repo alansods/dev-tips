@@ -26,6 +26,10 @@ import springBoot from '../../content/tracks/spring-boot/track.json';
 import pythonEssencial from '../../content/tracks/python-essencial/track.json';
 import fastapi from '../../content/tracks/fastapi/track.json';
 import django from '../../content/tracks/django/track.json';
+import csharpEssencial from '../../content/tracks/csharp-essencial/track.json';
+import aspnetCore from '../../content/tracks/aspnet-core/track.json';
+import rubyEssencial from '../../content/tracks/ruby-essencial/track.json';
+import rails from '../../content/tracks/rails/track.json';
 import sqlEssencial from '../../content/tracks/sql-essencial/track.json';
 import modelagemDeDados from '../../content/tracks/modelagem-de-dados/track.json';
 import transacoesEPerformance from '../../content/tracks/transacoes-e-performance/track.json';
@@ -73,6 +77,10 @@ const registry: unknown[] = [
   pythonEssencial,
   fastapi,
   django,
+  csharpEssencial,
+  aspnetCore,
+  rubyEssencial,
+  rails,
   sqlEssencial,
   modelagemDeDados,
   transacoesEPerformance,

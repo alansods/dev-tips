@@ -99,11 +99,15 @@ Um card `step` SHALL ter `number` (inteiro ≥ 1), `title`, `whatIs`, `whyItMatt
 - **THEN** a validação rejeita a trilha indicando o número repetido
 
 ### Requirement: Snippet de código
-Todo snippet (em `step`, `code` ou `question`) SHALL ter `file` (rótulo de onde o código vive, ex.: `terminal`, `src/db.ts`), `language` e `code` não vazios. MAY ter `note`. `language` MUST pertencer à lista suportada: `bash`, `ts`, `js`, `java`, `python`, `sql`, `xml`, `properties`, `json`, `yaml`, `text`. O conteúdo de `code` SHALL ser preservado exatamente como escrito, incluindo quebras de linha e indentação.
+Todo snippet (em `step`, `code` ou `question`) SHALL ter `file` (rótulo de onde o código vive, ex.: `terminal`, `src/db.ts`), `language` e `code` não vazios. MAY ter `note`. `language` MUST pertencer à lista suportada: `bash`, `ts`, `js`, `java`, `python`, `csharp`, `ruby`, `sql`, `xml`, `properties`, `json`, `yaml`, `text`. O conteúdo de `code` SHALL ser preservado exatamente como escrito, incluindo quebras de linha e indentação.
 
 #### Scenario: Linguagem não suportada
 - **WHEN** um snippet tem `language: "cobol"`
 - **THEN** a validação rejeita a trilha com erro no campo `language` do snippet
+
+#### Scenario: Snippet em C# e Ruby
+- **WHEN** um snippet tem `language: "csharp"` ou `language: "ruby"`
+- **THEN** a validação aceita o snippet
 
 #### Scenario: Código preservado
 - **WHEN** um snippet tem código com indentação de 4 espaços e linhas em branco
@@ -377,7 +381,7 @@ O ícone de uma trilha SHALL ser, nesta ordem de prioridade:
 - **THEN** o ícone da trilha é a sigla "AWS"
 
 #### Scenario: Trilha sem marca
-- **WHEN** a trilha "Fundamentos web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
+- **WHEN** a trilha "Fundamentos de programação e web" não declara `icon`, `language` nem `framework`, e sua primeira área é `fundamentos`
 - **THEN** o ícone da trilha é o ícone da área Fundamentos
 
 #### Scenario: Logo desconhecido na trilha
@@ -417,7 +421,7 @@ O catálogo do repositório SHALL ser validado pela suíte de testes.
 - **THEN** a validação rejeita o catálogo indicando o ciclo entre `a` e `b`
 
 #### Scenario: Sem pré-requisitos
-- **WHEN** a trilha "Fundamentos web" não declara `prerequisites`
+- **WHEN** a trilha "Fundamentos de programação e web" não declara `prerequisites`
 - **THEN** a validação aceita a trilha, com a lista de pré-requisitos vazia
 
 ### Requirement: Data de inclusão da trilha

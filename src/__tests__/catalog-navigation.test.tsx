@@ -17,7 +17,7 @@ import { resetStudyStore, useStudyStore } from '../study/store';
 import { crudTrack, webTrack } from '../test-utils';
 
 // Os cenários descrevem o catálogo com as duas trilhas originais (CRUD e
-// Fundamentos web); as trilhas de linguagem têm testes próprios.
+// Fundamentos de programação e web); as trilhas de linguagem têm testes próprios.
 jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());
 
 const APP = {
@@ -115,7 +115,7 @@ describe('Requirement: Tela da área', () => {
     await open('/area/fundamentos');
     expect(headers()).toEqual(['Fundamentos', 'Ordem sugerida', 'Trilhas']);
     expect(headers()).not.toContain('Comparativos');
-    expect(screen.getAllByText('Fundamentos web').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Fundamentos de programação e web').length).toBeGreaterThan(0);
   });
 
   it('Abrir trilha pela área', async () => {
@@ -168,7 +168,7 @@ describe('Requirement: Identidade da trilha', () => {
   it('Trilha na área Fundamentos', async () => {
     await open('/area/fundamentos');
     expect(headers()).toContain('Trilhas');
-    expect(screen.getByRole('button', { name: /^Fundamentos web,/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Fundamentos de programação e web,/ })).toBeOnTheScreen();
   });
 });
 

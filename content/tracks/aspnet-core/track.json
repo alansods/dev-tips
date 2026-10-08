@@ -1,0 +1,329 @@
+{
+  "id": "aspnet-core",
+  "title": "ASP.NET Core",
+  "description": "APIs com ASP.NET Core: pipeline de middleware, injeção de dependência, Entity Framework Core, validação, autenticação e testes.",
+  "prerequisites": ["csharp-essencial"],
+  "addedAt": "2026-10-08",
+  "areas": [
+    "backend"
+  ],
+  "language": "csharp",
+  "framework": "aspnet",
+  "decks": [
+    {
+      "id": "pipeline-e-di",
+      "title": "Pipeline e injeção de dependência",
+      "description": "Como a requisição atravessa a aplicação e como os serviços são criados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "minimal-api-e-controllers",
+          "level": "junior",
+          "term": "Minimal API e controllers",
+          "definition": "Há dois estilos de endpoint. Minimal API mapeia rotas direto no Program.cs (app.MapGet(\"/produtos\", ...)), com pouca cerimônia. Controllers são classes com [ApiController] e métodos por ação, com filtros e convenções. Os dois usam o mesmo pipeline, a mesma injeção de dependência e o mesmo model binding.",
+          "relatedTerms": [
+            "pipeline-de-middleware",
+            "ciclos-de-vida-da-di"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "pipeline-de-middleware",
+          "level": "pleno",
+          "term": "Pipeline de middleware",
+          "definition": "Cada requisição passa por uma sequência de middlewares registrados no Program.cs, na ordem em que aparecem (UseExceptionHandler, UseHttpsRedirection, UseAuthentication, UseAuthorization...). Cada um pode agir antes e depois de chamar o próximo, ou responder e interromper a cadeia. A ordem muda o comportamento.",
+          "relatedTerms": [
+            "minimal-api-e-controllers",
+            "autenticacao-jwt-aspnet"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "ciclos-de-vida-da-di",
+          "level": "pleno",
+          "term": "Ciclos de vida: Singleton, Scoped e Transient",
+          "definition": "O contêiner de DI nativo cria os serviços conforme o registro. Singleton: uma instância para a aplicação inteira. Scoped: uma por requisição (é o caso do DbContext). Transient: uma nova a cada injeção. Um Singleton que recebe um Scoped prende essa instância para sempre (captive dependency).",
+          "relatedTerms": [
+            "minimal-api-e-controllers",
+            "dbcontext"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "options-pattern",
+          "level": "pleno",
+          "term": "appsettings e options pattern",
+          "definition": "A configuração vem de appsettings.json, appsettings.{Ambiente}.json, variáveis de ambiente e user secrets, nessa ordem de prioridade crescente. O options pattern liga uma seção a uma classe (services.Configure<SmtpOptions>(...)) e a injeta como IOptions<T>, com validação na inicialização.",
+          "relatedTerms": [
+            "ciclos-de-vida-da-di"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "minimal-api-exemplo",
+          "level": "junior",
+          "title": "Endpoints com Minimal API",
+          "body": "Registro do serviço com ciclo Scoped e dois endpoints que recebem o serviço por injeção.",
+          "snippet": {
+            "file": "Program.cs",
+            "language": "csharp",
+            "code": "var builder = WebApplication.CreateBuilder(args);\nbuilder.Services.AddScoped<IProdutoService, ProdutoService>();\n\nvar app = builder.Build();\n\nvar produtos = app.MapGroup(\"/produtos\");\nprodutos.MapGet(\"/{id:int}\", async (int id, IProdutoService service, CancellationToken ct) =>\n    await service.BuscarAsync(id, ct) is { } p ? Results.Ok(p) : Results.NotFound());\nprodutos.MapPost(\"/\", async (NovoProduto dto, IProdutoService service, CancellationToken ct) =>\n{\n    var criado = await service.CriarAsync(dto, ct);\n    return Results.Created($\"/produtos/{criado.Id}\", criado);\n});\n\napp.Run();"
+          },
+          "relatedTerms": [
+            "minimal-api-e-controllers",
+            "ciclos-de-vida-da-di"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "appsettings-exemplo",
+          "level": "pleno",
+          "title": "appsettings.json por ambiente",
+          "body": "A seção Smtp vira uma classe com o options pattern. A senha não fica no arquivo: vem de variável de ambiente (Smtp__Senha) ou user secrets.",
+          "snippet": {
+            "file": "appsettings.json",
+            "language": "json",
+            "code": "{\n  \"ConnectionStrings\": {\n    \"Default\": \"Host=localhost;Database=loja;Username=app\"\n  },\n  \"Smtp\": {\n    \"Host\": \"smtp.exemplo.com\",\n    \"Porta\": 587,\n    \"Remetente\": \"nao-responda@exemplo.com\"\n  },\n  \"Logging\": {\n    \"LogLevel\": { \"Default\": \"Information\", \"Microsoft.AspNetCore\": \"Warning\" }\n  }\n}"
+          },
+          "relatedTerms": [
+            "options-pattern"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ef-core",
+      "title": "Entity Framework Core",
+      "description": "O ORM do .NET: contexto, migrations, rastreamento e consultas.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "dbcontext",
+          "level": "junior",
+          "term": "DbContext",
+          "definition": "A classe que representa uma sessão com o banco: expõe DbSet<T> para cada tabela, rastreia as entidades carregadas e grava as mudanças com SaveChangesAsync(), numa transação. É registrado como Scoped (AddDbContext) e não é seguro para uso por várias threads ao mesmo tempo.",
+          "relatedTerms": [
+            "migrations-ef-core",
+            "change-tracking"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "migrations-ef-core",
+          "level": "junior",
+          "term": "Migrations do EF Core",
+          "definition": "dotnet ef migrations add Nome compara o modelo atual com o snapshot e gera uma classe com Up e Down. dotnet ef database update aplica as pendentes. Em produção, o recomendado é gerar um script SQL idempotente (migrations script --idempotent) ou um bundle, em vez de migrar na inicialização da aplicação.",
+          "relatedTerms": [
+            "dbcontext"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "change-tracking",
+          "level": "pleno",
+          "term": "Change tracking e AsNoTracking",
+          "definition": "Por padrão, o DbContext guarda uma cópia de cada entidade carregada para descobrir o que mudou no SaveChanges. Em consultas só de leitura, isso gasta memória e CPU à toa: AsNoTracking() desliga o rastreamento. Projetar com Select para um DTO também evita rastrear.",
+          "relatedTerms": [
+            "dbcontext",
+            "include-e-n-mais-1"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "include-e-n-mais-1",
+          "level": "pleno",
+          "term": "Include e N+1",
+          "definition": "O EF Core não carrega relacionamentos sozinho. Include(p => p.Itens) traz os dados relacionados na mesma consulta. Com lazy loading ligado, acessar p.Itens dentro de um laço dispara uma consulta por pedido (N+1). Com vários Include de coleções, AsSplitQuery() evita o produto cartesiano.",
+          "relatedTerms": [
+            "change-tracking",
+            "dbcontext"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "dbcontext-exemplo",
+          "level": "pleno",
+          "title": "Entidade e DbContext",
+          "body": "Configuração do relacionamento e de um índice único com a Fluent API.",
+          "snippet": {
+            "file": "LojaContext.cs",
+            "language": "csharp",
+            "code": "public class Pedido\n{\n    public int Id { get; set; }\n    public required string ClienteEmail { get; set; }\n    public List<ItemPedido> Itens { get; set; } = [];\n}\n\npublic class LojaContext(DbContextOptions<LojaContext> options) : DbContext(options)\n{\n    public DbSet<Pedido> Pedidos => Set<Pedido>();\n\n    protected override void OnModelCreating(ModelBuilder model)\n    {\n        model.Entity<Pedido>().HasMany(p => p.Itens).WithOne().OnDelete(DeleteBehavior.Cascade);\n        model.Entity<Pedido>().HasIndex(p => p.ClienteEmail);\n    }\n}"
+          },
+          "relatedTerms": [
+            "dbcontext",
+            "migrations-ef-core"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "consulta-leitura",
+          "level": "pleno",
+          "title": "Consulta de leitura com projeção",
+          "body": "Filtro e projeção viram SQL; só as colunas usadas são lidas e nada é rastreado.",
+          "snippet": {
+            "file": "PedidoQueries.cs",
+            "language": "csharp",
+            "code": "public Task<List<PedidoResumo>> ListarAsync(string email, CancellationToken ct) =>\n    _db.Pedidos\n        .AsNoTracking()\n        .Where(p => p.ClienteEmail == email)\n        .OrderByDescending(p => p.Id)\n        .Select(p => new PedidoResumo(p.Id, p.Itens.Count, p.Itens.Sum(i => i.Preco)))\n        .ToListAsync(ct);"
+          },
+          "relatedTerms": [
+            "change-tracking",
+            "include-e-n-mais-1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "web-e-seguranca",
+      "title": "Web e segurança",
+      "description": "Entrada de dados, erros padronizados, autenticação, autorização e testes.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "model-binding-e-validacao",
+          "level": "junior",
+          "term": "Model binding e validação",
+          "definition": "O ASP.NET Core preenche os parâmetros do endpoint a partir da rota, da query string, dos headers e do corpo JSON. Com [ApiController], atributos como [Required] e [Range] são checados antes da ação, e um corpo inválido vira 400 automaticamente. Em Minimal API, a validação é registrada à parte ou feita com bibliotecas como FluentValidation.",
+          "relatedTerms": [
+            "problem-details",
+            "minimal-api-e-controllers"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "problem-details",
+          "level": "pleno",
+          "term": "ProblemDetails",
+          "definition": "Formato padrão de erro (RFC 9457) que o ASP.NET Core usa nas respostas de erro: type, title, status, detail e, na validação, errors por campo. AddProblemDetails() e UseExceptionHandler() fazem exceções não tratadas virarem um ProblemDetails 500, sem vazar a stack trace.",
+          "relatedTerms": [
+            "model-binding-e-validacao",
+            "pipeline-de-middleware"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "autenticacao-jwt-aspnet",
+          "level": "pleno",
+          "term": "Autenticação JWT no ASP.NET Core",
+          "definition": "AddAuthentication().AddJwtBearer(...) valida o token do header Authorization: assinatura, emissor, audiência e validade. O middleware UseAuthentication preenche HttpContext.User com as claims do token. Ele precisa vir antes de UseAuthorization, que decide se o usuário pode acessar o endpoint.",
+          "relatedTerms": [
+            "policies-de-autorizacao",
+            "pipeline-de-middleware"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "policies-de-autorizacao",
+          "level": "senior",
+          "term": "Policies de autorização",
+          "definition": "Em vez de espalhar checagens de papel, a aplicação define políticas com nome (AddAuthorization(o => o.AddPolicy(\"Admin\", p => p.RequireRole(\"admin\")))) e as aplica com [Authorize(Policy = ...)] ou RequireAuthorization(). Regras mais ricas, como \"só o dono do recurso\", usam requirements e handlers próprios.",
+          "relatedTerms": [
+            "autenticacao-jwt-aspnet"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "webapplicationfactory-exemplo",
+          "level": "pleno",
+          "title": "Teste de integração com WebApplicationFactory",
+          "body": "A fábrica sobe a aplicação inteira em memória, com o pipeline real, e o teste faz requisições HTTP de verdade contra ela.",
+          "snippet": {
+            "file": "ProdutosApiTests.cs",
+            "language": "csharp",
+            "code": "public class ProdutosApiTests(WebApplicationFactory<Program> factory)\n    : IClassFixture<WebApplicationFactory<Program>>\n{\n    [Fact]\n    public async Task Post_sem_nome_devolve_400()\n    {\n        var client = factory.CreateClient();\n\n        var resposta = await client.PostAsJsonAsync(\"/produtos\", new { preco = 10 });\n\n        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);\n        var problema = await resposta.Content.ReadFromJsonAsync<ValidationProblemDetails>();\n        Assert.Contains(\"Nome\", problema!.Errors.Keys);\n    }\n}"
+          },
+          "relatedTerms": [
+            "model-binding-e-validacao",
+            "problem-details"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "jwt-e-policy-exemplo",
+          "level": "senior",
+          "title": "JWT e policy no Program.cs",
+          "body": "Autenticação antes de autorização, e o grupo de rotas de admin protegido por uma policy.",
+          "snippet": {
+            "file": "Program.cs",
+            "language": "csharp",
+            "code": "builder.Services\n    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)\n    .AddJwtBearer(o =>\n    {\n        o.Authority = builder.Configuration[\"Auth:Authority\"];\n        o.Audience = \"loja-api\";\n    });\nbuilder.Services.AddAuthorizationBuilder()\n    .AddPolicy(\"Admin\", p => p.RequireRole(\"admin\"));\n\nvar app = builder.Build();\napp.UseAuthentication();\napp.UseAuthorization();\n\napp.MapGroup(\"/admin\").RequireAuthorization(\"Admin\").MapProdutosAdmin();"
+          },
+          "relatedTerms": [
+            "autenticacao-jwt-aspnet",
+            "policies-de-autorizacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "Perguntas de ASP.NET Core que aparecem em entrevistas, com uma resposta modelo.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "minimal-ou-controllers-pergunta",
+          "level": "junior",
+          "question": "Minimal API ou controllers: qual escolher?",
+          "answer": "Os dois rodam no mesmo pipeline, com a mesma performance prática. Minimal API combina com serviços pequenos e endpoints simples, com menos código. Controllers ajudam em APIs grandes, com muitos endpoints, filtros e convenções compartilhadas. Num time, o importante é escolher um estilo e manter.",
+          "relatedTerms": [
+            "minimal-api-e-controllers"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "ordem-middleware-pergunta",
+          "level": "pleno",
+          "question": "Por que a ordem dos middlewares importa?",
+          "answer": "Porque cada middleware só vê o que os anteriores deixaram passar e o que os seguintes devolveram. Se UseAuthorization vier antes de UseAuthentication, o usuário ainda não foi identificado e tudo parece anônimo. O tratamento de exceções vem primeiro para capturar erros de todo o resto.",
+          "relatedTerms": [
+            "pipeline-de-middleware",
+            "autenticacao-jwt-aspnet"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "captive-dependency-pergunta",
+          "level": "senior",
+          "question": "O que acontece ao injetar um serviço Scoped num Singleton?",
+          "answer": "O Singleton é criado uma vez e guarda a instância Scoped que recebeu, que passa a viver a aplicação inteira e é compartilhada entre requisições. Com um DbContext, isso causa dados velhos e erros de concorrência. Em desenvolvimento, a validação de escopos do contêiner lança exceção. A saída é injetar IServiceScopeFactory e criar um escopo quando precisar.",
+          "relatedTerms": [
+            "ciclos-de-vida-da-di",
+            "dbcontext"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "asnotracking-pergunta",
+          "level": "pleno",
+          "question": "Quando usar AsNoTracking no EF Core?",
+          "answer": "Em consultas que só leem dados para devolver na resposta, sem alterar e salvar as entidades. Sem rastreamento, o EF não guarda cópias para comparar no SaveChanges, o que economiza memória e CPU. Se for alterar e salvar, preciso do rastreamento (ou anexar a entidade de novo).",
+          "relatedTerms": [
+            "change-tracking"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "migrations-producao-pergunta",
+          "level": "senior",
+          "question": "Como aplicar migrations do EF Core em produção?",
+          "answer": "Evito Database.Migrate() na inicialização: com várias instâncias subindo juntas, elas competem pela migração, e a aplicação precisaria de permissão de alterar o schema. Gero um script idempotente ou um migration bundle no CI e aplico numa etapa do deploy, antes de liberar a versão nova, com migrations compatíveis com a versão anterior.",
+          "relatedTerms": [
+            "migrations-ef-core"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "authn-authz-pergunta",
+          "level": "pleno",
+          "question": "Qual a diferença entre UseAuthentication e UseAuthorization?",
+          "answer": "UseAuthentication descobre quem é o usuário: valida o token ou o cookie e preenche HttpContext.User. UseAuthorization decide se esse usuário pode acessar o endpoint, conforme [Authorize] e as policies. Sem o primeiro, o segundo vê sempre um usuário anônimo.",
+          "relatedTerms": [
+            "autenticacao-jwt-aspnet",
+            "policies-de-autorizacao"
+          ]
+        }
+      ]
+    }
+  ]
+}

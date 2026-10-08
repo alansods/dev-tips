@@ -1,12 +1,305 @@
 {
   "id": "fundamentos-web",
-  "title": "Fundamentos web",
-  "description": "Os conceitos da web por trás de toda API: HTTP, REST, regras do navegador e segurança.",
+  "title": "Fundamentos de programação e web",
+  "description": "A base de qualquer linguagem e da web: variáveis, funções, orientação a objetos, memória, HTTP, REST e segurança no navegador.",
   "addedAt": "2026-10-02",
   "areas": [
     "fundamentos"
   ],
   "decks": [
+    {
+      "id": "variaveis-e-tipos",
+      "title": "Variáveis e tipos",
+      "description": "Como os programas guardam e classificam os dados.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "variavel",
+          "level": "junior",
+          "term": "Variável",
+          "definition": "Um nome que aponta para um valor guardado na memória. Declarar cria o nome; atribuir coloca (ou troca) o valor. Muitas linguagens separam variáveis que podem ser reatribuídas das constantes, que recebem valor uma vez só.",
+          "relatedTerms": [
+            "tipos-primitivos-e-compostos",
+            "mutavel-e-imutavel"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipos-primitivos-e-compostos",
+          "level": "junior",
+          "term": "Tipos primitivos e compostos",
+          "definition": "Primitivos são os valores simples que a linguagem oferece direto: números, texto, booleano, às vezes caractere e nulo. Compostos agrupam outros valores: listas (arrays), dicionários (mapas) e objetos. O tipo define quais operações fazem sentido sobre o valor.",
+          "relatedTerms": [
+            "variavel",
+            "valor-e-referencia"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipagem-estatica-e-dinamica",
+          "level": "junior",
+          "term": "Tipagem estática e dinâmica",
+          "definition": "Na tipagem estática, o tipo de cada variável é conhecido antes de rodar e o compilador recusa operações incompatíveis (Java, C#, TypeScript). Na dinâmica, o tipo pertence ao valor e só é checado durante a execução (JavaScript, Python, Ruby). A estática pega erros mais cedo; a dinâmica exige menos declaração.",
+          "relatedTerms": [
+            "tipagem-forte-e-fraca",
+            "compilado-e-interpretado"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "tipagem-forte-e-fraca",
+          "level": "pleno",
+          "term": "Tipagem forte e fraca",
+          "definition": "Diz o quanto a linguagem converte tipos sozinha. Numa linguagem fraca, \"1\" + 1 vira \"11\" sem aviso (JavaScript). Numa forte, misturar tipos sem conversão explícita é erro (Python, Ruby). É um eixo diferente de estática e dinâmica: Python é dinâmica e forte.",
+          "relatedTerms": [
+            "tipagem-estatica-e-dinamica"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "valor-e-referencia",
+          "level": "pleno",
+          "term": "Valor e referência",
+          "definition": "Quando um valor é copiado por valor, a nova variável recebe uma cópia independente. Quando é por referência, as duas variáveis apontam para o mesmo objeto, e mudar por uma aparece na outra. Em geral, primitivos se comportam como valor e objetos e listas como referência; passar um objeto para uma função passa a referência.",
+          "relatedTerms": [
+            "mutavel-e-imutavel",
+            "stack-e-heap"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "mutavel-e-imutavel",
+          "level": "pleno",
+          "term": "Mutável e imutável",
+          "definition": "Um valor mutável pode ser alterado no lugar (uma lista que ganha itens). Um imutável nunca muda: toda \"alteração\" cria um valor novo (strings na maioria das linguagens). Imutabilidade evita efeitos colaterais quando várias partes do código, ou várias threads, compartilham o mesmo dado.",
+          "relatedTerms": [
+            "valor-e-referencia",
+            "condicao-de-corrida"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fluxo-e-funcoes",
+      "title": "Controle de fluxo e funções",
+      "description": "Decidir, repetir e organizar o código em blocos reutilizáveis.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "condicional",
+          "level": "junior",
+          "term": "Condicional",
+          "definition": "Executa um bloco só quando uma condição é verdadeira: if, else if e else, ou switch/match para comparar um valor com várias opções. Operadores lógicos (e, ou, não) combinam condições, e muitas linguagens param de avaliar assim que o resultado está decidido (curto-circuito).",
+          "relatedTerms": [
+            "laco",
+            "funcao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "laco",
+          "level": "junior",
+          "term": "Laço (for e while)",
+          "definition": "Repete um bloco. O for percorre uma sequência ou um intervalo conhecido; o while repete enquanto a condição for verdadeira, e serve quando não se sabe quantas voltas serão. break sai do laço e continue pula para a próxima volta. Um laço cuja condição nunca fica falsa trava o programa.",
+          "relatedTerms": [
+            "condicional",
+            "recursao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "funcao",
+          "level": "junior",
+          "term": "Função",
+          "definition": "Bloco de código com nome que recebe parâmetros e devolve um resultado. Evita repetir lógica e dá nome a uma ideia. Uma função pura depende só dos parâmetros e não altera nada fora dela: com a mesma entrada, sempre a mesma saída, o que facilita testar.",
+          "relatedTerms": [
+            "escopo",
+            "recursao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "escopo",
+          "level": "junior",
+          "term": "Escopo",
+          "definition": "A região do código onde um nome existe. Variáveis declaradas dentro de uma função (ou de um bloco, em várias linguagens) não são vistas fora dela. A busca de um nome começa no escopo mais interno e sobe até o global. Variáveis globais são visíveis em todo lugar, por isso tornam o código difícil de seguir.",
+          "relatedTerms": [
+            "funcao",
+            "closure"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "closure",
+          "level": "pleno",
+          "term": "Closure",
+          "definition": "Uma função que lembra as variáveis do escopo onde foi criada, mesmo depois que esse escopo terminou. Serve para guardar estado privado (um contador), criar funções configuradas (um multiplicador por 2) e callbacks que usam dados de fora. Cada linguagem tem suas regras sobre o que a closure pode alterar.",
+          "relatedTerms": [
+            "escopo",
+            "funcao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "recursao",
+          "level": "pleno",
+          "term": "Recursão",
+          "definition": "Uma função que chama a si mesma para resolver uma versão menor do problema, até chegar num caso base que responde direto. Combina com estruturas que se repetem dentro de si (árvores, pastas). Sem caso base, ou com profundidade grande demais, a pilha de chamadas estoura.",
+          "relatedTerms": [
+            "funcao",
+            "stack-e-heap"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "orientacao-a-objetos",
+      "title": "Orientação a objetos",
+      "description": "Os pilares que se repetem em Java, C#, Python, Ruby e TypeScript.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "classe-e-objeto",
+          "level": "junior",
+          "term": "Classe e objeto",
+          "definition": "Classe é o molde: descreve os dados (atributos) e os comportamentos (métodos) de um tipo. Objeto é uma instância criada a partir dela, com seus próprios valores. O construtor é o método que prepara o objeto ao ser criado.",
+          "relatedTerms": [
+            "encapsulamento",
+            "heranca"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "encapsulamento",
+          "level": "junior",
+          "term": "Encapsulamento",
+          "definition": "Esconder o estado interno do objeto e expor só operações que mantêm os dados válidos. Em vez de qualquer código mudar o saldo de uma conta, só depositar e sacar mexem nele, e eles checam as regras. Cada linguagem oferece mecanismos próprios (modificadores de acesso, convenções de nome).",
+          "relatedTerms": [
+            "classe-e-objeto",
+            "interface-e-classe-abstrata"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "heranca",
+          "level": "junior",
+          "term": "Herança",
+          "definition": "Uma classe filha reaproveita atributos e métodos da classe mãe e pode sobrescrever ou acrescentar comportamento. Expressa uma relação \"é um\" (um Gerente é um Funcionário). Hierarquias fundas acoplam as classes: mudar a mãe afeta todas as filhas.",
+          "relatedTerms": [
+            "classe-e-objeto",
+            "polimorfismo",
+            "composicao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "polimorfismo",
+          "level": "pleno",
+          "term": "Polimorfismo",
+          "definition": "Tratar objetos de tipos diferentes pelo mesmo contrato, e cada um responder do seu jeito. Uma lista de Formas chama area() em cada item, e o círculo e o quadrado calculam de formas diferentes. Permite acrescentar tipos novos sem mudar o código que os usa.",
+          "relatedTerms": [
+            "heranca",
+            "interface-e-classe-abstrata"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "interface-e-classe-abstrata",
+          "level": "pleno",
+          "term": "Interface e classe abstrata",
+          "definition": "Interface é um contrato: lista os métodos que um tipo precisa ter, sem dizer como. Classe abstrata é uma classe que não pode ser instanciada e pode já trazer parte da implementação e do estado. Em geral, uma classe pode cumprir várias interfaces, mas herdar de uma classe só.",
+          "relatedTerms": [
+            "polimorfismo",
+            "encapsulamento"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "composicao",
+          "level": "pleno",
+          "term": "Composição em vez de herança",
+          "definition": "Montar um objeto a partir de outros (\"tem um\") em vez de herdar (\"é um\"). Um Carro tem um Motor, em vez de ser um Motor. Composição deixa trocar partes sem mexer numa hierarquia, por isso costuma ser preferida quando a relação \"é um\" não é clara.",
+          "relatedTerms": [
+            "heranca",
+            "interface-e-classe-abstrata"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "memoria-e-execucao",
+      "title": "Memória e execução",
+      "description": "Como o código vira programa rodando, onde os dados ficam e o que dá errado.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "compilado-e-interpretado",
+          "level": "junior",
+          "term": "Compilado e interpretado",
+          "definition": "Linguagens compiladas traduzem o código para código de máquina antes de rodar (C, Go). Interpretadas executam o código-fonte com um programa intermediário (Python, Ruby). Muitas ficam no meio: compilam para bytecode e uma máquina virtual executa, com JIT transformando os trechos mais usados em código nativo (Java, C#, JavaScript).",
+          "relatedTerms": [
+            "tipagem-estatica-e-dinamica",
+            "garbage-collector"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "stack-e-heap",
+          "level": "pleno",
+          "term": "Stack e heap",
+          "definition": "A stack (pilha) guarda as chamadas de função em andamento e suas variáveis locais; cresce e encolhe a cada chamada e é muito rápida. O heap guarda os objetos que vivem além de uma chamada; a variável na stack guarda só a referência. Recursão funda demais estoura a stack; objetos demais esgotam o heap.",
+          "relatedTerms": [
+            "garbage-collector",
+            "valor-e-referencia",
+            "recursao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "garbage-collector",
+          "level": "pleno",
+          "term": "Garbage collector",
+          "definition": "Mecanismo que libera sozinho a memória de objetos que nenhuma parte do programa alcança mais. Evita esquecer de liberar memória e liberar duas vezes, mas custa tempo de CPU e pode causar pausas. Em linguagens sem ele (C), o programador aloca e libera à mão. Mesmo com GC, guardar referências sem necessidade (um cache que só cresce) vaza memória.",
+          "relatedTerms": [
+            "stack-e-heap",
+            "compilado-e-interpretado"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "excecao",
+          "level": "junior",
+          "term": "Exceção",
+          "definition": "Um erro sinalizado durante a execução que interrompe o fluxo normal e sobe pela pilha de chamadas até alguém tratar (try/catch, rescue, except). Se ninguém trata, o programa para. Boas práticas: tratar só onde dá para fazer algo útil, não engolir o erro em silêncio e liberar recursos num bloco finally (ou equivalente).",
+          "relatedTerms": [
+            "stack-e-heap",
+            "funcao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "thread",
+          "level": "pleno",
+          "term": "Thread",
+          "definition": "Uma linha de execução dentro de um processo. Threads do mesmo processo compartilham a memória (o heap), o que permite fazer várias coisas ao mesmo tempo, mas exige cuidado com dados compartilhados. Concorrência é lidar com várias tarefas intercaladas; paralelismo é executá-las de fato ao mesmo tempo, em núcleos diferentes.",
+          "relatedTerms": [
+            "condicao-de-corrida",
+            "stack-e-heap"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "condicao-de-corrida",
+          "level": "senior",
+          "term": "Condição de corrida",
+          "definition": "Bug em que o resultado depende da ordem em que threads (ou requisições) acessam um dado compartilhado. Duas threads leem o contador 10, somam 1 e gravam 11: um incremento some. Corrige-se com sincronização (locks), operações atômicas ou evitando estado mutável compartilhado.",
+          "relatedTerms": [
+            "thread",
+            "mutavel-e-imutavel"
+          ]
+        }
+      ]
+    },
     {
       "id": "http",
       "title": "HTTP",
@@ -267,8 +560,75 @@
     {
       "id": "perguntas-de-entrevista",
       "title": "Perguntas de entrevista",
-      "description": "Perguntas que costumam cair em entrevista sobre web, com resposta modelo.",
+      "description": "Perguntas de programação e de web que aparecem em entrevistas, com uma resposta modelo.",
       "cards": [
+        {
+          "type": "question",
+          "id": "valor-ou-referencia-pergunta",
+          "level": "junior",
+          "question": "Qual a diferença entre passar um argumento por valor e por referência?",
+          "answer": "Por valor, a função recebe uma cópia: mudar o parâmetro não afeta quem chamou. Por referência, ela recebe acesso ao mesmo objeto, e mudanças nele aparecem fora. Na prática, linguagens como Java, JavaScript e Python passam primitivos como cópia e, para objetos, passam uma cópia da referência: dá para alterar o objeto, mas reatribuir o parâmetro não troca a variável de quem chamou.",
+          "relatedTerms": [
+            "valor-e-referencia",
+            "funcao"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "estatica-ou-dinamica-pergunta",
+          "level": "junior",
+          "question": "Tipagem estática ou dinâmica: quais as vantagens de cada uma?",
+          "answer": "A estática pega erros de tipo antes de rodar, dá autocomplete e refatoração seguras e documenta o código, ao custo de mais declaração. A dinâmica é mais rápida para escrever e experimentar, mas erros de tipo só aparecem em execução, então depende mais de testes. Por isso surgiram opções no meio, como TypeScript e type hints do Python.",
+          "relatedTerms": [
+            "tipagem-estatica-e-dinamica",
+            "tipagem-forte-e-fraca"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "heranca-ou-composicao-pergunta",
+          "level": "pleno",
+          "question": "Quando usar herança e quando usar composição?",
+          "answer": "Herança quando existe de fato uma relação \"é um\" estável e a filha pode substituir a mãe em qualquer lugar sem surpresas. Composição no resto: monta o comportamento a partir de objetos menores, acopla menos e deixa trocar partes. Hierarquias fundas criadas só para reaproveitar código são o sinal clássico de que composição seria melhor.",
+          "relatedTerms": [
+            "composicao",
+            "heranca"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "interface-ou-abstrata-pergunta",
+          "level": "pleno",
+          "question": "Qual a diferença entre interface e classe abstrata?",
+          "answer": "A interface define só o contrato (o que o tipo faz) e um tipo pode cumprir várias. A classe abstrata pode ter estado e implementação parcial, mas, nas linguagens com herança simples, uma classe herda de uma só. Uso interface para descrever capacidades e classe abstrata quando várias classes parecidas compartilham código e estado.",
+          "relatedTerms": [
+            "interface-e-classe-abstrata",
+            "polimorfismo"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "recursao-estouro-pergunta",
+          "level": "pleno",
+          "question": "Por que uma função recursiva pode estourar a pilha, e como evitar?",
+          "answer": "Cada chamada ocupa um espaço na stack até retornar. Sem caso base, ou com entrada grande demais, as chamadas se acumulam até o limite (stack overflow). Para evitar: garantir o caso base, transformar a recursão num laço com uma pilha própria, ou usar otimização de chamada de cauda onde a linguagem oferece.",
+          "relatedTerms": [
+            "recursao",
+            "stack-e-heap"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "condicao-de-corrida-pergunta",
+          "level": "senior",
+          "question": "O que é condição de corrida e como evitar?",
+          "answer": "É quando o resultado depende da ordem em que tarefas concorrentes acessam um dado compartilhado, como dois incrementos simultâneos em que um se perde. Evito reduzindo estado mutável compartilhado (dados imutáveis, cada tarefa com seu dado), usando operações atômicas ou locks na seção crítica e, no banco, transações e restrições como unique.",
+          "relatedTerms": [
+            "condicao-de-corrida",
+            "thread",
+            "mutavel-e-imutavel"
+          ]
+        },
         {
           "type": "question",
           "id": "url-no-navegador",

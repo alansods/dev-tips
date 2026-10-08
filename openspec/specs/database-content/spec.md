@@ -4,7 +4,7 @@
 Define as trilhas de banco de dados, relacionais e não relacionais, da área "Banco de dados": quais são, como os decks são organizados e as regras de qualidade do conteúdo.
 ## Requirements
 ### Requirement: Trilhas de banco de dados no catálogo
-O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das trilhas de Python, cada uma em `content/tracks/<id>/track.json`, todas com `areas: ["banco-de-dados"]`, diretas na área (sem `language`, `framework` nem `variants`) e com a seção indicada na coluna Tipo (`section: "relacionais"` ou `section: "nao-relacionais"`):
+O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das trilhas de Ruby, cada uma em `content/tracks/<id>/track.json`, todas com `areas: ["banco-de-dados"]`, diretas na área (sem `language`, `framework` nem `variants`) e com a seção indicada na coluna Tipo (`section: "relacionais"` ou `section: "nao-relacionais"`):
 
 | id | Título | Tipo |
 |---|---|---|
@@ -19,7 +19,7 @@ O catálogo SHALL ter as trilhas abaixo, registradas nesta ordem depois das tril
 
 #### Scenario: Trilhas registradas
 - **WHEN** o catálogo é carregado
-- **THEN** ele contém as 8 trilhas, nessa ordem, logo depois de `django`, todas na área Banco de dados e diretas na área
+- **THEN** ele contém as 8 trilhas, nessa ordem, logo depois de `rails`, todas na área Banco de dados e diretas na área
 
 #### Scenario: Área Banco de dados
 - **WHEN** o usuário abre a área Banco de dados

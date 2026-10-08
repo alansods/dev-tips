@@ -43,9 +43,9 @@ describe('Requirement: Tradução completa para inglês', () => {
     expect(screen.getAllByText('The same CRUD in four frameworks').length).toBeGreaterThan(0);
   });
 
-  it('trilha Fundamentos web em inglês na área Fundamentos', async () => {
+  it('trilha Fundamentos de programação e web em inglês na área Fundamentos', async () => {
     await open('/area/fundamentos');
-    expect(screen.getAllByText('Web fundamentals').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Programming and web fundamentals').length).toBeGreaterThan(0);
   });
 
   it('Card exibido em inglês: concept CORS', async () => {
@@ -72,7 +72,9 @@ describe('Requirement: Tradução completa para inglês', () => {
       within(screen.getByTestId('term-sheet')).getByText(/A small piece of data the server stores/),
     ).toBeOnTheScreen();
     await open('/study/fundamentos-web/perguntas-de-entrevista');
-    expect(screen.getByText('What happens when you type a URL and press Enter?')).toBeOnTheScreen();
+    expect(
+      screen.getByText('What is the difference between passing an argument by value and by reference?'),
+    ).toBeOnTheScreen();
   });
 });
 
