@@ -6,6 +6,9 @@ import { Button } from '../../components/Button';
 import { ExpansionPanel } from '../../components/ExpansionPanel';
 import { ProgressBar } from '../../components/ProgressBar';
 import { Screen } from '../../components/Screen';
+import { TechIcon } from '../../components/TechIcon';
+import { repoTaxonomy } from '../../content';
+import { trackIcon } from '../../content/icons';
 import { useCatalog } from '../../content/useCatalog';
 import type { Track } from '../../content';
 import { useT } from '../../i18n';
@@ -44,6 +47,7 @@ function TrackProgress({ track }: { track: Track }) {
       header={
         <View style={{ gap: spacing.sm }}>
           <View style={styles.headRow}>
+            <TechIcon icon={trackIcon(track, repoTaxonomy)} size={32} />
             <AppText font="semibold" size={16} accessibilityRole="header" style={{ flex: 1 }}>
               {track.title}
             </AppText>

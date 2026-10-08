@@ -13,7 +13,13 @@ export default function HomeScreen() {
   return (
     <Screen>
       {areas.map(({ area, tracks }) => (
-        <AreaCard key={area} name={t.nav.areas[area]} tracks={tracks} onPress={() => router.push(`/area/${area}`)} />
+        <AreaCard
+          key={area}
+          area={area}
+          name={t.nav.areas[area]}
+          tracks={tracks}
+          onPress={() => router.push(`/area/${area}`)}
+        />
       ))}
     </Screen>
   );

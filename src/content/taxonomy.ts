@@ -6,15 +6,15 @@ import { z } from 'zod';
 import { pt } from 'zod/locales';
 
 import { dedupe, formatPath, type ContentError, type PathSegment } from './errors';
-import type { Track } from './schema';
+import { logoSlug, type Track } from './schema';
 
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const id = () => z.string().regex(KEBAB, { error: 'deve estar em kebab-case (a-z, 0-9 e -)' });
 const name = () => z.string().refine((s) => s.trim().length > 0, { error: 'não pode ficar vazio' });
 
 export const taxonomySchema = z.object({
-  languages: z.array(z.object({ id: id(), name: name() })),
-  frameworks: z.array(z.object({ id: id(), name: name(), language: id() })),
+  languages: z.array(z.object({ id: id(), name: name(), icon: logoSlug() })),
+  frameworks: z.array(z.object({ id: id(), name: name(), language: id(), icon: logoSlug() })),
 });
 
 export type Taxonomy = z.output<typeof taxonomySchema>;

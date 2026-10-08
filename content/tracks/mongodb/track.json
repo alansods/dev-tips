@@ -2,6 +2,7 @@
   "id": "mongodb",
   "title": "MongoDB",
   "description": "O banco de documentos mais usado: documentos e coleções, modelagem embutida ou por referência, índices e aggregation pipeline.",
+  "icon": { "logo": "mongodb" },
   "areas": [
     "banco-de-dados"
   ],

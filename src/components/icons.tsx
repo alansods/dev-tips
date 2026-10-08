@@ -1,6 +1,8 @@
 // Ícones de traço do design (mesmos desenhos do protótipo).
 import type { ColorValue } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Path, Rect } from 'react-native-svg';
+
+import type { Area } from '../content';
 
 type IconProps = { color: ColorValue; size?: number };
 
@@ -193,3 +195,69 @@ export function SendIcon({ color, size = 20 }: IconProps) {
     </Svg>
   );
 }
+
+// ---------- áreas do catálogo ----------
+
+export function FundamentalsIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M12 3l9 5-9 5-9-5z" />
+      <Path d="M3 13l9 5 9-5" />
+    </Svg>
+  );
+}
+
+export function FrontendIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={3} y={4} width={18} height={14} rx={2} />
+      <Path d="M3 8h18M8 21h8" />
+    </Svg>
+  );
+}
+
+export function BackendIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={4} y={4} width={16} height={7} rx={1.5} />
+      <Rect x={4} y={13} width={16} height={7} rx={1.5} />
+      <Path d="M8 7.5h.01M8 16.5h.01" />
+    </Svg>
+  );
+}
+
+export function DatabaseIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Ellipse cx={12} cy={6} rx={7} ry={2.8} />
+      <Path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8" />
+    </Svg>
+  );
+}
+
+export function MobileIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={7} y={2.5} width={10} height={19} rx={2.5} />
+      <Path d="M11 18.5h2" />
+    </Svg>
+  );
+}
+
+export function CloudIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8.5a4.8 4.8 0 0 1-.5 9.5z" />
+    </Svg>
+  );
+}
+
+/** Ícone de traço de cada área do catálogo. */
+export const AREA_ICONS: Record<Area, (props: IconProps) => React.JSX.Element> = {
+  fundamentos: FundamentalsIcon,
+  frontend: FrontendIcon,
+  backend: BackendIcon,
+  'banco-de-dados': DatabaseIcon,
+  mobile: MobileIcon,
+  devops: CloudIcon,
+};
