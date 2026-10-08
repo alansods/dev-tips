@@ -108,7 +108,11 @@ describe('Requirement: Busca e filtros na aba Trilhas (ordem e grupos)', () => {
     press('JavaScript');
     const list = headers();
     expect(list.indexOf('Por linguagem')).toBeLessThan(list.indexOf('Frontend'));
-    expect(list.filter((h) => ['Frontend', 'Backend', 'Mobile'].includes(h))).toEqual(['Frontend', 'Backend', 'Mobile']);
+    expect(list.filter((h) => ['Frontend', 'Backend', 'Mobile'].includes(h))).toEqual([
+      'Frontend',
+      'Backend',
+      'Mobile',
+    ]);
     expect(screen.getAllByRole('button', { name: /^JavaScript essencial, \d+ de/ })).toHaveLength(1);
   });
 });
