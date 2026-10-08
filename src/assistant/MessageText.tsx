@@ -32,7 +32,9 @@ export function MessageText({ text }: { text: string }) {
       {splitCode(text).map((part, i) =>
         part.kind === 'code' ? (
           <View key={i} testID="code-block" style={[styles.code, { backgroundColor: colors.code }]}>
-            <ScrollView horizontal showsHorizontalScrollIndicator>
+            {/* flexGrow 0: a ScrollView cresce por padrão e, dentro do balão numa conversa longa,
+                media altura a mais e empurrava as mensagens seguintes para fora da vista. */}
+            <ScrollView testID="code-scroll" horizontal showsHorizontalScrollIndicator style={{ flexGrow: 0 }}>
               <AppText font="mono" size={12} style={{ color: colors.codeInk, lineHeight: 18 }}>
                 {part.value}
               </AppText>

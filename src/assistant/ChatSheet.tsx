@@ -1,8 +1,9 @@
 // Gaveta do chat "Perguntar" (telas 3 a 6 e 9 do design), no mesmo padrão
 // da gaveta do glossário: Modal transparente com painel inferior.
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -44,6 +45,7 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
   const language = useLanguage();
   const expiresAt = useSubscriptionStore((s) => s.plan?.expiresAt ?? null);
   const [draft, setDraft] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
   const sending = status === 'sending';
   const canSend = draft.trim().length > 0 && !sending;
 
@@ -51,6 +53,8 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
     if (sending) return;
     onSend(text);
     setDraft('');
+    // Sem o teclado, a resposta tem a gaveta inteira para aparecer.
+    Keyboard.dismiss();
   };
 
   const lastIsOutOfScope = messages.at(-1)?.inScope === false;
@@ -121,7 +125,15 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
             </View>
           </View>
 
-          <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+          {/* Rola até o fim depois de medir o conteúdo novo (pergunta, "digitando…", resposta ou erro). */}
+          <ScrollView
+            ref={scrollRef}
+            testID="chat-messages"
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.body}
+            keyboardShouldPersistTaps="handled"
+            onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+          >
             {messages.length === 0 ? (
               <View style={{ gap: spacing.lg }}>
                 <View style={{ gap: 6 }}>
@@ -143,13 +155,16 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
             ) : (
               messages.map((m, i) =>
                 m.role === 'user' ? (
-                  <View key={i} style={[styles.bubble, styles.user, { backgroundColor: colors.accentSoft }]}>
+                  <View key={`user-${i}`} style={[styles.bubble, styles.user, { backgroundColor: colors.accentSoft }]}>
                     <AppText size={15} style={{ lineHeight: 21 }}>
                       {m.text}
                     </AppText>
                   </View>
                 ) : (
-                  <View key={i} style={[styles.bubble, styles.bot, { backgroundColor: colors.surface2 }]}>
+                  <View
+                    key={`assistant-${i}`}
+                    style={[styles.bubble, styles.bot, { backgroundColor: colors.surface2 }]}
+                  >
                     {m.inScope === false ? (
                       <AppText font="medium" size={12} tone="muted">
                         {t.assistant.outOfScope}

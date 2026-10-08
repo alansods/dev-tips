@@ -1,5 +1,5 @@
 import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
-import { Platform } from 'react-native';
+import { Keyboard, Platform, ScrollView } from 'react-native';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -183,6 +183,45 @@ describe('Requirement: Enviar pergunta no app', () => {
     expect(payload.card.title).toBe('API');
   });
 
+  it('Segunda pergunta', async () => {
+    askMock.mockResolvedValueOnce(answer('Primeira resposta.')).mockResolvedValueOnce(answer('Segunda resposta.'));
+    await open();
+    await press('Perguntar sobre este card');
+    await typeAndSend('Primeira?');
+    await typeAndSend('Segunda?');
+    const texts = ['Primeira?', 'Primeira resposta.', 'Segunda?', 'Segunda resposta.'];
+    for (const t of texts) expect(screen.getByText(t)).toBeOnTheScreen();
+    const order = within(screen.getByTestId('chat-messages'))
+      .getAllByText(/^(Primeira|Segunda)/)
+      .map((el) => el.props.children);
+    expect(order).toEqual(texts);
+    expect(askMock.mock.calls[1][0].history).toEqual([
+      { role: 'user', text: 'Primeira?' },
+      { role: 'assistant', text: 'Primeira resposta.' },
+    ]);
+    // A conversa rola até o fim quando o conteúdo cresce (pergunta, "digitando…", resposta).
+    const scrollToEnd = ScrollView.prototype.scrollToEnd as jest.Mock;
+    scrollToEnd.mockClear();
+    fireEvent(screen.getByTestId('chat-messages'), 'contentSizeChange', 320, 1200);
+    expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
+  });
+
+  it('Teclado fecha ao enviar', async () => {
+    askMock.mockResolvedValue(answer('Ok.'));
+    const dismiss = jest.spyOn(Keyboard, 'dismiss');
+    await open();
+    await press('Perguntar sobre este card');
+    await typeAndSend('Oi');
+    expect(dismiss).toHaveBeenCalledTimes(1);
+    await press('Fechar');
+    await press('Mostrar resposta');
+    await press('Já sabia');
+    await press('Perguntar sobre este card');
+    await press('Me dê um exemplo');
+    expect(dismiss).toHaveBeenCalledTimes(2);
+    dismiss.mockRestore();
+  });
+
   it('Sugestão', async () => {
     askMock.mockResolvedValue(answer('Um exemplo.'));
     await open();
@@ -198,6 +237,18 @@ describe('Requirement: Enviar pergunta no app', () => {
     await typeAndSend('Exemplo?');
     expect(screen.getByTestId('code-block')).toHaveTextContent('const x = 1;');
     expect(screen.getByText('Veja:')).toBeOnTheScreen();
+  });
+
+  it('Conversa longa com código', async () => {
+    askMock.mockResolvedValueOnce(answer('Veja:\n```js\nconst x = 1;\n```')).mockResolvedValueOnce(answer('Segunda.'));
+    await open();
+    await press('Perguntar sobre este card');
+    await typeAndSend('Exemplo?');
+    await typeAndSend('E depois?');
+    // A rolagem horizontal do código não pode crescer: com o padrão (flexGrow 1), o balão
+    // ganhava altura a mais numa conversa longa e empurrava a resposta nova para fora da vista.
+    expect(screen.getByTestId('code-scroll')).toHaveStyle({ flexGrow: 0 });
+    expect(screen.getByText('Segunda.')).toBeOnTheScreen();
   });
 
   it('Fora deste card', async () => {
