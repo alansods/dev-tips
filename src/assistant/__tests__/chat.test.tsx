@@ -26,7 +26,7 @@ const card = {
 
 const other = { ...card, id: 'outro-card', title: 'Outro' } as unknown as Card;
 
-const OK = { answer: 'Porque roda uma vez.', inScope: true, questions: { used: 31, limit: 100 } };
+const OK = { answer: 'Porque roda uma vez.', inScope: true, questions: { used: 31, limit: 200 } };
 const flush = () =>
   act(async () => {
     for (let i = 0; i < 10; i++) await Promise.resolve();
@@ -78,7 +78,7 @@ describe('ask', () => {
 describe('useCardChat', () => {
   it('envia a pergunta com as últimas 6 mensagens e atualiza o uso do plano', async () => {
     useSubscriptionStore.setState({
-      plan: { plan: 'pro', source: 'store', expiresAt: null, willRenew: true, questions: { used: 30, limit: 100 } },
+      plan: { plan: 'pro', source: 'store', expiresAt: null, willRenew: true, questions: { used: 30, limit: 200 } },
     });
     authFetch.mockResolvedValue(OK);
     const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
@@ -91,7 +91,7 @@ describe('useCardChat', () => {
     expect(lastBody.question).toBe('pergunta 3');
     expect(lastBody.card.title).toBe('Closure com estado privado');
     expect(result.current.messages).toHaveLength(8);
-    expect(useSubscriptionStore.getState().plan?.questions).toEqual({ used: 31, limit: 100 });
+    expect(useSubscriptionStore.getState().plan?.questions).toEqual({ used: 31, limit: 200 });
   });
 
   it('mostra "enviando" enquanto espera', async () => {

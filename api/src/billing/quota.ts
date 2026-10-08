@@ -7,7 +7,7 @@ import { findSubscription, incrementQuestionUsage, questionUsage, type Subscript
 import { AppError } from '../errors';
 import { isAdmin } from './access';
 
-export const QUESTION_LIMIT = 100;
+export const QUESTION_LIMIT = 200;
 
 type Asker = { id: string; email: string | null };
 export type QuotaTicket = { periodStart: number };

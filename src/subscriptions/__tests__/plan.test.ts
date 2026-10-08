@@ -16,7 +16,7 @@ const PRO = {
   source: 'store',
   expiresAt: '2026-11-05T12:00:00.000Z',
   willRenew: true,
-  questions: { used: 30, limit: 100 },
+  questions: { used: 30, limit: 200 },
 } as const;
 
 const json = (status: number, body: unknown = null) =>

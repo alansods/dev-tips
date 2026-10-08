@@ -1,6 +1,7 @@
 // Textos da interface em inglês. Mesma forma de `ptBR` (o TypeScript acusa
 // chave faltando ou sobrando).
 
+import { PRO_QUESTION_LIMIT } from '../subscriptions/limits';
 import type { Messages } from './pt-BR';
 
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
@@ -89,7 +90,7 @@ export const en: Messages = {
       'Answers focused only on the card content, no detours',
     ],
     planName: 'Pro monthly',
-    quotaAmount: '100',
+    quotaAmount: String(PRO_QUESTION_LIMIT),
     quotaUnit: 'questions per month',
     quotaScope: 'about any card, in any track',
     quotaRules: [
@@ -128,7 +129,7 @@ export const en: Messages = {
     resetsOn: (date: string) => `Resets on ${date}`,
     howTitle: 'How the quota works',
     howRules: [
-      '100 questions per subscription cycle.',
+      `${PRO_QUESTION_LIMIT} questions per subscription cycle.`,
       'Only answered questions count.',
       'On renewal, the counter goes back to zero.',
     ],
@@ -151,10 +152,10 @@ export const en: Messages = {
     offline: 'No connection. Try again when you are online.',
     error: 'Could not answer right now.',
     retry: 'Try again',
-    quotaTitle: 'You used all 100 questions this month',
+    quotaTitle: `You used all ${PRO_QUESTION_LIMIT} questions this month`,
     quotaBody: 'Your quota renews with your subscription.',
-    quotaUsage: '100 of 100',
-    quotaRenews: (date: string) => `100 of 100 · renews on ${date}`,
+    quotaUsage: `${PRO_QUESTION_LIMIT} of ${PRO_QUESTION_LIMIT}`,
+    quotaRenews: (date: string) => `${PRO_QUESTION_LIMIT} of ${PRO_QUESTION_LIMIT} · renews on ${date}`,
     disclaimer: 'AI-generated answers may contain mistakes.',
   },
   sync: {

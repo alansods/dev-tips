@@ -14,7 +14,7 @@ import { jsonBody } from '../validation';
 
 export const MAX_QUESTION = 500;
 export const MAX_CARD_TEXT = 8_000;
-export const MAX_HISTORY = 10;
+export const MAX_HISTORY = 6;
 
 const askBody = z.object({
   card: z.object({
