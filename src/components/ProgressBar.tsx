@@ -8,12 +8,14 @@ type Props = {
   /** Fração "não sabia", desenhada logo depois (opcional). */
   unknownValue?: number;
   height?: number;
+  /** Cor da parte preenchida: `warn` para alertas, como a cota acabando. */
+  tone?: 'accent' | 'warn';
   testID?: string;
 };
 
 const pct = (v: number) => `${Math.max(0, Math.min(1, v)) * 100}%` as const;
 
-export function ProgressBar({ value, unknownValue = 0, height = 6, testID }: Props) {
+export function ProgressBar({ value, unknownValue = 0, height = 6, tone = 'accent', testID }: Props) {
   const { colors } = useTheme();
   return (
     <View
@@ -22,7 +24,7 @@ export function ProgressBar({ value, unknownValue = 0, height = 6, testID }: Pro
       accessibilityValue={{ min: 0, max: 100, now: Math.round(value * 100) }}
       style={[styles.track, { height, borderRadius: height / 2, backgroundColor: colors.track }]}
     >
-      <View style={{ width: pct(value), backgroundColor: colors.accent }} />
+      <View style={{ width: pct(value), backgroundColor: colors[tone] }} />
       {unknownValue > 0 && <View style={{ width: pct(unknownValue), backgroundColor: colors.warn }} />}
     </View>
   );
