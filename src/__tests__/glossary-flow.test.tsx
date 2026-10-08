@@ -74,7 +74,9 @@ describe('Requirement: Aba Glossário', () => {
     expect(
       within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
     ).toBeOnTheScreen();
-    expect(within(screen.getByRole('button', { name: 'Cookie' })).getByText('Fundamentos de programação e web')).toBeOnTheScreen();
+    expect(
+      within(screen.getByRole('button', { name: 'Cookie' })).getByText('Fundamentos de programação e web'),
+    ).toBeOnTheScreen();
   });
 
   it('Selo de status', async () => {

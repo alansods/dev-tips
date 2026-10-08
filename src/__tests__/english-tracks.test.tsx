@@ -72,7 +72,9 @@ describe('Requirement: Tradução completa para inglês', () => {
       within(screen.getByTestId('term-sheet')).getByText(/A small piece of data the server stores/),
     ).toBeOnTheScreen();
     await open('/study/fundamentos-web/perguntas-de-entrevista');
-    expect(screen.getByText('What is the difference between passing an argument by value and by reference?')).toBeOnTheScreen();
+    expect(
+      screen.getByText('What is the difference between passing an argument by value and by reference?'),
+    ).toBeOnTheScreen();
   });
 });
 
