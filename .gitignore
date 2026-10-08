@@ -49,3 +49,7 @@ coverage/
 
 # Chaves de conta de serviço (Play/RevenueCat): nunca commitar, o repositório é público
 secrets/
+
+# Anotações pessoais (ideias, rascunhos): só locais. docs/legal/ continua versionado
+docs/*
+!docs/legal/
