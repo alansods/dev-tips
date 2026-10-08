@@ -9,19 +9,21 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
 import { ProgressBar } from '../components/ProgressBar';
-import { useLanguage, useT } from '../i18n';
+import { useT } from '../i18n';
 import { SectionTitle } from '../settings/SectionTitle';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { restore } from './actions';
+import { usePlanDate } from './format';
 import { ProBadge } from './ProBadge';
 import { manageSubscriptions } from './purchases';
+import { quotaStatus } from './quota';
 import { useSubscriptionStore } from './store';
 
 export function PlanCard() {
   const { colors } = useTheme();
   const t = useT();
-  const language = useLanguage();
+  const date = usePlanDate();
   const plan = useSubscriptionStore((s) => s.plan);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -36,9 +38,6 @@ export function PlanCard() {
     setBusy(false);
     setMessage(outcome === 'restored' ? t.pro.restored : outcome === 'none' ? t.pro.restoreNone : t.pro.restoreError);
   };
-
-  const date = (iso: string) =>
-    new Date(iso).toLocaleDateString(language === 'en' ? 'en-US' : 'pt-BR', { timeZone: 'UTC' });
 
   const card = [styles.card, { backgroundColor: colors.surface, borderColor: colors.line }];
   let body;
@@ -68,8 +67,8 @@ export function PlanCard() {
       </View>
     );
   } else {
-    const { used, limit } = plan.questions;
-    const max = limit ?? 0;
+    const quota = quotaStatus(plan);
+    const alert = quota ? quota.level !== 'normal' : false;
     body = (
       <View style={card}>
         <View style={styles.head}>
@@ -81,22 +80,49 @@ export function PlanCard() {
             {t.pro.active}
           </AppText>
         </View>
+        {quota ? (
+          <View style={{ gap: 10 }}>
+            <View style={styles.left}>
+              <AppText font="monoMedium" size={40} tone={alert ? 'warn' : 'ink'} style={{ lineHeight: 44 }}>
+                {String(quota.left)}
+              </AppText>
+              <AppText size={15} style={{ flex: 1, paddingBottom: 6 }}>
+                {t.pro.remainingLabel(quota.left)}
+              </AppText>
+            </View>
+            <ProgressBar value={quota.ratio} height={10} tone={alert ? 'warn' : 'accent'} />
+            <View style={styles.usage}>
+              <AppText font="mono" size={13} tone="muted" style={{ flex: 1 }}>
+                {t.pro.usedOf(quota.used, quota.limit)}
+              </AppText>
+              {plan.expiresAt ? (
+                <AppText size={13} tone="muted">
+                  {t.pro.resetsOn(date(plan.expiresAt))}
+                </AppText>
+              ) : null}
+            </View>
+          </View>
+        ) : null}
+        <View style={[styles.how, { backgroundColor: colors.surface2 }]}>
+          <AppText font="semibold" size={14}>
+            {t.pro.howTitle}
+          </AppText>
+          {t.pro.howRules.map((rule) => (
+            <View key={rule} style={styles.howRule}>
+              <AppText size={13} tone="muted">
+                {'•'}
+              </AppText>
+              <AppText size={13} tone="muted" style={{ flex: 1, lineHeight: 19 }}>
+                {rule}
+              </AppText>
+            </View>
+          ))}
+        </View>
         {plan.expiresAt ? (
           <AppText size={14} tone="muted">
             {plan.willRenew ? t.pro.renewsOn(date(plan.expiresAt)) : t.pro.endsOn(date(plan.expiresAt))}
           </AppText>
         ) : null}
-        <View style={{ gap: 6 }}>
-          <View style={styles.usage}>
-            <AppText size={13} style={{ flex: 1 }}>
-              {t.pro.questionsMonth}
-            </AppText>
-            <AppText font="mono" size={13} tone="muted">
-              {t.pro.usage(used, max)}
-            </AppText>
-          </View>
-          <ProgressBar value={max > 0 ? used / max : 0} />
-        </View>
         {message ? (
           <View accessibilityRole="alert" style={[styles.alert, { backgroundColor: colors.surface2 }]}>
             <AppText size={14}>{message}</AppText>
@@ -134,5 +160,8 @@ const styles = StyleSheet.create({
   card: { gap: spacing.md, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   usage: { flexDirection: 'row', alignItems: 'center' },
+  left: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
+  how: { gap: 6, paddingVertical: spacing.md, paddingHorizontal: 14, borderRadius: radius.md },
+  howRule: { flexDirection: 'row', gap: spacing.sm },
   alert: { padding: spacing.md, borderRadius: radius.md },
 });
