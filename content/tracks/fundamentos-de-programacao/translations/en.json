@@ -1,0 +1,145 @@
+{
+  "title": "Programming fundamentals",
+  "description": "The basics of any language: variables, types, functions, object-oriented programming, memory and execution.",
+  "decks": {
+    "variaveis-e-tipos": { "title": "Variables and types", "description": "How programs store and classify data." },
+    "fluxo-e-funcoes": {
+      "title": "Control flow and functions",
+      "description": "Deciding, repeating and organizing code into reusable blocks."
+    },
+    "orientacao-a-objetos": {
+      "title": "Object-oriented programming",
+      "description": "The pillars that repeat in Java, C#, Python, Ruby and TypeScript."
+    },
+    "memoria-e-execucao": {
+      "title": "Memory and execution",
+      "description": "How code becomes a running program, where data lives and what goes wrong."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "Programming questions that often come up in interviews, with a model answer."
+    }
+  },
+  "cards": {
+    "variavel": {
+      "term": "Variable",
+      "definition": "A name that points to a value stored in memory. Declaring creates the name; assigning puts (or swaps) the value. Many languages separate variables that can be reassigned from constants, which get a value only once."
+    },
+    "tipos-primitivos-e-compostos": {
+      "term": "Primitive and composite types",
+      "definition": "Primitives are the simple values the language offers directly: numbers, text, boolean, sometimes character and null. Composites group other values: lists (arrays), dictionaries (maps) and objects. The type defines which operations make sense on the value."
+    },
+    "tipagem-estatica-e-dinamica": {
+      "term": "Static and dynamic typing",
+      "definition": "With static typing, each variable's type is known before running and the compiler rejects incompatible operations (Java, C#, TypeScript). With dynamic typing, the type belongs to the value and is only checked at runtime (JavaScript, Python, Ruby). Static typing catches errors earlier; dynamic typing needs less declaration."
+    },
+    "tipagem-forte-e-fraca": {
+      "term": "Strong and weak typing",
+      "definition": "How much the language converts types on its own. In a weak language, \"1\" + 1 becomes \"11\" with no warning (JavaScript). In a strong one, mixing types without explicit conversion is an error (Python, Ruby). It is a separate axis from static and dynamic: Python is dynamic and strong."
+    },
+    "valor-e-referencia": {
+      "term": "Value and reference",
+      "definition": "When a value is copied by value, the new variable gets an independent copy. When it is by reference, both variables point to the same object, and a change through one shows up in the other. In general, primitives behave as values and objects and lists as references; passing an object to a function passes the reference."
+    },
+    "mutavel-e-imutavel": {
+      "term": "Mutable and immutable",
+      "definition": "A mutable value can be changed in place (a list that gains items). An immutable one never changes: every \"change\" creates a new value (strings in most languages). Immutability avoids side effects when several parts of the code, or several threads, share the same data."
+    },
+    "condicional": {
+      "term": "Conditional",
+      "definition": "Runs a block only when a condition is true: if, else if and else, or switch/match to compare a value against several options. Logical operators (and, or, not) combine conditions, and many languages stop evaluating as soon as the result is decided (short-circuit)."
+    },
+    "laco": {
+      "term": "Loop (for and while)",
+      "definition": "Repeats a block. A for goes through a sequence or a known range; a while repeats while the condition is true, and fits when you do not know how many rounds there will be. break leaves the loop and continue skips to the next round. A loop whose condition never becomes false hangs the program."
+    },
+    "funcao": {
+      "term": "Function",
+      "definition": "A named block of code that takes parameters and returns a result. It avoids repeating logic and gives a name to an idea. A pure function depends only on its parameters and changes nothing outside it: same input, same output, which makes it easy to test."
+    },
+    "escopo": {
+      "term": "Scope",
+      "definition": "The region of code where a name exists. Variables declared inside a function (or a block, in many languages) are not visible outside it. Looking up a name starts at the innermost scope and goes up to the global one. Global variables are visible everywhere, which makes code hard to follow."
+    },
+    "closure": {
+      "term": "Closure",
+      "definition": "A function that remembers the variables of the scope where it was created, even after that scope has ended. It is used to keep private state (a counter), create configured functions (a multiply-by-2) and callbacks that use outside data. Each language has its own rules about what the closure may change."
+    },
+    "recursao": {
+      "term": "Recursion",
+      "definition": "A function that calls itself to solve a smaller version of the problem, until it reaches a base case that answers directly. It fits structures that repeat inside themselves (trees, folders). Without a base case, or with too much depth, the call stack overflows."
+    },
+    "classe-e-objeto": {
+      "term": "Class and object",
+      "definition": "A class is the template: it describes the data (attributes) and the behaviors (methods) of a type. An object is an instance created from it, with its own values. The constructor is the method that sets up the object when it is created."
+    },
+    "encapsulamento": {
+      "term": "Encapsulation",
+      "definition": "Hiding the object's internal state and exposing only operations that keep the data valid. Instead of any code changing an account's balance, only deposit and withdraw touch it, and they check the rules. Each language offers its own mechanisms (access modifiers, naming conventions)."
+    },
+    "heranca": {
+      "term": "Inheritance",
+      "definition": "A child class reuses the parent class's attributes and methods and can override or add behavior. It expresses an \"is a\" relationship (a Manager is an Employee). Deep hierarchies couple the classes: changing the parent affects every child."
+    },
+    "polimorfismo": {
+      "term": "Polymorphism",
+      "definition": "Handling objects of different types through the same contract, with each one responding in its own way. A list of Shapes calls area() on each item, and the circle and the square compute it differently. It lets you add new types without changing the code that uses them."
+    },
+    "interface-e-classe-abstrata": {
+      "term": "Interface and abstract class",
+      "definition": "An interface is a contract: it lists the methods a type must have, without saying how. An abstract class is a class that cannot be instantiated and can already bring part of the implementation and state. In general, a class can fulfill several interfaces but inherit from only one class."
+    },
+    "composicao": {
+      "term": "Composition over inheritance",
+      "definition": "Building an object from others (\"has a\") instead of inheriting (\"is a\"). A Car has an Engine, instead of being an Engine. Composition lets you swap parts without touching a hierarchy, so it is usually preferred when the \"is a\" relationship is not clear."
+    },
+    "compilado-e-interpretado": {
+      "term": "Compiled and interpreted",
+      "definition": "Compiled languages translate code into machine code before running (C, Go). Interpreted ones run the source code through an intermediate program (Python, Ruby). Many sit in between: they compile to bytecode and a virtual machine runs it, with a JIT turning the most used parts into native code (Java, C#, JavaScript)."
+    },
+    "stack-e-heap": {
+      "term": "Stack and heap",
+      "definition": "The stack keeps the function calls in progress and their local variables; it grows and shrinks with each call and is very fast. The heap keeps the objects that live beyond a call; the variable on the stack holds only the reference. Recursion that goes too deep overflows the stack; too many objects exhaust the heap."
+    },
+    "garbage-collector": {
+      "term": "Garbage collector",
+      "definition": "A mechanism that automatically frees the memory of objects that no part of the program can reach anymore. It avoids forgetting to free memory and freeing it twice, but it costs CPU time and may cause pauses. In languages without one (C), the programmer allocates and frees by hand. Even with a GC, keeping references you do not need (a cache that only grows) leaks memory."
+    },
+    "excecao": {
+      "term": "Exception",
+      "definition": "An error signaled at runtime that interrupts the normal flow and travels up the call stack until someone handles it (try/catch, rescue, except). If no one handles it, the program stops. Good practice: handle it only where you can do something useful, do not swallow the error silently, and release resources in a finally block (or equivalent)."
+    },
+    "thread": {
+      "term": "Thread",
+      "definition": "A line of execution inside a process. Threads in the same process share memory (the heap), which lets you do several things at once but requires care with shared data. Concurrency is dealing with several interleaved tasks; parallelism is actually running them at the same time, on different cores."
+    },
+    "condicao-de-corrida": {
+      "term": "Race condition",
+      "definition": "A bug where the result depends on the order in which threads (or requests) access shared data. Two threads read the counter as 10, add 1 and write 11: one increment is lost. It is fixed with synchronization (locks), atomic operations or by avoiding shared mutable state."
+    },
+    "valor-ou-referencia-pergunta": {
+      "question": "What is the difference between passing an argument by value and by reference?",
+      "answer": "By value, the function gets a copy: changing the parameter does not affect the caller. By reference, it gets access to the same object, and changes to it show up outside. In practice, languages like Java, JavaScript and Python pass primitives as copies and, for objects, pass a copy of the reference: you can change the object, but reassigning the parameter does not swap the caller's variable."
+    },
+    "estatica-ou-dinamica-pergunta": {
+      "question": "Static or dynamic typing: what are the advantages of each?",
+      "answer": "Static typing catches type errors before running, enables safe autocomplete and refactoring and documents the code, at the cost of more declaration. Dynamic typing is faster to write and experiment with, but type errors only show up at runtime, so it relies more on tests. That is why middle-ground options appeared, such as TypeScript and Python type hints."
+    },
+    "heranca-ou-composicao-pergunta": {
+      "question": "When should you use inheritance and when composition?",
+      "answer": "Inheritance when there truly is a stable \"is a\" relationship and the child can replace the parent anywhere without surprises. Composition for the rest: it builds behavior from smaller objects, couples less and lets you swap parts. Deep hierarchies created only to reuse code are the classic sign that composition would be better."
+    },
+    "interface-ou-abstrata-pergunta": {
+      "question": "What is the difference between an interface and an abstract class?",
+      "answer": "An interface defines only the contract (what the type does) and a type can fulfill several. An abstract class can have state and a partial implementation, but in languages with single inheritance a class inherits from only one. I use an interface to describe capabilities and an abstract class when several similar classes share code and state."
+    },
+    "recursao-estouro-pergunta": {
+      "question": "Why can a recursive function overflow the stack, and how do you avoid it?",
+      "answer": "Each call takes space on the stack until it returns. Without a base case, or with an input that is too large, calls pile up until the limit (stack overflow). To avoid it: make sure there is a base case, turn the recursion into a loop with your own stack, or use tail-call optimization where the language offers it."
+    },
+    "condicao-de-corrida-pergunta": {
+      "question": "What is a race condition and how do you avoid it?",
+      "answer": "It is when the result depends on the order in which concurrent tasks access shared data, like two simultaneous increments where one is lost. I avoid it by reducing shared mutable state (immutable data, each task with its own data), using atomic operations or locks on the critical section and, in the database, transactions and constraints such as unique."
+    }
+  }
+}

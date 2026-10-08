@@ -7,6 +7,7 @@
 // nunca falha com o conteúdo do repositório.
 
 import crud4Frameworks from '../../content/tracks/crud-4-frameworks/track.json';
+import fundamentosDeProgramacao from '../../content/tracks/fundamentos-de-programacao/track.json';
 import fundamentosWeb from '../../content/tracks/fundamentos-web/track.json';
 import javascriptEssencial from '../../content/tracks/javascript-essencial/track.json';
 import javascriptAssincrono from '../../content/tracks/javascript-assincrono/track.json';
@@ -58,6 +59,7 @@ import { translationRegistry } from './translations';
 
 const registry: unknown[] = [
   crud4Frameworks,
+  fundamentosDeProgramacao,
   fundamentosWeb,
   javascriptEssencial,
   javascriptAssincrono,

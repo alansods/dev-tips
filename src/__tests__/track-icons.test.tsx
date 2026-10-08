@@ -61,7 +61,7 @@ describe('Requirement: Ícone nas listas e telas', () => {
 
   it('Trilha sem marca', async () => {
     await open('/area/fundamentos');
-    expect(iconIn('Fundamentos de programação e web', 'area:fundamentos')).toBeTruthy();
+    expect(iconIn('Fundamentos web', 'area:fundamentos')).toBeTruthy();
   });
 
   it('Card de área', async () => {

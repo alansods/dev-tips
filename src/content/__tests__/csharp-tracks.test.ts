@@ -27,6 +27,6 @@ describeContentTracks({
 });
 
 it('pré-requisitos das trilhas de C#', () => {
-  expect(getTrack('csharp-essencial')?.prerequisites).toEqual(['fundamentos-web']);
+  expect(getTrack('csharp-essencial')?.prerequisites).toEqual(['fundamentos-de-programacao']);
   expect(getTrack('aspnet-core')?.prerequisites).toEqual(['csharp-essencial']);
 });

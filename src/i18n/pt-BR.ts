@@ -210,6 +210,7 @@ export const ptBR = {
   nav: {
     areas: {
       fundamentos: 'Fundamentos',
+      git: 'Git',
       frontend: 'Frontend',
       backend: 'Backend',
       'banco-de-dados': 'Banco de dados',

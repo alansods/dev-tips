@@ -142,7 +142,7 @@ describe('Requirement: Continue de onde parou', () => {
     answer(CRUD, [deck.cards[0].id], 'known');
     await open('/');
     expect(screen.getByRole('header', { name: 'Também em andamento' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: /^Fundamentos de programação e web, \d+%$/ })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Fundamentos web, \d+%$/ })).toBeOnTheScreen();
   });
 });
 
@@ -185,9 +185,9 @@ describe('Requirement: Primeiro acesso', () => {
   it('Sem interesse escolhido', async () => {
     await open('/');
     expect(screen.getByRole('header', { name: 'Comece por aqui' })).toBeOnTheScreen();
-    expect(screen.getByText('Fundamentos de programação e web')).toBeOnTheScreen();
+    expect(screen.getByText('Fundamentos de programação')).toBeOnTheScreen();
     press('Começar a trilha');
-    expect(screen).toHavePathname('/track/fundamentos-web');
+    expect(screen).toHavePathname('/track/fundamentos-de-programacao');
   });
 
   it('Interesse em Backend', async () => {
@@ -195,7 +195,7 @@ describe('Requirement: Primeiro acesso', () => {
     fireEvent.press(screen.getByRole('checkbox', { name: 'Backend' }));
     expect(screen.getByRole('checkbox', { name: 'Backend' })).toBeChecked();
     expect(useSettingsStore.getState().interests).toEqual(['backend']);
-    expect(screen.queryByText('Fundamentos de programação e web')).toBeNull();
+    expect(screen.queryByText('Fundamentos de programação')).toBeNull();
   });
 });
 

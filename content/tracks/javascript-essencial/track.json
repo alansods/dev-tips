@@ -2,7 +2,7 @@
   "id": "javascript-essencial",
   "title": "JavaScript essencial",
   "description": "A base da linguagem: tipos, variáveis, funções, escopo, objetos e protótipos.",
-  "prerequisites": ["fundamentos-web"],
+  "prerequisites": ["fundamentos-de-programacao"],
   "addedAt": "2026-10-05",
   "areas": [
     "frontend",

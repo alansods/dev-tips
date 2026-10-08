@@ -3,6 +3,7 @@
 // catálogo falha se um arquivo de tradução ficar sem registro.
 
 import crud4FrameworksEn from '../../content/tracks/crud-4-frameworks/translations/en.json';
+import fundamentosDeProgramacaoEn from '../../content/tracks/fundamentos-de-programacao/translations/en.json';
 import fundamentosWebEn from '../../content/tracks/fundamentos-web/translations/en.json';
 import javascriptEssencialEn from '../../content/tracks/javascript-essencial/translations/en.json';
 import javascriptAssincronoEn from '../../content/tracks/javascript-assincrono/translations/en.json';
@@ -50,6 +51,7 @@ import modulosNativosNoExpoEn from '../../content/tracks/modulos-nativos-no-expo
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
+  'fundamentos-de-programacao': { en: fundamentosDeProgramacaoEn },
   'fundamentos-web': { en: fundamentosWebEn },
   'javascript-essencial': { en: javascriptEssencialEn },
   'javascript-assincrono': { en: javascriptAssincronoEn },

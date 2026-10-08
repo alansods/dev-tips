@@ -11,7 +11,7 @@ describeContentTracks({
     {
       id: 'git-e-colaboracao',
       title: 'Git e colaboração',
-      areas: ['fundamentos'],
+      areas: ['git'],
       placement: direct,
       decks: ['modelo-do-git', 'fluxo-em-equipe', 'resolver-problemas'],
     },

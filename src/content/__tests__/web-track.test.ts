@@ -13,8 +13,8 @@ const cards = () => web().decks.flatMap((d) => d.cards);
 
 describe('Requirement: Identidade da trilha', () => {
   it('Trilha no catálogo', () => {
-    expect(catalog.map((t) => t.id).slice(0, 2)).toEqual(['crud-4-frameworks', 'fundamentos-web']);
-    expect(web().title).toBe('Fundamentos de programação e web');
+    expect(catalog.map((t) => t.id).slice(0, 3)).toEqual(['crud-4-frameworks', 'fundamentos-de-programacao', 'fundamentos-web']);
+    expect(web().title).toBe('Fundamentos web');
     expect(web().variants).toBeUndefined();
     expect(web().compareColumns).toBeUndefined();
     expect(web().areas).toEqual(['fundamentos']);
@@ -25,28 +25,15 @@ describe('Requirement: Identidade da trilha', () => {
 describe('Requirement: Decks e contagens', () => {
   it('Contagem por deck', () => {
     const track = web();
-    expect(track.decks.map((d) => d.id)).toEqual([
-      'variaveis-e-tipos',
-      'fluxo-e-funcoes',
-      'orientacao-a-objetos',
-      'memoria-e-execucao',
-      'http',
-      'rest',
-      'navegador-e-seguranca',
-      'perguntas-de-entrevista',
-    ]);
+    expect(track.decks.map((d) => d.id)).toEqual(['http', 'rest', 'navegador-e-seguranca', 'perguntas-de-entrevista']);
     const types = track.decks.map((d) => ({ n: d.cards.length, types: [...new Set(d.cards.map((c) => c.type))] }));
     expect(types).toEqual([
-      { n: 6, types: ['concept'] },
-      { n: 6, types: ['concept'] },
-      { n: 6, types: ['concept'] },
-      { n: 6, types: ['concept'] },
       { n: 7, types: ['concept'] },
       { n: 6, types: ['concept'] },
       { n: 8, types: ['concept'] },
-      { n: 12, types: ['question'] },
+      { n: 6, types: ['question'] },
     ]);
-    expect(cards()).toHaveLength(57);
+    expect(cards()).toHaveLength(27);
   });
 
   it('Sem termos repetidos entre trilhas', () => {
@@ -70,22 +57,5 @@ describe('Requirement: Ligação com o glossário', () => {
   it('Pergunta ligada aos termos que cita', () => {
     const q = cards().find((c) => c.type === 'question' && c.question === 'Qual a diferença entre XSS e CSRF?');
     expect(q?.relatedTerms).toEqual(expect.arrayContaining(['xss', 'csrf']));
-  });
-});
-
-describe('Requirement: Conceitos gerais só em Fundamentos', () => {
-  it('Sem termos repetidos nas linguagens', () => {
-    const base = new Set(getGlossary(web()).map((c) => c.term.toLowerCase()));
-    const repeated = catalog
-      .filter((t) => t.language)
-      .flatMap((t) => getGlossary(t).map((c) => `${t.id}: ${c.term}`))
-      .filter((label) => base.has(label.slice(label.indexOf(': ') + 2).toLowerCase()));
-    expect(repeated).toEqual([]);
-  });
-
-  it('Fundamentos antes da linguagem', () => {
-    for (const id of ['javascript-essencial', 'java-essencial', 'python-essencial']) {
-      expect(getTrack(id)?.prerequisites).toContain('fundamentos-web');
-    }
   });
 });

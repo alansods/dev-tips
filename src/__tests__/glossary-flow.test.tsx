@@ -12,7 +12,7 @@ import TrackScreen from '../app/track/[trackId]';
 import { resetStudyStore, useStudyStore } from '../study/store';
 import { crudTrack } from '../test-utils';
 
-// Os cenários do glossário descrevem o catálogo com as trilhas CRUD e Fundamentos de programação e web.
+// Os cenários do glossário descrevem o catálogo com as trilhas CRUD e Fundamentos web.
 jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());
 const APP = {
   _layout: RootLayout,
@@ -61,11 +61,11 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
 describe('Requirement: Aba Glossário', () => {
   it('Lista completa', async () => {
     await open('/glossary');
-    expect(listed()).toHaveLength(69);
+    expect(listed()).toHaveLength(45);
     expect(listed()[0]).toBe('API');
     expect(listed()[23]).toBe('venv (Python)');
-    expect(listed()[24]).toBe('Variável');
-    expect(screen.getByText('69 termos')).toBeOnTheScreen();
+    expect(listed()[24]).toBe('HTTP');
+    expect(screen.getByText('45 termos')).toBeOnTheScreen();
     expect(screen.queryByText(/em construção/i)).toBeNull();
   });
 
@@ -74,9 +74,7 @@ describe('Requirement: Aba Glossário', () => {
     expect(
       within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
     ).toBeOnTheScreen();
-    expect(
-      within(screen.getByRole('button', { name: 'Cookie' })).getByText('Fundamentos de programação e web'),
-    ).toBeOnTheScreen();
+    expect(within(screen.getByRole('button', { name: 'Cookie' })).getByText('Fundamentos web')).toBeOnTheScreen();
   });
 
   it('Selo de status', async () => {
