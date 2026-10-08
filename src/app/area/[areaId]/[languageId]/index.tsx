@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { FullScreen, Section } from '../../../../components/FullScreen';
 import { NavRow, TrackCard } from '../../../../components/TrackCard';
 import { repoTaxonomy } from '../../../../content';
+import { frameworkIcon } from '../../../../content/icons';
 import { isArea, languageSections } from '../../../../content/navigation';
 import { useCatalog } from '../../../../content/useCatalog';
 import { useT } from '../../../../i18n';
@@ -36,6 +37,7 @@ export default function LanguageScreen() {
               <NavRow
                 key={framework.id}
                 name={framework.name}
+                icon={frameworkIcon(framework)}
                 count={count}
                 onPress={() => router.push(`/area/${area}/${language.id}/${framework.id}`)}
               />

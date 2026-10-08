@@ -75,3 +75,26 @@ export function frameworkTracks(catalog: readonly Track[], area: Area, languageI
     return p.kind === 'framework' && p.framework === frameworkId;
   });
 }
+
+/**
+ * Trilhas da área na ordem sugerida: cada trilha vem depois dos seus
+ * pré-requisitos que também são da área; no empate, vale a ordem do catálogo.
+ */
+export function areaPath(catalog: readonly Track[], area: Area): Track[] {
+  const pending = tracksInArea(catalog, area);
+  const inArea = new Set(pending.map((t) => t.id));
+  const placed = new Set<string>();
+  const path: Track[] = [];
+  while (pending.length > 0) {
+    const ready = pending.findIndex((t) => t.prerequisites.every((p) => !inArea.has(p) || placed.has(p)));
+    // Sem ciclos (a validação garante); por segurança, um ciclo não trava a tela.
+    const [next] = pending.splice(ready === -1 ? 0 : ready, 1);
+    placed.add(next.id);
+    path.push(next);
+  }
+  return path;
+}
+
+/** Trilhas que têm `trackId` como pré-requisito, na ordem do catálogo. */
+export const nextTracks = (catalog: readonly Track[], trackId: string): Track[] =>
+  catalog.filter((t) => t.prerequisites.includes(trackId));

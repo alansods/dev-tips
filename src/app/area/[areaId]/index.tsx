@@ -1,9 +1,11 @@
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { FullScreen, Section } from '../../../components/FullScreen';
+import { PathList } from '../../../components/PathList';
 import { NavRow, TrackCard } from '../../../components/TrackCard';
 import { repoTaxonomy } from '../../../content';
-import { areaSections, isArea } from '../../../content/navigation';
+import { languageIcon } from '../../../content/icons';
+import { areaPath, areaSections, isArea } from '../../../content/navigation';
 import { useCatalog } from '../../../content/useCatalog';
 import { useT } from '../../../i18n';
 
@@ -27,6 +29,9 @@ export default function AreaScreen() {
     >
       {sections ? (
         <>
+          <Section title={t.nav.sections.path}>
+            {area ? [<PathList key="path" tracks={areaPath(catalog, area)} />] : []}
+          </Section>
           <Section title={t.nav.sections.tracks}>
             {sections.direct.map((track) => (
               <TrackCard key={track.id} track={track} />
@@ -44,6 +49,7 @@ export default function AreaScreen() {
               <NavRow
                 key={language.id}
                 name={language.name}
+                icon={languageIcon(language)}
                 count={count}
                 onPress={() => router.push(`/area/${area}/${language.id}`)}
               />

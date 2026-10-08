@@ -17,9 +17,11 @@ Tocar numa trilha em qualquer lista de trilhas SHALL abrir a tela da trilha em t
 
 ### Requirement: Deck com progresso e ação
 Cada deck na tela da trilha SHALL mostrar o título, a quantidade de cards, quantos estão marcados como "já sabia" (ex.: "3/20"), uma barra de progresso proporcional e um botão de ação:
-- **Estudar**, quando nenhum card do deck tem resposta registrada. Abre uma sessão com todos os cards, na ordem do deck;
-- **Continuar**, quando algum card tem resposta, mas nem todos estão como "já sabia". Abre uma sessão com os cards que ainda não estão como "já sabia", na ordem do deck;
+- **Estudar**, quando nenhum card do deck tem resposta registrada. Abre uma sessão com todos os cards;
+- **Continuar**, quando algum card tem resposta, mas nem todos estão como "já sabia". Abre uma sessão com os cards que ainda não estão como "já sabia";
 - **Estudar de novo**, quando todos os cards estão como "já sabia". Abre uma sessão com todos os cards.
+
+A ordem dos cards dentro da sessão segue o requisito "Sessão de estudo".
 
 #### Scenario: Deck nunca estudado
 - **WHEN** nenhum card do deck Glossário tem resposta
@@ -34,22 +36,56 @@ Cada deck na tela da trilha SHALL mostrar o título, a quantidade de cards, quan
 - **THEN** o deck mostra "5/5" e o botão "Estudar de novo", que abre uma sessão com os 5 cards
 
 ### Requirement: Sessão de estudo
-A sessão SHALL abrir em tela cheia, sem a barra de abas. O cabeçalho SHALL ter um botão de sair (rótulo acessível "Sair da sessão"), o título do deck, o contador "posição / total" e uma barra de progresso. A sessão SHALL mostrar um card por vez, na ordem definida ao abrir.
+A sessão SHALL abrir em tela cheia, sem a barra de abas. O cabeçalho SHALL ter um botão de sair (rótulo acessível "Sair da sessão"), o título do deck, o contador "posição / total" e uma barra de progresso. A sessão SHALL mostrar um card por vez.
+
+Ao abrir, a sessão SHALL sortear a ordem dos seus cards, e essa ordem MUST ficar fixa até a sessão terminar. Isso vale para toda sessão: a do deck, a revisão de hoje e "Revisar os que errei". Abrir uma nova sessão SHALL sortear de novo.
+
+A exceção são os cards de passo numerado (tipo step), que MUST aparecer em ordem crescente de número, mesmo numa sessão sorteada. O sorteio MUST NOT mudar quais cards entram na sessão.
 
 #### Scenario: Primeiro card
 - **WHEN** o usuário abre a sessão de um deck com 20 cards
-- **THEN** vê o primeiro card pela frente e o contador "1 / 20"
+- **THEN** vê um dos 20 cards pela frente e o contador "1 / 20"
+
+#### Scenario: Ordem sorteada
+- **WHEN** o sorteio coloca o card `cors` em primeiro e o usuário abre a sessão do deck
+- **THEN** o primeiro card exibido é `cors`, mesmo que ele não seja o primeiro do deck
+
+#### Scenario: Nova ordem a cada sessão
+- **WHEN** o usuário abre a sessão de um deck, sai e abre de novo, e o sorteio da segunda vez é diferente
+- **THEN** a segunda sessão mostra os cards na nova ordem sorteada
+
+#### Scenario: Passos em ordem
+- **WHEN** o usuário abre a sessão de um deck com os passos 1, 2 e 3
+- **THEN** os passos aparecem na ordem 1, 2 e 3
+
+#### Scenario: Mesmos cards
+- **WHEN** a sessão do deck é aberta com "Continuar" e há 3 cards que não estão como "já sabia"
+- **THEN** a sessão tem exatamente esses 3 cards, em ordem sorteada
 
 #### Scenario: Sair no meio
 - **WHEN** o usuário respondeu 3 cards e toca em "Sair da sessão"
 - **THEN** volta para a tela da trilha, e as 3 respostas continuam registradas no progresso
 
 ### Requirement: Virar e responder
-Cada card SHALL começar pela frente. Tocar no card ou no botão "Mostrar resposta" SHALL mostrar o verso. Só com o verso visível SHALL aparecer os botões "Não sabia" e "Já sabia". Tocar em um deles SHALL registrar a resposta para aquele card e avançar para o próximo, que começa pela frente. Depois do último card, a sessão SHALL mostrar o resumo.
+Cada card SHALL começar pela frente. Tocar no card ou no botão "Mostrar resposta" SHALL mostrar o verso. Com o verso visível, a sessão SHALL mostrar o botão "Ver pergunta", e tocar nele ou no card SHALL voltar para a frente. O usuário SHALL poder alternar entre frente e verso quantas vezes quiser.
+
+Os botões "Não sabia" e "Já sabia" SHALL aparecer só com o verso visível. Tocar em um deles SHALL registrar a resposta para aquele card e avançar para o próximo, que começa pela frente. Depois do último card, a sessão SHALL mostrar o resumo.
 
 #### Scenario: Virar o card
 - **WHEN** o usuário toca em "Mostrar resposta"
 - **THEN** o verso aparece e os botões "Não sabia" e "Já sabia" ficam disponíveis
+
+#### Scenario: Voltar para a pergunta
+- **WHEN** o verso está visível e o usuário toca em "Ver pergunta"
+- **THEN** a frente aparece de novo, com o botão "Mostrar resposta", e os botões "Não sabia" e "Já sabia" deixam de estar disponíveis
+
+#### Scenario: Tocar no verso
+- **WHEN** o verso está visível e o usuário toca no card
+- **THEN** a frente aparece de novo
+
+#### Scenario: Virar de novo
+- **WHEN** o usuário voltou para a frente e toca em "Mostrar resposta"
+- **THEN** o verso aparece de novo, e responder registra o card normalmente
 
 #### Scenario: Responder e avançar
 - **WHEN** o verso do card 1 de 5 está visível e o usuário toca em "Já sabia"
@@ -119,7 +155,7 @@ Snippets SHALL ser exibidos em fonte monoespaçada, preservando quebras de linha
 Ao responder o último card, a sessão SHALL mostrar o resumo:
 - quantos cards foram marcados como "já sabia" e como "não sabia" nesta sessão, com esses rótulos;
 - a lista dos cards marcados como "não sabia", identificados pelo tipo e pelo título;
-- o botão **Revisar os que errei**, só quando houver algum "não sabia", que inicia uma nova sessão apenas com esses cards, na mesma ordem;
+- o botão **Revisar os que errei**, só quando houver algum "não sabia". Ele inicia uma nova sessão apenas com esses cards, com a ordem sorteada de novo como no requisito "Sessão de estudo";
 - o botão **Voltar à trilha**.
 
 #### Scenario: Resumo com erros
@@ -142,11 +178,11 @@ O progresso de cada card SHALL ser a última resposta registrada ("já sabia" ou
 - **THEN** ele passa a contar como "já sabia"
 
 ### Requirement: Nível no card
-Na sessão de estudo e na revisão, a frente e o verso de todo card SHALL mostrar o nível do card como um chip ao lado do chip de tipo: "Júnior", "Pleno" ou "Sênior" em PT-BR, e "Junior", "Mid-level" ou "Senior" em inglês. O chip SHALL ser só informativo, sem ação ao tocar.
+Na sessão de estudo e na revisão, a frente e o verso de todo card SHALL mostrar o nível do card como um chip ao lado do selo de origem do card: "Júnior", "Pleno" ou "Sênior" em PT-BR, e "Junior", "Mid-level" ou "Senior" em inglês. O chip SHALL ser só informativo, sem ação ao tocar.
 
 #### Scenario: Nível na frente
 - **WHEN** a sessão mostra a frente de um card com `level: "pleno"`
-- **THEN** o chip "Pleno" aparece ao lado do tipo do card
+- **THEN** o chip "Pleno" aparece ao lado do selo de origem do card
 
 #### Scenario: Nível no verso
 - **WHEN** o usuário vira um card com `level: "senior"`
@@ -155,4 +191,25 @@ Na sessão de estudo e na revisão, a frente e o verso de todo card SHALL mostra
 #### Scenario: Nível em inglês
 - **WHEN** o app está em inglês e a sessão mostra um card com `level: "pleno"`
 - **THEN** o chip mostra "Mid-level"
+
+### Requirement: Origem do card na sessão
+Na sessão de estudo e nas revisões, a frente e o verso de todo card SHALL começar pelo selo de origem: o ícone da trilha e o texto "<trilha> · <deck>", com o título da trilha e o título do deck a que o card pertence, no idioma exibido. O selo SHALL ser só informativo, sem ação ao tocar.
+
+O tipo do card (por exemplo, "Glossário" ou "Pergunta") MUST NOT aparecer como selo. A exceção são os cards de passo, que SHALL continuar mostrando "Passo N" ao lado do selo de origem.
+
+#### Scenario: Card de conceito
+- **WHEN** a sessão mostra o card `cors` do deck Glossário da trilha CRUD
+- **THEN** o card mostra o selo "O mesmo CRUD em quatro frameworks · Glossário", e nenhum selo de tipo
+
+#### Scenario: Revisão de todas as trilhas
+- **WHEN** a revisão de todas as trilhas mostra um card do deck "Compras dentro do app" da trilha "Pagamentos no app"
+- **THEN** o selo mostra "Pagamentos no app · Compras dentro do app" com o ícone da trilha
+
+#### Scenario: Card de passo
+- **WHEN** a sessão mostra o passo 3 da trilha CRUD
+- **THEN** o card mostra o selo de origem e também "Passo 3"
+
+#### Scenario: Em inglês
+- **WHEN** o app está em inglês e a sessão mostra o card `cors`
+- **THEN** o selo mostra os títulos da trilha e do deck em inglês
 

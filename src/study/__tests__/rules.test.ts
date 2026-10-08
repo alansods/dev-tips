@@ -7,9 +7,11 @@ import {
   initialSession,
   progressKey,
   sessionCardIds,
+  sessionOrder,
   sessionReducer,
   summary,
   trackStats,
+  trackStatus,
   type Progress,
 } from '../rules';
 
@@ -60,13 +62,29 @@ describe('Requirement: Deck com progresso e ação', () => {
 
 describe('Requirement: Virar e responder', () => {
   it('Virar o card', () => {
-    const state = sessionReducer(initialSession(['a', 'b']), { type: 'reveal' });
+    const state = sessionReducer(initialSession(['a', 'b']), { type: 'flip' });
     expect(state.revealed).toBe(true);
+  });
+
+  it('Voltar para a pergunta', () => {
+    let state = sessionReducer(initialSession(['a', 'b']), { type: 'flip' });
+    state = sessionReducer(state, { type: 'flip' });
+    expect(state).toMatchObject({ index: 0, revealed: false, results: {} });
+    // de volta à frente, não dá para responder
+    expect(sessionReducer(state, { type: 'answer', result: 'known' })).toBe(state);
+  });
+
+  it('Virar de novo', () => {
+    let state = initialSession(['a', 'b']);
+    for (let i = 0; i < 3; i++) state = sessionReducer(state, { type: 'flip' });
+    expect(state.revealed).toBe(true);
+    state = sessionReducer(state, { type: 'answer', result: 'unknown' });
+    expect(state).toMatchObject({ index: 1, revealed: false, results: { a: 'unknown' } });
   });
 
   it('Responder e avançar', () => {
     let state = initialSession(['a', 'b', 'c', 'd', 'e']);
-    state = sessionReducer(state, { type: 'reveal' });
+    state = sessionReducer(state, { type: 'flip' });
     state = sessionReducer(state, { type: 'answer', result: 'known' });
     expect(state).toMatchObject({ index: 1, revealed: false, finished: false, results: { a: 'known' } });
   });
@@ -78,10 +96,10 @@ describe('Requirement: Virar e responder', () => {
 
   it('termina depois do último card', () => {
     let state = initialSession(['a']);
-    state = sessionReducer(state, { type: 'reveal' });
+    state = sessionReducer(state, { type: 'flip' });
     state = sessionReducer(state, { type: 'answer', result: 'unknown' });
     expect(state.finished).toBe(true);
-    expect(sessionReducer(state, { type: 'reveal' })).toBe(state);
+    expect(sessionReducer(state, { type: 'flip' })).toBe(state);
   });
 
   it('restart começa uma nova sessão com outros cards', () => {
@@ -94,7 +112,7 @@ describe('Requirement: Resumo da sessão', () => {
   function answerAll(results: ('known' | 'unknown')[]) {
     let state = initialSession(results.map((_, i) => `c${i}`));
     for (const result of results) {
-      state = sessionReducer(state, { type: 'reveal' });
+      state = sessionReducer(state, { type: 'flip' });
       state = sessionReducer(state, { type: 'answer', result });
     }
     return state;
@@ -107,6 +125,52 @@ describe('Requirement: Resumo da sessão', () => {
 
   it('Resumo sem erros', () => {
     expect(summary(answerAll(['known', 'known']))).toEqual({ known: 2, unknown: 0, missedIds: [] });
+  });
+});
+
+describe('Requirement: Sessão de estudo (ordem sorteada)', () => {
+  const allCards = new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c]));
+  const always = (value: number) => () => value;
+
+  it('Ordem sorteada', () => {
+    // Com o sorteio sempre 0, Fisher-Yates troca cada posição com a primeira.
+    const ordered = ids(endpoints);
+    const [a, b, c, d, e] = ordered;
+    expect(sessionOrder(ordered, allCards, always(0))).toEqual([b, c, d, e, a]);
+  });
+
+  it('sorteio próximo de 1 mantém a ordem original', () => {
+    expect(sessionOrder(ids(endpoints), allCards, always(0.999999))).toEqual(ids(endpoints));
+  });
+
+  it('Passos em ordem', () => {
+    const steps = deck('passo-a-passo');
+    const result = sessionOrder(ids(steps), allCards, always(0));
+    const numbers = result
+      .map((id) => allCards.get(id)!)
+      .flatMap((card) => (card.type === 'step' ? [card.number] : []));
+    expect(numbers).toEqual([...numbers].sort((x, y) => x - y));
+    expect(result).not.toEqual(ids(steps)); // os outros cards foram sorteados
+  });
+
+  it('Mesmos cards', () => {
+    const steps = deck('passo-a-passo');
+    const result = sessionOrder(ids(steps), allCards, Math.random);
+    expect([...result].sort()).toEqual([...ids(steps)].sort());
+  });
+
+  it('não altera a lista recebida', () => {
+    const ordered = ids(endpoints);
+    sessionOrder(ordered, allCards, always(0));
+    expect(ordered).toEqual(ids(endpoints));
+  });
+});
+
+describe('Requirement: Ordem sugerida na área (estado da trilha)', () => {
+  it('Estados', () => {
+    expect(trackStatus({ total: 5, known: 5, unknown: 0, answered: 5 })).toBe('done');
+    expect(trackStatus({ total: 5, known: 1, unknown: 1, answered: 2 })).toBe('started');
+    expect(trackStatus({ total: 5, known: 0, unknown: 0, answered: 0 })).toBe('new');
   });
 });
 

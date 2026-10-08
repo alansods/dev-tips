@@ -2,6 +2,8 @@
   "id": "estado-e-dados-no-react",
   "title": "Estado e dados no React",
   "description": "Onde guardar cada estado em apps React e React Native: Context, Zustand, Redux Toolkit, dados do servidor com React Query e SWR, Axios e hooks personalizados.",
+  "prerequisites": ["react"],
+  "addedAt": "2026-10-06",
   "areas": [
     "frontend",
     "mobile"

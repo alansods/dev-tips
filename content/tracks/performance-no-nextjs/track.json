@@ -2,6 +2,8 @@
   "id": "performance-no-nextjs",
   "title": "Performance no Next.js",
   "description": "Deixar aplicações Next.js rápidas: rotas estáticas e dinâmicas, Cache Components, pré-renderização parcial, imagens, fontes, JavaScript no cliente e Core Web Vitals.",
+  "prerequisites": ["nextjs"],
+  "addedAt": "2026-10-06",
   "areas": [
     "frontend"
   ],

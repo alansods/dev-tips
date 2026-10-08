@@ -2,6 +2,8 @@
   "id": "aws-essencial",
   "title": "AWS essencial",
   "description": "Os serviços básicos da AWS que aparecem em entrevista: IAM, regiões, EC2, VPC, S3, RDS e DynamoDB.",
+  "icon": { "text": "AWS" },
+  "addedAt": "2026-10-05",
   "areas": [
     "devops"
   ],

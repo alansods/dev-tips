@@ -4,7 +4,9 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import LanguageScreen from '../app/area/[areaId]/[languageId]/index';
 import FrameworkScreen from '../app/area/[areaId]/[languageId]/[frameworkId]';
@@ -29,8 +31,10 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'area/[areaId]/index': AreaScreen,
   'area/[areaId]/[languageId]/index': LanguageScreen,
   'area/[areaId]/[languageId]/[frameworkId]': FrameworkScreen,
@@ -59,7 +63,7 @@ describe('Requirement: Tela da área', () => {
   });
 
   it('Home soma as trilhas de linguagem na área', async () => {
-    await open('/');
+    await open('/tracks');
     expect(within(screen.getByRole('button', { name: /^Backend,/ })).getByText('4 trilhas')).toBeOnTheScreen();
   });
 });

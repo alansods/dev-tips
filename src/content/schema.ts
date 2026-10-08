@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { TECH_ICON_SLUGS } from './techIcons.generated';
+
 /** Texto obrigatório: não pode ser vazio nem só espaços. O valor é preservado sem trim. */
 const text = () =>
   z.string().refine((s) => s.trim().length > 0, { error: 'não pode ficar vazio' });
@@ -99,6 +101,22 @@ export const cardSchema = z.discriminatedUnion('type', [
   questionCardSchema,
 ]);
 
+/** Nome de um logo do conjunto gerado por `npm run tech-icons`. */
+export const logoSlug = () => z.enum(TECH_ICON_SLUGS, { error: 'logo desconhecido; rode npm run tech-icons' });
+
+/** Ícone próprio da trilha: um logo do conjunto ou uma sigla curta. */
+export const trackIconSchema = z
+  .strictObject({
+    logo: logoSlug().optional(),
+    text: z
+      .string()
+      .refine((s) => s.trim().length >= 1 && s.length <= 4, { error: 'a sigla deve ter de 1 a 4 caracteres' })
+      .optional(),
+  })
+  .refine((icon) => (icon.logo === undefined) !== (icon.text === undefined), {
+    error: 'use "logo" ou "text", um dos dois',
+  });
+
 export const variantSchema = z.object({ id: id(), name: text(), language: text() });
 export const compareColumnSchema = z.object({ id: id(), label: text() });
 
@@ -116,6 +134,14 @@ export const trackSchema = z.object({
   areas: z.array(z.enum(AREAS, { error: `área desconhecida; use: ${AREAS.join(', ')}` })).min(1, { error: 'a trilha precisa de pelo menos uma área' }),
   language: id().optional(),
   framework: id().optional(),
+  icon: trackIconSchema.optional(),
+  prerequisites: z.array(id()).default([]),
+  addedAt: z
+    .string()
+    .refine((s) => /^\d{4}-\d{2}-\d{2}$/.test(s) && new Date(`${s}T00:00:00Z`).toISOString().startsWith(s), {
+      error: 'data deve estar no formato AAAA-MM-DD e existir',
+    })
+    .optional(),
   section: z.enum(SECTIONS, { error: `seção desconhecida; use: ${SECTIONS.join(', ')}` }).optional(),
   variants: z.array(variantSchema).optional(),
   compareColumns: z.array(compareColumnSchema).optional(),
@@ -123,6 +149,7 @@ export const trackSchema = z.object({
 });
 
 export type Track = z.output<typeof trackSchema>;
+export type TrackIconField = z.output<typeof trackIconSchema>;
 export type Area = (typeof AREAS)[number];
 export type Level = (typeof LEVELS)[number];
 export type Section = (typeof SECTIONS)[number];

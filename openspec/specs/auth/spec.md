@@ -64,22 +64,22 @@ Rotas que exigem conta SHALL aceitar só requisições com `Authorization: Beare
 - **THEN** a exclusão responde `204`, e o novo login cria um usuário novo, sem dados anteriores
 
 ### Requirement: Tela de login
-A tela de login SHALL mostrar o nome do app "Dev Tips", a ilustração de cards, o título "Aprenda, reforce e relembre", o texto "Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.", os botões "Continuar com o Google" e "Continuar sem conta", e os links "Termos de uso" e "Política de privacidade". No primeiro uso do app, a tela SHALL aparecer uma única vez antes da aba Trilhas; depois, só pelo botão "Entrar" de Ajustes. "Continuar sem conta" SHALL fechar a tela sem criar conta, e o app SHALL funcionar normalmente sem conta.
+A tela de login SHALL mostrar o nome do app "Dev Tips", a ilustração de cards, o título "Aprenda, reforce e relembre", o texto "Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.", os botões "Continuar com o Google" e "Continuar sem conta", e os links "Termos de uso" e "Política de privacidade". No primeiro uso do app, a tela SHALL aparecer uma única vez antes da aba Início; depois, só pelo botão "Entrar" da aba Perfil. "Continuar sem conta" SHALL fechar a tela sem criar conta, e o app SHALL funcionar normalmente sem conta.
 
 #### Scenario: Primeiro uso
 - **WHEN** o app abre pela primeira vez
-- **THEN** a tela de login aparece antes da aba Trilhas
+- **THEN** a tela de login aparece antes da aba Início
 
 #### Scenario: Continuar sem conta
 - **WHEN** o usuário toca em "Continuar sem conta" e depois fecha e abre o app
-- **THEN** a aba Trilhas abre, e a tela de login não aparece de novo
+- **THEN** a aba Início abre, e a tela de login não aparece de novo
 
 ### Requirement: Entrar pelo app
 Tocar em "Continuar com o Google" SHALL abrir o login do Google e, com sucesso, enviar o ID token à API, guardar a sessão e voltar para a tela de onde o login foi aberto (a aba Trilhas no primeiro uso). Durante o envio, o botão SHALL mostrar "Entrando…" com um indicador, e "Continuar sem conta" SHALL ficar desabilitado. Se o usuário cancelar o login do Google, a tela SHALL voltar ao estado normal sem mensagem. Sem conexão, SHALL mostrar "Sem conexão. Tente de novo quando estiver online."; com erro da API, "Não foi possível entrar agora. Tente de novo."
 
 #### Scenario: Login com sucesso
-- **WHEN** o usuário entra com o Google a partir de Ajustes
-- **THEN** o app volta para Ajustes, e a seção Conta mostra o nome e o e-mail
+- **WHEN** o usuário entra com o Google a partir da aba Perfil
+- **THEN** o app volta para a aba Perfil, e a seção Conta mostra o nome e o e-mail
 
 #### Scenario: Carregando
 - **WHEN** o ID token foi obtido e a API ainda não respondeu
@@ -98,7 +98,7 @@ Tocar em "Continuar com o Google" SHALL abrir o login do Google e, com sucesso, 
 - **THEN** aparece "Não foi possível entrar agora. Tente de novo."
 
 ### Requirement: Conta no app
-A seção "Conta" de Ajustes SHALL mostrar:
+A seção "Conta" da aba Perfil SHALL mostrar:
 - sem sessão: o convite "Salve seu progresso na nuvem" com o botão "Entrar", que abre a tela de login;
 - com sessão: uma linha com foto, nome e e-mail, que abre a tela "Conta".
 
@@ -127,7 +127,7 @@ O bloco "Plano" SHALL aparecer no Android e no iOS. No iOS, onde o Pro ainda nã
 A confirmação de "Apagar conta" SHALL ter os botões "Cancelar" e "Apagar minha conta". Nos dois casos (sair e apagar), o progresso no aparelho MUST NOT ser apagado. Sem conexão, sair SHALL encerrar a sessão no aparelho mesmo assim; apagar a conta SHALL mostrar o erro de conexão e manter a conta.
 
 #### Scenario: Convite para entrar
-- **WHEN** não há sessão e o usuário abre Ajustes
+- **WHEN** não há sessão e o usuário abre a aba Perfil
 - **THEN** a seção Conta mostra "Salve seu progresso na nuvem" e o botão "Entrar"
 
 #### Scenario: Sair

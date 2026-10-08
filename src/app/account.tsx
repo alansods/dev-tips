@@ -20,9 +20,9 @@ import { PlanCard } from '../subscriptions/PlanCard';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
-function backToSettings() {
+function backToProfile() {
   if (router.canGoBack()) router.back();
-  else router.replace('/settings');
+  else router.replace('/profile');
 }
 
 type Confirm = 'signOut' | 'delete' | null;
@@ -35,12 +35,12 @@ export default function AccountScreen() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  if (!user) return <Redirect href="/settings" />;
+  if (!user) return <Redirect href="/profile" />;
 
   const onSignOut = async () => {
     setBusy(true);
     await signOut();
-    backToSettings();
+    backToProfile();
   };
 
   const onDelete = async () => {
@@ -48,14 +48,14 @@ export default function AccountScreen() {
     setMessage(null);
     const outcome = await deleteAccount();
     setBusy(false);
-    if (outcome === 'deleted') backToSettings();
+    if (outcome === 'deleted') backToProfile();
     else setMessage(outcome === 'offline' ? t.account.deleteOffline : t.account.deleteError);
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
       <View style={styles.header}>
-        <IconButton label={t.common.back} onPress={backToSettings}>
+        <IconButton label={t.common.back} onPress={backToProfile}>
           <BackIcon color={colors.ink} />
         </IconButton>
         <AppText font="bold" size={20} accessibilityRole="header">

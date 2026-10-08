@@ -5,7 +5,8 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import type { Track } from '../content';
+import { repoTaxonomy, type Area, type Track } from '../content';
+import { trackIcon, type ItemIcon } from '../content/icons';
 import { useT } from '../i18n';
 import { today } from '../study/clock';
 import { trackStats, tracksStats } from '../study/rules';
@@ -15,9 +16,21 @@ import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { AppText } from './AppText';
 import { ChevronRightIcon } from './icons';
+import { TechIcon } from './TechIcon';
 import { ProgressBar } from './ProgressBar';
 
-function Card({ label, onPress, children }: { label: string; onPress: () => void; children: ReactNode }) {
+function Card({
+  label,
+  onPress,
+  fill = false,
+  children,
+}: {
+  label: string;
+  onPress: () => void;
+  /** Ocupa toda a altura disponível (cards lado a lado com a mesma altura). */
+  fill?: boolean;
+  children: ReactNode;
+}) {
   const { colors } = useTheme();
   return (
     <Pressable
@@ -26,6 +39,7 @@ function Card({ label, onPress, children }: { label: string; onPress: () => void
       onPress={onPress}
       style={({ pressed }) => [
         styles.card,
+        fill && styles.fill,
         { backgroundColor: colors.surface, borderColor: colors.line, opacity: pressed ? 0.85 : 1 },
       ]}
     >
@@ -62,9 +76,12 @@ export function TrackCard({ track }: { track: Track }) {
       label={t.home.cardLabel(track.title, stats.known, stats.total)}
       onPress={() => router.push(`/track/${track.id}`)}
     >
-      <AppText font="semibold" size={16}>
-        {track.title}
-      </AppText>
+      <View style={styles.row}>
+        <TechIcon icon={trackIcon(track, repoTaxonomy)} size={40} />
+        <AppText font="semibold" size={16} style={{ flex: 1 }}>
+          {track.title}
+        </AppText>
+      </View>
       <AppText size={13} tone="muted">
         {track.description}
       </AppText>
@@ -78,20 +95,38 @@ export function TrackCard({ track }: { track: Track }) {
   );
 }
 
-export function AreaCard({ name, tracks, onPress }: { name: string; tracks: readonly Track[]; onPress: () => void }) {
+export function AreaCard({
+  area,
+  name,
+  tracks,
+  onPress,
+  compact = false,
+}: {
+  area: Area;
+  name: string;
+  tracks: readonly Track[];
+  onPress: () => void;
+  /** Em duas colunas: ícone acima do nome. */
+  compact?: boolean;
+}) {
   const t = useT();
   const progress = useStudyStore((s) => s.progress);
   const stats = tracksStats(tracks, progress);
   const due = useDue(tracks);
   const count = t.nav.trackCount(tracks.length);
   return (
-    <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress}>
-      <AppText font="semibold" size={18}>
-        {name}
-      </AppText>
-      <AppText size={13} tone="muted">
-        {count}
-      </AppText>
+    <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress} fill={compact}>
+      <View style={compact ? { gap: spacing.sm } : styles.row}>
+        <TechIcon icon={{ kind: 'area', area }} size={40} />
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText font="semibold" size={compact ? 16 : 18}>
+            {name}
+          </AppText>
+          <AppText size={13} tone="muted">
+            {count}
+          </AppText>
+        </View>
+      </View>
       <ProgressLine known={stats.known} total={stats.total} />
       {due > 0 && (
         <AppText font="medium" size={13} tone="warn">
@@ -103,13 +138,24 @@ export function AreaCard({ name, tracks, onPress }: { name: string; tracks: read
 }
 
 /** Linha de linguagem ou framework: nome, quantidade de trilhas e seta. */
-export function NavRow({ name, count, onPress }: { name: string; count: number; onPress: () => void }) {
+export function NavRow({
+  name,
+  icon,
+  count,
+  onPress,
+}: {
+  name: string;
+  icon: ItemIcon;
+  count: number;
+  onPress: () => void;
+}) {
   const { colors } = useTheme();
   const t = useT();
   const tracks = t.nav.trackCount(count);
   return (
     <Card label={t.nav.rowLabel(name, tracks)} onPress={onPress}>
       <View style={styles.row}>
+        <TechIcon icon={icon} size={40} />
         <View style={{ flex: 1, gap: 2 }}>
           <AppText font="semibold" size={16}>
             {name}
@@ -126,6 +172,7 @@ export function NavRow({ name, count, onPress }: { name: string; count: number; 
 
 const styles = StyleSheet.create({
   card: { padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1, gap: spacing.sm },
+  fill: { flex: 1 },
   progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.xs },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 });

@@ -2,6 +2,8 @@
   "id": "react",
   "title": "React",
   "description": "A biblioteca de interfaces mais usada: componentes, hooks, renderização e performance.",
+  "prerequisites": ["javascript-no-navegador"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend"
   ],

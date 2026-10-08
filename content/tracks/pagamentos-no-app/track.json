@@ -2,6 +2,8 @@
   "id": "pagamentos-no-app",
   "title": "Pagamentos no app",
   "description": "Cobrar dentro de um app mobile: quando usar a compra da App Store e do Google Play, IAP no Expo com RevenueCat, gateway, Pix, webhooks e idempotência.",
+  "prerequisites": ["react-native"],
+  "addedAt": "2026-10-06",
   "areas": [
     "mobile"
   ],

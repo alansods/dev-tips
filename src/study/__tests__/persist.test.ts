@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import * as clock from '../clock';
 import { progressKey } from '../rules';
 import { STUDY_STORAGE_KEY, resetStudyStore, useStudyStore } from '../store';
 
@@ -78,8 +79,15 @@ describe('Requirement: Progresso salvo no aparelho', () => {
     store().answer(TRACK, 'api', 'unknown');
     await flush();
     const saved = JSON.parse((await AsyncStorage.getItem(STUDY_STORAGE_KEY))!);
-    expect(Object.keys(saved.state).sort()).toEqual(['lastStudyDay', 'preferredVariant', 'progress', 'schedule']);
-    expect(saved.version).toBe(2);
+    expect(Object.keys(saved.state).sort()).toEqual([
+      'lastAnswer',
+      'lastStudyDay',
+      'preferredVariant',
+      'progress',
+      'schedule',
+      'studyDays',
+    ]);
+    expect(saved.version).toBe(4);
   });
 });
 
@@ -95,5 +103,63 @@ describe('Requirement: Zerar progresso de uma trilha', () => {
     await flush();
     await reopen();
     expect(store().progress).toEqual({ [progressKey('outro-trilha', 'api')]: 'known' });
+  });
+});
+
+describe('Requirement: Dias estudados (no aparelho)', () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it('responder registra o dia e ele é mantido ao reabrir', async () => {
+    jest.spyOn(clock, 'today').mockReturnValue('2026-10-07');
+    store().answer(TRACK, 'api', 'known');
+    await flush();
+    await reopen();
+    expect(store().studyDays).toEqual(['2026-10-07']);
+  });
+
+  it('Dados de quem já usava o app', async () => {
+    await AsyncStorage.setItem(
+      STUDY_STORAGE_KEY,
+      JSON.stringify({
+        state: { progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: '2026-10-06' },
+        version: 2,
+      }),
+    );
+    await reopen();
+    expect(store().studyDays).toEqual(['2026-10-06']);
+  });
+
+  it('dias estudados inválidos são ignorados', async () => {
+    await AsyncStorage.setItem(
+      STUDY_STORAGE_KEY,
+      JSON.stringify({
+        state: { progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: null, studyDays: 'ontem' },
+        version: 3,
+      }),
+    );
+    await reopen();
+    expect(store().studyDays).toEqual([]);
+  });
+});
+
+describe('Requirement: Continue de onde parou (última resposta)', () => {
+  it('a última resposta fica salva e é mantida ao reabrir', async () => {
+    store().answer(TRACK, 'api', 'known');
+    store().answer(TRACK, 'cors', 'unknown');
+    await flush();
+    await reopen();
+    expect(store().lastAnswer).toEqual({ trackId: TRACK, cardId: 'cors' });
+  });
+
+  it('quem vem da versão 3 começa sem última resposta', async () => {
+    await AsyncStorage.setItem(
+      STUDY_STORAGE_KEY,
+      JSON.stringify({
+        state: { progress: {}, preferredVariant: {}, schedule: {}, lastStudyDay: null, studyDays: [] },
+        version: 3,
+      }),
+    );
+    await reopen();
+    expect(store().lastAnswer).toBeNull();
   });
 });

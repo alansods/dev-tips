@@ -1,6 +1,8 @@
 // Ícones de traço do design (mesmos desenhos do protótipo).
 import type { ColorValue } from 'react-native';
-import Svg, { Circle, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, Ellipse, Path, Rect } from 'react-native-svg';
+
+import type { Area } from '../content';
 
 type IconProps = { color: ColorValue; size?: number };
 
@@ -26,6 +28,23 @@ export function GlossaryIcon({ color, size = 22 }: IconProps) {
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" {...stroke(color)} />
       <Path d="M4 21V5M9 8h6M9 12h4" {...stroke(color)} />
+    </Svg>
+  );
+}
+
+export function HomeIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M4 10.5L12 4l8 6.5V20h-5v-6h-6v6H4z" />
+    </Svg>
+  );
+}
+
+export function ProfileIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Circle cx={12} cy={8.5} r={3.5} />
+      <Path d="M5 20c1-3.5 4-5.5 7-5.5s6 2 7 5.5" />
     </Svg>
   );
 }
@@ -70,18 +89,6 @@ export function CloseIcon({ color, size = 20 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
       <Path d="M18 6L6 18M6 6l12 12" {...stroke(color)} />
-    </Svg>
-  );
-}
-
-export function SettingsIcon({ color, size = 20 }: IconProps) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24">
-      <Circle cx="12" cy="12" r="3" {...stroke(color)} />
-      <Path
-        d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"
-        {...stroke(color)}
-      />
     </Svg>
   );
 }
@@ -193,3 +200,69 @@ export function SendIcon({ color, size = 20 }: IconProps) {
     </Svg>
   );
 }
+
+// ---------- áreas do catálogo ----------
+
+export function FundamentalsIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M12 3l9 5-9 5-9-5z" />
+      <Path d="M3 13l9 5 9-5" />
+    </Svg>
+  );
+}
+
+export function FrontendIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={3} y={4} width={18} height={14} rx={2} />
+      <Path d="M3 8h18M8 21h8" />
+    </Svg>
+  );
+}
+
+export function BackendIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={4} y={4} width={16} height={7} rx={1.5} />
+      <Rect x={4} y={13} width={16} height={7} rx={1.5} />
+      <Path d="M8 7.5h.01M8 16.5h.01" />
+    </Svg>
+  );
+}
+
+export function DatabaseIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Ellipse cx={12} cy={6} rx={7} ry={2.8} />
+      <Path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8" />
+    </Svg>
+  );
+}
+
+export function MobileIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Rect x={7} y={2.5} width={10} height={19} rx={2.5} />
+      <Path d="M11 18.5h2" />
+    </Svg>
+  );
+}
+
+export function CloudIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M7 18a4.5 4.5 0 0 1-.6-9A6 6 0 0 1 18 8.5a4.8 4.8 0 0 1-.5 9.5z" />
+    </Svg>
+  );
+}
+
+/** Ícone de traço de cada área do catálogo. */
+export const AREA_ICONS: Record<Area, (props: IconProps) => React.JSX.Element> = {
+  fundamentos: FundamentalsIcon,
+  frontend: FrontendIcon,
+  backend: BackendIcon,
+  'banco-de-dados': DatabaseIcon,
+  mobile: MobileIcon,
+  devops: CloudIcon,
+};

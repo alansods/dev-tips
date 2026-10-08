@@ -4,10 +4,11 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import AccountScreen from '../app/account';
-import SettingsScreen from '../app/settings';
 import TrackScreen from '../app/track/[trackId]';
 import { useAccountStore } from '../auth/store';
 import { saveTokens } from '../auth/tokens';
@@ -21,9 +22,10 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
-  settings: SettingsScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   account: AccountScreen,
   'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
@@ -58,7 +60,7 @@ afterEach(() => fetchMock.mockRestore());
 describe('Requirement: Aviso de offline', () => {
   it('Ficar offline com conta', async () => {
     await signIn();
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(OFFLINE)).toBeNull();
     await act(async () => network.__setNetworkState(false));
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
@@ -71,7 +73,7 @@ describe('Requirement: Aviso de offline', () => {
   it('Reconectar', async () => {
     await signIn();
     network.__setNetworkState(false);
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
     await act(async () => network.__setNetworkState(true));
     expect(screen.queryByText(OFFLINE)).toBeNull();
@@ -79,15 +81,15 @@ describe('Requirement: Aviso de offline', () => {
 
   it('Offline sem conta', async () => {
     network.__setNetworkState(false);
-    await open('/');
+    await open('/tracks');
     expect(screen.queryByText(OFFLINE)).toBeNull();
   });
 });
 
 describe('Requirement: Estado da sincronização', () => {
-  it('Sincronizado (tela Conta e Ajustes)', async () => {
+  it('Sincronizado (tela Conta e Perfil)', async () => {
     await signIn();
-    await open('/settings');
+    await open('/profile');
     expect(useSyncStore.getState().lastSyncedAt).toEqual(expect.any(Number));
     expect(screen.getByText('Sincronizado agora há pouco')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: /Ana Souza/ }));
@@ -97,7 +99,7 @@ describe('Requirement: Estado da sincronização', () => {
 
   it('Sem conexão com mudanças pendentes', async () => {
     await signIn();
-    await open('/settings');
+    await open('/profile');
     await act(async () => network.__setNetworkState(false));
     await act(async () => useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known'));
     expect(screen.getByText('Aguardando conexão')).toBeOnTheScreen();
@@ -108,7 +110,7 @@ describe('Requirement: Primeiro login', () => {
   it('mensagem depois da primeira sincronização', async () => {
     useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
     await signIn();
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText('Seu progresso foi salvo na conta.')).toBeOnTheScreen();
     expect(server.card('crud-4-frameworks', 'cors')?.result).toBe('known');
   });

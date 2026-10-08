@@ -2,6 +2,9 @@
   "id": "redis",
   "title": "Redis",
   "description": "O banco em memória mais usado: estruturas de dados, TTL, cache, persistência, pub/sub e filas.",
+  "icon": { "logo": "redis" },
+  "prerequisites": ["nosql"],
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],

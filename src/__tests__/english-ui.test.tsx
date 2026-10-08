@@ -4,7 +4,9 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import ReviewScreen from '../app/review/[trackId]';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
@@ -16,8 +18,10 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
   'review/[trackId]': ReviewScreen,
@@ -40,6 +44,8 @@ describe('Requirement: Interface traduzida', () => {
   it('Sessão em inglês', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
     expect(screen.getByText('Tap to see the answer')).toBeOnTheScreen();
+    // Origem do card na sessão: em inglês
+    expect(screen.getByText("The same CRUD in four frameworks · What we'll build")).toBeOnTheScreen();
     press('Show answer');
     expect(screen.getByRole('button', { name: "I didn't know" })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'I knew it' })).toBeOnTheScreen();
@@ -93,7 +99,7 @@ describe('Requirement: Interface traduzida', () => {
 
   it('Home em inglês', async () => {
     useStudyStore.getState().answer(TRACK, deckIds('glossario')[0], 'unknown');
-    await open('/');
+    await open('/tracks');
     expect(screen.getByText('1 to review today')).toBeOnTheScreen();
   });
 });

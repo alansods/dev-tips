@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { Animated, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -16,7 +16,16 @@ import { useT } from '../i18n';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { flipDuration } from './motion';
-import { cardTitle, initialSession, sessionReducer, summary, type SessionState } from './rules';
+import * as chance from './chance';
+import {
+  cardTitle,
+  initialSession,
+  progressKey,
+  sessionOrder,
+  sessionReducer,
+  summary,
+  type SessionState,
+} from './rules';
 import { useStudyStore } from './store';
 import { useReducedMotion } from './useReducedMotion';
 
@@ -25,36 +34,58 @@ export function leaveToTrack(trackId: string) {
   else router.replace(`/track/${trackId}`);
 }
 
+/** Um card da sessão e a trilha a que ele pertence. */
+export type SessionEntry = { trackId: string; cardId: string };
+
 type SessionProps = {
-  track: Track;
+  /** Trilhas dos cards da sessão (uma, no deck; várias, na revisão de todas as trilhas). */
+  tracks: readonly Track[];
   /** Nome exibido no cabeçalho e no resumo (ex.: título do deck ou "Revisão de hoje"). */
   title: string;
-  /** Ids dos cards, calculados uma única vez na abertura da sessão. */
-  initialIds: () => string[];
+  /** Cards da sessão, calculados uma única vez na abertura. */
+  entries: () => SessionEntry[];
+  /** Sair da sessão (botão de fechar e "Voltar" do resumo). */
+  onExit: () => void;
 };
 
 /** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
-export function StudySession({ track, title, initialIds }: SessionProps) {
+export function StudySession({ tracks, title, entries, onExit }: SessionProps) {
   const { colors } = useTheme();
   const t = useT();
   const answerCard = useStudyStore((s) => s.answer);
   const setVariant = useStudyStore((s) => s.setVariant);
-  const variantId = useStudyStore((s) => s.preferredVariant[track.id]) ?? track.variants?.[0]?.id ?? '';
+  const preferredVariant = useStudyStore((s) => s.preferredVariant);
 
-  // A ordem é fixada ao abrir a sessão.
-  const [state, dispatch] = useReducer(sessionReducer, undefined, () => initialSession(initialIds()));
-  const cardsById = useMemo(() => new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c])), [track]);
+  // Cada card da sessão é identificado por `trackId:cardId` (a mesma chave do progresso).
+  const byKey = useMemo(
+    () =>
+      new Map(
+        tracks.flatMap((track) =>
+          track.decks.flatMap((d) => d.cards).map((card) => [progressKey(track.id, card.id), { track, card }] as const),
+        ),
+      ),
+    [tracks],
+  );
+  const cardsById = useMemo(() => new Map([...byKey].map(([key, { card }]) => [key, card])), [byKey]);
+  // A ordem é sorteada ao abrir (e ao reiniciar pelo resumo) e fica fixa até o fim da sessão.
+  const order = (keys: string[]) => sessionOrder(keys, cardsById, chance.random);
+  const [state, dispatch] = useReducer(sessionReducer, undefined, () =>
+    initialSession(order(entries().map((e) => progressKey(e.trackId, e.cardId)))),
+  );
+  const current = state.finished ? undefined : byKey.get(state.ids[state.index]);
+  const track = current?.track ?? tracks[0];
+  const variantId = preferredVariant[track.id] ?? track.variants?.[0]?.id ?? '';
   const [openTerm, setOpenTerm] = useState<string | null>(null);
   const reducedMotion = useReducedMotion();
-  // 0 = de lado (90°, invisível), 1 = de frente. Anima só quando o verso é pedido.
+  // 0 = de lado (90°, invisível), 1 = de frente. Anima o lado que entra quando o
+  // usuário vira o card (nos dois sentidos); card novo aparece sem animação.
   const [flip] = useState(() => new Animated.Value(1));
+  const shown = useRef({ index: state.index, revealed: state.revealed });
   useEffect(() => {
-    if (!state.revealed) {
-      flip.setValue(1);
-      return;
-    }
+    const flipped = shown.current.index === state.index && shown.current.revealed !== state.revealed;
+    shown.current = { index: state.index, revealed: state.revealed };
     const duration = flipDuration(reducedMotion);
-    if (duration === 0) {
+    if (!flipped || duration === 0) {
       flip.setValue(1);
       return;
     }
@@ -71,7 +102,7 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
     ],
   };
 
-  const exit = () => leaveToTrack(track.id);
+  const exit = onExit;
 
   if (state.finished) {
     return (
@@ -80,14 +111,14 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
           state={state}
           title={title}
           cardsById={cardsById}
-          onReview={(ids) => dispatch({ type: 'restart', ids })}
+          onReview={(ids) => dispatch({ type: 'restart', ids: order(ids) })}
           onBack={exit}
         />
       </SafeAreaView>
     );
   }
 
-  const card = cardsById.get(state.ids[state.index])!;
+  const card = current!.card;
   const total = state.ids.length;
   const respond = (result: 'known' | 'unknown') => {
     answerCard(track.id, card.id, result);
@@ -114,27 +145,45 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
       <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
         <ScrollView contentContainerStyle={styles.cardContent}>
           {state.revealed ? (
-            <Animated.View style={flipStyle}>
-              <CardFace
-                card={card}
-                track={track}
-                side="back"
-                variantId={variantId}
-                onSelectVariant={(id) => setVariant(track.id, id)}
-                onOpenTerm={setOpenTerm}
-              />
-            </Animated.View>
+            // O toque no verso volta para a frente. Sem foco de acessibilidade para não
+            // esconder as abas e os chips do leitor de tela; para ele há "Ver pergunta".
+            <Pressable testID="card-back" accessible={false} onPress={() => dispatch({ type: 'flip' })}>
+              <Animated.View style={flipStyle}>
+                <CardFace
+                  card={card}
+                  track={track}
+                  side="back"
+                  variantId={variantId}
+                  onSelectVariant={(id) => setVariant(track.id, id)}
+                  onOpenTerm={setOpenTerm}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t.session.showQuestion}
+                  accessibilityHint={t.session.showQuestionHint}
+                  onPress={() => dispatch({ type: 'flip' })}
+                  style={styles.showQuestion}
+                >
+                  <AppText size={13} tone="accentText" font="medium">
+                    {t.session.showQuestion}
+                  </AppText>
+                </Pressable>
+              </Animated.View>
+            </Pressable>
           ) : (
             <Pressable
+              testID="card-front"
               accessibilityRole="button"
               accessibilityLabel={t.session.flip}
               accessibilityHint={t.session.flipHint}
-              onPress={() => dispatch({ type: 'reveal' })}
+              onPress={() => dispatch({ type: 'flip' })}
             >
-              <CardFace card={card} track={track} side="front" variantId={variantId} onSelectVariant={() => {}} />
-              <AppText size={13} tone="accentText" font="medium" style={{ marginTop: spacing.lg }}>
-                {t.session.tapToReveal}
-              </AppText>
+              <Animated.View style={flipStyle}>
+                <CardFace card={card} track={track} side="front" variantId={variantId} onSelectVariant={() => {}} />
+                <AppText size={13} tone="accentText" font="medium" style={{ marginTop: spacing.lg }}>
+                  {t.session.tapToReveal}
+                </AppText>
+              </Animated.View>
             </Pressable>
           )}
         </ScrollView>
@@ -147,7 +196,7 @@ export function StudySession({ track, title, initialIds }: SessionProps) {
             <Button title={t.answer.known.button} onPress={() => respond('known')} />
           </>
         ) : (
-          <Button title={t.session.showAnswer} onPress={() => dispatch({ type: 'reveal' })} />
+          <Button title={t.session.showAnswer} onPress={() => dispatch({ type: 'flip' })} />
         )}
         {/* Sempre o último da barra, nas duas faces: o botão nunca muda de lugar. */}
         <CardAssistant card={card} />
@@ -251,6 +300,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', gap: spacing.sm },
   card: { flex: 1, marginHorizontal: spacing.lg, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
   cardContent: { padding: spacing.lg, flexGrow: 1 },
+  showQuestion: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', marginTop: spacing.sm },
   actions: { flexDirection: 'row', gap: spacing.md, padding: spacing.lg },
   summary: { padding: spacing.xl, gap: spacing.lg },
   kicker: { textTransform: 'uppercase', letterSpacing: 0.8 },

@@ -4,7 +4,9 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import LanguageScreen from '../app/area/[areaId]/[languageId]/index';
 import FrameworkScreen from '../app/area/[areaId]/[languageId]/[frameworkId]';
@@ -16,8 +18,10 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'area/[areaId]/index': AreaScreen,
   'area/[areaId]/[languageId]/index': LanguageScreen,
   'area/[areaId]/[languageId]/[frameworkId]': FrameworkScreen,
@@ -54,7 +58,7 @@ describe('Requirement: Trilhas de DevOps e Cloud no catálogo', () => {
 
 describe('Requirement: Home por áreas', () => {
   it('Mobile e DevOps e Cloud no fim', async () => {
-    await open('/');
+    await open('/tracks');
     const names = ['Fundamentos', 'Frontend', 'Backend', 'Banco de dados', 'Mobile', 'DevOps e Cloud'];
     expect(buttons(names)).toEqual(names);
     expect(within(screen.getByRole('button', { name: /^DevOps e Cloud,/ })).getByText('4 trilhas')).toBeOnTheScreen();
@@ -70,7 +74,7 @@ describe('Requirement: Tradução das trilhas de DevOps e Cloud', () => {
 
   it('Área DevOps em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
-    await open('/');
+    await open('/tracks');
     expect(screen.getByRole('button', { name: /^DevOps & Cloud,/ })).toBeOnTheScreen();
   });
 });

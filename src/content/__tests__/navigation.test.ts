@@ -1,5 +1,5 @@
 import { validateTaxonomy, type Taxonomy, type Track } from '../index';
-import { areaSections, areasWithTracks, frameworkTracks, languageSections, tracksInArea } from '../navigation';
+import { areaPath, areaSections, areasWithTracks, frameworkTracks, languageSections, nextTracks, tracksInArea } from '../navigation';
 import { fullTrack, minimalTrack, testTaxonomy, type Json } from '../__fixtures__/tracks';
 import { trackOf } from '../__fixtures__/expect';
 import { progressKey, tracksStats } from '../../study/rules';
@@ -156,5 +156,54 @@ describe('Requirement: Tela da área (seções)', () => {
 
   it('sem seções, grouped fica vazio', () => {
     expect(areaSections(catalog(), taxonomy(), 'backend').grouped).toEqual([]);
+  });
+});
+
+describe('Requirement: Ordem sugerida na área', () => {
+  it('Pré-requisito antes', () => {
+    const tracks = [
+      make('nextjs', { areas: ['frontend'], prerequisites: ['react'] }),
+      make('react', { areas: ['frontend'] }),
+    ];
+    expect(ids(areaPath(tracks, 'frontend'))).toEqual(['react', 'nextjs']);
+  });
+
+  it('Ordem do catálogo no empate', () => {
+    const tracks = [
+      make('js-navegador', { areas: ['frontend'] }),
+      make('vue', { areas: ['frontend'], prerequisites: ['js-navegador'] }),
+      make('react', { areas: ['frontend'], prerequisites: ['js-navegador'] }),
+    ];
+    expect(ids(areaPath(tracks, 'frontend'))).toEqual(['js-navegador', 'vue', 'react']);
+  });
+
+  it('Pré-requisito de outra área', () => {
+    const tracks = [
+      make('react', { areas: ['frontend'] }),
+      make('react-native', { areas: ['mobile'], prerequisites: ['react'] }),
+      make('expo-nativo', { areas: ['mobile'], prerequisites: ['react-native'] }),
+    ];
+    expect(ids(areaPath(tracks, 'mobile'))).toEqual(['react-native', 'expo-nativo']);
+  });
+
+  it('cadeia longa fica em ordem e cada trilha aparece uma vez', () => {
+    const tracks = [
+      make('c', { areas: ['backend'], prerequisites: ['b'] }),
+      make('d', { areas: ['backend'], prerequisites: ['a', 'c'] }),
+      make('b', { areas: ['backend'], prerequisites: ['a'] }),
+      make('a', { areas: ['backend'] }),
+    ];
+    expect(ids(areaPath(tracks, 'backend'))).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('nextTracks devolve as trilhas que dependem da trilha, na ordem do catálogo', () => {
+    const tracks = [
+      make('react', { areas: ['frontend'] }),
+      make('nextjs', { areas: ['frontend'], prerequisites: ['react'] }),
+      make('web', { areas: ['fundamentos'] }),
+      make('react-native', { areas: ['mobile'], prerequisites: ['react'] }),
+    ];
+    expect(ids(nextTracks(tracks, 'react'))).toEqual(['nextjs', 'react-native']);
+    expect(nextTracks(tracks, 'web')).toEqual([]);
   });
 });

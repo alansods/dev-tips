@@ -2,6 +2,7 @@
   "id": "crud-4-frameworks",
   "title": "O mesmo CRUD em quatro frameworks",
   "description": "Vamos construir um CRUD completo de produtos (criar, listar, buscar, atualizar e apagar) e ver, etapa por etapa, como cada framework resolve a mesma coisa.",
+  "addedAt": "2026-10-02",
   "areas": [
     "backend"
   ],

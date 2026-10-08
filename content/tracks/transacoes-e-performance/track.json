@@ -2,6 +2,8 @@
   "id": "transacoes-e-performance",
   "title": "Transações e performance",
   "description": "ACID, níveis de isolamento, locks e deadlocks, índices, EXPLAIN, N+1 e paginação.",
+  "prerequisites": ["sql-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "banco-de-dados"
   ],

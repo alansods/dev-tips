@@ -4,7 +4,9 @@ import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 import AreaScreen from '../app/area/[areaId]/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
@@ -16,8 +18,10 @@ const APP = {
   _layout: RootLayout,
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   'area/[areaId]/index': AreaScreen,
   'track/[trackId]': TrackScreen,
   'study/[trackId]/[deckId]': StudyScreen,
@@ -36,12 +40,12 @@ describe('Requirement: Tradução completa para inglês', () => {
 
   it('trilha CRUD em inglês na área Backend', async () => {
     await open('/area/backend');
-    expect(screen.getByText('The same CRUD in four frameworks')).toBeOnTheScreen();
+    expect(screen.getAllByText('The same CRUD in four frameworks').length).toBeGreaterThan(0);
   });
 
   it('trilha Fundamentos web em inglês na área Fundamentos', async () => {
     await open('/area/fundamentos');
-    expect(screen.getByText('Web fundamentals')).toBeOnTheScreen();
+    expect(screen.getAllByText('Web fundamentals').length).toBeGreaterThan(0);
   });
 
   it('Card exibido em inglês: concept CORS', async () => {

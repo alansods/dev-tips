@@ -5,7 +5,9 @@ import RootLayout, { ErrorBoundary } from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import HomeScreen from '../app/(tabs)/index';
-import ProgressScreen from '../app/(tabs)/progress';
+import TracksScreen from '../app/(tabs)/tracks';
+import ProfileScreen from '../app/(tabs)/profile';
+import ProgressScreen from '../app/progress';
 
 // Uma tela que falha enquanto `failing` for true (simula um erro passageiro).
 let failing = true;
@@ -18,8 +20,10 @@ const APP = {
   _layout: { default: RootLayout, ErrorBoundary },
   '(tabs)/_layout': TabsLayout,
   '(tabs)/index': HomeScreen,
+  '(tabs)/tracks': TracksScreen,
   '(tabs)/glossary': GlossaryScreen,
-  '(tabs)/progress': ProgressScreen,
+  '(tabs)/profile': ProfileScreen,
+  progress: ProgressScreen,
   flaky: FlakyScreen,
   '+not-found': NotFoundScreen,
 };

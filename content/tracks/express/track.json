@@ -2,6 +2,8 @@
   "id": "express",
   "title": "Express",
   "description": "O framework minimalista de APIs no Node.js: rotas, middlewares, requisição, resposta e erros.",
+  "prerequisites": ["nodejs"],
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],

@@ -22,7 +22,7 @@ describeContentTracks({
 describe('Requirement: Trilha de React Native no catálogo (cadastro)', () => {
   it('framework React Native em JavaScript, depois de NestJS', () => {
     const ids = repoTaxonomy.frameworks.map((f) => f.id);
-    expect(repoTaxonomy.frameworks.find((f) => f.id === 'react-native')).toEqual({
+    expect(repoTaxonomy.frameworks.find((f) => f.id === 'react-native')).toMatchObject({
       id: 'react-native',
       name: 'React Native',
       language: 'javascript',

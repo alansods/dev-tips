@@ -2,6 +2,8 @@
   "id": "java-colecoes-e-concorrencia",
   "title": "Java: coleções, streams e concorrência",
   "description": "As estruturas de dados do dia a dia, a programação funcional com streams e o trabalho com threads.",
+  "prerequisites": ["java-essencial"],
+  "addedAt": "2026-10-05",
   "areas": [
     "backend"
   ],

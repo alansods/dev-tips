@@ -29,6 +29,8 @@ beforeEach(() => {
   require('./src/auth/store').useAccountStore.setState({ user: null });
   require('./src/subscriptions/store').resetSubscriptionStore();
   require('./src/auth/tokens').__resetSecureStoreForTests();
+  // Sessões na ordem do deck por padrão; os testes de sorteio trocam o valor.
+  jest.spyOn(require('./src/study/chance'), 'random').mockReturnValue(0.999999);
   /* eslint-enable @typescript-eslint/no-require-imports */
 });
 

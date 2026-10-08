@@ -74,16 +74,16 @@ describe('Requirement: Nível do card', () => {
 describe('Requirement: Cadastro de linguagens e frameworks', () => {
   it('Cadastro válido', () => {
     const result = validateTaxonomy({
-      languages: [{ id: 'java', name: 'Java' }],
-      frameworks: [{ id: 'spring', name: 'Spring Boot', language: 'java' }],
+      languages: [{ id: 'java', name: 'Java', icon: 'openjdk' }],
+      frameworks: [{ id: 'spring', name: 'Spring Boot', language: 'java', icon: 'springboot' }],
     });
     expect(result.ok).toBe(true);
   });
 
   it('Framework de linguagem inexistente', () => {
     const result = validateTaxonomy({
-      languages: [{ id: 'java', name: 'Java' }],
-      frameworks: [{ id: 'rails', name: 'Rails', language: 'ruby' }],
+      languages: [{ id: 'java', name: 'Java', icon: 'openjdk' }],
+      frameworks: [{ id: 'rails', name: 'Rails', language: 'ruby', icon: 'javascript' }],
     });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.errors.map((e) => e.path)).toContain('frameworks[0].language');
@@ -92,8 +92,8 @@ describe('Requirement: Cadastro de linguagens e frameworks', () => {
   it('Linguagem repetida', () => {
     const result = validateTaxonomy({
       languages: [
-        { id: 'java', name: 'Java' },
-        { id: 'java', name: 'Java 2' },
+        { id: 'java', name: 'Java', icon: 'openjdk' },
+        { id: 'java', name: 'Java 2', icon: 'openjdk' },
       ],
       frameworks: [],
     });
@@ -169,5 +169,36 @@ describe('Requirement: Seção da trilha', () => {
 
   it('Seção em trilha comparativa', () => {
     expectErrorAt({ ...fullTrack(), section: 'relacionais' }, 'section');
+  });
+});
+
+describe('Requirement: Ícone de linguagem, framework e trilha (validação)', () => {
+  it('Logo desconhecido na trilha', () => {
+    expectErrorAt({ ...minimalTrack(), icon: { logo: 'cobol-x' } }, 'icon.logo');
+  });
+
+  it('Sigla longa demais', () => {
+    expectErrorAt({ ...minimalTrack(), icon: { text: 'KUBERNETES' } }, 'icon.text');
+  });
+
+  it('Logo e sigla válidos', () => {
+    expect(trackOf({ ...minimalTrack(), icon: { logo: 'react' } }).icon).toEqual({ logo: 'react' });
+    expect(trackOf({ ...minimalTrack(), icon: { text: 'AWS' } }).icon).toEqual({ text: 'AWS' });
+  });
+
+  it('Cadastro sem ícone', () => {
+    const input = testTaxonomy();
+    delete (input.languages as Json[])[1].icon;
+    const result = validateTaxonomy(input);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.map((e) => e.path)).toContain('languages[1].icon');
+  });
+
+  it('Logo desconhecido no cadastro', () => {
+    const input = testTaxonomy();
+    (input.frameworks as Json[])[0].icon = 'cobol-x';
+    const result = validateTaxonomy(input);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.errors.map((e) => e.path)).toContain('frameworks[0].icon');
   });
 });

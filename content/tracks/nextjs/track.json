@@ -2,6 +2,8 @@
   "id": "nextjs",
   "title": "Next.js",
   "description": "O framework React para produção: App Router, Server Components, estratégias de renderização e rotas de API.",
+  "prerequisites": ["react"],
+  "addedAt": "2026-10-05",
   "areas": [
     "frontend"
   ],
