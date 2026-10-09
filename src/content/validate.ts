@@ -77,6 +77,11 @@ function checkPrerequisites(inputs: unknown[]): ContentError[] {
         errors.push({ path: `[${i}].prerequisites[${j}]`, message: `trilha inexistente no catálogo: ${pre}` });
         return [];
       }
+      const target = inputs[index.get(pre)!] as { kind?: unknown };
+      if (target.kind === 'simulation') {
+        errors.push({ path: `[${i}].prerequisites[${j}]`, message: `uma simulação não pode ser pré-requisito: ${pre}` });
+        return [];
+      }
       return [index.get(pre)!];
     });
   });

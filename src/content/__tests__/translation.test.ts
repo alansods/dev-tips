@@ -1,6 +1,6 @@
-import { fullTrack } from '../__fixtures__/tracks';
+import { fullTrack, interviewCard, simulationTrack } from '../__fixtures__/tracks';
 import { trackSchema, type Track } from '../schema';
-import { validateTranslation } from '../translation';
+import { localizeTrack, missingTranslations, validateTranslation } from '../translation';
 
 const track = (): Track => trackSchema.parse(fullTrack());
 const paths = (input: unknown) => validateTranslation(track(), input).map((e) => e.path);
@@ -61,5 +61,43 @@ describe('Requirement: Tradução de uma trilha', () => {
       'cards.ep-delete.method',
       'cards.ep-delete.path',
     ]);
+  });
+});
+
+describe('Requirement: Tradução de uma trilha (simulação)', () => {
+  const sim = (): Track => {
+    const raw = simulationTrack();
+    raw.decks[0].cards[0] = interviewCard('investigar', { why: 'Porque.', watchOut: 'Cuidado.' });
+    return trackSchema.parse(raw);
+  };
+  const simPaths = (input: unknown) => validateTranslation(sim(), input).map((e) => e.path);
+
+  it('Tradução de uma simulação', () => {
+    const input = {
+      scenario: { context: 'The dashboard takes 8 seconds.', stack: ['Next.js', 'Node.js', 'PostgreSQL'] },
+      cards: { investigar: { question: 'How?', answer: 'I would measure.', why: 'Because.', watchOut: 'Careful.' } },
+    };
+    expect(validateTranslation(sim(), input)).toEqual([]);
+    const localized = localizeTrack(sim(), input);
+    expect(localized.scenario?.context).toBe('The dashboard takes 8 seconds.');
+    expect(localized.decks[0].cards[0]).toEqual(expect.objectContaining({ why: 'Because.', watchOut: 'Careful.' }));
+  });
+
+  it('Stack traduzida com tamanho diferente', () => {
+    expect(simPaths({ scenario: { stack: ['Next.js', 'Node.js'] } })).toEqual(['scenario.stack']);
+  });
+
+  it('Campo do interview em outro tipo', () => {
+    expect(paths({ cards: { 'step-1': { watchOut: 'x' } } })).toEqual(['cards.step-1.watchOut']);
+  });
+
+  it('caso numa trilha que não é simulação', () => {
+    expect(paths({ scenario: { context: 'x' } })).toEqual(['scenario']);
+  });
+
+  it('cobertura do caso e dos campos do interview', () => {
+    expect(missingTranslations(sim(), { title: 'T', description: 'D', decks: { conversa: { title: 'C' } }, cards: {} })).toEqual(
+      expect.arrayContaining(['scenario.context', 'scenario.stack', 'cards.investigar.question', 'cards.investigar.why', 'cards.investigar.watchOut']),
+    );
   });
 });

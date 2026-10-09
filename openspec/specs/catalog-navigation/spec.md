@@ -4,9 +4,9 @@
 Define como o usuário encontra as trilhas: a aba Trilhas lista as áreas, e cada área leva às suas trilhas, linguagens, frameworks e comparativos, conforme a posição declarada em cada trilha.
 ## Requirements
 ### Requirement: Home por áreas
-A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud. Cada área SHALL aparecer como um card tocável com:
+A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud e Situações-problema. Cada área SHALL aparecer como um card tocável com:
 - o nome da área;
-- a quantidade de trilhas ("2 trilhas", "1 trilha");
+- a quantidade de trilhas ("2 trilhas", "1 trilha"); na área Situações-problema, a quantidade de casos ("6 casos", "1 caso");
 - uma barra de progresso e o texto "sei/total", somados sobre todos os cards das trilhas da área com a mesma regra de progresso da capability `study-flow`;
 - quando houver, "N para revisar hoje", somando os cards vencidos das trilhas da área.
 
@@ -32,6 +32,14 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 - **WHEN** o catálogo tem trilhas nas sete áreas
 - **THEN** a Home mostra Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile e DevOps e Cloud, nessa ordem
 
+#### Scenario: Situações-problema por último
+- **WHEN** o catálogo tem trilhas nas sete áreas e simulações
+- **THEN** o card "Situações-problema" aparece depois de "DevOps e Cloud" e mostra "6 casos"
+
+#### Scenario: Progresso das simulações
+- **WHEN** o usuário marcou 3 cards de simulações como "já sabia"
+- **THEN** o card "Situações-problema" mostra "3/25"
+
 ### Requirement: Tela da área
 Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas, com botão de voltar e o nome da área como título. A tela SHALL mostrar, nesta ordem, as seções:
 1. **Ordem sugerida**: todas as trilhas da área, conforme o requisito "Ordem sugerida na área";
@@ -41,6 +49,8 @@ Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas,
 5. **Comparativos**: as trilhas comparativas da área.
 
 Seções sem itens MUST NOT aparecer. Nas seções 2 a 5, as trilhas SHALL aparecer na ordem do catálogo, como cards tocáveis com título, descrição, barra de progresso, "sei/total" e, quando houver, "N para revisar hoje". Tocar numa trilha SHALL abrir a tela da trilha, e tocar numa linguagem SHALL abrir a tela da linguagem nessa área. Uma área inexistente ou sem trilhas SHALL mostrar "Área não encontrada.".
+
+A área Situações-problema (`simulacoes`) é uma exceção: abaixo do título, a tela SHALL mostrar a frase "O entrevistador apresenta um problema e aprofunda a cada pergunta. Responda em voz alta, como na entrevista." e, logo depois, as simulações na ordem do catálogo, sem títulos de seção e sem "Ordem sugerida". O nome da área MUST aparecer uma única vez na tela. Cada simulação SHALL aparecer como card tocável com título, descrição, barra de progresso, "sei/total" e, quando houver, "N para revisar hoje". Tocar numa simulação SHALL abrir a tela da simulação, definida na capability `study-flow`.
 
 #### Scenario: Backend com o conteúdo atual
 - **WHEN** o usuário abre a área Backend
@@ -70,6 +80,14 @@ Seções sem itens MUST NOT aparecer. Nas seções 2 a 5, as trilhas SHALL apare
 - **WHEN** a área tem trilhas diretas com `section: "aws"` registradas antes de outras com `section: "ci-cd"`
 - **THEN** a tela mostra a seção "CI/CD" e depois a seção "AWS", cada uma com as suas trilhas
 
+#### Scenario: Área Situações-problema
+- **WHEN** o usuário abre a área Situações-problema
+- **THEN** a tela mostra o título "Situações-problema" uma única vez, a frase de introdução e os 6 casos, o primeiro sendo "Dashboard lento: de 8 s para menos de 2", e não mostra "Ordem sugerida" nem títulos de seção
+
+#### Scenario: Abrir uma simulação
+- **WHEN** o usuário toca em "Pedido e pagamento em dobro" na área Situações-problema
+- **THEN** a tela da simulação abre
+
 ### Requirement: Tela da linguagem
 Tocar numa linguagem SHALL abrir a tela da linguagem, com o nome da linguagem como título e o nome da área acima dele. A tela SHALL mostrar, nesta ordem, as seções:
 1. **Linguagem pura**: as trilhas da linguagem nessa área sem framework;
@@ -97,11 +115,13 @@ Os textos da navegação SHALL seguir o idioma do app:
 
 | PT-BR | Inglês |
 |---|---|
-| Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud | Fundamentals, Git, Frontend, Backend, Databases, Mobile, DevOps & Cloud |
+| Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud, Situações-problema | Fundamentals, Git, Frontend, Backend, Databases, Mobile, DevOps & Cloud, Problem scenarios |
 | Trilhas, Linguagens, Comparativos | Tracks, Languages, Comparisons |
 | Relacionais, Não relacionais, CI/CD, AWS | Relational, Non-relational, CI/CD, AWS |
 | Linguagem pura, Frameworks | Core language, Frameworks |
 | "1 trilha", "N trilhas" | "1 track", "N tracks" |
+| "1 caso", "N casos" | "1 case", "N cases" |
+| O entrevistador apresenta um problema e aprofunda a cada pergunta. Responda em voz alta, como na entrevista. | The interviewer presents a problem and digs deeper with each question. Answer out loud, as you would in the interview. |
 | Área não encontrada., Linguagem não encontrada., Framework não encontrado. | Area not found., Language not found., Framework not found. |
 
 Os nomes de linguagens e frameworks SHALL ser os do cadastro nos dois idiomas.
@@ -117,6 +137,10 @@ Os nomes de linguagens e frameworks SHALL ser os do cadastro nos dois idiomas.
 #### Scenario: Área DevOps em inglês
 - **WHEN** o app está em inglês e a aba Trilhas é exibida
 - **THEN** o card da área DevOps e Cloud mostra "DevOps & Cloud"
+
+#### Scenario: Área Situações-problema em inglês
+- **WHEN** o app está em inglês e a aba Trilhas é exibida
+- **THEN** o card da área Situações-problema mostra "Problem scenarios" e "6 cases"
 
 ### Requirement: Ordem sugerida na área
 A seção "Ordem sugerida" da tela da área SHALL listar todas as trilhas da área, uma vez cada, numa linha do tempo. A ordem SHALL respeitar os pré-requisitos entre trilhas da mesma área: uma trilha só aparece depois dos seus pré-requisitos que também são da área. Pré-requisitos de outras áreas não contam para a ordem. Entre as trilhas que podem vir a seguir, SHALL vir primeiro a que aparece antes no catálogo.
@@ -210,4 +234,15 @@ Com busca, filtro de estado ou linguagem ativos, a aba SHALL mostrar a seção "
 #### Scenario: Resultado agrupado por área
 - **WHEN** o usuário toca em "JavaScript" em "Por linguagem"
 - **THEN** as trilhas aparecem sob os títulos "Frontend", "Backend" e "Mobile", e "JavaScript essencial" aparece uma única vez, em "Frontend"
+
+### Requirement: Simulações na busca
+A busca e os filtros de estado da aba Trilhas SHALL considerar as simulações como as trilhas: pelo título e pela descrição, no idioma exibido, e pelos mesmos estados. Nos resultados, as simulações SHALL aparecer sob o título "Situações-problema", depois das outras áreas. Como não têm linguagem, as simulações MUST NOT aparecer com um filtro de linguagem ativo. Tocar numa simulação dos resultados SHALL abrir a tela da simulação.
+
+#### Scenario: Buscar uma simulação
+- **WHEN** o usuário digita "notificacoes" na busca
+- **THEN** a simulação "API de notificações" aparece sob o título "Situações-problema"
+
+#### Scenario: Filtro de linguagem
+- **WHEN** o filtro de JavaScript está ativo
+- **THEN** nenhuma simulação aparece na lista
 

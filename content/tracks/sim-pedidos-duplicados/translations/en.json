@@ -1,0 +1,42 @@
+{
+  "title": "Double order, double charge",
+  "description": "Idempotency, transactions and failures between the API and the payment provider.",
+  "scenario": {
+    "context": "In an online store, the user clicks \"Place order\" twice, and the system creates two orders and, sometimes, two payments.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "Payment provider"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "desabilitar-o-botao": {
+      "question": "Does disabling the checkout button while the request is sent solve the problem?",
+      "answer": "Disabling the button improves the user experience, but it doesn't solve the problem reliably. The request can be sent again because of a timeout, a page reload, an automatic retry or another client.\n\nThat's why the main protection has to live in the backend, with idempotency and integrity guarantees in the database.",
+      "why": "It shows you don't rely on the frontend to enforce a business rule: the real protection is in the backend."
+    },
+    "idempotencia-no-backend": {
+      "question": "How do you stop two simultaneous requests from creating two purchases?",
+      "answer": "I'd use an idempotency key tied to the purchase operation. The client sends the key, and the backend checks whether the operation has already been recorded.\n\nIn PostgreSQL, I'd add a unique constraint on the key, so two concurrent requests can't record two operations with the same identifier.\n\nIf the first request has already finished, the backend returns the stored result. If it's still being processed, it returns the operation's status instead of starting another purchase.",
+      "watchOut": "A real implementation must handle simultaneous attempts, operations still in progress and a key being wrongly reused with different data.",
+      "snippet": {
+        "note": "The UNIQUE constraint guarantees, in the database, that the same key can't create two orders."
+      }
+    },
+    "pedido-e-pagamento": {
+      "question": "How do you avoid inconsistencies between the order and the payment?",
+      "answer": "I'd keep the order status separate from the payment status and define explicit transitions, such as pending, paid, failed and cancelled, according to the product rules.\n\nFirst, I'd save the order and its items in a PostgreSQL transaction. Then I'd start the payment with the external provider, using an idempotency key when the provider supports it.\n\nThe result would be confirmed by a reliable response from the provider or by a validated webhook. I'd also have a reconciliation process to find operations stuck in an intermediate state.",
+      "why": "Persisted states, a validated webhook and reconciliation let the system recover when one side fails halfway through."
+    },
+    "timeout-no-provedor": {
+      "question": "The provider processed the payment, but your API call timed out. What do you do?",
+      "answer": "A timeout doesn't mean the payment failed, so I wouldn't create another payment right away. I'd check the operation's status with the provider when possible, or wait for the webhook confirmation.\n\nIf I had to retry the request, I'd reuse the same idempotency key.",
+      "watchOut": "A PostgreSQL transaction can't undo a charge made in an external system. Coordinating both systems takes idempotency, persisted states and recovery mechanisms."
+    }
+  }
+}

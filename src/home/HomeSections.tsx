@@ -9,7 +9,7 @@ import { Button } from '../components/Button';
 import { ChevronRightIcon } from '../components/icons';
 import { ProgressBar } from '../components/ProgressBar';
 import { TechIcon } from '../components/TechIcon';
-import { repoTaxonomy, type Track } from '../content';
+import { isSimulation, repoTaxonomy, type Track } from '../content';
 import { trackIcon } from '../content/icons';
 import { useCatalog } from '../content/useCatalog';
 import { useSettingsStore, useT } from '../i18n';
@@ -25,10 +25,11 @@ import {
   greetingPeriod,
   inProgressTracks,
   lastSevenDays,
-  newTracks,
   reviewSummary,
   startHere,
   suggestions,
+  whatsNew,
+  type WhatsNewItem,
 } from './sections';
 
 function SectionTitle({ children, action }: { children: string; action?: ReactNode }) {
@@ -181,7 +182,10 @@ export function ContinueSection() {
         <>
           <SectionTitle>{t.home.continueTitle}</SectionTitle>
           <Surface
-            label={t.home.continueLabel(target.track.title, target.deck.title)}
+            label={t.home.continueLabel(
+              target.track.title,
+              isSimulation(target.track) ? t.simulation.kicker : target.deck.title,
+            )}
             onPress={() => router.push(`/study/${target.track.id}/${target.deck.id}`)}
           >
             <View style={styles.row}>
@@ -191,7 +195,9 @@ export function ContinueSection() {
                   {target.track.title}
                 </AppText>
                 <AppText font="semibold" size={15}>
-                  {t.home.deckPosition(target.position, target.deckCount, target.deck.title)}
+                  {isSimulation(target.track)
+                    ? t.simulation.kicker
+                    : t.home.deckPosition(target.position, target.deckCount, target.deck.title)}
                 </AppText>
                 <View style={styles.row}>
                   <View style={{ flex: 1 }}>
@@ -262,11 +268,10 @@ export function SuggestionsSection() {
   );
 }
 
-export function NewTracksSection() {
-  const { colors } = useTheme();
+export function WhatsNewSection() {
   const t = useT();
-  const tracks = newTracks(useCatalog(), today());
-  if (tracks.length === 0) return null;
+  const items = whatsNew(useCatalog(), today());
+  if (items.length === 0) return null;
   return (
     <View style={styles.section}>
       <SectionTitle
@@ -278,24 +283,53 @@ export function NewTracksSection() {
           </Pressable>
         }
       >
-        {t.home.newTracks}
+        {t.home.whatsNew}
       </SectionTitle>
-      {tracks.map((track) => (
-        <Surface key={track.id} label={`${track.title}, ${t.home.newBadge}`} onPress={() => openTrack(track)}>
-          <View style={styles.row}>
-            <TechIcon icon={trackIcon(track, repoTaxonomy)} size={32} />
-            <AppText size={15} style={{ flex: 1 }}>
-              {track.title}
-            </AppText>
-            <View style={[styles.badge, { backgroundColor: colors.accentSoft }]}>
-              <AppText font="mono" size={11} tone="accentText">
-                {t.home.newBadge.toUpperCase()}
-              </AppText>
-            </View>
-          </View>
-        </Surface>
+      {items.map((item) => (
+        <WhatsNewRow key={item.kind === 'area' ? `area:${item.area}` : item.track.id} item={item} />
       ))}
     </View>
+  );
+}
+
+/** Uma novidade: área nova (abre a área) ou trilha/simulação nova (abre a tela dela). */
+function WhatsNewRow({ item }: { item: WhatsNewItem }) {
+  const { colors } = useTheme();
+  const t = useT();
+  const area = item.kind === 'area' ? item.area : undefined;
+  const title = area ? t.nav.areas[area] : item.kind === 'track' ? item.track.title : '';
+  const count =
+    item.kind === 'area'
+      ? item.area === 'simulacoes'
+        ? t.nav.simulationCount(item.tracks.length)
+        : t.nav.trackCount(item.tracks.length)
+      : undefined;
+  const badge = area ? t.home.newAreaBadge : t.home.newBadge;
+  return (
+    <Surface
+      label={[title, count, badge].filter(Boolean).join(', ')}
+      onPress={() => (item.kind === 'area' ? router.push(`/area/${item.area}`) : openTrack(item.track))}
+    >
+      <View style={styles.row}>
+        <TechIcon
+          icon={item.kind === 'area' ? { kind: 'area', area: item.area } : trackIcon(item.track, repoTaxonomy)}
+          size={32}
+        />
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText size={15}>{title}</AppText>
+          {count ? (
+            <AppText size={12} tone="muted">
+              {count}
+            </AppText>
+          ) : null}
+        </View>
+        <View style={[styles.badge, { backgroundColor: colors.accentSoft }]}>
+          <AppText font="mono" size={11} tone="accentText">
+            {badge.toUpperCase()}
+          </AppText>
+        </View>
+      </View>
+    </Surface>
   );
 }
 

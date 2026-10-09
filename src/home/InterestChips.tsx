@@ -14,7 +14,9 @@ export function InterestChips() {
   const t = useT();
   const interests = useSettingsStore((s) => s.interests);
   const toggle = useSettingsStore((s) => s.toggleInterest);
-  const areas = areasWithTracks(useCatalog()).map((a) => a.area);
+  const areas = areasWithTracks(useCatalog())
+    .map((a) => a.area)
+    .filter((area) => area !== 'simulacoes');
   return (
     <View style={styles.wrap}>
       {areas.map((area) => {

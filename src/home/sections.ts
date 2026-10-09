@@ -1,8 +1,8 @@
 // Regras das seções da aba Início, como funções puras: recebem o catálogo, o
 // progresso, o agendamento e o dia, e devolvem o que cada seção mostra.
 
-import type { Area, Deck, Track } from '../content';
-import { areaPath, nextTracks } from '../content/navigation';
+import { AREA_ADDED_AT, AREAS, type Area, type Deck, type Track } from '../content';
+import { areaPath, nextTracks, tracksInArea } from '../content/navigation';
 import { addDays } from '../study/clock';
 import { deckStats, trackStats, type Progress, type Stats } from '../study/rules';
 import { dueCardIds, type Schedule } from '../study/srs';
@@ -113,15 +113,33 @@ export function suggestions(
   return tracks.length > 0 ? { kind: 'forYou', tracks } : null;
 }
 
-/** Até 3 trilhas incluídas nos últimos 30 dias, da mais recente (empate: a registrada depois). */
-export function newTracks(catalog: readonly Track[], today: string, limit = 3): Track[] {
+export type WhatsNewItem =
+  { kind: 'area'; area: Area; date: string; tracks: Track[] } | { kind: 'track'; track: Track; date: string };
+
+/**
+ * Até 3 novidades dos últimos 30 dias, da mais recente: áreas com data de
+ * inclusão e trilhas (ou simulações) pelo `addedAt`. Uma trilha só de áreas
+ * novas fica de fora, porque a área já a representa. No empate, a área vem
+ * antes, e entre trilhas vale a registrada depois.
+ */
+export function whatsNew(catalog: readonly Track[], today: string, limit = 3): WhatsNewItem[] {
   const since = addDays(today, -29);
-  return catalog
+  const recent = (date: string | undefined): date is string => date !== undefined && date >= since && date <= today;
+
+  const areas = AREAS.flatMap((area) => {
+    const date = AREA_ADDED_AT[area];
+    const tracks = tracksInArea(catalog, area);
+    return recent(date) && tracks.length > 0 ? [{ kind: 'area' as const, area, date, tracks }] : [];
+  });
+  const newAreas = new Set(areas.map((a) => a.area));
+  const tracks = catalog
     .map((track, index) => ({ track, index }))
-    .filter(({ track }) => track.addedAt !== undefined && track.addedAt >= since && track.addedAt <= today)
+    .filter(({ track }) => recent(track.addedAt) && !track.areas.every((area) => newAreas.has(area)))
     .sort((a, b) => b.track.addedAt!.localeCompare(a.track.addedAt!) || b.index - a.index)
-    .slice(0, limit)
-    .map(({ track }) => track);
+    .map(({ track }) => ({ kind: 'track' as const, track, date: track.addedAt! }));
+
+  // sort é estável: no empate de data, as áreas (que vêm antes) continuam antes.
+  return [...areas, ...tracks].sort((a, b) => b.date.localeCompare(a.date)).slice(0, limit);
 }
 
 /** Primeira trilha sem pré-requisitos da área de interesse (ou de Fundamentos) e a seguinte a ela. */

@@ -1,0 +1,70 @@
+{
+  "id": "sim-projetos-e-permissoes",
+  "kind": "simulation",
+  "title": "Projetos, membros e permissões",
+  "description": "Modelagem, autorização, desenho da API e evolução da arquitetura.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "Você vai construir uma funcionalidade em que usuários criam projetos, convidam integrantes e definem as permissões de acesso de cada um.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "API REST"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "modelar-o-banco",
+          "level": "pleno",
+          "question": "Como você modelaria o banco de dados?",
+          "answer": "Começaria identificando as entidades principais: usuários, projetos e membros do projeto.\n\nComo um usuário pode participar de vários projetos e um projeto pode ter vários usuários, criaria uma tabela intermediária para representar esse relacionamento e guardar o papel de cada membro.",
+          "watchOut": "Na implementação completa, valide os papéis permitidos, crie os índices necessários e defina regras para a remoção de registros e para os convites pendentes.",
+          "snippet": {
+            "file": "PostgreSQL",
+            "language": "sql",
+            "code": "CREATE TABLE projects (\n  id UUID PRIMARY KEY,\n  name TEXT NOT NULL,\n  created_by UUID NOT NULL REFERENCES users(id)\n);\n\nCREATE TABLE project_members (\n  project_id UUID NOT NULL REFERENCES projects(id),\n  user_id UUID NOT NULL REFERENCES users(id),\n  role TEXT NOT NULL,\n  PRIMARY KEY (project_id, user_id)\n);",
+            "note": "project_members é a tabela intermediária do relacionamento muitos-para-muitos, com o papel de cada membro."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "impedir-acesso-alheio",
+          "level": "pleno",
+          "question": "Como impedir que um usuário acesse o projeto de outra pessoa?",
+          "answer": "Não confiaria só no ID recebido do frontend. Em cada requisição, o backend identificaria o usuário autenticado e verificaria se ele tem a permissão necessária para acessar aquele projeto.\n\nEssa verificação ficaria centralizada numa política ou num serviço de autorização reutilizável. Também incluiria testes para garantir que um usuário não acesse projetos de outra organização trocando o ID na URL.",
+          "watchOut": "Não confunda os dois conceitos: autenticação identifica o usuário; autorização decide o que ele pode fazer."
+        },
+        {
+          "type": "interview",
+          "id": "desenhar-a-api",
+          "level": "pleno",
+          "question": "Como você construiria a API dessa funcionalidade?",
+          "answer": "Separaria as rotas, que cuidam da validação HTTP, das regras de negócio e da persistência. Os serviços verificariam as permissões e aplicariam as regras de cada operação.\n\nA camada de banco ficaria responsável pelas consultas e alterações, com constraints garantindo a integridade dos dados.",
+          "why": "Com as camadas separadas, a regra de permissão fica num só lugar, fácil de testar e de aplicar em todas as rotas.",
+          "snippet": {
+            "file": "Endpoints",
+            "language": "text",
+            "code": "POST   /projects\nGET    /projects\nGET    /projects/:id\nPOST   /projects/:id/members\nPATCH  /projects/:id/members/:userId\nDELETE /projects/:id/members/:userId",
+            "note": "Criar, listar e consultar projetos; adicionar membros, alterar o papel e remover."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "evoluir-a-arquitetura",
+          "level": "senior",
+          "question": "Se a plataforma crescesse muito, como você evoluiria a arquitetura?",
+          "answer": "Começaria com um monólito modular, porque é mais simples de desenvolver, testar e operar. Conforme o volume crescesse, mediria os gargalos e melhoraria índices, paginação, cache e isolamento dos dados.\n\nSó consideraria separar serviços quando houvesse motivos concretos, como necessidades diferentes de escalabilidade, autonomia de deploy ou isolamento operacional.",
+          "watchOut": "Não adote microsserviços só porque a aplicação cresceu."
+        }
+      ]
+    }
+  ]
+}

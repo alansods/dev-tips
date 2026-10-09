@@ -150,6 +150,7 @@ export function cardTitle(card: Card): string {
     case 'code':
       return card.title;
     case 'question':
+    case 'interview':
       return card.question;
   }
 }

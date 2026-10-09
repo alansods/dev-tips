@@ -1,0 +1,65 @@
+{
+  "id": "sim-arquivos-em-segundo-plano",
+  "kind": "simulation",
+  "title": "Processamento de arquivos em segundo plano",
+  "description": "Filas, workers, falhas e picos de carga no processamento assíncrono.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "A aplicação recebe PDFs, extrai o conteúdo e processa os arquivos. Algumas operações levam dois minutos e estouram o timeout da requisição HTTP.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "Fila",
+      "Object storage"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "redesenhar-o-fluxo",
+          "level": "pleno",
+          "question": "Como você redesenharia esse fluxo?",
+          "answer": "Separaria o recebimento do arquivo do processamento. A API validaria a requisição, guardaria o arquivo num object storage e registraria uma tarefa no banco. Em seguida, devolveria um identificador para o frontend acompanhar o processamento.\n\nUm worker consumiria as tarefas e faria o processamento em segundo plano. O frontend consultaria o status periodicamente ou receberia atualizações por SSE ou WebSocket, se isso fosse necessário.",
+          "why": "A requisição deixa de depender da duração do processamento, e o usuário acompanha o andamento pelo status da tarefa.",
+          "snippet": {
+            "file": "Fluxo",
+            "language": "text",
+            "code": "Frontend ──upload──▶ API Node.js\nAPI ──────────────▶ Object storage\nAPI ──────────────▶ PostgreSQL (task: pending)\nPostgreSQL ───────▶ Queue\nQueue ────────────▶ Worker\nWorker ───────────▶ Object storage (result)\nWorker ───────────▶ PostgreSQL (task: done)\nFrontend ─polling/SSE─▶ API (status)",
+            "note": "A requisição HTTP termina logo depois do upload; o trabalho pesado fica com o worker."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "banco-e-fila",
+          "level": "senior",
+          "question": "A API grava a tarefa no PostgreSQL e depois publica a mensagem na fila. E se só uma das duas operações funcionar?",
+          "answer": "Como são duas operações independentes, uma pode funcionar e a outra falhar: a tarefa fica no banco sem nunca ser processada, ou a mensagem vai para a fila sem tarefa registrada.\n\nQuando a publicação da tarefa precisa ser garantida, eu avaliaria o padrão transactional outbox: o registro da tarefa e o do evento são gravados na mesma transação, e um publicador envia o evento para a fila depois.",
+          "watchOut": "Gravar no banco e publicar na fila não é uma operação atômica; sem um mecanismo como o outbox, uma falha entre os dois passos perde trabalho."
+        },
+        {
+          "type": "interview",
+          "id": "worker-caiu",
+          "level": "pleno",
+          "question": "E se o worker cair no meio do processamento de um arquivo?",
+          "answer": "Partiria do princípio de que a mesma tarefa pode ser executada de novo. Por isso, o processamento precisa ser idempotente ou ter mecanismos que impeçam efeitos duplicados.\n\nA tarefa teria estados persistidos, tentativas limitadas, backoff entre as novas tentativas e um mecanismo para recuperar tarefas abandonadas. Erros permanentes iriam para uma fila de falhas, para investigação.",
+          "watchOut": "Não basta colocar uma mensagem na fila: também é preciso definir como o sistema recupera o trabalho quando um worker falha."
+        },
+        {
+          "type": "interview",
+          "id": "pico-de-arquivos",
+          "level": "pleno",
+          "question": "Dez mil arquivos chegam ao mesmo tempo. O que você faria?",
+          "answer": "Evitaria criar um worker por arquivo. Usaria a fila para absorver o pico e limitaria quantas tarefas rodam ao mesmo tempo, respeitando a capacidade de processamento e os limites dos serviços externos.\n\nMonitoraria o tamanho da fila, o tempo de espera, a duração do processamento e a taxa de falhas. Se a demanda crescesse de forma sustentada, escalaria os workers horizontalmente com base nessas métricas.",
+          "watchOut": "Trade-off: mais workers reduzem o tempo de espera, mas aumentam o custo, a pressão no banco e a concorrência sobre os serviços externos."
+        }
+      ]
+    }
+  ]
+}

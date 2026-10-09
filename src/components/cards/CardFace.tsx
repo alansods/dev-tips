@@ -8,6 +8,7 @@ import type {
   CompareCard,
   ConceptCard,
   EndpointCard,
+  InterviewCard,
   QuestionCard,
   StepCard,
   Track,
@@ -17,7 +18,7 @@ import { useTheme } from '../../theme/ThemeProvider';
 import { radius, spacing } from '../../theme/tokens';
 import { AppText } from '../AppText';
 import { TermChips } from '../../glossary/TermChips';
-import { repoTaxonomy } from '../../content';
+import { isSimulation, repoTaxonomy } from '../../content';
 import { trackIcon } from '../../content/icons';
 import { CodeBlock, LevelChip, OriginChip, SupplementBadge, TypeChip, VariantTabs } from './parts';
 
@@ -40,7 +41,12 @@ export function CardFace({ card, track, side, variantId, onSelectVariant, onOpen
   return (
     <View style={styles.face}>
       <View style={styles.chips}>
-        <OriginChip icon={trackIcon(track, repoTaxonomy)} label={t.card.origin(track.title, deck?.title ?? '')} />
+        <OriginChip
+          icon={trackIcon(track, repoTaxonomy)}
+          label={
+            isSimulation(track) ? t.card.simulationOrigin(track.title) : t.card.origin(track.title, deck?.title ?? '')
+          }
+        />
         {card.type === 'step' ? <TypeChip label={t.card.stepNumber(card.number)} /> : null}
         <LevelChip label={t.card.levels[card.level]} />
         {card.origin === 'supplement' && <SupplementBadge label={t.card.supplement} />}
@@ -68,6 +74,8 @@ function Body(props: Props) {
       return <Code card={card} side={props.side} />;
     case 'question':
       return <Question card={card} side={props.side} />;
+    case 'interview':
+      return <Interview card={card} track={props.track} side={props.side} />;
     default: {
       const exhaustive: never = card;
       return exhaustive;
@@ -275,7 +283,56 @@ function Question({ card, side }: { card: QuestionCard; side: Side }) {
   );
 }
 
+function Interview({ card, track, side }: { card: InterviewCard; track: Track; side: Side }) {
+  const { colors } = useTheme();
+  const t = useT();
+  if (side === 'front') {
+    return (
+      <View style={styles.gap}>
+        {track.scenario ? (
+          <View style={[styles.note, { backgroundColor: colors.surface2 }]}>
+            <AppText size={11} tone="muted" style={styles.caps}>
+              {t.card.scenario}
+            </AppText>
+            <AppText size={14}>{track.scenario.context}</AppText>
+          </View>
+        ) : null}
+        <Title>{card.question}</Title>
+        <Prompt>{t.card.frontPrompt.interview}</Prompt>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.gap}>
+      <AppText font="semibold" size={15} tone="muted">
+        {card.question}
+      </AppText>
+      <AppText size={16} style={{ lineHeight: 24 }}>
+        {card.answer}
+      </AppText>
+      {card.why ? (
+        <View style={[styles.note, { backgroundColor: colors.accentSoft }]}>
+          <AppText size={11} tone="accentText" style={styles.caps}>
+            {t.card.why}
+          </AppText>
+          <AppText size={14}>{card.why}</AppText>
+        </View>
+      ) : null}
+      {card.watchOut ? (
+        <View style={[styles.note, { backgroundColor: colors.warnSoft }]}>
+          <AppText size={11} tone="warn" style={styles.caps}>
+            {t.card.watchOut}
+          </AppText>
+          <AppText size={14}>{card.watchOut}</AppText>
+        </View>
+      ) : null}
+      {card.snippet && <CodeBlock snippet={card.snippet} />}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  note: { padding: spacing.md, borderRadius: radius.md, gap: 4 },
   face: { gap: spacing.md },
   chips: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
   gap: { gap: spacing.md },

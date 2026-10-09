@@ -25,6 +25,7 @@ export function checkIntegrity(input: unknown): ContentError[] {
   const push: Push = (path, message) => errors.push({ path: formatPath(path), message });
 
   checkPosition(input, push);
+  checkSimulation(input, push);
   checkUniqueIds(input.variants, 'variants', 'variante', push);
   checkUniqueIds(input.compareColumns, 'compareColumns', 'coluna', push);
 
@@ -57,6 +58,38 @@ export function checkIntegrity(input: unknown): ContentError[] {
   });
 
   return errors;
+}
+
+/**
+ * Simulação de entrevista: caso obrigatório, só a área Simulações, um deck só
+ * com cards interview e nenhuma posição. Uma trilha comum não usa nada disso.
+ */
+function checkSimulation(input: Obj, push: Push) {
+  const simulation = input.kind === 'simulation';
+  const cards = list(input.decks).flatMap((deck, d) =>
+    isObj(deck) ? list(deck.cards).map((card, c) => ({ card, at: ['decks', d, 'cards', c] as PathSegment[] })) : [],
+  );
+
+  if (!simulation) {
+    if (input.scenario !== undefined) push(['scenario'], 'só simulações (kind "simulation") têm caso');
+    if (list(input.areas).includes('simulacoes')) push(['areas'], 'a área simulacoes é exclusiva das simulações');
+    for (const { card, at } of cards) {
+      if (isObj(card) && card.type === 'interview') push(at, 'cards interview só existem em simulações');
+    }
+    return;
+  }
+
+  if (input.scenario === undefined) push(['scenario'], 'a simulação precisa declarar o caso (scenario)');
+  const areas = list(input.areas);
+  if (areas.length !== 1 || areas[0] !== 'simulacoes') push(['areas'], 'a simulação fica só na área simulacoes');
+  if (Array.isArray(input.decks) && input.decks.length !== 1) push(['decks'], 'a simulação tem exatamente um deck');
+  for (const { card, at } of cards) {
+    if (isObj(card) && card.type !== 'interview') push(at, 'a simulação só tem cards interview');
+  }
+  for (const key of ['language', 'framework', 'variants', 'compareColumns', 'section'] as const) {
+    if (input[key] !== undefined) push([key], `a simulação não declara ${key}`);
+  }
+  if (list(input.prerequisites).length > 0) push(['prerequisites'], 'a simulação não tem pré-requisitos');
 }
 
 /** Áreas sem repetição e combinações de posição que não dependem do cadastro. */

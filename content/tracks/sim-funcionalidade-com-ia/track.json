@@ -1,0 +1,58 @@
+{
+  "id": "sim-funcionalidade-com-ia",
+  "kind": "simulation",
+  "title": "Resumos de PDF com IA",
+  "description": "Uma API de IA como parte do produto: limites, custo e qualidade.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "O produto precisa receber PDFs e gerar resumos estruturados usando uma API de inteligência artificial.",
+    "stack": [
+      "Node.js",
+      "Fila",
+      "API de IA"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "implementar-resumos",
+          "level": "pleno",
+          "question": "Como você implementaria essa funcionalidade?",
+          "answer": "Primeiro, entenderia o objetivo do resumo, o formato de saída esperado, o volume de documentos, os requisitos de privacidade e o orçamento por processamento.\n\nNa implementação, o frontend enviaria o arquivo para a API. O backend validaria o arquivo, guardaria o original e criaria uma tarefa de processamento. Um worker extrairia o texto, prepararia a entrada e chamaria o provedor de IA.\n\nDepois, validaria a resposta, gravaria o resultado e atualizaria o status da tarefa para o frontend exibir.",
+          "watchOut": "Mantenha as credenciais do provedor no servidor e estabeleça limites de tamanho, tempo e custo."
+        },
+        {
+          "type": "interview",
+          "id": "pdf-de-500-paginas",
+          "level": "pleno",
+          "question": "Um usuário envia um PDF de 500 páginas. Como você resolveria?",
+          "answer": "Não enviaria automaticamente o documento inteiro numa única chamada. Primeiro, verificaria se o conteúdo cabe no limite de contexto do modelo e se a chamada seria economicamente viável.\n\nSe necessário, dividiria o documento em partes coerentes, preservando títulos e contexto. Geraria resumos parciais e depois os consolidaria num resumo final.\n\nSe o objetivo fosse responder perguntas específicas sobre o documento, em vez de resumir tudo, avaliaria uma estratégia de recuperação de informações, como RAG.",
+          "watchOut": "A abordagem hierárquica ajuda, mas a divisão precisa respeitar o conteúdo: tabelas, referências e relações entre seções se perdem quando o documento é cortado de forma arbitrária."
+        },
+        {
+          "type": "interview",
+          "id": "respostas-incorretas",
+          "level": "pleno",
+          "question": "Como você lidaria com respostas incorretas da IA?",
+          "answer": "Não consideraria a resposta do modelo confiável só porque a chamada retornou sucesso. Validaria o formato e os campos esperados com um schema e criaria critérios de qualidade baseados em exemplos representativos.\n\nSe o resumo precisasse trazer informações factuais, tentaria associar as afirmações às fontes no documento. Também avaliaria os casos em que o modelo omite informações importantes, inventa fatos ou não consegue responder.\n\nPor fim, monitoraria a qualidade, a latência e o custo das execuções e teria uma estratégia para tratar falhas e resultados inválidos.",
+          "why": "Trata a saída do modelo como um dado que precisa ser validado, e não como uma resposta confiável por padrão."
+        },
+        {
+          "type": "interview",
+          "id": "provar-o-valor",
+          "level": "senior",
+          "question": "O CEO pergunta como você provaria que a IA vale a pena nessa funcionalidade. O que você responde?",
+          "answer": "Compararia a solução com uma alternativa convencional, usando critérios definidos antes, como qualidade do resultado, tempo economizado, custo por documento e taxa de correções necessárias.\n\nA adoção da IA precisa justificar sua complexidade e seu custo.",
+          "why": "Mostra que você entende a IA como parte de uma solução de produto, e não apenas como uma chamada de API."
+        }
+      ]
+    }
+  ]
+}

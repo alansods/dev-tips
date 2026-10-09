@@ -52,6 +52,12 @@ import gitEColaboracao from '../../content/tracks/git-e-colaboracao/track.json';
 import pagamentosNoApp from '../../content/tracks/pagamentos-no-app/track.json';
 import performanceNoNextjs from '../../content/tracks/performance-no-nextjs/track.json';
 import modulosNativosNoExpo from '../../content/tracks/modulos-nativos-no-expo/track.json';
+import simDashboardLento from '../../content/tracks/sim-dashboard-lento/track.json';
+import simPedidosDuplicados from '../../content/tracks/sim-pedidos-duplicados/track.json';
+import simProjetosEPermissoes from '../../content/tracks/sim-projetos-e-permissoes/track.json';
+import simArquivosEmSegundoPlano from '../../content/tracks/sim-arquivos-em-segundo-plano/track.json';
+import simFuncionalidadeComIa from '../../content/tracks/sim-funcionalidade-com-ia/track.json';
+import simApiDeNotificacoes from '../../content/tracks/sim-api-de-notificacoes/track.json';
 import type { Language } from '../i18n/language';
 import { trackSchema, type Track } from './schema';
 import { localizeTrack, trackTranslationSchema } from './translation';
@@ -104,6 +110,12 @@ const registry: unknown[] = [
   pagamentosNoApp,
   performanceNoNextjs,
   modulosNativosNoExpo,
+  simDashboardLento,
+  simPedidosDuplicados,
+  simProjetosEPermissoes,
+  simArquivosEmSegundoPlano,
+  simFuncionalidadeComIa,
+  simApiDeNotificacoes,
 ];
 
 export const catalog: readonly Track[] = registry.map((raw) => trackSchema.parse(raw));

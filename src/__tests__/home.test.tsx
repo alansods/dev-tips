@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import HomeScreen from '../app/(tabs)/index';
 import ProfileScreen from '../app/(tabs)/profile';
 import TracksScreen from '../app/(tabs)/tracks';
+import AreaScreen from '../app/area/[areaId]/index';
 import ReviewAllScreen from '../app/review/index';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
@@ -27,6 +28,7 @@ const APP = {
   'review/index': ReviewAllScreen,
   'study/[trackId]/[deckId]': StudyScreen,
   'track/[trackId]': TrackScreen,
+  'area/[areaId]/index': AreaScreen,
 };
 const TODAY = '2026-10-07';
 const CRUD = 'crud-4-frameworks';
@@ -137,6 +139,17 @@ describe('Requirement: Continue de onde parou', () => {
     expect(screen).toHavePathname(`/study/${CRUD}/${deck.id}`);
   });
 
+  it('Última resposta numa simulação', async () => {
+    const sim = getTrack('sim-dashboard-lento')!;
+    answer(sim.id, [sim.decks[0].cards[0].id], 'known');
+    await open('/');
+    expect(screen.getAllByText('Dashboard lento: de 8 s para menos de 2').length).toBeGreaterThan(0);
+    expect(screen.getByText('Situação-problema')).toBeOnTheScreen();
+    expect(screen.queryByText(/deck 1 de 1/)).toBeNull();
+    press('Continuar Dashboard lento: de 8 s para menos de 2, Situação-problema');
+    expect(screen).toHavePathname('/study/sim-dashboard-lento/conversa');
+  });
+
   it('Também em andamento', async () => {
     answer(WEB, ['http'], 'known');
     answer(CRUD, [deck.cards[0].id], 'known');
@@ -163,11 +176,11 @@ describe('Requirement: Próximo passo', () => {
   });
 });
 
-describe('Requirement: Novas trilhas', () => {
+describe('Requirement: Novidades', () => {
   it('Trilha incluída há 3 dias', async () => {
     answer(WEB, ['http'], 'known');
     await open('/');
-    expect(screen.getByRole('header', { name: 'Novas trilhas' })).toBeOnTheScreen();
+    expect(screen.getByRole('header', { name: 'Novidades' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Módulos nativos no Expo, Nova' })).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('link', { name: 'Ver todas' }));
     expect(screen).toHavePathname('/tracks');
@@ -177,7 +190,33 @@ describe('Requirement: Novas trilhas', () => {
     jest.spyOn(clock, 'today').mockReturnValue('2026-11-30');
     answer(WEB, ['http'], 'known');
     await open('/');
-    expect(screen.queryByText('Novas trilhas')).toBeNull();
+    expect(screen.queryByText('Novidades')).toBeNull();
+  });
+
+  it('Área nova', async () => {
+    jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
+    answer(WEB, ['http'], 'known');
+    await open('/');
+    expect(screen.getByRole('button', { name: 'Situações-problema, 6 casos, Nova área' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: /^Pedido e pagamento em dobro, Nova$/ })).toBeNull();
+  });
+
+  it('Abrir a área nova', async () => {
+    jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
+    answer(WEB, ['http'], 'known');
+    await open('/');
+    press('Situações-problema, 6 casos, Nova área');
+    expect(screen).toHavePathname('/area/simulacoes');
+  });
+
+  it('Em inglês', async () => {
+    jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
+    useSettingsStore.setState({ language: 'en' });
+    answer(WEB, ['http'], 'known');
+    await open('/');
+    expect(screen.getByRole('header', { name: "What's new" })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Problem scenarios, 6 cases, New area' })).toBeOnTheScreen();
+    useSettingsStore.setState({ language: 'pt-BR' });
   });
 });
 
@@ -196,6 +235,14 @@ describe('Requirement: Primeiro acesso', () => {
     expect(screen.getByRole('checkbox', { name: 'Backend' })).toBeChecked();
     expect(useSettingsStore.getState().interests).toEqual(['backend']);
     expect(screen.queryByText('Fundamentos de programação')).toBeNull();
+  });
+});
+
+describe('Requirement: Primeiro acesso (simulações)', () => {
+  it('Sem opção de simulações', async () => {
+    await open('/');
+    expect(screen.getByRole('checkbox', { name: 'Backend' })).toBeOnTheScreen();
+    expect(screen.queryByRole('checkbox', { name: 'Situações-problema' })).toBeNull();
   });
 });
 
