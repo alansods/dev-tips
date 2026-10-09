@@ -3,7 +3,7 @@ import {
   ContinueSection,
   FirstAccess,
   Greeting,
-  NewTracksSection,
+  WhatsNewSection,
   ReviewSection,
   SuggestionsSection,
 } from '../../home/HomeSections';
@@ -22,7 +22,7 @@ export default function HomeScreen() {
           <ReviewSection />
           <ContinueSection />
           <SuggestionsSection />
-          <NewTracksSection />
+          <WhatsNewSection />
         </>
       )}
     </Screen>

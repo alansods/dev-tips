@@ -46,10 +46,12 @@ type SessionProps = {
   entries: () => SessionEntry[];
   /** Sair da sessão (botão de fechar e "Voltar" do resumo). */
   onExit: () => void;
+  /** Rótulo do botão de voltar do resumo; padrão "Voltar à trilha". */
+  backLabel?: string;
 };
 
 /** Sessão de flashcards: frente → verso → "Já sabia"/"Não sabia", e o resumo no fim. */
-export function StudySession({ tracks, title, entries, onExit }: SessionProps) {
+export function StudySession({ tracks, title, entries, onExit, backLabel }: SessionProps) {
   const { colors } = useTheme();
   const t = useT();
   const answerCard = useStudyStore((s) => s.answer);
@@ -113,6 +115,7 @@ export function StudySession({ tracks, title, entries, onExit }: SessionProps) {
           cardsById={cardsById}
           onReview={(ids) => dispatch({ type: 'restart', ids: order(ids) })}
           onBack={exit}
+          backLabel={backLabel}
         />
       </SafeAreaView>
     );
@@ -212,9 +215,10 @@ type SummaryProps = {
   cardsById: Map<string, Card>;
   onReview: (ids: string[]) => void;
   onBack: () => void;
+  backLabel?: string;
 };
 
-function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: SummaryProps) {
+function Summary({ state, title: sessionTitle, cardsById, onReview, onBack, backLabel }: SummaryProps) {
   const { colors } = useTheme();
   const t = useT();
   const { known, unknown, missedIds } = summary(state);
@@ -282,7 +286,7 @@ function Summary({ state, title: sessionTitle, cardsById, onReview, onBack }: Su
           </View>
         )}
         <View style={{ flexDirection: 'row' }}>
-          <Button title={t.summary.backToTrack} variant="secondary" onPress={onBack} />
+          <Button title={backLabel ?? t.summary.backToTrack} variant="secondary" onPress={onBack} />
         </View>
       </View>
     </ScrollView>

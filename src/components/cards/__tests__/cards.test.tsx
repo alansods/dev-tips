@@ -1,7 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react-native';
 import { useState } from 'react';
 
-import type { Card, StepCard } from '../../../content';
+import type { Card, InterviewCard, StepCard, Track } from '../../../content';
+import { getCatalog, getTrack } from '../../../content/catalog';
 import { ptBR } from '../../../i18n/pt-BR';
 import { cardById, crudTrack, renderWithTheme, webTrack } from '../../../test-utils';
 import { CardFace } from '../CardFace';
@@ -186,5 +187,66 @@ describe('Requirement: Origem do card na sessão', () => {
     const card = webTrack.decks[0].cards[0];
     renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
     expect(screen.getByText(`Fundamentos web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Frente e verso por tipo de card (simulação)', () => {
+  const sim = getTrack('sim-pedidos-duplicados')!;
+  const showSim = (id: string, side: 'front' | 'back', track: Track = sim) =>
+    renderWithTheme(
+      <CardFace card={cardById(id, track)} track={track} side={side} variantId="" onSelectVariant={() => {}} />,
+    );
+
+  it('Pergunta de simulação', () => {
+    showSim('idempotencia-no-backend', 'front');
+    expect(screen.getByText('Contexto')).toBeOnTheScreen();
+    expect(screen.getByText(sim.scenario!.context)).toBeOnTheScreen();
+    expect(screen.getByText('Como evitar que duas requisições simultâneas criem duas compras?')).toBeOnTheScreen();
+    expect(screen.getByText(FRONT_PROMPT.interview)).toBeOnTheScreen();
+    expect(screen.queryByText('Atenção')).toBeNull();
+    screen.unmount();
+
+    showSim('idempotencia-no-backend', 'back');
+    const card = cardById('idempotencia-no-backend', sim) as InterviewCard;
+    expect(screen.getByText(card.answer)).toBeOnTheScreen();
+    expect(screen.getByText('Atenção')).toBeOnTheScreen();
+    expect(screen.getByText(card.watchOut!)).toBeOnTheScreen();
+    expect(screen.getByText(card.snippet!.code)).toBeOnTheScreen();
+  });
+
+  it('Simulação sem por que', () => {
+    showSim('idempotencia-no-backend', 'back');
+    expect(screen.queryByText('Por que funciona')).toBeNull();
+    screen.unmount();
+    showSim('desabilitar-o-botao', 'back');
+    expect(screen.getByText('Por que funciona')).toBeOnTheScreen();
+    expect(screen.queryByText('Atenção')).toBeNull();
+  });
+
+  it('Card de simulação (selo de origem)', () => {
+    showSim('desabilitar-o-botao', 'front');
+    expect(screen.getByText('Caso · Pedido e pagamento em dobro')).toBeOnTheScreen();
+  });
+
+  it('Verso em inglês', () => {
+    const en = getCatalog('en').find((t) => t.id === 'sim-dashboard-lento')!;
+    renderWithTheme(
+      <CardFace card={cardById('query-lenta', en)} track={en} side="back" variantId="" onSelectVariant={() => {}} />,
+      { language: 'en' },
+    );
+    expect(screen.getByText('Watch out')).toBeOnTheScreen();
+    expect(screen.getByText('Case · Slow dashboard: from 8 s to under 2')).toBeOnTheScreen();
+    screen.unmount();
+    renderWithTheme(
+      <CardFace
+        card={cardById('investigar-lentidao', en)}
+        track={en}
+        side="front"
+        variantId=""
+        onSelectVariant={() => {}}
+      />,
+      { language: 'en' },
+    );
+    expect(screen.getByText('Context')).toBeOnTheScreen();
   });
 });

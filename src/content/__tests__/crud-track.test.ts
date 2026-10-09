@@ -191,6 +191,7 @@ function textsOf(card: Card): [string, string][] {
     case 'code':
       return [['title', card.title], ['body', card.body], ['snippet.file', card.snippet.file], ...(card.snippet.note ? [['snippet.note', card.snippet.note] as [string, string]] : [])];
     case 'question':
+    case 'interview':
       return [['question', card.question], ['answer', card.answer]];
   }
 }

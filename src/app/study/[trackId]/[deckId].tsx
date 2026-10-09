@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '../../../components/AppText';
 import { Button } from '../../../components/Button';
+import { isSimulation } from '../../../content';
 import { useCatalogTrack } from '../../../content/useCatalog';
 import { sessionCardIds } from '../../../study/rules';
 import { useStudyStore } from '../../../study/store';
@@ -32,7 +33,7 @@ export default function StudyScreen() {
   return (
     <StudySession
       tracks={[track]}
-      title={deck.title}
+      title={isSimulation(track) ? track.title : deck.title}
       entries={() =>
         sessionCardIds(track.id, deck, useStudyStore.getState().progress).map((cardId) => ({
           trackId: track.id,
@@ -40,6 +41,7 @@ export default function StudyScreen() {
         }))
       }
       onExit={() => leaveToTrack(track.id)}
+      backLabel={isSimulation(track) ? t.summary.backToSimulation : undefined}
     />
   );
 }

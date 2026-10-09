@@ -10,7 +10,13 @@ const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const id = () => z.string().regex(KEBAB, { error: 'deve estar em kebab-case (a-z, 0-9 e -)' });
 
 /** Áreas do catálogo, na ordem de exibição. */
-export const AREAS = ['fundamentos', 'git', 'frontend', 'backend', 'banco-de-dados', 'mobile', 'devops'] as const;
+export const AREAS = ['fundamentos', 'git', 'frontend', 'backend', 'banco-de-dados', 'mobile', 'devops', 'simulacoes'] as const;
+
+/** Data de inclusão das áreas que têm uma (as mais antigas não têm). Usada em "Novidades". */
+export const AREA_ADDED_AT: Partial<Record<(typeof AREAS)[number], string>> = { simulacoes: '2026-10-09' };
+
+/** Tipos de entrada do catálogo: trilha de estudo ou simulação de entrevista. */
+export const TRACK_KINDS = ['track', 'simulation'] as const;
 
 /** Seções que agrupam trilhas diretas dentro de uma área, na ordem de exibição. */
 export const SECTIONS = ['relacionais', 'nao-relacionais', 'ci-cd', 'aws'] as const;
@@ -92,6 +98,16 @@ export const questionCardSchema = z.object({
   snippet: snippetSchema.optional(),
 });
 
+export const interviewCardSchema = z.object({
+  ...cardBase,
+  type: z.literal('interview'),
+  question: text(),
+  answer: text(),
+  why: text().optional(),
+  watchOut: text().optional(),
+  snippet: snippetSchema.optional(),
+});
+
 export const cardSchema = z.discriminatedUnion('type', [
   endpointCardSchema,
   stepCardSchema,
@@ -99,6 +115,7 @@ export const cardSchema = z.discriminatedUnion('type', [
   conceptCardSchema,
   codeCardSchema,
   questionCardSchema,
+  interviewCardSchema,
 ]);
 
 /** Nome de um logo do conjunto gerado por `npm run tech-icons`. */
@@ -127,8 +144,16 @@ export const deckSchema = z.object({
   cards: z.array(cardSchema).min(1, { error: 'o deck precisa de pelo menos um card' }),
 });
 
+/** O caso de uma simulação: o contexto apresentado pelo entrevistador e a stack. */
+export const scenarioSchema = z.object({
+  context: text(),
+  stack: z.array(text()).min(1, { error: 'a stack precisa de pelo menos um item' }),
+});
+
 export const trackSchema = z.object({
   id: id(),
+  kind: z.enum(TRACK_KINDS, { error: 'kind deve ser "track" ou "simulation"' }).default('track'),
+  scenario: scenarioSchema.optional(),
   title: text(),
   description: text(),
   areas: z.array(z.enum(AREAS, { error: `área desconhecida; use: ${AREAS.join(', ')}` })).min(1, { error: 'a trilha precisa de pelo menos uma área' }),
@@ -161,7 +186,12 @@ export type StepCard = z.output<typeof stepCardSchema>;
 export type CompareCard = z.output<typeof compareCardSchema>;
 export type CodeCard = z.output<typeof codeCardSchema>;
 export type QuestionCard = z.output<typeof questionCardSchema>;
+export type InterviewCard = z.output<typeof interviewCardSchema>;
+export type Scenario = z.output<typeof scenarioSchema>;
 export type Snippet = z.output<typeof snippetSchema>;
 export type SnippetLanguage = (typeof SNIPPET_LANGUAGES)[number];
 export type Variant = z.output<typeof variantSchema>;
 export type CompareColumn = z.output<typeof compareColumnSchema>;
+
+/** A entrada é uma simulação de entrevista (e não uma trilha de estudo). */
+export const isSimulation = (track: Pick<Track, 'kind'>): boolean => track.kind === 'simulation';

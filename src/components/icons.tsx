@@ -286,6 +286,16 @@ export function CloudIcon({ color, size = 22 }: IconProps) {
   );
 }
 
+/** Dois balões de fala: a conversa de uma simulação de entrevista. */
+export function ConversationIcon({ color, size = 22 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" {...stroke(color)}>
+      <Path d="M14 9.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v4.5a2 2 0 0 0 2 2h1v3l3.5-3H12" />
+      <Path d="M10 13.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-1v2.5L15 19h-3a2 2 0 0 1-2-2z" />
+    </Svg>
+  );
+}
+
 /** Ícone de traço de cada área do catálogo. */
 export const AREA_ICONS: Record<Area, (props: IconProps) => React.JSX.Element> = {
   fundamentos: FundamentalsIcon,
@@ -295,4 +305,5 @@ export const AREA_ICONS: Record<Area, (props: IconProps) => React.JSX.Element> =
   'banco-de-dados': DatabaseIcon,
   mobile: MobileIcon,
   devops: CloudIcon,
+  simulacoes: ConversationIcon,
 };

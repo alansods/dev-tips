@@ -1,0 +1,39 @@
+{
+  "title": "AI-powered PDF summaries",
+  "description": "An AI API as part of the product: limits, cost and quality.",
+  "scenario": {
+    "context": "The product needs to receive PDFs and generate structured summaries using an artificial intelligence API.",
+    "stack": [
+      "Node.js",
+      "Queue",
+      "AI API"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "implementar-resumos": {
+      "question": "How would you implement this feature?",
+      "answer": "First, I'd understand the goal of the summary, the expected output format, the document volume, the privacy requirements and the budget per document.\n\nIn the implementation, the frontend would send the file to the API. The backend would validate the file, store the original and create a processing task. A worker would extract the text, prepare the input and call the AI provider.\n\nThen it would validate the response, save the result and update the task status so the frontend can show it.",
+      "watchOut": "Keep the provider credentials on the server and set limits on size, time and cost."
+    },
+    "pdf-de-500-paginas": {
+      "question": "A user uploads a 500-page PDF. How would you handle it?",
+      "answer": "I wouldn't automatically send the whole document in a single call. First, I'd check whether the content fits the model's context limit and whether the call would make economic sense.\n\nIf needed, I'd split the document into coherent parts, keeping headings and context. I'd generate partial summaries and then consolidate them into a final summary.\n\nIf the goal were to answer specific questions about the document instead of summarizing all of it, I'd consider an information retrieval strategy such as RAG.",
+      "watchOut": "A hierarchical approach helps, but the split has to respect the content: tables, references and links between sections get lost when the document is cut arbitrarily."
+    },
+    "respostas-incorretas": {
+      "question": "How would you deal with incorrect answers from the AI?",
+      "answer": "I wouldn't consider the model's answer reliable just because the call succeeded. I'd validate the format and the expected fields with a schema and create quality criteria based on representative examples.\n\nIf the summary had to contain factual information, I'd try to link each claim to its source in the document. I'd also evaluate cases where the model leaves out important information, makes up facts or can't answer.\n\nFinally, I'd monitor quality, latency and cost and keep a strategy for handling failures and invalid results.",
+      "why": "It treats the model's output as data that has to be validated, not as an answer that is reliable by default."
+    },
+    "provar-o-valor": {
+      "question": "The CEO asks how you'd prove the AI is worth it for this feature. What do you answer?",
+      "answer": "I'd compare the solution with a conventional alternative, using criteria defined in advance, such as output quality, time saved, cost per document and the rate of corrections needed.\n\nAdopting AI has to justify its complexity and its cost.",
+      "why": "It shows you see AI as part of a product solution, not just as an API call."
+    }
+  }
+}

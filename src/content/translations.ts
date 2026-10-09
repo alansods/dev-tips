@@ -48,6 +48,12 @@ import gitEColaboracaoEn from '../../content/tracks/git-e-colaboracao/translatio
 import pagamentosNoAppEn from '../../content/tracks/pagamentos-no-app/translations/en.json';
 import performanceNoNextjsEn from '../../content/tracks/performance-no-nextjs/translations/en.json';
 import modulosNativosNoExpoEn from '../../content/tracks/modulos-nativos-no-expo/translations/en.json';
+import simDashboardLentoEn from '../../content/tracks/sim-dashboard-lento/translations/en.json';
+import simPedidosDuplicadosEn from '../../content/tracks/sim-pedidos-duplicados/translations/en.json';
+import simProjetosEPermissoesEn from '../../content/tracks/sim-projetos-e-permissoes/translations/en.json';
+import simArquivosEmSegundoPlanoEn from '../../content/tracks/sim-arquivos-em-segundo-plano/translations/en.json';
+import simFuncionalidadeComIaEn from '../../content/tracks/sim-funcionalidade-com-ia/translations/en.json';
+import simApiDeNotificacoesEn from '../../content/tracks/sim-api-de-notificacoes/translations/en.json';
 
 export const translationRegistry: Record<string, Record<string, unknown>> = {
   'crud-4-frameworks': { en: crud4FrameworksEn },
@@ -96,4 +102,10 @@ export const translationRegistry: Record<string, Record<string, unknown>> = {
   'pagamentos-no-app': { en: pagamentosNoAppEn },
   'performance-no-nextjs': { en: performanceNoNextjsEn },
   'modulos-nativos-no-expo': { en: modulosNativosNoExpoEn },
+  'sim-dashboard-lento': { en: simDashboardLentoEn },
+  'sim-pedidos-duplicados': { en: simPedidosDuplicadosEn },
+  'sim-projetos-e-permissoes': { en: simProjetosEPermissoesEn },
+  'sim-arquivos-em-segundo-plano': { en: simArquivosEmSegundoPlanoEn },
+  'sim-funcionalidade-com-ia': { en: simFuncionalidadeComIaEn },
+  'sim-api-de-notificacoes': { en: simApiDeNotificacoesEn },
 };

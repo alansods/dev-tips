@@ -1,0 +1,64 @@
+{
+  "id": "sim-pedidos-duplicados",
+  "kind": "simulation",
+  "title": "Pedido e pagamento em dobro",
+  "description": "Idempotência, transações e falhas entre a API e o provedor de pagamento.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "Num e-commerce, o usuário clica duas vezes em \"Finalizar compra\", e o sistema cria dois pedidos e, às vezes, dois pagamentos.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "Provedor de pagamento"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "desabilitar-o-botao",
+          "level": "pleno",
+          "question": "Desabilitar o botão de compra durante o envio resolve o problema?",
+          "answer": "Desabilitar o botão melhora a experiência do usuário, mas não resolve o problema de forma confiável. A requisição pode ser reenviada por um timeout, uma atualização da página, um retry automático ou outro cliente.\n\nPor isso, a proteção principal precisa estar no backend, com idempotência e garantias de integridade no banco.",
+          "why": "Mostra que você não depende do frontend para garantir uma regra de negócio: a proteção real fica no backend."
+        },
+        {
+          "type": "interview",
+          "id": "idempotencia-no-backend",
+          "level": "pleno",
+          "question": "Como evitar que duas requisições simultâneas criem duas compras?",
+          "answer": "Usaria uma chave de idempotência associada à operação de compra. O cliente envia essa chave, e o backend verifica se a operação já foi registrada.\n\nNo PostgreSQL, criaria uma restrição única para a chave, de modo que duas requisições concorrentes não consigam registrar duas operações com o mesmo identificador.\n\nSe a primeira requisição já terminou, o backend devolve o resultado registrado. Se ela ainda está em processamento, devolve o estado da operação, em vez de iniciar outra compra.",
+          "watchOut": "A implementação real precisa tratar tentativas simultâneas, operações ainda em processamento e a reutilização indevida de uma chave com dados diferentes.",
+          "snippet": {
+            "file": "PostgreSQL",
+            "language": "sql",
+            "code": "CREATE TABLE orders (\n  id UUID PRIMARY KEY,\n  user_id UUID NOT NULL,\n  idempotency_key TEXT NOT NULL UNIQUE,\n  status TEXT NOT NULL DEFAULT 'pending'\n);",
+            "note": "A restrição UNIQUE garante no banco que a mesma chave não gera dois pedidos."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "pedido-e-pagamento",
+          "level": "pleno",
+          "question": "Como evitar inconsistências entre o pedido e o pagamento?",
+          "answer": "Separaria o estado do pedido do estado do pagamento e definiria transições explícitas, como pending, paid, failed e cancelled, conforme as regras do produto.\n\nPrimeiro, gravaria o pedido e os itens numa transação do PostgreSQL. Depois, iniciaria o pagamento no provedor externo, usando uma chave de idempotência quando ele oferecer esse recurso.\n\nO resultado seria confirmado por uma resposta confiável do provedor ou por um webhook validado. Também teria um processo de reconciliação para encontrar operações que ficaram num estado intermediário.",
+          "why": "Estados persistidos, webhook validado e reconciliação permitem recuperar o sistema quando uma das partes falha no meio do caminho."
+        },
+        {
+          "type": "interview",
+          "id": "timeout-no-provedor",
+          "level": "senior",
+          "question": "O provedor processou o pagamento, mas a chamada da sua API sofreu timeout. O que você faz?",
+          "answer": "O timeout não significa que o pagamento falhou, então eu não criaria outro pagamento na hora. Consultaria o estado da operação no provedor, quando possível, ou aguardaria a confirmação por webhook.\n\nSe precisasse repetir a solicitação, reutilizaria a mesma chave de idempotência.",
+          "watchOut": "Uma transação do PostgreSQL não desfaz uma cobrança feita num sistema externo. Para coordenar os dois sistemas, é preciso idempotência, estados persistidos e mecanismos de recuperação."
+        }
+      ]
+    }
+  ]
+}

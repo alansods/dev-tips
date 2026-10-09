@@ -43,11 +43,20 @@ const cardTranslationSchemas = {
     answer: optionalText(),
     snippet: snippetNote.optional(),
   }),
+  interview: z.strictObject({
+    tags: textList(),
+    question: optionalText(),
+    answer: optionalText(),
+    why: optionalText(),
+    watchOut: optionalText(),
+    snippet: snippetNote.optional(),
+  }),
 } satisfies Record<Card['type'], z.ZodType>;
 
 export const trackTranslationSchema = z.strictObject({
   title: optionalText(),
   description: optionalText(),
+  scenario: z.strictObject({ context: optionalText(), stack: textList() }).optional(),
   compareColumns: z.record(z.string(), text()).optional(),
   decks: z.record(z.string(), z.strictObject({ title: optionalText(), description: optionalText() })).optional(),
   cards: z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
@@ -84,6 +93,12 @@ export function validateTranslation(track: Track, input: unknown): ContentError[
   const columnIds = new Set((track.compareColumns ?? []).map((c) => c.id));
   const cards = new Map(track.decks.flatMap((d) => d.cards).map((c) => [c.id, c]));
 
+  if (isObj(input.scenario)) {
+    if (!track.scenario) missing(['scenario'], 'caso');
+    else if (Array.isArray(input.scenario.stack) && input.scenario.stack.length !== track.scenario.stack.length) {
+      errors.push({ path: 'scenario.stack', message: `a stack traduzida precisa ter ${track.scenario.stack.length} itens` });
+    }
+  }
   if (isObj(input.decks)) for (const id of Object.keys(input.decks)) if (!deckIds.has(id)) missing(['decks', id], 'deck');
   if (isObj(input.compareColumns))
     for (const id of Object.keys(input.compareColumns)) if (!columnIds.has(id)) missing(['compareColumns', id], 'coluna');
@@ -116,6 +131,10 @@ export function localizeTrack(track: Track, translation: TrackTranslation | unde
     ...track,
     title: translation.title ?? track.title,
     description: translation.description ?? track.description,
+    scenario: track.scenario && {
+      context: translation.scenario?.context ?? track.scenario.context,
+      stack: track.scenario.stack.map((item, i) => translation.scenario?.stack?.[i] ?? item),
+    },
     compareColumns: track.compareColumns?.map((col) => ({ ...col, label: translation.compareColumns?.[col.id] ?? col.label })),
     decks: track.decks.map((deck) => {
       const d = translation.decks?.[deck.id];
@@ -143,7 +162,7 @@ function localizeCard(card: Card, raw: Record<string, unknown> | undefined): Car
       Object.entries(out.snippets).map(([v, s]) => [v, { ...s, note: snippets[v]?.note ?? s.note }]),
     );
   }
-  if ((out.type === 'code' || out.type === 'question') && snippet && out.snippet) {
+  if ((out.type === 'code' || out.type === 'question' || out.type === 'interview') && snippet && out.snippet) {
     out.snippet = { ...out.snippet, note: snippet.note ?? out.snippet.note };
   }
   if (out.type === 'compare' && values) out.values = { ...out.values, ...values };
@@ -158,6 +177,7 @@ const COVERED_FIELDS: { [K in Card['type']]: string[] } = {
   concept: ['term', 'definition', 'frontendAnalogy'],
   code: ['title', 'body'],
   question: ['question', 'answer'],
+  interview: ['question', 'answer', 'why', 'watchOut'],
 };
 
 /**
@@ -168,6 +188,10 @@ export function missingTranslations(track: Track, translation: TrackTranslation)
   const missing: string[] = [];
   if (!translation.title) missing.push('title');
   if (!translation.description) missing.push('description');
+  if (track.scenario) {
+    if (!translation.scenario?.context) missing.push('scenario.context');
+    if (!translation.scenario?.stack) missing.push('scenario.stack');
+  }
   for (const col of track.compareColumns ?? []) {
     if (!translation.compareColumns?.[col.id]) missing.push(`compareColumns.${col.id}`);
   }
@@ -187,7 +211,7 @@ export function missingTranslations(track: Track, translation: TrackTranslation)
           if (snippet.note && !notes?.[variant]?.note) missing.push(`cards.${card.id}.snippets.${variant}.note`);
         }
       }
-      if ((card.type === 'code' || card.type === 'question') && card.snippet?.note) {
+      if ((card.type === 'code' || card.type === 'question' || card.type === 'interview') && card.snippet?.note) {
         if (!(tr.snippet as { note?: string } | undefined)?.note) missing.push(`cards.${card.id}.snippet.note`);
       }
     }

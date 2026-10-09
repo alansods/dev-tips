@@ -1,0 +1,39 @@
+{
+  "title": "Notifications API",
+  "description": "High volume, provider outages, duplicates and scope under a tight deadline.",
+  "scenario": {
+    "context": "You need to build an API that reliably sends thousands of notifications per minute, and you have three days to ship the first version.",
+    "stack": [
+      "Node.js",
+      "Queue",
+      "Workers"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "como-comecar": {
+      "question": "Where would you start?",
+      "answer": "I'd clarify which channels we need to support, the expected volume, whether there's a maximum delivery time and how the system should behave when something fails.\n\nFor high volume, I'd separate creating the notification from actually sending it. The API would record the request and make it available for asynchronous processing, with a queue and workers.",
+      "why": "Starting with the requirements shows you understand the problem before choosing the solution."
+    },
+    "provedor-fora-do-ar": {
+      "question": "The sending provider is down for five minutes. What happens to the notifications?",
+      "answer": "I'd keep the notifications pending and retry with exponential backoff, respecting the provider's limits. I'd set a maximum number of attempts and a queue for messages that fail permanently.\n\nI'd also monitor queue size and waiting time to quickly detect notifications piling up.",
+      "why": "No notification is lost during the outage, and monitoring the queue reveals the problem before it grows."
+    },
+    "notificacoes-duplicadas": {
+      "question": "Some notifications reach users twice. How would you solve it?",
+      "answer": "I'd find the source of the duplication: queue redelivery, a worker retry or the provider's behavior.\n\nI'd give each notification a unique identifier and record its processing state. That keeps the application from running an operation that already finished. I'd also use the provider's idempotency features, if it has them.",
+      "watchOut": "Don't promise exactly-once delivery in every circumstance: if the external send happens but the acknowledgment is lost, it may be impossible to know right away whether the message was delivered. The system has to tolerate that ambiguity."
+    },
+    "prazo-de-tres-dias": {
+      "question": "You only have three days to deliver. What goes into the first version?",
+      "answer": "I'd define an MVP with one notification channel, basic validation, persistence, asynchronous sending, failure handling and logs, and I'd make sure the critical flows were tested.\n\nI'd leave secondary features, such as multiple channels and advanced priority rules, for later stages. I'd also make the limits of the first version and the remaining risks clear.",
+      "why": "It shows you balance quality, deadline and scope without ignoring critical requirements."
+    }
+  }
+}

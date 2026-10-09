@@ -1,0 +1,45 @@
+{
+  "title": "Projects, members and permissions",
+  "description": "Data modeling, authorization, API design and evolving the architecture.",
+  "scenario": {
+    "context": "You'll build a feature where users create projects, invite members and set each member's access permissions.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "REST API"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "modelar-o-banco": {
+      "question": "How would you model the database?",
+      "answer": "I'd start by identifying the main entities: users, projects and project members.\n\nSince a user can join many projects and a project can have many users, I'd create a join table to represent that relationship and store each member's role.",
+      "watchOut": "In the full implementation, validate the allowed roles, create the indexes you need and define rules for deleting records and for pending invitations.",
+      "snippet": {
+        "note": "project_members is the join table of the many-to-many relationship, with each member's role."
+      }
+    },
+    "impedir-acesso-alheio": {
+      "question": "How do you prevent a user from accessing someone else's project?",
+      "answer": "I wouldn't trust only the ID sent by the frontend. On every request, the backend would identify the authenticated user and check whether they have the permission needed to access that project.\n\nThat check would live in a reusable authorization policy or service. I'd also add tests to make sure a user can't reach another organization's projects by changing the ID in the URL.",
+      "watchOut": "Don't mix up the two concepts: authentication identifies the user; authorization decides what they can do."
+    },
+    "desenhar-a-api": {
+      "question": "How would you build the API for this feature?",
+      "answer": "I'd keep the routes, which handle HTTP validation, separate from the business rules and from persistence. The services would check permissions and apply the rules of each operation.\n\nThe database layer would handle queries and updates, with constraints guaranteeing data integrity.",
+      "why": "With separate layers, the permission rule lives in one place, easy to test and to apply to every route.",
+      "snippet": {
+        "note": "Create, list and get projects; add members, change their role and remove them."
+      }
+    },
+    "evoluir-a-arquitetura": {
+      "question": "If the platform grew a lot, how would you evolve the architecture?",
+      "answer": "I'd start with a modular monolith, because it's simpler to build, test and operate. As the volume grew, I'd measure the bottlenecks and improve indexes, pagination, caching and data isolation.\n\nI'd only consider splitting out services when there were concrete reasons, such as different scaling needs, deployment autonomy or operational isolation.",
+      "watchOut": "Don't adopt microservices just because the application grew."
+    }
+  }
+}

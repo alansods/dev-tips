@@ -1,0 +1,43 @@
+{
+  "title": "Background file processing",
+  "description": "Queues, workers, failures and load spikes in asynchronous processing.",
+  "scenario": {
+    "context": "The app receives PDFs, extracts their content and processes the files. Some operations take two minutes and exceed the HTTP request timeout.",
+    "stack": [
+      "Node.js",
+      "PostgreSQL",
+      "Queue",
+      "Object storage"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "redesenhar-o-fluxo": {
+      "question": "How would you redesign this flow?",
+      "answer": "I'd separate receiving the file from processing it. The API would validate the request, store the file in object storage and record a task in the database. Then it would return an identifier so the frontend can track the processing.\n\nA worker would consume the tasks and do the processing in the background. The frontend would poll the status or receive updates through SSE or WebSocket, if that were needed.",
+      "why": "The request no longer depends on how long processing takes, and the user follows the progress through the task status.",
+      "snippet": {
+        "note": "The HTTP request ends right after the upload; the heavy work is done by the worker."
+      }
+    },
+    "banco-e-fila": {
+      "question": "The API saves the task in PostgreSQL and then publishes the message to the queue. What if only one of the two operations succeeds?",
+      "answer": "Because they are two independent operations, one can succeed while the other fails: the task stays in the database and is never processed, or the message reaches the queue with no recorded task.\n\nWhen publishing the task must be guaranteed, I'd consider the transactional outbox pattern: the task record and the event are saved in the same transaction, and a publisher sends the event to the queue afterwards.",
+      "watchOut": "Writing to the database and publishing to the queue isn't atomic; without a mechanism like the outbox, a failure between the two steps loses work."
+    },
+    "worker-caiu": {
+      "question": "What if the worker crashes in the middle of processing a file?",
+      "answer": "I'd assume the same task may run again. That's why the processing needs to be idempotent or have mechanisms that prevent duplicated effects.\n\nThe task would have persisted states, a limited number of attempts, backoff between retries and a way to recover abandoned tasks. Permanent errors would go to a dead-letter queue for investigation.",
+      "watchOut": "Putting a message on a queue isn't enough: you also have to define how the system recovers the work when a worker fails."
+    },
+    "pico-de-arquivos": {
+      "question": "Ten thousand files arrive at the same time. What would you do?",
+      "answer": "I'd avoid creating one worker per file. I'd use the queue to absorb the spike and cap how many tasks run at the same time, respecting the processing capacity and the limits of external services.\n\nI'd monitor queue size, waiting time, processing duration and failure rate. If demand grew in a sustained way, I'd scale the workers horizontally based on those metrics.",
+      "watchOut": "Trade-off: more workers reduce waiting time, but they increase cost, database pressure and contention on external services."
+    }
+  }
+}

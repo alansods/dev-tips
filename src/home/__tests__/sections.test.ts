@@ -1,3 +1,4 @@
+import { isSimulation } from '../../content';
 import { getCatalog, getTrack } from '../../content/catalog';
 import { progressKey, type Progress } from '../../study/rules';
 import { nextSchedule, type Schedule } from '../../study/srs';
@@ -7,10 +8,10 @@ import {
   greetingPeriod,
   inProgressTracks,
   lastSevenDays,
-  newTracks,
   reviewSummary,
   startHere,
   suggestions,
+  whatsNew,
 } from '../sections';
 
 const catalog = getCatalog('pt-BR');
@@ -123,16 +124,51 @@ describe('Requirement: Próximo passo', () => {
   });
 });
 
-describe('Requirement: Novas trilhas', () => {
+describe('Requirement: Novidades', () => {
+  const trackItems = (items: ReturnType<typeof whatsNew>) =>
+    items.flatMap((item) => (item.kind === 'track' ? [item.track] : []));
+  const areaItems = (items: ReturnType<typeof whatsNew>) =>
+    items.flatMap((item) => (item.kind === 'area' ? [item.area] : []));
+
   it('Trilha incluída há 3 dias', () => {
-    const list = newTracks(catalog, TODAY);
-    expect(list.length).toBeLessThanOrEqual(3);
-    expect(ids(list)).toContain('modulos-nativos-no-expo');
-    for (const track of list) expect(track.addedAt).toBe('2026-10-06');
+    const items = whatsNew(catalog, TODAY);
+    expect(items.length).toBeLessThanOrEqual(3);
+    expect(areaItems(items)).toEqual([]);
+    expect(ids(trackItems(items))).toContain('modulos-nativos-no-expo');
+    for (const track of trackItems(items)) expect(track.addedAt).toBe('2026-10-06');
+  });
+
+  it('Área nova', () => {
+    const items = whatsNew(catalog, '2026-10-10');
+    expect(items[0]).toEqual(expect.objectContaining({ kind: 'area', area: 'simulacoes', date: '2026-10-09' }));
+    if (items[0].kind === 'area') expect(items[0].tracks).toHaveLength(6);
+    expect(trackItems(items).some(isSimulation)).toBe(false);
+    expect(items).toHaveLength(3);
+  });
+
+  it('Simulação nova numa área antiga', () => {
+    const base = getTrack('sim-api-de-notificacoes')!;
+    const novo = { ...base, id: 'sim-nova', addedAt: '2026-11-15' };
+    const items = whatsNew([...catalog, novo], '2026-11-20');
+    expect(areaItems(items)).toEqual([]);
+    expect(ids(trackItems(items))).toEqual(['sim-nova']);
+  });
+
+  it('Áreas sem data', () => {
+    expect(areaItems(whatsNew(catalog, '2026-10-10'))).toEqual(['simulacoes']);
   });
 
   it('Trilha antiga', () => {
-    expect(newTracks(catalog, '2026-11-30')).toEqual([]);
+    expect(whatsNew(catalog, '2026-11-30')).toEqual([]);
+  });
+});
+
+describe('Requirement: Próximo passo (simulações)', () => {
+  it('Depois de uma simulação', () => {
+    const result = suggestions(catalog, {}, 'sim-dashboard-lento', [])!;
+    expect(result.kind).toBe('forYou');
+    expect(result.tracks[0].id).toBe('fundamentos-de-programacao');
+    expect(result.tracks.some(isSimulation)).toBe(false);
   });
 });
 
