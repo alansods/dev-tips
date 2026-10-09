@@ -77,6 +77,7 @@ async function open(url: string) {
   renderRouter(APP, { initialUrl: url });
   await flush();
 }
+const UNAVAILABLE = 'A assinatura está indisponível no momento. Tente de novo mais tarde.';
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const press = async (name: string | RegExp) => {
   fireEvent.press(button(name));
@@ -218,6 +219,14 @@ describe('Requirement: Paywall', () => {
     jest.mocked(monthlyPrice).mockReturnValue(new Promise(() => {}));
     await open('/paywall');
     expect(button('Assinar o Pro')).toBeDisabled();
+    expect(screen.queryByText(UNAVAILABLE)).toBeNull();
+  });
+
+  it('Assinatura indisponível', async () => {
+    jest.mocked(monthlyPrice).mockResolvedValue(null);
+    await open('/paywall');
+    expect(screen.getByText(UNAVAILABLE)).toBeOnTheScreen();
+    expect(button('Assinar o Pro')).toBeDisabled();
   });
 
   it('Paywall no iOS', async () => {
@@ -262,7 +271,7 @@ describe('Requirement: Assinar pelo app', () => {
     await press(/Dev Tips Pro/);
     await press('Assinar o Pro');
     expect(screen).toHavePathname('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(screen).toHavePathname('/paywall');
     expect(useAccountStore.getState().user).toEqual(ana);
     expect(purchaseMonthly).not.toHaveBeenCalled();

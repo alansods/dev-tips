@@ -1,4 +1,4 @@
-// Botão "Continuar com o Google" no padrão visual do Google (fundo claro,
+// Botão "Entrar ou criar conta com o Google" no padrão visual do Google (fundo claro,
 // borda cinza, "G" colorido), com o estado de carregando.
 
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
@@ -27,7 +27,7 @@ export function GoogleButton({ label, loading, disabled, onPress }: Props) {
       ]}
     >
       {loading ? <ActivityIndicator color={colors.accent} /> : <GoogleLogo />}
-      <AppText font="medium" size={16} style={{ color: dark ? '#E3E3E3' : '#1F1F1F' }}>
+      <AppText font="medium" size={16} style={[styles.label, { color: dark ? '#E3E3E3' : '#1F1F1F' }]}>
         {label}
       </AppText>
     </Pressable>
@@ -43,5 +43,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
+    paddingHorizontal: 16,
   },
+  label: { flexShrink: 1, textAlign: 'center' },
 });
