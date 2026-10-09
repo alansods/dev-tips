@@ -90,9 +90,15 @@ describe('Requirement: Tela de login', () => {
     expect(
       screen.getByText('Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.'),
     ).toBeOnTheScreen();
-    expect(button('Continuar com o Google')).toBeOnTheScreen();
+    expect(button('Entrar ou criar conta com o Google')).toBeOnTheScreen();
     expect(screen.getByRole('link', { name: 'Termos de uso' })).toBeOnTheScreen();
     expect(screen.getByRole('link', { name: 'Política de privacidade' })).toBeOnTheScreen();
+  });
+
+  it('Cadastro explicado', async () => {
+    await open('/login');
+    expect(button('Entrar ou criar conta com o Google')).toBeOnTheScreen();
+    expect(screen.getByText('Primeira vez? Sua conta é criada na hora, sem formulário.')).toBeOnTheScreen();
   });
 
   it('Continuar sem conta', async () => {
@@ -115,9 +121,9 @@ describe('Requirement: Entrar pelo app', () => {
     google.mockResolvedValue({ type: 'success', idToken: 'id-token-do-google' });
     api({ 'POST /auth/google': () => json(200, session) });
     await open('/profile');
-    await press('Entrar');
+    await press('Entrar ou criar conta');
     expect(screen).toHavePathname('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(screen).toHavePathname('/profile');
     expect(screen.getByText('Ana Souza')).toBeOnTheScreen();
     expect(screen.getByText('ana@example.com')).toBeOnTheScreen();
@@ -131,7 +137,7 @@ describe('Requirement: Entrar pelo app', () => {
     let respond: (r: Response) => void = () => {};
     api({ 'POST /auth/google': () => new Promise<Response>((r) => (respond = r)) });
     await open('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(button('Entrando…')).toBeOnTheScreen();
     expect(button('Continuar sem conta')).toBeDisabled();
     respond(json(200, session));
@@ -141,9 +147,9 @@ describe('Requirement: Entrar pelo app', () => {
   it('Cancelado', async () => {
     google.mockResolvedValue({ type: 'cancelled' });
     await open('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(screen).toHavePathname('/login');
-    expect(button('Continuar com o Google')).toBeOnTheScreen();
+    expect(button('Entrar ou criar conta com o Google')).toBeOnTheScreen();
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
@@ -151,7 +157,7 @@ describe('Requirement: Entrar pelo app', () => {
     google.mockResolvedValue({ type: 'success', idToken: 'id' });
     fetchMock.mockRejectedValue(new TypeError('Network request failed'));
     await open('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(screen.getByText('Sem conexão. Tente de novo quando estiver online.')).toBeOnTheScreen();
   });
 
@@ -159,7 +165,7 @@ describe('Requirement: Entrar pelo app', () => {
     google.mockResolvedValue({ type: 'success', idToken: 'id' });
     api({ 'POST /auth/google': () => json(500, { error: { code: 'internal_error' } }) });
     await open('/login');
-    await press('Continuar com o Google');
+    await press('Entrar ou criar conta com o Google');
     expect(screen.getByText('Não foi possível entrar agora. Tente de novo.')).toBeOnTheScreen();
   });
 });
@@ -168,7 +174,7 @@ describe('Requirement: Conta no app', () => {
   it('Convite para entrar', async () => {
     await open('/profile');
     expect(screen.getByText('Salve seu progresso na nuvem')).toBeOnTheScreen();
-    expect(button('Entrar')).toBeOnTheScreen();
+    expect(button('Entrar ou criar conta')).toBeOnTheScreen();
   });
 
   it('tela Conta', async () => {
