@@ -159,6 +159,10 @@ A confirmação de "Apagar conta" SHALL ter os botões "Cancelar" e "Apagar minh
 - **WHEN** um assinante com 30 perguntas usadas e renovação em 12/11/2026 abre a tela Conta
 - **THEN** o bloco Plano mostra "Pro mensal", "Ativo", "170", "perguntas restantes", "30 / 200 usadas", "Zera em 12/11/2026", "Como a cota funciona", "Renova em 12/11/2026", "Gerenciar assinatura" e "Restaurar compras"
 
+#### Scenario: Gerenciar assinatura no Android
+- **WHEN** um assinante toca em "Gerenciar assinatura" na tela Conta, no Android
+- **THEN** abre a página de assinaturas do Google Play com a assinatura do Dev Tips, onde ele pode cancelá-la
+
 #### Scenario: Uma pergunta restante na Conta
 - **WHEN** um assinante com 199 perguntas usadas abre a tela Conta
 - **THEN** o bloco Plano mostra "1" e "pergunta restante"
