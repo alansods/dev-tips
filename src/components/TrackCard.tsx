@@ -113,7 +113,7 @@ export function AreaCard({
   const progress = useStudyStore((s) => s.progress);
   const stats = tracksStats(tracks, progress);
   const due = useDue(tracks);
-  const count = t.nav.trackCount(tracks.length);
+  const count = area === 'simulacoes' ? t.nav.simulationCount(tracks.length) : t.nav.trackCount(tracks.length);
   return (
     <Card label={t.nav.areaLabel(name, count, stats.known, stats.total)} onPress={onPress} fill={compact}>
       <View style={compact ? { gap: spacing.sm } : styles.row}>

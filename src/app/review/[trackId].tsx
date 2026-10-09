@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppText } from '../../components/AppText';
 import { Button } from '../../components/Button';
+import { isSimulation } from '../../content';
 import { useCatalogTrack } from '../../content/useCatalog';
 import { today } from '../../study/clock';
 import { dueCardIds } from '../../study/srs';
@@ -37,6 +38,7 @@ export default function ReviewScreen() {
         dueCardIds(track, useStudyStore.getState().schedule, today()).map((cardId) => ({ trackId: track.id, cardId }))
       }
       onExit={() => leaveToTrack(track.id)}
+      backLabel={isSimulation(track) ? t.summary.backToSimulation : undefined}
     />
   );
 }

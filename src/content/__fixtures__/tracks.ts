@@ -122,3 +122,28 @@ export function testTaxonomy(): Json {
 export function cardAt(track: Json, deck: number, card: number): Json {
   return track.decks[deck].cards[card];
 }
+
+export function interviewCard(id = 'investigar', extra: Json = {}): Json {
+  return {
+    type: 'interview',
+    level: 'pleno',
+    id,
+    question: 'Como você investigaria?',
+    answer: 'Eu começaria medindo cada etapa.',
+    ...extra,
+  };
+}
+
+/** Simulação mínima: um caso e um deck com dois cards interview. */
+export function simulationTrack(extra: Json = {}): Json {
+  return {
+    id: 'sim-teste',
+    kind: 'simulation',
+    title: 'Simulação de teste',
+    description: 'Um caso de teste.',
+    areas: ['simulacoes'],
+    scenario: { context: 'O dashboard passou a demorar 8 segundos.', stack: ['Next.js', 'Node.js', 'PostgreSQL'] },
+    decks: [{ id: 'conversa', title: 'Conversa', cards: [interviewCard(), interviewCard('consultas')] }],
+    ...extra,
+  };
+}

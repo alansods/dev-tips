@@ -1,6 +1,6 @@
 export { validateCatalog, validateTrack, type CatalogResult, type TrackResult } from './validate';
 export { getGlossary } from './glossary';
-export { AREAS, LEVELS, SECTIONS, SNIPPET_LANGUAGES, trackSchema } from './schema';
+export { AREA_ADDED_AT, AREAS, isSimulation, LEVELS, SECTIONS, SNIPPET_LANGUAGES, trackSchema } from './schema';
 export { placementOf, validateTaxonomy, type Framework, type Language, type Placement, type Taxonomy, type TaxonomyResult } from './taxonomy';
 export { repoTaxonomy } from './repoTaxonomy';
 export type { ContentError } from './errors';
@@ -15,7 +15,9 @@ export type {
   EndpointCard,
   Level,
   Section,
+  InterviewCard,
   QuestionCard,
+  Scenario,
   Snippet,
   SnippetLanguage,
   StepCard,

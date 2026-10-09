@@ -1,0 +1,72 @@
+{
+  "id": "sim-dashboard-lento",
+  "kind": "simulation",
+  "title": "Dashboard lento: de 8 s para menos de 2",
+  "description": "Next.js, API Node e PostgreSQL: investigar a causa antes de otimizar.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "Uma aplicação Next.js consome uma API Node.js que consulta o PostgreSQL. O dashboard passou a demorar 8 segundos para carregar, e a meta é ficar abaixo de 2.",
+    "stack": [
+      "Next.js",
+      "Node.js",
+      "PostgreSQL"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "investigar-lentidao",
+          "level": "pleno",
+          "question": "Como você investigaria a lentidão do dashboard?",
+          "answer": "Eu começaria tentando reproduzir o problema e entender quando ele começou. Depois, mediria o tempo de cada etapa, separando o frontend, a API e as consultas ao banco.\n\nVerificaria métricas de latência, logs, volume de requisições e mudanças recentes. No backend, mediria o tempo de cada operação e, no PostgreSQL, analisaria as consultas mais lentas e seus planos de execução.\n\nCom esses dados, identificaria a principal causa antes de decidir qual otimização fazer.",
+          "why": "Mostra investigação da causa raiz, em vez de presumir que o problema está no React ou no banco."
+        },
+        {
+          "type": "interview",
+          "id": "consultas-repetidas",
+          "level": "pleno",
+          "question": "Você descobre que a API faz 50 consultas parecidas para montar o dashboard. O que faria?",
+          "answer": "Primeiro, verificaria se as consultas realmente precisam ser feitas separadamente. Se elas buscam informações relacionadas, tentaria juntá-las em menos consultas, com JOINs ou consultas em lote, conforme a modelagem.\n\nTambém avaliaria se existem índices adequados para os filtros e relacionamentos usados. Depois, mediria de novo para confirmar a melhoria.",
+          "watchOut": "Não crie índices nem adicione cache sem medir o impacto: índices aumentam o custo das escritas, e o cache traz a complexidade da invalidação."
+        },
+        {
+          "type": "interview",
+          "id": "query-lenta",
+          "level": "pleno",
+          "question": "Uma das consultas do dashboard continua lenta. Como você descobriria o motivo?",
+          "answer": "Usaria EXPLAIN ANALYZE para ver o plano de execução real, procurando varreduras sequenciais caras, estimativas de cardinalidade erradas, joins ineficientes ou muitas linhas processadas.\n\nTambém verificaria os índices existentes, os filtros da consulta e possíveis locks. A partir disso, faria uma alteração por vez e compararia os resultados.",
+          "watchOut": "Se essa consulta é frequente e a tabela é grande, um índice em organization_id pode ajudar, mas a decisão depende do plano e da distribuição dos dados.",
+          "snippet": {
+            "file": "PostgreSQL",
+            "language": "sql",
+            "code": "EXPLAIN ANALYZE\nSELECT id, name\nFROM users\nWHERE organization_id = 10;",
+            "note": "EXPLAIN ANALYZE executa a consulta e mostra o tempo real de cada etapa do plano."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "cache-de-dados-agregados",
+          "level": "pleno",
+          "question": "Parte dos dados do dashboard pode ficar um pouco desatualizada. Você usaria cache?",
+          "answer": "Depende da tolerância à desatualização de cada dado. Para indicadores agregados, que não precisam refletir cada alteração na hora, usaria cache com uma estratégia de expiração ou revalidação.\n\nPara informações críticas, como permissões e dados financeiros, evitaria depender de um cache possivelmente desatualizado para tomar decisões de segurança ou de consistência.",
+          "watchOut": "Isole o cache por organização e pelos parâmetros da consulta; senão, os dados de um cliente podem aparecer para outro."
+        },
+        {
+          "type": "interview",
+          "id": "comprovar-melhoria",
+          "level": "pleno",
+          "question": "Depois das otimizações, como você comprovaria que o dashboard melhorou?",
+          "answer": "Compararia a latência antes e depois, incluindo percentis como o p95, além da taxa de erro e da carga no banco, usando uma amostra representativa de requisições.",
+          "why": "Sem medir antes e depois com os mesmos critérios, não dá para afirmar que a otimização resolveu o problema."
+        }
+      ]
+    }
+  ]
+}

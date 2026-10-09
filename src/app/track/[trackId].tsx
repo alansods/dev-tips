@@ -7,7 +7,7 @@ import { Button } from '../../components/Button';
 import { FullScreenHeader } from '../../components/FullScreen';
 import { ProgressBar } from '../../components/ProgressBar';
 import { TechIcon } from '../../components/TechIcon';
-import { repoTaxonomy } from '../../content';
+import { isSimulation, repoTaxonomy } from '../../content';
 import { trackIcon } from '../../content/icons';
 import { useCatalogTrack } from '../../content/useCatalog';
 import type { Deck, Track } from '../../content';
@@ -27,8 +27,14 @@ export default function TrackScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} edges={['top', 'bottom']}>
-      <FullScreenHeader kicker={t.track.kicker} />
-      {track ? <TrackContent track={track} /> : <AppText style={styles.missing}>{t.common.trackNotFound}</AppText>}
+      <FullScreenHeader kicker={track && isSimulation(track) ? t.simulation.kicker : t.track.kicker} />
+      {!track ? (
+        <AppText style={styles.missing}>{t.common.trackNotFound}</AppText>
+      ) : isSimulation(track) ? (
+        <SimulationContent track={track} />
+      ) : (
+        <TrackContent track={track} />
+      )}
     </SafeAreaView>
   );
 }
@@ -83,6 +89,65 @@ function TrackContent({ track }: { track: Track }) {
       {track.decks.map((deck, i) => (
         <DeckItem key={deck.id} track={track} deck={deck} index={i} />
       ))}
+    </ScrollView>
+  );
+}
+
+/** Simulação: o caso, a stack, o progresso e um botão que abre a conversa (o deck único). */
+function SimulationContent({ track }: { track: Track }) {
+  const { colors } = useTheme();
+  const t = useT();
+  const progress = useStudyStore((s) => s.progress);
+  const deck = track.decks[0];
+  const stats = deckStats(track.id, deck, progress);
+  const action = t.simulation.action[deckAction(stats)];
+
+  return (
+    <ScrollView contentContainerStyle={styles.content}>
+      <TechIcon icon={trackIcon(track, repoTaxonomy)} size={48} />
+      <AppText font="bold" size={24} accessibilityRole="header" style={{ lineHeight: 30 }}>
+        {track.title}
+      </AppText>
+
+      {track.scenario ? (
+        <View style={[styles.stats, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <AppText font="mono" size={11} tone="muted" style={styles.caps}>
+            {t.card.scenario}
+          </AppText>
+          <AppText size={16} style={{ lineHeight: 24 }}>
+            {track.scenario.context}
+          </AppText>
+        </View>
+      ) : null}
+
+      {track.scenario ? (
+        <View style={styles.chips}>
+          {track.scenario.stack.map((item) => (
+            <View key={item} style={[styles.chip, { borderColor: colors.line, backgroundColor: colors.surface }]}>
+              <AppText font="semibold" size={13}>
+                {item}
+              </AppText>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      <View style={[styles.deck, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <AppText size={13} tone="muted">
+          {t.simulation.questions(stats.total)}
+        </AppText>
+        <View style={styles.progressRow}>
+          <View style={{ flex: 1 }}>
+            <ProgressBar value={stats.known / stats.total} unknownValue={stats.unknown / stats.total} />
+          </View>
+          <AppText font="mono" size={12} tone="muted">{`${stats.known}/${stats.total}`}</AppText>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Button title={action} onPress={() => router.push(`/study/${track.id}/${deck.id}`)} />
+        </View>
+      </View>
+
+      <ReviewToday track={track} />
     </ScrollView>
   );
 }

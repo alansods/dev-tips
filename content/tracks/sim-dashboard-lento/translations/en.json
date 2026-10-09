@@ -1,0 +1,47 @@
+{
+  "title": "Slow dashboard: from 8 s to under 2",
+  "description": "Next.js, a Node API and PostgreSQL: find the cause before optimizing.",
+  "scenario": {
+    "context": "A Next.js app calls a Node.js API that queries PostgreSQL. The dashboard now takes 8 seconds to load, and the goal is to get it under 2.",
+    "stack": [
+      "Next.js",
+      "Node.js",
+      "PostgreSQL"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "investigar-lentidao": {
+      "question": "How would you investigate the slow dashboard?",
+      "answer": "I'd start by trying to reproduce the problem and finding out when it began. Then I'd measure the time spent in each stage, separating the frontend, the API and the database queries.\n\nI'd check latency metrics, logs, request volume and recent changes. In the backend, I'd time each operation and, in PostgreSQL, I'd look at the slowest queries and their execution plans.\n\nWith that data, I'd identify the main cause before deciding which optimization to make.",
+      "why": "It shows root-cause investigation instead of assuming the problem is in React or in the database."
+    },
+    "consultas-repetidas": {
+      "question": "You find out the API runs 50 similar queries to build the dashboard. What would you do?",
+      "answer": "First, I'd check whether the queries really need to run separately. If they fetch related data, I'd try to combine them into fewer queries, using JOINs or batch queries, depending on the data model.\n\nI'd also check whether there are suitable indexes for the filters and relationships being used. Then I'd measure again to confirm the improvement.",
+      "watchOut": "Don't add indexes or caching without measuring the impact: indexes make writes more expensive, and caching brings the complexity of invalidation."
+    },
+    "query-lenta": {
+      "question": "One of the dashboard queries is still slow. How would you find out why?",
+      "answer": "I'd use EXPLAIN ANALYZE to see the actual execution plan, looking for expensive sequential scans, wrong cardinality estimates, inefficient joins or a large number of rows processed.\n\nI'd also check the existing indexes, the query filters and possible locks. From there, I'd make one change at a time and compare the results.",
+      "watchOut": "If the query is frequent and the table is large, an index on organization_id may help, but the decision depends on the plan and on how the data is distributed.",
+      "snippet": {
+        "note": "EXPLAIN ANALYZE runs the query and shows the real time spent in each step of the plan."
+      }
+    },
+    "cache-de-dados-agregados": {
+      "question": "Some of the dashboard data can be slightly out of date. Would you use a cache?",
+      "answer": "It depends on how stale each piece of data is allowed to be. For aggregated metrics that don't need to reflect every change right away, I'd use a cache with an expiration or revalidation strategy.\n\nFor critical information, such as permissions and financial data, I'd avoid relying on a possibly stale cache to make security or consistency decisions.",
+      "watchOut": "Scope the cache by organization and by the query parameters; otherwise one customer's data may be shown to another."
+    },
+    "comprovar-melhoria": {
+      "question": "After the optimizations, how would you prove the dashboard got faster?",
+      "answer": "I'd compare latency before and after, including percentiles such as p95, along with the error rate and the database load, using a representative sample of requests.",
+      "why": "Without measuring before and after with the same criteria, you can't claim the optimization solved the problem."
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 
+import { AppText } from '../../../components/AppText';
 import { FullScreen, Section } from '../../../components/FullScreen';
 import { PathList } from '../../../components/PathList';
 import { NavRow, TrackCard } from '../../../components/TrackCard';
@@ -9,7 +10,7 @@ import { areaPath, areaSections, isArea } from '../../../content/navigation';
 import { useCatalog } from '../../../content/useCatalog';
 import { useT } from '../../../i18n';
 
-/** Área: trilhas diretas, linguagens com trilhas na área e comparativos. */
+/** Área: trilhas diretas, linguagens com trilhas na área e comparativos; na área Situações-problema, uma frase de introdução e a lista de casos. */
 export default function AreaScreen() {
   const { areaId } = useLocalSearchParams<{ areaId: string }>();
   const t = useT();
@@ -27,7 +28,16 @@ export default function AreaScreen() {
       title={found && area ? t.nav.areas[area] : undefined}
       missing={t.nav.areaNotFound}
     >
-      {sections ? (
+      {sections && area === 'simulacoes' ? (
+        <>
+          <AppText size={15} tone="muted">
+            {t.nav.simulationsIntro}
+          </AppText>
+          {sections.direct.map((track) => (
+            <TrackCard key={track.id} track={track} />
+          ))}
+        </>
+      ) : sections ? (
         <>
           <Section title={t.nav.sections.path}>
             {area ? [<PathList key="path" tracks={areaPath(catalog, area)} />] : []}

@@ -1,0 +1,58 @@
+{
+  "id": "sim-api-de-notificacoes",
+  "kind": "simulation",
+  "title": "API de notificações",
+  "description": "Alto volume, falhas do provedor, duplicidade e escopo com prazo curto.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-09",
+  "scenario": {
+    "context": "Você precisa criar uma API que envie milhares de notificações por minuto, com confiabilidade, e tem três dias para entregar a primeira versão.",
+    "stack": [
+      "Node.js",
+      "Fila",
+      "Workers"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "como-comecar",
+          "level": "pleno",
+          "question": "Por onde você começaria?",
+          "answer": "Esclareceria quais canais precisamos suportar, qual o volume esperado, se existe um prazo máximo de entrega e qual o comportamento desejado em caso de falha.\n\nPara um volume alto, separaria a criação da notificação do envio efetivo. A API registraria a solicitação e a deixaria disponível para processamento assíncrono, com uma fila e workers.",
+          "why": "Começar pelos requisitos mostra que você entende o problema antes de escolher a solução."
+        },
+        {
+          "type": "interview",
+          "id": "provedor-fora-do-ar",
+          "level": "pleno",
+          "question": "O provedor de envio fica indisponível por cinco minutos. O que acontece com as notificações?",
+          "answer": "Manteria as notificações pendentes e tentaria de novo com backoff exponencial, respeitando os limites do provedor. Definiria um número máximo de tentativas e uma fila para as mensagens com falha permanente.\n\nTambém monitoraria o tamanho da fila e o tempo de espera, para detectar rápido o acúmulo de notificações.",
+          "why": "Nenhuma notificação se perde durante a indisponibilidade, e o monitoramento da fila mostra o problema antes que ele cresça."
+        },
+        {
+          "type": "interview",
+          "id": "notificacoes-duplicadas",
+          "level": "senior",
+          "question": "Algumas notificações chegam duplicadas para os usuários. Como você resolveria?",
+          "answer": "Identificaria a origem da duplicação: reentrega da fila, retry do worker ou comportamento do provedor.\n\nCriaria um identificador único para cada notificação e registraria seu estado de processamento. Isso evita que a aplicação execute de novo uma operação já concluída. Também usaria os mecanismos de idempotência do provedor, se existirem.",
+          "watchOut": "Não prometa entrega exatamente uma vez em todas as circunstâncias: se o envio externo acontece mas a confirmação se perde, pode ser impossível saber na hora se a mensagem foi entregue. O sistema precisa tolerar essa ambiguidade."
+        },
+        {
+          "type": "interview",
+          "id": "prazo-de-tres-dias",
+          "level": "pleno",
+          "question": "Você só tem três dias para entregar. O que entra na primeira versão?",
+          "answer": "Definiria um MVP com um canal de notificação, validação básica, persistência, envio assíncrono, tratamento de falhas e logs, e garantiria que os fluxos críticos estivessem testados.\n\nDeixaria funcionalidades secundárias, como vários canais e regras avançadas de prioridade, para as próximas etapas. Também deixaria claros os limites da primeira versão e os riscos que continuariam existindo.",
+          "why": "Mostra que você equilibra qualidade, prazo e escopo sem ignorar os requisitos críticos."
+        }
+      ]
+    }
+  ]
+}
