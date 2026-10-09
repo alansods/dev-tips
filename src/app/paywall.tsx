@@ -38,12 +38,15 @@ export default function PaywallScreen() {
   const t = useT();
   const signedIn = useAccountStore((s) => s.user !== null);
   const ios = Platform.OS === 'ios';
-  const [storePrice, setPrice] = useState<string | null>(null);
+  // undefined = carregando; null = a loja não devolveu preço (venda indisponível).
+  const [storePrice, setPrice] = useState<string | null | undefined>(undefined);
   const price = ios ? t.pro.iosPrice : storePrice;
   const [busy, setBusy] = useState<'subscribe' | 'restore' | null>(null);
   const [message, setMessage] = useState<Message | null>(null);
   const closing = useRef<ReturnType<typeof setTimeout> | null>(null);
   const legal = legalUrls();
+  const notice: Message | null =
+    message ?? (!ios && storePrice === null ? { text: t.pro.unavailable, tone: 'error' } : null);
 
   useEffect(() => {
     let alive = true;
@@ -162,17 +165,17 @@ export default function PaywallScreen() {
       </ScrollView>
 
       <View style={styles.footer}>
-        {message ? (
+        {notice ? (
           <View
             accessibilityRole="alert"
             style={[
               styles.alert,
-              message.tone === 'ok'
+              notice.tone === 'ok'
                 ? { backgroundColor: colors.accentSoft, borderColor: colors.accent }
                 : { backgroundColor: colors.warnSoft, borderColor: colors.warn },
             ]}
           >
-            <AppText size={14}>{message.text}</AppText>
+            <AppText size={14}>{notice.text}</AppText>
           </View>
         ) : null}
         <View style={{ flexDirection: 'row' }}>

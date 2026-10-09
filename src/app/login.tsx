@@ -83,6 +83,9 @@ export default function LoginScreen() {
             disabled={loading}
             onPress={() => void onGoogle()}
           />
+          <AppText size={13} tone="muted" style={styles.hint}>
+            {t.auth.signupHint}
+          </AppText>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t.auth.skip}
@@ -122,5 +125,6 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.md },
   alert: { padding: spacing.md, borderRadius: radius.md, borderWidth: 1 },
   skip: { minHeight: 48, borderRadius: radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  hint: { textAlign: 'center', lineHeight: 18 },
   consent: { textAlign: 'center', lineHeight: 18, marginTop: spacing.sm },
 });

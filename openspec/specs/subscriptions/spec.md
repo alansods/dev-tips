@@ -136,7 +136,7 @@ O paywall SHALL abrir em tela cheia, deslizando de baixo para cima, com botão d
 - o aviso "Renova automaticamente. Cancele quando quiser nas configurações do Google Play.";
 - os links "Restaurar compras", "Termos" e "Privacidade".
 
-Enquanto o preço da loja não carrega, o botão "Assinar o Pro" SHALL ficar desabilitado. "Termos" e "Privacidade" SHALL abrir os mesmos endereços da seção Sobre.
+Enquanto o preço da loja não carrega, o botão "Assinar o Pro" SHALL ficar desabilitado, sem aviso. No Android, se a loja não devolver o preço (assinatura não configurada, plano não encontrado ou erro da loja), o paywall SHALL mostrar o aviso "A assinatura está indisponível no momento. Tente de novo mais tarde." e o botão "Assinar o Pro" SHALL continuar desabilitado. "Termos" e "Privacidade" SHALL abrir os mesmos endereços da seção Sobre.
 
 No iOS, onde a venda ainda não existe, o paywall SHALL mostrar o mesmo conteúdo com o preço fixo "R$ 14,90/mês" e o botão "Assinar o Pro" habilitado. Tocar em "Assinar o Pro" ou em "Restaurar compras" SHALL mostrar o aviso "A assinatura pelo iPhone ainda não está disponível. Em breve!", sem abrir login nem loja.
 
@@ -150,7 +150,11 @@ No iOS, onde a venda ainda não existe, o paywall SHALL mostrar o mesmo conteúd
 
 #### Scenario: Preço carregando
 - **WHEN** o paywall abre e a loja ainda não respondeu
-- **THEN** o botão "Assinar o Pro" fica desabilitado
+- **THEN** o botão "Assinar o Pro" fica desabilitado, sem o aviso de assinatura indisponível
+
+#### Scenario: Assinatura indisponível
+- **WHEN** o paywall abre no Android e a loja responde sem preço
+- **THEN** a tela mostra "A assinatura está indisponível no momento. Tente de novo mais tarde." e o botão "Assinar o Pro" fica desabilitado
 
 #### Scenario: Paywall no iOS
 - **WHEN** o paywall abre no iPhone
