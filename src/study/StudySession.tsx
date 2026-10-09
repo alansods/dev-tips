@@ -146,11 +146,16 @@ export function StudySession({ tracks, title, entries, onExit, backLabel }: Sess
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-        <ScrollView contentContainerStyle={styles.cardContent}>
+        <ScrollView testID="card-scroll" contentContainerStyle={styles.cardContent}>
           {state.revealed ? (
             // O toque no verso volta para a frente. Sem foco de acessibilidade para não
             // esconder as abas e os chips do leitor de tela; para ele há "Ver pergunta".
-            <Pressable testID="card-back" accessible={false} onPress={() => dispatch({ type: 'flip' })}>
+            <Pressable
+              testID="card-back"
+              accessible={false}
+              onPress={() => dispatch({ type: 'flip' })}
+              style={styles.cardTouch}
+            >
               <Animated.View style={flipStyle}>
                 <CardFace
                   card={card}
@@ -180,6 +185,7 @@ export function StudySession({ tracks, title, entries, onExit, backLabel }: Sess
               accessibilityLabel={t.session.flip}
               accessibilityHint={t.session.flipHint}
               onPress={() => dispatch({ type: 'flip' })}
+              style={styles.cardTouch}
             >
               <Animated.View style={flipStyle}>
                 <CardFace card={card} track={track} side="front" variantId={variantId} onSelectVariant={() => {}} />
@@ -303,7 +309,9 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: 'row', gap: spacing.sm },
   card: { flex: 1, marginHorizontal: spacing.lg, borderRadius: radius.xl, borderWidth: 1, overflow: 'hidden' },
-  cardContent: { padding: spacing.lg, flexGrow: 1 },
+  cardContent: { flexGrow: 1 },
+  // A área de toque cobre o card inteiro: ocupa todo o espaço e carrega o padding.
+  cardTouch: { flexGrow: 1, padding: spacing.lg },
   showQuestion: { minHeight: 44, justifyContent: 'center', alignSelf: 'flex-start', marginTop: spacing.sm },
   actions: { flexDirection: 'row', gap: spacing.md, padding: spacing.lg },
   summary: { padding: spacing.xl, gap: spacing.lg },
