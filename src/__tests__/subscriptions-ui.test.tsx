@@ -13,7 +13,7 @@ import { API_URL } from '../auth/config';
 import { signInWithGoogle } from '../auth/providers';
 import { useAccountStore } from '../auth/store';
 import { saveTokens } from '../auth/tokens';
-import { monthlyPrice, purchaseMonthly, restorePurchases } from '../subscriptions/purchases';
+import { manageSubscriptions, monthlyPrice, purchaseMonthly, restorePurchases } from '../subscriptions/purchases';
 import { useSubscriptionStore } from '../subscriptions/store';
 import { palettes } from '../theme/tokens';
 
@@ -386,6 +386,14 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
     expect(screen.getByText('Renova em 12/11/2026')).toBeOnTheScreen();
     expect(button('Gerenciar assinatura')).toBeOnTheScreen();
     expect(button('Restaurar compras')).toBeOnTheScreen();
+  });
+
+  it('Gerenciar assinatura no Android', async () => {
+    await signedIn(PRO);
+    api(PRO);
+    await open('/account');
+    await press('Gerenciar assinatura');
+    expect(manageSubscriptions).toHaveBeenCalledTimes(1);
   });
 
   it('Uma pergunta restante na Conta', async () => {

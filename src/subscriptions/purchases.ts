@@ -2,7 +2,7 @@
 // estas funções. Nesta versão a venda é só no Android (Google Play): no iOS e
 // na web todas viram "não disponível".
 
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Purchases, { PURCHASES_ERROR_CODE, type PurchasesPackage } from 'react-native-purchases';
 
 /** Chave pública do RevenueCat para Android (não é segredo: vai dentro do app). */
@@ -78,8 +78,16 @@ export async function restorePurchases(): Promise<RestoreOutcome> {
   }
 }
 
-/** Abre a tela de assinaturas do Google Play. */
+/** Id da assinatura no Play Console e pacote do app (o mesmo de app.json). */
+const PRO_PRODUCT_ID = 'pro_monthly';
+const ANDROID_PACKAGE = 'dev.devtips.app';
+
+/**
+ * Abre a assinatura do Dev Tips no Google Play, onde o usuário pode cancelar.
+ * `Purchases.showManageSubscriptions()` só existe no iOS: no Android ela lança erro.
+ */
 export async function manageSubscriptions(): Promise<void> {
-  if (!ensureConfigured()) return;
-  await Purchases.showManageSubscriptions().catch(() => {});
+  if (Platform.OS !== 'android') return;
+  const url = `https://play.google.com/store/account/subscriptions?sku=${PRO_PRODUCT_ID}&package=${ANDROID_PACKAGE}`;
+  await Linking.openURL(url).catch(() => {});
 }
