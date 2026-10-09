@@ -1,4 +1,5 @@
 import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
+import { StyleSheet } from 'react-native';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -212,6 +213,36 @@ describe('Requirement: Virar e responder (na tela)', () => {
     fireEvent.press(screen.getByTestId('card-back'));
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
     expect(screen.queryByText('C · Create')).toBeNull();
+  });
+
+  // O ambiente de teste não mede layout: confere que a área de toque cobre o card inteiro
+  // (ocupa todo o espaço e carrega o padding) e que o ScrollView não tem padding fora dela.
+  const touchArea = (testID: string) => {
+    const pressable = screen.getByTestId(testID);
+    const scroll = screen.getByTestId('card-scroll');
+    return {
+      pressable: StyleSheet.flatten(pressable.props.style) ?? {},
+      content: StyleSheet.flatten(scroll.props.contentContainerStyle) ?? {},
+    };
+  };
+
+  it('Tocar no espaço vazio da frente', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    const { pressable, content } = touchArea('card-front');
+    expect(pressable.flexGrow).toBe(1);
+    expect(pressable.padding).toBeGreaterThan(0);
+    expect(content.padding).toBeUndefined();
+    fireEvent.press(screen.getByTestId('card-front'));
+    expect(screen.getByText('C · Create')).toBeOnTheScreen();
+  });
+
+  it('Tocar no espaço vazio do verso', async () => {
+    await open(`/study/${TRACK}/o-que-vamos-criar`);
+    press('Mostrar resposta');
+    const { pressable, content } = touchArea('card-back');
+    expect(pressable.flexGrow).toBe(1);
+    expect(pressable.padding).toBeGreaterThan(0);
+    expect(content.padding).toBeUndefined();
   });
 
   it('Virar de novo', async () => {
