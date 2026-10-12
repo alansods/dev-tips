@@ -1,0 +1,342 @@
+{
+  "id": "nextjs-no-backend",
+  "title": "Next.js no backend",
+  "description": "Usar o Next.js como backend: Route Handlers, Server Actions, autenticação, acesso a dados e quando separar um serviço próprio.",
+  "prerequisites": [
+    "nextjs"
+  ],
+  "addedAt": "2026-10-12",
+  "areas": [
+    "backend"
+  ],
+  "language": "javascript",
+  "framework": "nextjs",
+  "decks": [
+    {
+      "id": "route-handlers",
+      "title": "Route Handlers",
+      "description": "Endpoints HTTP dentro do app: parâmetros, validação, cache e webhooks.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "route-handler",
+          "level": "junior",
+          "term": "Route Handler",
+          "definition": "Arquivo route.ts dentro de app/ que exporta uma função por método HTTP (GET, POST, PUT, PATCH, DELETE). Cada função recebe um Request, da Web API padrão, e devolve um Response; NextRequest e NextResponse acrescentam atalhos como cookies e nextUrl. Um mesmo segmento não pode ter route.ts e page.tsx. É o caminho para quem não é a interface do próprio app: app mobile, integrações e webhooks.",
+          "relatedTerms": [
+            "params-assincronos",
+            "webhook"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "params-assincronos",
+          "level": "pleno",
+          "term": "params assíncrono",
+          "definition": "Desde o Next 15, o segundo argumento do handler traz params como Promise: { params }: { params: Promise<{ id: string }> }, lido com const { id } = await params. A query string vem de request.nextUrl.searchParams. Acessar params sem await é o erro mais comum de quem migra código antigo.",
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "cache-de-get",
+          "level": "senior",
+          "term": "Cache de Route Handler",
+          "definition": "Route Handlers não ficam em cache por padrão, nem o GET (isso mudou no Next 15). Para cachear um GET, o modelo antigo usa export const dynamic = \"force-static\"; com Cache Components, a diretiva 'use cache' vai numa função auxiliar que o handler chama, e não no corpo do handler. POST, PUT, PATCH e DELETE nunca são cacheados.",
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "webhook",
+          "level": "pleno",
+          "term": "Webhook",
+          "definition": "Endpoint POST que um serviço externo chama para avisar de um evento, como um pagamento aprovado. O handler lê o corpo cru com request.text(), porque a assinatura (HMAC) é calculada sobre os bytes exatos, e só depois faz o parse. Ele responde 2xx rápido e precisa ser idempotente: o provedor reenvia o mesmo evento quando não recebe resposta.",
+          "relatedTerms": [
+            "route-handler"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "get-com-params",
+          "level": "junior",
+          "title": "GET com params e query string",
+          "body": "params chega como Promise e precisa de await; a query string vem de nextUrl. O status da resposta diz ao cliente o que aconteceu.",
+          "snippet": {
+            "file": "app/api/products/[id]/route.ts",
+            "language": "ts",
+            "code": "import { type NextRequest } from 'next/server';\nimport { db } from '@/lib/db';\n\nexport async function GET(\n  request: NextRequest,\n  { params }: { params: Promise<{ id: string }> },\n) {\n  const { id } = await params;\n  const fields = request.nextUrl.searchParams.get('fields');\n\n  const product = await db.product.findUnique({ where: { id } });\n  if (!product) {\n    return Response.json({ error: 'Produto não encontrado' }, { status: 404 });\n  }\n  return Response.json(fields === 'basic' ? { id: product.id, name: product.name } : product);\n}"
+          },
+          "relatedTerms": [
+            "params-assincronos",
+            "route-handler"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "post-com-validacao",
+          "level": "pleno",
+          "title": "POST validando a entrada",
+          "body": "O corpo é validado com um schema antes de tocar no banco, e entrada inválida vira 400 com os erros por campo. Depois de gravar, revalidateTag marca a lista como desatualizada.",
+          "snippet": {
+            "file": "app/api/products/route.ts",
+            "language": "ts",
+            "code": "import * as z from 'zod';\nimport { revalidateTag } from 'next/cache';\nimport { db } from '@/lib/db';\n\nconst ProductInput = z.object({\n  name: z.string().trim().min(1),\n  price: z.number().positive(),\n});\n\nexport async function POST(request: Request) {\n  const body = await request.json().catch(() => null);\n  const result = ProductInput.safeParse(body);\n  if (!result.success) {\n    return Response.json({ errors: z.flattenError(result.error).fieldErrors }, { status: 400 });\n  }\n\n  const product = await db.product.create({ data: result.data });\n  revalidateTag('products', 'max');\n  return Response.json(product, { status: 201 });\n}",
+            "note": "Num Route Handler use revalidateTag; updateTag só funciona dentro de Server Actions."
+          },
+          "relatedTerms": [
+            "route-handler",
+            "revalidacao-apos-mutacao"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "server-actions",
+      "title": "Server Actions e mutações",
+      "description": "Gravar dados a partir da interface: validação, estado do formulário e cache.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "server-action",
+          "level": "junior",
+          "term": "Server Action",
+          "definition": "Função assíncrona marcada com 'use server' (no topo do arquivo ou dentro da função) que roda no servidor e é chamada direto de um <form action> ou de um Client Component. Por baixo, o Next cria um endpoint POST com um id difícil de adivinhar, mas ele continua público: qualquer pessoa com o id consegue chamá-lo. Por isso toda action valida a entrada e confere sessão e permissão.",
+          "relatedTerms": [
+            "use-action-state",
+            "revalidacao-apos-mutacao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "use-action-state",
+          "level": "pleno",
+          "term": "useActionState",
+          "definition": "Hook do React para formulários em Client Components: const [state, formAction, pending] = useActionState(action, initialState). A action passa a receber (prevState, formData) e o que ela devolve vira o novo state, como os erros de validação por campo. pending indica o envio em andamento, para desabilitar o botão. O formulário continua funcionando antes de o JavaScript carregar.",
+          "relatedTerms": [
+            "server-action"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "revalidacao-apos-mutacao",
+          "level": "pleno",
+          "term": "Revalidação após mutação",
+          "definition": "Depois de gravar, o servidor avisa ao Next quais dados em cache ficaram velhos. updateTag(tag) só funciona em Server Action e expira o cache na hora: o usuário vê a própria alteração. revalidateTag(tag, \"max\") funciona também em Route Handlers e usa stale-while-revalidate: entrega o dado antigo enquanto busca o novo. No Next 16, o revalidateTag sem o segundo argumento está descontinuado. revalidatePath(caminho) invalida uma rota inteira.",
+          "relatedTerms": [
+            "server-action",
+            "cache-de-get"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "after",
+          "level": "senior",
+          "term": "after()",
+          "definition": "Função de next/server que agenda um trabalho para depois de a resposta ser enviada, como log, métrica ou e-mail de confirmação, sem atrasar o usuário. Funciona em Server Components, Server Actions e Route Handlers. Não é uma fila: se o trabalho falhar, ninguém tenta de novo, e ele ainda conta no tempo da função. Trabalho longo ou que não pode se perder vai para uma fila de verdade.",
+          "relatedTerms": [
+            "server-action",
+            "route-handler"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "action-com-validacao",
+          "level": "pleno",
+          "title": "Server Action com validação e permissão",
+          "body": "A action confere a sessão, valida o FormData com um schema e devolve os erros por campo. No sucesso, updateTag faz a lista mostrar o produto novo na hora.",
+          "snippet": {
+            "file": "app/products/actions.ts",
+            "language": "ts",
+            "code": "'use server';\n\nimport * as z from 'zod';\nimport { updateTag } from 'next/cache';\nimport { verifySession } from '@/lib/dal';\nimport { db } from '@/lib/db';\n\nconst ProductInput = z.object({\n  name: z.string().trim().min(1, { error: 'Informe o nome.' }),\n  price: z.coerce.number().positive({ error: 'O preço precisa ser maior que zero.' }),\n});\n\nexport type FormState = { errors?: Record<string, string[] | undefined> } | undefined;\n\nexport async function createProduct(_prev: FormState, formData: FormData): Promise<FormState> {\n  const { userId } = await verifySession();\n\n  const result = ProductInput.safeParse({\n    name: formData.get('name'),\n    price: formData.get('price'),\n  });\n  if (!result.success) {\n    return { errors: z.flattenError(result.error).fieldErrors };\n  }\n\n  await db.product.create({ data: { ...result.data, ownerId: userId } });\n  updateTag('products');\n  return {};\n}"
+          },
+          "relatedTerms": [
+            "server-action",
+            "revalidacao-apos-mutacao",
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "formulario-com-use-action-state",
+          "level": "pleno",
+          "title": "Formulário com useActionState",
+          "body": "O Client Component liga o formulário à action, mostra os erros devolvidos e desabilita o botão durante o envio.",
+          "snippet": {
+            "file": "app/products/new/product-form.tsx",
+            "language": "ts",
+            "code": "'use client';\n\nimport { useActionState } from 'react';\nimport { createProduct } from '../actions';\n\nexport function ProductForm() {\n  const [state, formAction, pending] = useActionState(createProduct, undefined);\n\n  return (\n    <form action={formAction}>\n      <input name=\"name\" />\n      {state?.errors?.name && <p>{state.errors.name[0]}</p>}\n\n      <input name=\"price\" inputMode=\"decimal\" />\n      {state?.errors?.price && <p>{state.errors.price[0]}</p>}\n\n      <button disabled={pending}>{pending ? 'Salvando...' : 'Salvar'}</button>\n    </form>\n  );\n}"
+          },
+          "relatedTerms": [
+            "use-action-state",
+            "server-action"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "auth-e-dados",
+      "title": "Autenticação e acesso a dados",
+      "description": "Sessão, autorização perto dos dados e o que pode ir para o cliente.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "data-access-layer",
+          "level": "pleno",
+          "term": "Data Access Layer (DAL)",
+          "definition": "Módulo só de servidor que concentra o acesso a dados e as checagens de autorização. Cada função confere a sessão e a permissão antes de consultar o banco e devolve só os campos necessários (um DTO), nunca o registro inteiro. Páginas, Server Actions e Route Handlers chamam a DAL em vez do banco direto, então a checagem não tem como ser esquecida num lugar.",
+          "relatedTerms": [
+            "server-only",
+            "sessao-em-cookie"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "server-only",
+          "level": "junior",
+          "term": "server-only",
+          "definition": "Pacote que marca um módulo como exclusivo do servidor: com import 'server-only' no topo, o build falha se algum Client Component importar o arquivo, o que impede que código de banco e segredos vazem para o bundle do navegador. Variáveis de ambiente sem o prefixo NEXT_PUBLIC_ também nunca chegam ao cliente.",
+          "relatedTerms": [
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "proxy-otimista",
+          "level": "pleno",
+          "term": "Proxy como checagem otimista",
+          "definition": "O proxy.ts roda antes das rotas do matcher e é bom para redirecionar cedo quem não tem sessão, lendo só o cookie, sem ir ao banco. É uma checagem otimista, não a autorização: o matcher pode deixar rotas de fora, Server Actions são POSTs para a rota da página, e o proxy não sabe se o usuário pode ver aquele registro. A autorização de verdade fica na DAL, perto dos dados.",
+          "relatedTerms": [
+            "data-access-layer",
+            "sessao-em-cookie"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "sessao-em-cookie",
+          "level": "pleno",
+          "term": "Sessão em cookie httpOnly",
+          "definition": "O token de sessão (um JWT assinado ou o id de uma sessão no banco) fica num cookie httpOnly, secure e sameSite=lax: o JavaScript da página não consegue lê-lo, o que limita o estrago de um XSS. No Next, cookies() é assíncrono: (await cookies()).get(\"session\") lê em qualquer lugar do servidor, e set só funciona em Server Actions e Route Handlers. Clientes que não são navegador, como um app mobile, mandam o token no header Authorization.",
+          "relatedTerms": [
+            "proxy-otimista",
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "verify-session",
+          "level": "pleno",
+          "title": "DAL com verifySession",
+          "body": "cache() do React evita reler e decifrar o cookie várias vezes na mesma requisição. getProject confere o dono e devolve só os campos que a tela usa.",
+          "snippet": {
+            "file": "lib/dal.ts",
+            "language": "ts",
+            "code": "import 'server-only';\n\nimport { cache } from 'react';\nimport { cookies } from 'next/headers';\nimport { redirect } from 'next/navigation';\nimport { decrypt } from '@/lib/session';\nimport { db } from '@/lib/db';\n\nexport const verifySession = cache(async () => {\n  const token = (await cookies()).get('session')?.value;\n  const session = await decrypt(token);\n  if (!session?.userId) redirect('/login');\n  return { userId: session.userId };\n});\n\nexport async function getProject(projectId: string) {\n  const { userId } = await verifySession();\n  const project = await db.project.findUnique({ where: { id: projectId } });\n  if (!project || project.ownerId !== userId) return null;\n  return { id: project.id, name: project.name };\n}"
+          },
+          "relatedTerms": [
+            "data-access-layer",
+            "server-only",
+            "sessao-em-cookie"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "proxy-de-sessao",
+          "level": "pleno",
+          "title": "proxy.ts com redirecionamento",
+          "body": "Lê só o cookie e redireciona: sem sessão, para o login; já logado, para fora das telas públicas. O matcher deixa de fora a API e os arquivos estáticos.",
+          "snippet": {
+            "file": "proxy.ts",
+            "language": "ts",
+            "code": "import { NextResponse, type NextRequest } from 'next/server';\nimport { decrypt } from '@/lib/session';\n\nconst publicRoutes = ['/login', '/signup'];\n\nexport async function proxy(request: NextRequest) {\n  const isPublic = publicRoutes.includes(request.nextUrl.pathname);\n  const session = await decrypt(request.cookies.get('session')?.value);\n\n  if (!isPublic && !session?.userId) {\n    return NextResponse.redirect(new URL('/login', request.nextUrl));\n  }\n  if (isPublic && session?.userId) {\n    return NextResponse.redirect(new URL('/dashboard', request.nextUrl));\n  }\n  return NextResponse.next();\n}\n\nexport const config = {\n  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],\n};"
+          },
+          "relatedTerms": [
+            "proxy-otimista",
+            "sessao-em-cookie"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "perguntas-de-entrevista",
+      "title": "Perguntas de entrevista",
+      "description": "O que costumam perguntar sobre Next.js no backend.",
+      "cards": [
+        {
+          "type": "question",
+          "id": "next-substitui-express",
+          "level": "pleno",
+          "question": "O Next.js substitui um backend como Express ou NestJS?",
+          "answer": "Para o backend da própria aplicação web, em boa parte sim: leio dados em Server Components, faço mutações com Server Actions e exponho endpoints com Route Handlers, tudo no mesmo deploy. Mas o Next é feito para servir a interface. Ele não traz injeção de dependência, módulos nem filas, e em ambiente serverless cada requisição tem limite de tempo e pode sofrer cold start. Se o domínio é grande, vários clientes consomem a mesma API ou há trabalho longo e em tempo real, um backend dedicado faz mais sentido, com o Next como BFF na frente.",
+          "relatedTerms": [
+            "route-handler",
+            "server-action"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "proxy-nao-basta",
+          "level": "senior",
+          "question": "Por que checar a sessão só no proxy não basta?",
+          "answer": "Porque o proxy é uma checagem otimista e fica longe dos dados. O matcher pode deixar uma rota de fora, Server Actions chegam como POST na rota da página, e o proxy só sabe se existe um cookie válido, não se aquele usuário pode ver aquele projeto. Já houve falha real nisso: em 2025, a CVE-2025-29927 permitia pular o middleware com um header. Por isso uso o proxy só para redirecionar cedo e faço a autorização na DAL, em cada leitura e em cada action.",
+          "relatedTerms": [
+            "proxy-otimista",
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "proteger-server-action",
+          "level": "pleno",
+          "question": "Como você protege uma Server Action?",
+          "answer": "Trato a action como um endpoint POST público. Dentro dela confiro a sessão pela DAL e a permissão sobre o recurso, porque estar logado não basta: o usuário precisa ser dono do registro. Valido o FormData com um schema, sem confiar em tipos nem em campos escondidos do formulário, e devolvo só o que a tela precisa. O Next ajuda comparando o Origin com o Host contra CSRF e gerando ids difíceis de adivinhar, mas isso não é autorização.",
+          "relatedTerms": [
+            "server-action",
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "conexao-com-banco",
+          "level": "senior",
+          "question": "Como você abre a conexão com o banco num app Next.js?",
+          "answer": "Com um único cliente reaproveitado. Em desenvolvimento, o hot reload executa os módulos de novo, e cada recarga criaria um pool novo até esgotar as conexões do banco; por isso guardo o pool em globalThis. Em produção serverless, cada instância da função tem o próprio pool, e com muito tráfego surgem dezenas de instâncias. Então uso um pool pequeno por instância e um pooler na frente do banco, como o PgBouncer ou a URL com pooling do provedor.",
+          "snippet": {
+            "file": "lib/db.ts",
+            "language": "ts",
+            "code": "import 'server-only';\nimport { Pool } from 'pg';\n\nconst globalForDb = globalThis as unknown as { pool?: Pool };\n\nexport const pool =\n  globalForDb.pool ?? new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });\n\nif (process.env.NODE_ENV !== 'production') globalForDb.pool = pool;"
+          },
+          "relatedTerms": [
+            "data-access-layer",
+            "server-only"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "mobile-route-handler-ou-action",
+          "level": "pleno",
+          "question": "O app mobile da empresa vai usar o mesmo backend do site em Next.js. Route Handler ou Server Action?",
+          "answer": "Route Handler. Server Action é um mecanismo interno do React e do Next: o id muda a cada build e não existe um contrato estável, então ela só serve à interface do próprio site. Para o app mobile eu exponho endpoints REST versionados, com o token no header Authorization em vez do cookie. Para não duplicar regra, Server Actions e Route Handlers chamam as mesmas funções da DAL.",
+          "relatedTerms": [
+            "route-handler",
+            "server-action",
+            "data-access-layer"
+          ]
+        },
+        {
+          "type": "question",
+          "id": "quando-separar-backend",
+          "level": "senior",
+          "question": "Quando você separaria o backend do Next.js num serviço próprio?",
+          "answer": "Quando aparece um sinal concreto: trabalho que passa do tempo limite da função, filas, cron e workers, WebSocket ou tempo real, vários clientes consumindo a mesma API, um time de backend separado ou necessidade de escalar diferente da interface. Até lá, começar no Next é mais rápido. Se o acesso a dados já está concentrado numa DAL, extrair depois é mover essas funções para o serviço e deixar o Next como BFF chamando ele.",
+          "relatedTerms": [
+            "route-handler",
+            "after"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "id": "typescript-essencial",
   "title": "TypeScript essencial",
-  "description": "O sistema de tipos no dia a dia: tipos básicos, interfaces, unions, narrowing e tsconfig.",
+  "description": "O sistema de tipos no dia a dia: tipos básicos, interfaces, unions, narrowing, enums e tsconfig.",
   "icon": { "logo": "typescript" },
   "prerequisites": ["javascript-essencial"],
   "addedAt": "2026-10-05",
@@ -215,7 +215,10 @@
           "term": "enum",
           "definition": "Conjunto nomeado de constantes que, ao contrário de tipos, gera código JavaScript. Muitos times preferem union de literais ou um objeto as const, que não geram código extra e funcionam melhor com ferramentas que só removem tipos.",
           "relatedTerms": [
-            "union"
+            "union",
+            "enum-numerico",
+            "enum-de-string",
+            "objeto-as-const"
           ]
         },
         {
@@ -247,6 +250,91 @@
           },
           "relatedTerms": [
             "union-discriminada",
+            "any-unknown-never"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "enums",
+      "title": "Enums e alternativas",
+      "description": "Conjuntos fechados de valores: os tipos de enum e as alternativas que não geram código.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "enum-numerico",
+          "level": "junior",
+          "term": "Enum numérico",
+          "definition": "enum em que cada membro vale um número: enum Direction { Up, Down } faz Up valer 0 e Down valer 1, incrementando a partir do primeiro valor. É o único tipo de enum com reverse mapping: Direction[0] devolve \"Up\". O lado ruim é que, em logs e no JSON da API, aparece só o número, que não diz nada sozinho.",
+          "relatedTerms": [
+            "enum-de-string",
+            "enum"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "enum-de-string",
+          "level": "pleno",
+          "term": "Enum de string",
+          "definition": "enum em que cada membro recebe um texto: enum Status { Active = \"active\" }. Todo membro precisa de valor explícito, não há reverse mapping, e o valor é legível em logs e na API. Pegadinha: uma variável do tipo Status não aceita a string \"active\" direto, só Status.Active, o que atrapalha ao receber dados de fora.",
+          "relatedTerms": [
+            "enum-numerico",
+            "objeto-as-const"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "const-enum",
+          "level": "senior",
+          "term": "const enum",
+          "definition": "Variante que não gera objeto: o compilador troca cada uso pelo valor literal, então Direction.Up vira 0 no JavaScript. Para isso o compilador precisa ler a declaração. Ferramentas que transpilam arquivo por arquivo (Babel, esbuild, swc) não enxergam um const enum declarado em outro arquivo, e por isso a opção isolatedModules restringe o uso. As opções mais novas vão além: erasableSyntaxOnly e o type stripping do Node rejeitam qualquer enum, porque enum não é só tipo que se apaga.",
+          "relatedTerms": [
+            "enum-numerico",
+            "objeto-as-const",
+            "tsconfig"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "objeto-as-const",
+          "level": "pleno",
+          "term": "Objeto as const",
+          "definition": "Alternativa ao enum feita só de JavaScript e tipos: const Status = { Active: \"active\", Inactive: \"inactive\" } as const, mais o tipo type Status = (typeof Status)[keyof typeof Status], que vira \"active\" | \"inactive\". Mantém o acesso Status.Active, aceita a string literal direto, não gera nada além do próprio objeto e funciona com qualquer ferramenta que só apaga tipos.",
+          "relatedTerms": [
+            "enum-de-string",
+            "union"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "enum-vs-as-const",
+          "level": "pleno",
+          "title": "O JavaScript gerado por cada forma",
+          "body": "O enum vira uma função que monta um objeto em tempo de execução. O objeto as const continua sendo o mesmo objeto, e o tipo some na compilação.",
+          "snippet": {
+            "file": "status.ts",
+            "language": "ts",
+            "code": "// TypeScript\nenum Color { Red = \"red\", Blue = \"blue\" }\n\nconst Size = { Small: \"sm\", Large: \"lg\" } as const;\ntype Size = (typeof Size)[keyof typeof Size]; // \"sm\" | \"lg\"\n\n// JavaScript gerado\nvar Color;\n(function (Color) {\n  Color[\"Red\"] = \"red\";\n  Color[\"Blue\"] = \"blue\";\n})(Color || (Color = {}));\n\nconst Size = { Small: \"sm\", Large: \"lg\" };",
+            "note": "Com as const, o JavaScript gerado é idêntico ao que você escreveu, sem os tipos."
+          },
+          "relatedTerms": [
+            "enum-de-string",
+            "objeto-as-const"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "enum-exaustivo",
+          "level": "pleno",
+          "title": "Checagem exaustiva de um conjunto fechado",
+          "body": "Record<Status, string> obriga a ter um rótulo para cada valor, e o default com never quebra a compilação se surgir um status novo sem tratamento.",
+          "snippet": {
+            "file": "post-status.ts",
+            "language": "ts",
+            "code": "const Status = {\n  Draft: \"draft\",\n  Published: \"published\",\n  Archived: \"archived\",\n} as const;\ntype Status = (typeof Status)[keyof typeof Status];\n\nconst labels: Record<Status, string> = {\n  draft: \"Rascunho\",\n  published: \"Publicado\",\n  archived: \"Arquivado\",\n};\n\nfunction canEdit(status: Status): boolean {\n  switch (status) {\n    case Status.Draft:\n      return true;\n    case Status.Published:\n    case Status.Archived:\n      return false;\n    default: {\n      const unreachable: never = status;\n      return unreachable;\n    }\n  }\n}"
+          },
+          "relatedTerms": [
+            "objeto-as-const",
             "any-unknown-never"
           ]
         }

@@ -1,7 +1,7 @@
 {
   "id": "react-native",
   "title": "React Native",
-  "description": "Apps nativos para iOS e Android com React: componentes nativos, estilo, Expo, navegação, performance e publicação.",
+  "description": "Apps nativos para iOS e Android com React: componentes nativos, estilo, Expo, navegação, rotas privadas, performance e publicação.",
   "prerequisites": ["react"],
   "addedAt": "2026-10-05",
   "areas": [
@@ -241,6 +241,90 @@
           },
           "relatedTerms": [
             "listas-virtualizadas"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rotas-privadas",
+      "title": "Autenticação e rotas privadas",
+      "description": "Telas que só aparecem com login: sessão, rotas protegidas e o papel da API.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "rota-protegida",
+          "level": "junior",
+          "term": "Rota protegida (Stack.Protected)",
+          "definition": "No Expo Router, as telas privadas ficam dentro de <Stack.Protected guard={...}>. Com o guard falso, ninguém navega para elas: o app manda para a rota âncora (em geral a index) ou para a primeira tela disponível, como o login. Se a tela já estava aberta quando o guard vira falso, por exemplo no logout, o usuário é redirecionado e essas telas saem do histórico, então o botão de voltar não leva de volta a elas. Existe desde o SDK 53; a partir do SDK 58, a prop redirectTo escolhe o destino.",
+          "relatedTerms": [
+            "expo-router",
+            "contexto-de-sessao"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "contexto-de-sessao",
+          "level": "pleno",
+          "term": "Contexto de sessão",
+          "definition": "Um React Context (SessionProvider) na raiz do app que expõe a sessão, um isLoading e as funções signIn e signOut. Ao abrir, ele lê o token guardado no expo-secure-store; como a leitura é assíncrona, isLoading começa true. Enquanto carrega, a splash continua na tela, senão o usuário logado vê a tela de login piscar antes de entrar.",
+          "relatedTerms": [
+            "rota-protegida",
+            "armazenamento-local"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "grupos-de-rotas",
+          "level": "pleno",
+          "term": "Grupos de rotas",
+          "definition": "Pastas com o nome entre parênteses, como (app) e (auth), que agrupam telas e podem ter o próprio _layout.tsx sem entrar na URL: src/app/(app)/home.tsx atende /home. Para rotas privadas, basta proteger o grupo inteiro com um único <Stack.Screen name=\"(app)\" /> dentro do Stack.Protected, em vez de listar tela por tela.",
+          "relatedTerms": [
+            "expo-router",
+            "rota-protegida"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "layout-com-stack-protected",
+          "level": "pleno",
+          "title": "Layout raiz com rotas protegidas",
+          "body": "O grupo (app) só existe com sessão, e o login só existe sem ela. Quando signIn ou signOut mudam a sessão, o guard muda e o Expo Router troca de tela sozinho, sem router.replace manual.",
+          "snippet": {
+            "file": "src/app/_layout.tsx",
+            "language": "ts",
+            "code": "import { SplashScreen, Stack } from 'expo-router';\nimport { SessionProvider, useSession } from '../session';\n\nSplashScreen.preventAutoHideAsync();\n\nexport default function RootLayout() {\n  return (\n    <SessionProvider>\n      <SplashScreenController />\n      <RootNavigator />\n    </SessionProvider>\n  );\n}\n\nfunction SplashScreenController() {\n  const { isLoading } = useSession();\n  if (!isLoading) SplashScreen.hide();\n  return null;\n}\n\nfunction RootNavigator() {\n  const { session } = useSession();\n  return (\n    <Stack screenOptions={{ headerShown: false }}>\n      <Stack.Protected guard={!!session}>\n        <Stack.Screen name=\"(app)\" />\n      </Stack.Protected>\n      <Stack.Protected guard={!session}>\n        <Stack.Screen name=\"sign-in\" />\n      </Stack.Protected>\n    </Stack>\n  );\n}",
+            "note": "A splash esconde a troca de tela enquanto o token ainda está sendo lido."
+          },
+          "relatedTerms": [
+            "rota-protegida",
+            "grupos-de-rotas"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "session-provider",
+          "level": "pleno",
+          "title": "SessionProvider com SecureStore",
+          "body": "O token fica no SecureStore (Keychain no iOS, Keystore no Android), nunca no AsyncStorage. Ao abrir o app, o provider lê o token e só então desliga o isLoading.",
+          "snippet": {
+            "file": "src/session.tsx",
+            "language": "ts",
+            "code": "import * as SecureStore from 'expo-secure-store';\nimport { createContext, use, useEffect, useState, type PropsWithChildren } from 'react';\n\ntype Session = {\n  session: string | null;\n  isLoading: boolean;\n  signIn: (token: string) => Promise<void>;\n  signOut: () => Promise<void>;\n};\n\nconst SessionContext = createContext<Session | null>(null);\n\nexport function useSession() {\n  const value = use(SessionContext);\n  if (!value) throw new Error('useSession precisa estar dentro de <SessionProvider>');\n  return value;\n}\n\nexport function SessionProvider({ children }: PropsWithChildren) {\n  const [session, setSession] = useState<string | null>(null);\n  const [isLoading, setIsLoading] = useState(true);\n\n  useEffect(() => {\n    SecureStore.getItemAsync('token')\n      .then(setSession)\n      .finally(() => setIsLoading(false));\n  }, []);\n\n  async function signIn(token: string) {\n    await SecureStore.setItemAsync('token', token);\n    setSession(token);\n  }\n\n  async function signOut() {\n    await SecureStore.deleteItemAsync('token');\n    setSession(null);\n  }\n\n  return (\n    <SessionContext.Provider value={{ session, isLoading, signIn, signOut }}>\n      {children}\n    </SessionContext.Provider>\n  );\n}"
+          },
+          "relatedTerms": [
+            "contexto-de-sessao",
+            "armazenamento-local"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "protecao-no-cliente",
+          "level": "senior",
+          "term": "Rota privada não é segurança",
+          "definition": "Stack.Protected só decide quais telas o app mostra. Os dados ficam protegidos pela API, que valida o token em toda requisição: qualquer pessoa pode chamar a API sem passar pelo app, e um token pode expirar ou ser revogado com o app aberto. Por isso o app manda o token no header Authorization e, ao receber 401, chama signOut; o guard vira falso e o usuário volta ao login sozinho. Esconder a tela de admin no cliente não substitui checar a permissão no servidor.",
+          "relatedTerms": [
+            "contexto-de-sessao",
+            "rota-protegida"
           ]
         }
       ]

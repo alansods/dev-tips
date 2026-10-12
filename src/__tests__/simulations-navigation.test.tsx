@@ -26,6 +26,7 @@ const SIM_TITLES = [
   'Processamento de arquivos em segundo plano',
   'Resumos de PDF com IA',
   'API de notificações',
+  'CEP com três APIs',
 ];
 
 async function open(url: string) {
@@ -50,14 +51,14 @@ describe('Requirement: Home por áreas (Situações-problema)', () => {
     await open('/tracks');
     expect(areaNames().at(-1)).toBe('Situações-problema');
     expect(areaNames().at(-2)).toBe('DevOps e Cloud');
-    expect(screen.getByRole('button', { name: /^Situações-problema, 6 casos, 0 de 25 / })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Situações-problema, 7 casos, 0 de 30 / })).toBeOnTheScreen();
   });
 
   it('Progresso das simulações', async () => {
     const sim = getTrack('sim-dashboard-lento')!;
     for (const card of sim.decks[0].cards.slice(0, 3)) useStudyStore.getState().answer(sim.id, card.id, 'known');
     await open('/tracks');
-    expect(screen.getByRole('button', { name: /^Situações-problema, 6 casos, 3 de 25 / })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Situações-problema, 7 casos, 3 de 30 / })).toBeOnTheScreen();
   });
 });
 
@@ -101,6 +102,6 @@ describe('Requirement: Textos da navegação (Situações-problema)', () => {
   it('Área Situações-problema em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/tracks');
-    expect(screen.getByRole('button', { name: /^Problem scenarios, 6 cases, / })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: /^Problem scenarios, 7 cases, / })).toBeOnTheScreen();
   });
 });

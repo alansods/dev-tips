@@ -1,6 +1,6 @@
 {
   "title": "TypeScript essentials",
-  "description": "The type system day to day: basic types, interfaces, unions, narrowing and tsconfig.",
+  "description": "The type system day to day: basic types, interfaces, unions, narrowing, enums and tsconfig.",
   "decks": {
     "tipos-basicos": {
       "title": "Basic types",
@@ -13,6 +13,10 @@
     "unions-e-narrowing": {
       "title": "Unions and narrowing",
       "description": "Values of one of several types and how to narrow them."
+    },
+    "enums": {
+      "title": "Enums and alternatives",
+      "description": "Closed sets of values: the kinds of enum and the alternatives that emit no code."
     },
     "perguntas-de-entrevista": {
       "title": "Interview questions",
@@ -91,6 +95,33 @@
     "exhaustive-check": {
       "title": "Exhaustive check with never",
       "body": "If someone adds a new status to the union and forgets the case, the assignment to never fails at compile time, pointing at the exact place to fix."
+    },
+    "enum-numerico": {
+      "term": "Numeric enum",
+      "definition": "An enum whose members are numbers: enum Direction { Up, Down } makes Up 0 and Down 1, incrementing from the first value. It is the only kind of enum with reverse mapping: Direction[0] returns \"Up\". The downside is that logs and API JSON show only the number, which means nothing on its own."
+    },
+    "enum-de-string": {
+      "term": "String enum",
+      "definition": "An enum whose members get a text value: enum Status { Active = \"active\" }. Every member needs an explicit value, there is no reverse mapping, and the value is readable in logs and in the API. Gotcha: a variable of type Status does not accept the string \"active\" directly, only Status.Active, which gets in the way when receiving external data."
+    },
+    "const-enum": {
+      "term": "const enum",
+      "definition": "A variant that emits no object: the compiler replaces each use with the literal value, so Direction.Up becomes 0 in JavaScript. For that, the compiler has to read the declaration. Tools that transpile file by file (Babel, esbuild, swc) cannot see a const enum declared in another file, which is why the isolatedModules option restricts its use. Newer options go further: erasableSyntaxOnly and Node's type stripping reject any enum, because an enum is not just a type that can be erased."
+    },
+    "objeto-as-const": {
+      "term": "as const object",
+      "definition": "An alternative to enum made only of JavaScript and types: const Status = { Active: \"active\", Inactive: \"inactive\" } as const, plus the type type Status = (typeof Status)[keyof typeof Status], which becomes \"active\" | \"inactive\". It keeps the Status.Active access, accepts the string literal directly, emits nothing beyond the object itself and works with any tool that only strips types."
+    },
+    "enum-vs-as-const": {
+      "title": "The JavaScript emitted by each form",
+      "body": "The enum becomes a function that builds an object at runtime. The as const object stays the same object, and the type disappears at compile time.",
+      "snippet": {
+        "note": "With as const, the emitted JavaScript is identical to what you wrote, minus the types."
+      }
+    },
+    "enum-exaustivo": {
+      "title": "Exhaustive check over a closed set",
+      "body": "Record<Status, string> requires a label for every value, and the default with never breaks the build if a new status shows up without handling."
     },
     "por-que-typescript": {
       "question": "Why use TypeScript instead of JavaScript?",

@@ -1,6 +1,6 @@
 {
   "title": "React Native",
-  "description": "Native iOS and Android apps with React: native components, styling, Expo, navigation, performance and publishing.",
+  "description": "Native iOS and Android apps with React: native components, styling, Expo, navigation, private routes, performance and publishing.",
   "decks": {
     "componentes-e-estilo": {
       "title": "Components and styling",
@@ -13,6 +13,10 @@
     "performance-e-publicacao": {
       "title": "Performance and publishing",
       "description": "Lists, threads, storage and the path to the stores."
+    },
+    "rotas-privadas": {
+      "title": "Authentication and private routes",
+      "description": "Screens that only show up after login: session, protected routes and the API's role."
     },
     "perguntas-de-entrevista": {
       "title": "Interview questions",
@@ -95,6 +99,33 @@
     "flatlist-otimizada": {
       "title": "Optimized FlatList",
       "body": "Memoized item, stable key, stable callback and fixed height declared with getItemLayout."
+    },
+    "rota-protegida": {
+      "term": "Protected route (Stack.Protected)",
+      "definition": "In Expo Router, private screens go inside <Stack.Protected guard={...}>. With a false guard, nobody can navigate to them: the app sends the user to the anchor route (usually index) or to the first available screen, such as login. If the screen was already open when the guard turns false, for example on logout, the user is redirected and those screens leave the history, so the back button does not lead back to them. It exists since SDK 53; from SDK 58 on, the redirectTo prop picks the destination."
+    },
+    "contexto-de-sessao": {
+      "term": "Session context",
+      "definition": "A React Context (SessionProvider) at the root of the app that exposes the session, an isLoading flag and the signIn and signOut functions. On startup it reads the token stored in expo-secure-store; since the read is asynchronous, isLoading starts as true. While it loads, the splash stays on screen, otherwise a logged-in user sees the login screen flash before getting in."
+    },
+    "grupos-de-rotas": {
+      "term": "Route groups",
+      "definition": "Folders with the name in parentheses, such as (app) and (auth), that group screens and can have their own _layout.tsx without entering the URL: src/app/(app)/home.tsx serves /home. For private routes, you protect the whole group with a single <Stack.Screen name=\"(app)\" /> inside Stack.Protected, instead of listing screen by screen."
+    },
+    "layout-com-stack-protected": {
+      "title": "Root layout with protected routes",
+      "body": "The (app) group only exists with a session, and sign-in only exists without one. When signIn or signOut change the session, the guard changes and Expo Router switches screens by itself, with no manual router.replace.",
+      "snippet": {
+        "note": "The splash hides the screen switch while the token is still being read."
+      }
+    },
+    "session-provider": {
+      "title": "SessionProvider with SecureStore",
+      "body": "The token lives in SecureStore (Keychain on iOS, Keystore on Android), never in AsyncStorage. When the app opens, the provider reads the token and only then turns isLoading off."
+    },
+    "protecao-no-cliente": {
+      "term": "A private route is not security",
+      "definition": "Stack.Protected only decides which screens the app shows. The data is protected by the API, which validates the token on every request: anyone can call the API without going through the app, and a token can expire or be revoked while the app is open. That is why the app sends the token in the Authorization header and, on a 401, calls signOut; the guard turns false and the user goes back to login by itself. Hiding the admin screen on the client does not replace checking the permission on the server."
     },
     "rn-vs-web": {
       "question": "What changes between React for the web and React Native?",
