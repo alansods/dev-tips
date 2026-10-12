@@ -6,7 +6,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -57,30 +56,33 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
     Keyboard.dismiss();
   };
 
-  const lastIsOutOfScope = messages.at(-1)?.inScope === false;
-  const suggestions = (
-    <View style={{ gap: spacing.sm }}>
-      {t.assistant.suggestions.map((s) => (
-        <Pressable
-          key={s}
-          accessibilityRole="button"
-          accessibilityLabel={s}
-          accessibilityState={{ disabled: sending }}
-          disabled={sending}
-          onPress={() => send(s)}
-          style={({ pressed }) => [
-            styles.suggestion,
-            { borderColor: colors.line, backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1 },
-          ]}
-        >
-          <AppText size={14} style={{ flex: 1 }}>
-            {s}
-          </AppText>
-          <AppText tone="muted">→</AppText>
-        </Pressable>
-      ))}
-    </View>
-  );
+  // Sugestão já perguntada (tocada ou escrita igual) sai da lista; as outras ficam.
+  const asked = new Set(messages.filter((m) => m.role === 'user').map((m) => m.text.trim()));
+  const remaining = t.assistant.suggestions.filter((s) => !asked.has(s));
+  const suggestions =
+    remaining.length === 0 ? null : (
+      <View style={{ gap: spacing.sm }}>
+        {remaining.map((s) => (
+          <Pressable
+            key={s}
+            accessibilityRole="button"
+            accessibilityLabel={s}
+            accessibilityState={{ disabled: sending }}
+            disabled={sending}
+            onPress={() => send(s)}
+            style={({ pressed }) => [
+              styles.suggestion,
+              { borderColor: colors.line, backgroundColor: colors.surface, opacity: pressed ? 0.7 : 1 },
+            ]}
+          >
+            <AppText size={14} style={{ flex: 1 }}>
+              {s}
+            </AppText>
+            <AppText tone="muted">→</AppText>
+          </Pressable>
+        ))}
+      </View>
+    );
 
   const date = expiresAt
     ? new Date(expiresAt).toLocaleDateString(language === 'en' ? 'en-US' : 'pt-BR', { timeZone: 'UTC' })
@@ -88,7 +90,8 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      {/* "padding" também no Android: com edge-to-edge a janela não encolhe sozinha com o teclado. */}
+      <KeyboardAvoidingView style={styles.root} behavior="padding">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t.common.close}
@@ -134,48 +137,42 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
             keyboardShouldPersistTaps="handled"
             onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
           >
-            {messages.length === 0 ? (
-              <View style={{ gap: spacing.lg }}>
-                <View style={{ gap: 6 }}>
-                  <View style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}>
-                    <AskIcon color={colors.accentText} size={22} />
-                  </View>
-                  <AppText font="semibold" size={17}>
-                    {t.assistant.emptyTitle}
-                  </AppText>
-                  <AppText size={14} tone="muted" style={{ lineHeight: 21 }}>
-                    {t.assistant.emptyBody}
-                  </AppText>
+            {/* O bloco inicial fica no topo mesmo depois da primeira pergunta, com as mensagens embaixo. */}
+            <View style={{ gap: spacing.lg }}>
+              <View style={{ gap: 6 }}>
+                <View style={[styles.emptyIcon, { backgroundColor: colors.accentSoft }]}>
+                  <AskIcon color={colors.accentText} size={22} />
                 </View>
-                {suggestions}
-                <AppText size={12} tone="muted">
-                  {t.assistant.resetNote}
+                <AppText font="semibold" size={17}>
+                  {t.assistant.emptyTitle}
+                </AppText>
+                <AppText size={14} tone="muted" style={{ lineHeight: 21 }}>
+                  {t.assistant.emptyBody}
                 </AppText>
               </View>
-            ) : (
-              messages.map((m, i) =>
-                m.role === 'user' ? (
-                  <View key={`user-${i}`} style={[styles.bubble, styles.user, { backgroundColor: colors.accentSoft }]}>
-                    <AppText size={15} style={{ lineHeight: 21 }}>
-                      {m.text}
+              {suggestions}
+              <AppText size={12} tone="muted">
+                {t.assistant.resetNote}
+              </AppText>
+            </View>
+            {messages.map((m, i) =>
+              m.role === 'user' ? (
+                <View key={`user-${i}`} style={[styles.bubble, styles.user, { backgroundColor: colors.accentSoft }]}>
+                  <AppText size={15} style={{ lineHeight: 21 }}>
+                    {m.text}
+                  </AppText>
+                </View>
+              ) : (
+                <View key={`assistant-${i}`} style={[styles.bubble, styles.bot, { backgroundColor: colors.surface2 }]}>
+                  {m.inScope === false ? (
+                    <AppText font="medium" size={12} tone="muted">
+                      {t.assistant.outOfScope}
                     </AppText>
-                  </View>
-                ) : (
-                  <View
-                    key={`assistant-${i}`}
-                    style={[styles.bubble, styles.bot, { backgroundColor: colors.surface2 }]}
-                  >
-                    {m.inScope === false ? (
-                      <AppText font="medium" size={12} tone="muted">
-                        {t.assistant.outOfScope}
-                      </AppText>
-                    ) : null}
-                    <MessageText text={m.text} />
-                  </View>
-                ),
-              )
+                  ) : null}
+                  <MessageText text={m.text} />
+                </View>
+              ),
             )}
-            {lastIsOutOfScope && !sending ? suggestions : null}
             {sending ? (
               <View
                 accessibilityRole="progressbar"
