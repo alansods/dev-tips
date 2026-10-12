@@ -44,7 +44,7 @@ export const useRemindersStore = create<RemindersState>()(
   ),
 );
 
-/** Volta ao padrão (usado nos testes). */
+/** Volta ao padrão (testes e apagar a conta). */
 export function resetRemindersStore() {
   useRemindersStore.setState({ ...initialData(), permissionDenied: false });
 }

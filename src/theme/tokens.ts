@@ -13,6 +13,9 @@ export type ColorTokens = {
   accentText: string;
   warn: string;
   warnSoft: string;
+  /** Ação destrutiva e irreversível (ex.: Apagar conta). Diferente de `warn`, que é só alerta. */
+  danger: string;
+  onDanger: string;
   code: string;
   codeInk: string;
   codeMuted: string;
@@ -35,6 +38,8 @@ export const palettes: Record<ColorScheme, ColorTokens> = {
     accentText: '#2440C8',
     warn: '#A4460B',
     warnSoft: '#FCECDF',
+    danger: '#C62828',
+    onDanger: '#FFFFFF',
     code: '#0F141B',
     codeInk: '#DCE3EC',
     codeMuted: '#8C97A6',
@@ -53,6 +58,8 @@ export const palettes: Record<ColorScheme, ColorTokens> = {
     accentText: '#A9B6FF',
     warn: '#FFA466',
     warnSoft: '#3A2517',
+    danger: '#FF6B6B',
+    onDanger: '#1A0A0A',
     code: '#070A0E',
     codeInk: '#DCE3EC',
     codeMuted: '#7E8A99',

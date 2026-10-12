@@ -1,3 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import { Platform } from 'react-native';
 
@@ -17,6 +19,9 @@ import { readTokens, saveTokens } from '../auth/tokens';
 import { useSettingsStore } from '../i18n';
 import { progressKey } from '../study/rules';
 import { resetStudyStore, useStudyStore } from '../study/store';
+import { useRemindersStore } from '../reminders/store';
+import { useSyncStore } from '../sync/store';
+import { COLOR_SCHEME_KEY } from '../theme/ThemeProvider';
 
 // A sincronização tem testes próprios; aqui ela fica desligada.
 jest.mock('../sync/useSync', () => ({ useSync: () => {} }));
@@ -211,18 +216,52 @@ describe('Requirement: Conta no app', () => {
     expect(useAccountStore.getState().user).toBeNull();
   });
 
+  it('Confirmação de apagar', async () => {
+    await signedIn();
+    await open('/account');
+    await press('Apagar conta');
+    expect(screen.getByText('O progresso neste aparelho também será apagado.')).toBeOnTheScreen();
+    expect(screen.queryByText(/O progresso neste aparelho continua/)).toBeNull();
+  });
+
   it('Apagar conta', async () => {
     await signedIn();
     useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
+    useSettingsStore.setState({ language: 'pt-BR', interests: ['backend'] });
+    useRemindersStore.setState({ enabled: true, time: '08:00' });
+    useSyncStore.setState({
+      pendingCards: {
+        'crud-4-frameworks:cors': {
+          trackId: 'crud-4-frameworks',
+          cardId: 'cors',
+          result: 'known',
+          box: 2,
+          due: '2026-10-14',
+          updatedAt: 1,
+        },
+      },
+      pendingSettings: true,
+    });
+    await AsyncStorage.setItem(COLOR_SCHEME_KEY, 'dark');
+    jest.mocked(Notifications.cancelAllScheduledNotificationsAsync).mockClear();
     api({ 'DELETE /me': () => json(204) });
     await open('/profile');
     await press(/Ana Souza/);
     await press('Apagar conta');
     expect(screen.getByRole('header', { name: 'Apagar sua conta?' })).toBeOnTheScreen();
     await press('Apagar minha conta');
-    expect(screen).toHavePathname('/profile');
-    expect(screen.getByText('Salve seu progresso na nuvem')).toBeOnTheScreen();
-    expect(useStudyStore.getState().progress[progressKey('crud-4-frameworks', 'cors')]).toBe('known');
+    expect(screen).toHavePathname('/login');
+    expect(useAccountStore.getState().user).toBeNull();
+    expect(useStudyStore.getState().progress).toEqual({});
+    expect(useStudyStore.getState().schedule).toEqual({});
+    expect(useSettingsStore.getState().interests).toEqual([]);
+    expect(useSettingsStore.getState().onboardingSeen).toBe(false);
+    expect(useSettingsStore.getState().language).toBe('pt-BR');
+    expect(useRemindersStore.getState().enabled).toBe(false);
+    expect(Notifications.cancelAllScheduledNotificationsAsync).toHaveBeenCalled();
+    expect(useSyncStore.getState().pendingCards).toEqual({});
+    expect(useSyncStore.getState().pendingSettings).toBe(false);
+    expect(await AsyncStorage.getItem(COLOR_SCHEME_KEY)).toBe('dark');
   });
 
   it('Cancelar a exclusão', async () => {
@@ -244,6 +283,18 @@ describe('Requirement: Conta no app', () => {
     await press('Apagar minha conta');
     expect(screen.getByText('Sem conexão. Tente de novo quando estiver online.')).toBeOnTheScreen();
     expect(useAccountStore.getState().user).toEqual(ana);
+  });
+
+  it('Apagar conta sem conexão mantém o progresso', async () => {
+    await signedIn();
+    useStudyStore.getState().answer('crud-4-frameworks', 'cors', 'known');
+    useSettingsStore.setState({ interests: ['backend'] });
+    fetchMock.mockRejectedValue(new TypeError('Network request failed'));
+    await open('/account');
+    await press('Apagar conta');
+    await press('Apagar minha conta');
+    expect(useStudyStore.getState().progress[progressKey('crud-4-frameworks', 'cors')]).toBe('known');
+    expect(useSettingsStore.getState().interests).toEqual(['backend']);
   });
 });
 
