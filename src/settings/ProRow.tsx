@@ -1,5 +1,5 @@
 // Linha "Dev Tips Pro" da seção Conta: no plano grátis abre o paywall; para
-// quem é Pro, mostra o uso da cota e abre a tela Conta. No Android e no iOS
+// quem é Pro, mostra o uso da cota e abre a tela Plano. No Android e no iOS
 // (no iOS a compra ainda não existe: o paywall avisa).
 
 import { router } from 'expo-router';
@@ -42,7 +42,7 @@ export function ProRow() {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      onPress={() => router.push(pro ? '/account' : '/paywall')}
+      onPress={() => router.push(pro ? '/plan' : '/paywall')}
       style={({ pressed }) => [
         styles.row,
         {

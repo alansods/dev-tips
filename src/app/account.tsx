@@ -1,5 +1,5 @@
-// Tela Conta: dados da conta Google, plano Pro, Sair e Apagar conta, com confirmação na
-// própria tela. Nenhuma das ações apaga o progresso guardado no aparelho.
+// Tela Conta: dados da conta Google, sincronização, Sair e Apagar conta, com confirmação na
+// própria tela. O plano fica na tela Plano. Nenhuma das ações apaga o progresso guardado no aparelho.
 
 import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
@@ -14,9 +14,9 @@ import { AppText } from '../components/AppText';
 import { Avatar } from '../components/Avatar';
 import { Button } from '../components/Button';
 import { IconButton } from '../components/IconButton';
+import { TextLink } from '../components/TextLink';
 import { BackIcon, GoogleLogo } from '../components/icons';
 import { useT } from '../i18n';
-import { PlanCard } from '../subscriptions/PlanCard';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 
@@ -83,8 +83,6 @@ export default function AccountScreen() {
           </View>
         </View>
 
-        <PlanCard />
-
         <View style={{ gap: spacing.sm }}>
           <SectionTitle>{t.sync.section}</SectionTitle>
           <View style={[styles.syncCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -110,13 +108,13 @@ export default function AccountScreen() {
           </View>
         ) : (
           <View style={styles.row}>
-            <Button title={t.account.signOut} variant="secondary" onPress={() => setConfirm('signOut')} />
+            <Button title={t.account.signOut} variant="dangerOutline" onPress={() => setConfirm('signOut')} />
           </View>
         )}
 
-        <View style={[styles.danger, { borderColor: colors.line }]}>
+        <View style={styles.danger}>
           {confirm === 'delete' ? (
-            <View style={[styles.confirm, { backgroundColor: colors.surface, borderColor: colors.warn }]}>
+            <View style={[styles.confirm, { backgroundColor: colors.surface, borderColor: colors.danger }]}>
               <AppText font="semibold" size={16} accessibilityRole="header">
                 {t.account.deleteTitle}
               </AppText>
@@ -124,7 +122,7 @@ export default function AccountScreen() {
                 {t.account.deleteBody}
               </AppText>
               <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
-                {t.account.deleteKeep}
+                {t.account.deleteDevice}
               </AppText>
               <AppText size={14} tone="muted" style={{ lineHeight: 20 }}>
                 {t.account.deleteSubscription}
@@ -141,7 +139,7 @@ export default function AccountScreen() {
                 <View style={styles.row}>
                   <Button
                     title={t.account.deleteConfirm}
-                    variant="warn"
+                    variant="danger"
                     onPress={() => void (busy ? null : onDelete())}
                   />
                 </View>
@@ -149,9 +147,7 @@ export default function AccountScreen() {
             </View>
           ) : (
             <>
-              <View style={styles.row}>
-                <Button title={t.account.delete} variant="warn" onPress={() => setConfirm('delete')} />
-              </View>
+              <TextLink title={t.account.delete} tone="danger" onPress={() => setConfirm('delete')} />
               <AppText size={12} tone="muted" style={{ textAlign: 'center' }}>
                 {t.account.deleteHint}
               </AppText>
@@ -171,7 +167,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  content: { padding: spacing.lg, gap: spacing.lg },
+  content: { flexGrow: 1, padding: spacing.lg, gap: spacing.lg },
   profile: { alignItems: 'center', gap: spacing.sm, padding: spacing.xl, borderRadius: radius.xl, borderWidth: 1 },
   chip: {
     flexDirection: 'row',
@@ -183,7 +179,8 @@ const styles = StyleSheet.create({
   },
   row: { flexDirection: 'row', gap: spacing.md },
   confirm: { gap: spacing.sm, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1.5 },
-  danger: { gap: spacing.sm, paddingTop: spacing.lg, borderTopWidth: 1, marginTop: spacing.lg },
+  // Empurrado para o fim da tela: "Apagar conta" fica longe das ações comuns.
+  danger: { gap: 4, marginTop: 'auto', paddingTop: spacing.xl },
   alert: { padding: spacing.md, borderRadius: radius.md },
   syncCard: { gap: 4, padding: spacing.lg, borderRadius: radius.lg, borderWidth: 1 },
 });

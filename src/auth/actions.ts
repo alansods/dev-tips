@@ -1,5 +1,5 @@
 // Ações da conta usadas pelas telas: entrar, sair e apagar a conta.
-// Nenhuma delas apaga o progresso guardado no aparelho.
+// Sair mantém o progresso no aparelho; apagar a conta apaga também o que está no aparelho.
 
 import {
   ApiError,
@@ -12,6 +12,7 @@ import {
 } from './api';
 import { signInWithGoogle, signOutFromGoogle } from './providers';
 import { readTokens } from './tokens';
+import { wipeLocalData } from './wipe';
 
 export type SignInOutcome = 'success' | 'cancelled' | 'offline' | 'error';
 
@@ -41,7 +42,7 @@ export async function signOut(): Promise<void> {
 
 export type DeleteOutcome = 'deleted' | 'offline' | 'error';
 
-/** Apagar exige conexão: sem ela, nada é apagado. */
+/** Apagar exige conexão: sem ela, nada é apagado, nem na nuvem nem no aparelho. */
 export async function deleteAccount(): Promise<DeleteOutcome> {
   try {
     await authFetch('/me', { method: 'DELETE' });
@@ -52,5 +53,6 @@ export async function deleteAccount(): Promise<DeleteOutcome> {
   }
   await signOutFromGoogle();
   await endLocalSession();
+  await wipeLocalData();
   return 'deleted';
 }

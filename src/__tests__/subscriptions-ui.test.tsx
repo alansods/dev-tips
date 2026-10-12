@@ -9,6 +9,7 @@ import TracksScreen from '../app/(tabs)/tracks';
 import AccountScreen from '../app/account';
 import LoginScreen from '../app/login';
 import PaywallScreen from '../app/paywall';
+import PlanScreen from '../app/plan';
 import { API_URL } from '../auth/config';
 import { signInWithGoogle } from '../auth/providers';
 import { useAccountStore } from '../auth/store';
@@ -41,6 +42,7 @@ const APP = {
   login: LoginScreen,
   account: AccountScreen,
   paywall: PaywallScreen,
+  plan: PlanScreen,
 };
 
 const ana = { id: 'u1', name: 'Ana Souza', email: 'ana@example.com', photoUrl: null };
@@ -135,7 +137,7 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     expect(row).toHaveAccessibleName(/37 de 200 perguntas usadas/);
     expect(screen.getByTestId('quota-bar')).toBeOnTheScreen();
     await press(/Dev Tips Pro/);
-    expect(screen).toHavePathname('/account');
+    expect(screen).toHavePathname('/plan');
   });
 
   it('Quase no fim', async () => {
@@ -166,6 +168,8 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     expect(row).toHaveTextContent(/Pro \(admin\)/);
     expect(row).toHaveTextContent(/Perguntas sem limite/);
     expect(screen.queryByTestId('quota-bar')).toBeNull();
+    await press(/Pro \(admin\)/);
+    expect(screen).toHavePathname('/plan');
   });
 
   it('Uso atualizado pelo chat', async () => {
@@ -360,19 +364,19 @@ describe('Requirement: Restaurar compras', () => {
   });
 });
 
-describe('Requirement: Conta no app (bloco Plano)', () => {
-  it('Plano grátis na Conta', async () => {
+describe('Requirement: Tela Plano', () => {
+  it('Plano grátis na tela Plano', async () => {
     await signedIn(FREE);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Plano grátis')).toBeOnTheScreen();
     await press('Conhecer o Pro');
     expect(screen).toHavePathname('/paywall');
   });
 
-  it('Assinante na Conta', async () => {
+  it('Assinante na tela Plano', async () => {
     await signedIn(PRO);
     api(PRO);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
     expect(screen.getByText('Ativo')).toBeOnTheScreen();
     expect(screen.getByText('170')).toBeOnTheScreen();
@@ -386,58 +390,112 @@ describe('Requirement: Conta no app (bloco Plano)', () => {
     expect(screen.getByText('Renova em 12/11/2026')).toBeOnTheScreen();
     expect(button('Gerenciar assinatura')).toBeOnTheScreen();
     expect(button('Restaurar compras')).toBeOnTheScreen();
+    expect(screen.queryByText('ana@example.com')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sair' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Apagar conta' })).toBeNull();
+  });
+
+  it('Destaque dos botões do Plano', async () => {
+    await signedIn(PRO);
+    api(PRO);
+    await open('/plan');
+    const { accent, accentText, surface } = palettes.light;
+    expect(button('Gerenciar assinatura')).toHaveStyle({ borderColor: accent, backgroundColor: surface });
+    expect(screen.getByText('Gerenciar assinatura')).toHaveStyle({ color: accentText });
+    expect(button('Restaurar compras')).not.toHaveStyle({ borderWidth: 1.5 });
+    expect(screen.getByText('Restaurar compras')).toHaveStyle({ textDecorationLine: 'underline' });
   });
 
   it('Gerenciar assinatura no Android', async () => {
     await signedIn(PRO);
     api(PRO);
-    await open('/account');
+    await open('/plan');
     await press('Gerenciar assinatura');
     expect(manageSubscriptions).toHaveBeenCalledTimes(1);
   });
 
-  it('Uma pergunta restante na Conta', async () => {
+  it('Uma pergunta restante na tela Plano', async () => {
     const almost = { ...PRO, questions: { used: 199, limit: 200 } };
     await signedIn(almost);
     api(almost);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('1')).toBeOnTheScreen();
     expect(screen.getByText('pergunta restante')).toBeOnTheScreen();
   });
 
-  it('Renovação desligada', async () => {
+  it('Renovação desligada na tela Plano', async () => {
     const cancelled = { ...PRO, willRenew: false };
     await signedIn(cancelled);
     api(cancelled);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Termina em 12/11/2026')).toBeOnTheScreen();
   });
 
-  it('Admin na Conta', async () => {
+  it('Admin na tela Plano', async () => {
     await signedIn(ADMIN);
     api(ADMIN);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Pro (admin)')).toBeOnTheScreen();
     expect(screen.getByText('Perguntas sem limite')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Gerenciar assinatura' })).toBeNull();
   });
 
-  it('Conta no iOS', async () => {
+  it('Tela Plano no iOS', async () => {
     setOS('ios');
     await signedIn(PRO);
     api(PRO);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Pro mensal')).toBeOnTheScreen();
     expect(screen.getByText('30 / 200 usadas')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Gerenciar assinatura' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Restaurar compras' })).toBeNull();
   });
 
-  it('Plano grátis na Conta no iOS', async () => {
+  it('Plano grátis na tela Plano no iOS', async () => {
     setOS('ios');
     await signedIn(FREE);
-    await open('/account');
+    await open('/plan');
     expect(screen.getByText('Plano grátis')).toBeOnTheScreen();
+  });
+
+  it('Tela Plano sem sessão', async () => {
+    await open('/plan');
+    expect(screen).toHavePathname('/profile');
+  });
+});
+
+describe('Requirement: Conta no app', () => {
+  it('Conta sem o plano', async () => {
+    await signedIn(PRO);
+    api(PRO);
+    await open('/account');
+    expect(screen.getByText('ana@example.com')).toBeOnTheScreen();
+    expect(screen.getByText('Conectado com Google')).toBeOnTheScreen();
+    expect(button('Sair')).toBeOnTheScreen();
+    expect(button('Apagar conta')).toBeOnTheScreen();
+    expect(screen.queryByText('Plano')).toBeNull();
+    expect(screen.queryByText('Pro mensal')).toBeNull();
+    expect(screen.queryByText('30 / 200 usadas')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Gerenciar assinatura' })).toBeNull();
+  });
+
+  it('Destaque dos botões da Conta', async () => {
+    await signedIn(FREE);
+    await open('/account');
+    const { danger, surface } = palettes.light;
+    expect(button('Sair')).toHaveStyle({ borderColor: danger, backgroundColor: surface });
+    expect(screen.getByText('Sair')).toHaveStyle({ color: danger });
+    expect(button('Apagar conta')).not.toHaveStyle({ backgroundColor: danger });
+    expect(button('Apagar conta')).not.toHaveStyle({ borderWidth: 1.5 });
+    expect(screen.getByText('Apagar conta')).toHaveStyle({ color: danger });
+    expect(screen.getByText('Apaga sua conta e todo o seu progresso, na nuvem e neste aparelho.')).toBeOnTheScreen();
+  });
+
+  it('Confirmação de apagar', async () => {
+    await signedIn(FREE);
+    await open('/account');
+    await press('Apagar conta');
+    expect(button('Apagar minha conta')).toHaveStyle({ backgroundColor: palettes.light.danger });
   });
 
   it('Confirmação de apagar avisa sobre a assinatura', async () => {

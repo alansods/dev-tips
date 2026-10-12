@@ -4,7 +4,7 @@ import { useFontsReady } from '../theme/fonts';
 import { useTheme } from '../theme/ThemeProvider';
 import { fontFamilies, type FontRole } from '../theme/tokens';
 
-type Tone = 'ink' | 'muted' | 'accentText' | 'warn';
+export type Tone = 'ink' | 'muted' | 'accentText' | 'warn' | 'danger';
 
 type AppTextProps = TextProps & {
   font?: FontRole;
