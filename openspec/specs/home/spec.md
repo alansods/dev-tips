@@ -109,10 +109,16 @@ Tocar numa sugestão SHALL abrir a tela da trilha. Sem sugestão, a seção MUST
 
 ### Requirement: Primeiro acesso
 Sem nenhuma resposta registrada, o Início SHALL mostrar:
-- o título "Bem-vindo ao Dev Tips" e uma frase sobre como o app funciona;
+- o título "Bem-vindo ao Dev Cards" e uma frase sobre como o app funciona;
 - a pergunta "O que você quer estudar?", com uma opção por área do catálogo, exceto Situações-problema. As opções podem ser marcadas e desmarcadas, e a escolha fica salva como áreas de interesse;
 - "Comece por aqui", com a primeira trilha sem pré-requisitos da ordem sugerida da primeira área de interesse (ou de Fundamentos, sem interesse) e o botão "Começar a trilha", que abre a tela da trilha;
 - quando houver, a trilha seguinte a ela ("Depois:"), a primeira que tem a trilha de "Comece por aqui" como pré-requisito.
+
+Em inglês, o título SHALL ser "Welcome to Dev Cards".
+
+#### Scenario: Boas-vindas
+- **WHEN** é o primeiro acesso
+- **THEN** o Início mostra "Bem-vindo ao Dev Cards"
 
 #### Scenario: Sem interesse escolhido
 - **WHEN** é o primeiro acesso e nenhuma área foi escolhida

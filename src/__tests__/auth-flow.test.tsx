@@ -90,7 +90,7 @@ describe('Requirement: Tela de login', () => {
     useSettingsStore.setState({ onboardingSeen: false });
     await open('/tracks');
     expect(screen).toHavePathname('/login');
-    expect(screen.getByText('Dev Tips')).toBeOnTheScreen();
+    expect(screen.getByText('Dev Cards')).toBeOnTheScreen();
     expect(screen.getByRole('header', { name: 'Aprenda, reforce e relembre' })).toBeOnTheScreen();
     expect(
       screen.getByText('Conceitos de fullstack em cards curtos, com revisões na hora certa para você não esquecer.'),

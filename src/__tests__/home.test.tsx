@@ -63,7 +63,7 @@ describe('Requirement: Aba Início', () => {
 
   it('Primeiro acesso no lugar das seções', async () => {
     await open('/');
-    expect(screen.getByText('Bem-vindo ao Dev Tips')).toBeOnTheScreen();
+    expect(screen.getByText('Bem-vindo ao Dev Cards')).toBeOnTheScreen();
     expect(screen.queryByText('Continue de onde parou')).toBeNull();
   });
 });
