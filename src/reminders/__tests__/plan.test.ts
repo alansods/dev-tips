@@ -43,7 +43,7 @@ describe('Requirement: Uma notificação por dia com texto do dia', () => {
     const plans = plan({ schedule: due(crud, 3, '2026-10-02') });
     expect(plans[0]).toEqual({
       date: at('2026-10-02', '20:00'),
-      title: 'Dev Tips',
+      title: 'Dev Cards',
       body: 'Revisão do dia: 3 cards esperando por você',
     });
     expect(plans).toHaveLength(7);

@@ -35,14 +35,14 @@ O app MUST NOT pedir permissão de notificação ao abrir. Ao ligar o lembrete, 
 
 ### Requirement: Uma notificação por dia com texto do dia
 Com o lembrete ligado, o app SHALL manter agendada uma notificação por dia, no horário escolhido, para os próximos 7 dias, a partir do primeiro horário ainda não passado. O texto de cada notificação SHALL depender dos cards para revisar naquele dia, somando todas as trilhas e contando os cards cuja data de revisão é igual ou anterior a esse dia:
-- com N > 0 cards: título "Dev Tips" e texto "Revisão do dia: N cards esperando por você" ("1 card esperando por você" quando N = 1);
-- sem cards: título "Dev Tips" e texto "5 minutos de estudo? Continue de onde parou."
+- com N > 0 cards: título "Dev Cards" e texto "Revisão do dia: N cards esperando por você" ("1 card esperando por você" quando N = 1);
+- sem cards: título "Dev Cards" e texto "5 minutos de estudo? Continue de onde parou."
 
 Em inglês, os textos SHALL ser "Today's review: N cards waiting for you" ("1 card waiting for you" quando N = 1) e "5 minutes of study? Pick up where you left off." O idioma é o do app no momento do agendamento.
 
 #### Scenario: Dia com revisão
 - **WHEN** hoje é 2026-10-02 às 10:00, o horário é 20:00 e 3 cards vencem até 2026-10-02
-- **THEN** a notificação de 2026-10-02 às 20:00 diz "Revisão do dia: 3 cards esperando por você"
+- **THEN** a notificação de 2026-10-02 às 20:00 tem o título "Dev Cards" e diz "Revisão do dia: 3 cards esperando por você"
 
 #### Scenario: Revisão futura já prevista
 - **WHEN** hoje é 2026-10-02 e um card tem revisão em 2026-10-05
@@ -58,7 +58,7 @@ Em inglês, os textos SHALL ser "Today's review: N cards waiting for you" ("1 ca
 
 #### Scenario: Texto em inglês
 - **WHEN** o app está em inglês e 3 cards vencem no dia
-- **THEN** a notificação desse dia diz "Today's review: 3 cards waiting for you"
+- **THEN** a notificação desse dia tem o título "Dev Cards" e diz "Today's review: 3 cards waiting for you"
 
 #### Scenario: Um card
 - **WHEN** 1 card vence no dia

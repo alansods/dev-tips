@@ -1,6 +1,23 @@
-# Dev Tips
+<p align="center">
+  <img src="store/play/play-icon-512.png" width="112" alt="Dev Cards app icon" />
+</p>
+
+<h1 align="center">Dev Cards</h1>
 
 A mobile study app with cards that reinforce fullstack development concepts that come up in job interviews.
+
+> Formerly **Dev Tips**. Only the display name changed: the package id (`dev.devtips.app`), the API and the stored data keep the old identifiers.
+
+<p align="center">
+  <img src="store/play/screenshot-1.png" width="250" alt="Home tab in light mode: today's review, continue where you left off and suggestions" />
+  <img src="store/play/screenshot-2.png" width="250" alt="Concept card in dark mode: Route Handler" />
+  <img src="store/play/screenshot-3.png" width="250" alt="Card assistant chat in light mode, answering with a code example" />
+</p>
+<p align="center">
+  <img src="store/play/screenshot-4.png" width="250" alt="Code card in dark mode: a bank transfer inside a SQL transaction" />
+  <img src="store/play/screenshot-5.png" width="250" alt="Interview case card in light mode, with the answer and why it works" />
+  <img src="store/play/screenshot-6.png" width="250" alt="Dev Cards Pro paywall in dark mode: 200 questions per month" />
+</p>
 
 Pick an **area** (Fundamentals, Frontend, Backend, Databases), open a **track** and a **deck** and study the **cards** as flashcards: flip the card, answer "I knew it" or "I didn't know", and the app schedules the next review. It works offline and without an account. Google sign-in is optional and is used to sync your progress across devices.
 
@@ -17,6 +34,7 @@ Pick an **area** (Fundamentals, Frontend, Backend, Databases), open a **track** 
 - **Languages**: Brazilian Portuguese and English (UI and content).
 - **Light and dark mode.**
 - **Optional account** (Google) that syncs progress and preferences.
+- **Dev Cards Pro** (optional subscription on Android): an AI assistant answers questions about the card you're studying, up to 200 questions per month.
 
 ## Stack
 
@@ -84,7 +102,7 @@ npm test             # tests (Jest)
 npm run lint         # lint (expo lint)
 npm run typecheck    # tsc --noEmit
 npm run format       # Prettier
-npm run icons        # generate the app icons
+npm run icons        # generate the app icons and the Play Store icon
 ```
 
 ## Running the API
@@ -163,4 +181,4 @@ The privacy policy and terms of use live in [`docs/legal/`](docs/legal/) and are
 
 ## License
 
-Copyright (c) 2026 Alan Santos. All rights reserved. The code is published for reading only: no license is granted to copy, modify, distribute or reuse any part of it, including the card content and the "Dev Tips" brand. See [`LICENSE`](LICENSE).
+Copyright (c) 2026 Alan Santos. All rights reserved. The code is published for reading only: no license is granted to copy, modify, distribute or reuse any part of it, including the card content and the "Dev Cards" brand. See [`LICENSE`](LICENSE).
