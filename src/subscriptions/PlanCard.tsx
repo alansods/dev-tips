@@ -133,13 +133,7 @@ export function PlanCard() {
             <View style={{ flexDirection: 'row' }}>
               <Button title={t.pro.manage} variant="accentOutline" onPress={() => void manageSubscriptions()} />
             </View>
-            <TextLink
-              title={t.pro.restore}
-              tone="muted"
-              underline
-              disabled={busy}
-              onPress={() => void onRestore()}
-            />
+            <TextLink title={t.pro.restore} tone="muted" underline disabled={busy} onPress={() => void onRestore()} />
           </View>
         ) : null}
       </View>

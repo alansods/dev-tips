@@ -21,12 +21,7 @@ export function TextLink({ title, onPress, tone = 'accentText', underline = fals
       onPress={onPress}
       style={({ pressed }) => [styles.link, { opacity: disabled ? 0.5 : pressed ? 0.6 : 1 }]}
     >
-      <AppText
-        font="medium"
-        size={14}
-        tone={tone}
-        style={underline ? { textDecorationLine: 'underline' } : undefined}
-      >
+      <AppText font="medium" size={14} tone={tone} style={underline ? { textDecorationLine: 'underline' } : undefined}>
         {title}
       </AppText>
     </Pressable>
