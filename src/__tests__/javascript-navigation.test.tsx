@@ -79,7 +79,9 @@ describe('Requirement: Trilhas de JavaScript no catálogo', () => {
     ]);
     expect(buttons(FRAMEWORKS)).toEqual(['Next.js', 'Express', 'NestJS']);
     for (const name of ['Next\\.js', 'Express', 'NestJS']) {
-      expect(within(screen.getByRole('button', { name: new RegExp(`^${name},`) })).getByText('1 trilha')).toBeOnTheScreen();
+      expect(
+        within(screen.getByRole('button', { name: new RegExp(`^${name},`) })).getByText('1 trilha'),
+      ).toBeOnTheScreen();
     }
   });
 
