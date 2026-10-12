@@ -1,5 +1,5 @@
 import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
-import { Keyboard, Platform, ScrollView } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -138,6 +138,65 @@ describe('Requirement: Chat do card', () => {
     expect(button('Enviar pergunta')).toBeDisabled();
   });
 
+  it('Campo acima do teclado', async () => {
+    for (const platform of ['ios', 'android']) {
+      setOS(platform);
+      await open();
+      await press('Perguntar sobre este card');
+      // No Android edge-to-edge a janela não encolhe com o teclado: sem behavior, o campo fica embaixo dele.
+      expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe('padding');
+      screen.unmount();
+    }
+  });
+
+  it('Sugestões depois da resposta', async () => {
+    askMock.mockResolvedValueOnce(answer('Primeira resposta.')).mockResolvedValueOnce(answer('Um exemplo.'));
+    await open();
+    await press('Perguntar sobre este card');
+    await typeAndSend('O que é?');
+    // O bloco inicial continua no topo, antes das mensagens.
+    const order = within(screen.getByTestId('chat-messages'))
+      .getAllByText(/^(O que ficou confuso\?|Me dê um exemplo|O que é\?|Primeira resposta\.)$/)
+      .map((el) => el.props.children);
+    expect(order).toEqual(['O que ficou confuso?', 'Me dê um exemplo', 'O que é?', 'Primeira resposta.']);
+    for (const s of ['Explique de outro jeito', 'Me dê um exemplo', 'Por que isso importa?'])
+      expect(button(s)).toBeEnabled();
+    await press('Me dê um exemplo');
+    expect(askMock.mock.calls[1][0].question).toBe('Me dê um exemplo');
+    expect(screen.getByText('Um exemplo.')).toBeOnTheScreen();
+  });
+
+  it('Sugestão usada some', async () => {
+    askMock.mockResolvedValue(answer('Um exemplo.'));
+    await open();
+    await press('Perguntar sobre este card');
+    await press('Me dê um exemplo');
+    expect(screen.getByText('Um exemplo.')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Me dê um exemplo' })).toBeNull();
+    expect(button('Explique de outro jeito')).toBeOnTheScreen();
+    expect(button('Por que isso importa?')).toBeOnTheScreen();
+  });
+
+  it('Todas as sugestões usadas', async () => {
+    askMock.mockResolvedValue(answer('Ok.'));
+    await open();
+    await press('Perguntar sobre este card');
+    for (const s of ['Explique de outro jeito', 'Me dê um exemplo', 'Por que isso importa?']) await press(s);
+    for (const s of ['Explique de outro jeito', 'Me dê um exemplo', 'Por que isso importa?'])
+      expect(screen.queryByRole('button', { name: s })).toBeNull();
+    expect(screen.getByText('O que ficou confuso?')).toBeOnTheScreen();
+  });
+
+  it('Sugestões durante o envio', async () => {
+    askMock.mockReturnValue(new Promise(() => {}));
+    await open();
+    await press('Perguntar sobre este card');
+    await typeAndSend('O que é?');
+    expect(screen.getByText('digitando…')).toBeOnTheScreen();
+    for (const s of ['Explique de outro jeito', 'Me dê um exemplo', 'Por que isso importa?'])
+      expect(button(s)).toBeDisabled();
+  });
+
   it('Conversa recomeça em outro card', async () => {
     askMock.mockResolvedValue(answer('Resposta sobre API.'));
     await open();
@@ -257,7 +316,8 @@ describe('Requirement: Enviar pergunta no app', () => {
     await press('Perguntar sobre este card');
     await typeAndSend('React ou Vue?');
     expect(screen.getByText('Fora deste card')).toBeOnTheScreen();
-    expect(button('Explique de outro jeito')).toBeOnTheScreen();
+    for (const s of ['Explique de outro jeito', 'Me dê um exemplo', 'Por que isso importa?'])
+      expect(screen.getAllByRole('button', { name: s })).toHaveLength(1);
   });
 });
 
