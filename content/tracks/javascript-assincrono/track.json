@@ -1,7 +1,7 @@
 {
   "id": "javascript-assincrono",
   "title": "JavaScript assíncrono",
-  "description": "Como o JavaScript faz várias coisas sem travar: event loop, Promises e async/await.",
+  "description": "Como o JavaScript faz várias coisas sem travar: event loop, Promises, async/await e combinadores de Promise.",
   "prerequisites": ["javascript-essencial"],
   "addedAt": "2026-10-05",
   "areas": [
@@ -135,7 +135,11 @@
           "term": "Promise.all, allSettled, race e any",
           "definition": "Formas de esperar várias Promises: all resolve com todos os valores e rejeita no primeiro erro; allSettled espera todas e diz o resultado de cada uma; race termina com a primeira que terminar (sucesso ou erro); any resolve com a primeira que der certo.",
           "relatedTerms": [
-            "promise"
+            "promise",
+            "combinador-all",
+            "combinador-allsettled",
+            "combinador-race",
+            "combinador-any"
           ]
         },
         {
@@ -250,6 +254,91 @@
           "relatedTerms": [
             "await-sequencial",
             "async-await"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "combinadores-de-promise",
+      "title": "Combinadores de Promise",
+      "description": "Esperar várias Promises de uma vez: quando cada combinador resolve e quando rejeita.",
+      "cards": [
+        {
+          "type": "concept",
+          "id": "combinador-all",
+          "level": "junior",
+          "term": "Promise.all",
+          "definition": "Recebe várias Promises e resolve com um array dos valores, na mesma ordem da entrada, quando todas dão certo. Rejeita na primeira falha, com o erro dela, e você perde os valores das que deram certo. As outras não são canceladas: continuam rodando, só que ninguém espera por elas. Use quando precisa de todos os resultados e qualquer falha invalida o conjunto.",
+          "relatedTerms": [
+            "combinadores",
+            "combinador-allsettled"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "combinador-allsettled",
+          "level": "pleno",
+          "term": "Promise.allSettled",
+          "definition": "Espera todas terminarem e nunca rejeita. Resolve com um array de objetos: { status: \"fulfilled\", value } para as que deram certo e { status: \"rejected\", reason } para as que falharam. Use quando as tarefas são independentes e uma falha não deve descartar as outras, como enviar várias notificações e depois relatar quais falharam.",
+          "relatedTerms": [
+            "combinador-all",
+            "promise"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "combinador-race",
+          "level": "pleno",
+          "term": "Promise.race",
+          "definition": "Termina junto com a primeira Promise que terminar, seja com sucesso ou com erro. Se a mais rápida falhar, o race rejeita, mesmo que as outras fossem dar certo depois. O uso clássico é o timeout: correr a operação contra um timer que rejeita. Com um array vazio, fica pendente para sempre.",
+          "relatedTerms": [
+            "combinador-any",
+            "abort-controller"
+          ]
+        },
+        {
+          "type": "concept",
+          "id": "combinador-any",
+          "level": "pleno",
+          "term": "Promise.any",
+          "definition": "Resolve com a primeira Promise que der certo e ignora as falhas enquanto ainda houver alguma pendente. Só rejeita se todas falharem, com um AggregateError cujo campo errors traz o motivo de cada uma. É o combinador do fallback: consultar várias fontes equivalentes e ficar com a primeira resposta válida.",
+          "relatedTerms": [
+            "combinador-race",
+            "combinador-all"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "race-com-timeout",
+          "level": "pleno",
+          "title": "Timeout com Promise.race",
+          "body": "Quem terminar primeiro decide: a resposta ou o erro do timer. O race não cancela a requisição perdedora; para cancelar de fato, passe um AbortSignal ao fetch.",
+          "snippet": {
+            "file": "timeout.js",
+            "language": "js",
+            "code": "function timeout(ms) {\n  return new Promise((_, reject) =>\n    setTimeout(() => reject(new Error(`Tempo esgotado após ${ms} ms`)), ms),\n  );\n}\n\nconst response = await Promise.race([fetch(\"/api/report\"), timeout(5000)]);\n\n// Alternativa que também cancela a requisição:\nconst report = await fetch(\"/api/report\", { signal: AbortSignal.timeout(5000) });",
+            "note": "AbortSignal.timeout aborta o fetch sozinho depois do prazo, sem precisar do race."
+          },
+          "relatedTerms": [
+            "combinador-race",
+            "abort-controller"
+          ]
+        },
+        {
+          "type": "code",
+          "id": "any-com-fallback",
+          "level": "pleno",
+          "title": "Fallback entre três APIs de CEP",
+          "body": "As três consultas saem juntas, e vale a primeira resposta válida. Uma resposta 200 com erro no corpo também precisa virar rejeição, senão ela \"ganha\" do jeito errado. Se todas falharem, o catch recebe um AggregateError.",
+          "snippet": {
+            "file": "cep.js",
+            "language": "js",
+            "code": "async function fetchCep(url) {\n  const response = await fetch(url);\n  if (!response.ok) throw new Error(`HTTP ${response.status}`);\n  const data = await response.json();\n  if (data.erro) throw new Error(\"CEP não encontrado\");\n  return data;\n}\n\ntry {\n  const address = await Promise.any([\n    fetchCep(`https://viacep.com.br/ws/${cep}/json/`),\n    fetchCep(`https://brasilapi.com.br/api/cep/v2/${cep}`),\n    fetchCep(`https://cep.awesomeapi.com.br/json/${cep}`),\n  ]);\n  console.log(address);\n} catch (error) {\n  // AggregateError: todas falharam\n  console.error(error.errors);\n}",
+            "note": "Cada API responde num formato diferente; num app real, converta para um formato só antes de devolver."
+          },
+          "relatedTerms": [
+            "combinador-any",
+            "combinador-race"
           ]
         }
       ]

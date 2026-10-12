@@ -1,0 +1,53 @@
+{
+  "title": "CEP lookup with three APIs",
+  "description": "Fallback across unreliable external APIs: Promise.any, time limits, cancellation and caching on the backend.",
+  "scenario": {
+    "context": "In an e-commerce app's checkout, the address is filled in from the CEP (Brazilian postal code) with a public API. When it goes down or gets slow, nobody can finish a purchase. Two other free CEP APIs are available.",
+    "stack": [
+      "React Native",
+      "Node.js",
+      "ViaCEP, BrasilAPI and AwesomeAPI"
+    ]
+  },
+  "decks": {
+    "conversa": {
+      "title": "Conversation"
+    }
+  },
+  "cards": {
+    "tres-apis-de-cep": {
+      "question": "How would you use the three APIs so the address does not depend on just one?",
+      "answer": "First I would create a single address shape and one adapter per API, because each one answers with different fields. The rest of the app only knows that shape.\n\nThen I would pick one of two strategies. In the first, I fire all three at once and use Promise.any: the first valid answer wins, and one failing does not affect the others. It is the fastest, but it triples the calls.\n\nIn the second, I call one at a time, in order of preference, and only move to the next when the previous one fails. It spends fewer calls, but in the worst case the waits add up.\n\nIn a checkout, where every second counts, I would start with Promise.any and a time limit per call.",
+      "why": "It shows you split the problem in two parts, unifying the answers and choosing the fallback strategy, and that you know the cost of each strategy.",
+      "snippet": {
+        "note": "Each adapter converts the answer to the same shape; whoever calls lookupCep does not know which API the address came from."
+      }
+    },
+    "race-ou-any": {
+      "question": "A colleague suggested using Promise.race to keep the fastest answer. Why does that not solve the problem?",
+      "answer": "Because race settles with the first Promise that settles, even if it settles with an error. If the API that is down refuses the connection in 50 ms, race rejects right away, and the other two, which would answer in 300 ms, are ignored. That is exactly the scenario we want to avoid.\n\nPromise.any ignores failures while any call is still pending and only rejects if all of them fail. race is still useful elsewhere: racing each call against a timer, so that a slow API counts as a failure.",
+      "why": "It shows you tell apart \"the first to finish\" from \"the first to succeed\", which is what decides the behavior when an API fails."
+    },
+    "cep-inexistente": {
+      "question": "With CEP 00000-000, ViaCEP answers 200 with {\"erro\": true}, and the app shows an empty address. What is wrong and how would you handle it?",
+      "answer": "The code treats any 200 response as success. Since the three calls are in a Promise.any, that answer wins the race and an empty address reaches the screen.\n\nThe ViaCEP adapter has to turn {\"erro\": true} into a rejection, the same way BrasilAPI's 404 already becomes an error. I would also validate the CEP before calling any API: 8 digits, no dash.\n\nThen I would separate two cases for the user. If every API said the CEP does not exist, the message is \"CEP not found\". If they failed because of the network or a timeout, the message is \"We could not look up the address right now\", and the user fills it in by hand. Promise.any's AggregateError carries the reason for each failure, which makes that distinction possible.",
+      "why": "It shows you do not rely on the HTTP status alone: each API's contract defines what success is.",
+      "watchOut": "Do not block the purchase: if the lookup fails, the address fields must stay editable."
+    },
+    "cancelar-e-timeout": {
+      "question": "One of the APIs started hanging for 30 seconds, and the requests that lost the race stay open after the address shows up. How would you solve it?",
+      "answer": "I would give each call its own deadline, such as 3 seconds, with AbortSignal.timeout. A hanging API then counts as a quick failure, and Promise.any does not keep waiting for it.\n\nFor the losers, I would create a shared AbortController: when the first valid answer arrives, I call abort() and cancel the others. That frees connections, which on a phone cost battery and data, and avoids processing answers nobody will use.\n\nI combine both signals with AbortSignal.any, so each fetch stops on whatever happens first: its own deadline or another API winning.",
+      "why": "It shows you think about the cost of the requests that lost the race, not only about the result.",
+      "watchOut": "In React Native, check whether AbortSignal.timeout and AbortSignal.any exist in the runtime; if they do not, use a setTimeout that calls controller.abort().",
+      "snippet": {
+        "note": "Each adapter receives the signal and passes it on to fetch."
+      }
+    },
+    "mover-para-o-backend": {
+      "question": "As traffic grew, the APIs started answering 429 (rate limit) to the app. What would you change in the architecture?",
+      "answer": "I would take the lookup out of the app and move it to an endpoint in our backend, which becomes the only client of the CEP APIs.\n\nIn that endpoint I would add a cache, for example in Redis, valid for days: a CEP hardly ever changes, and the most searched ones repeat a lot. That way most lookups never reach the external APIs.\n\nExternal calls would become sequential, in order of preference, instead of always firing all three: with the cache, latency matters less and usage drops to a third. I would add a circuit breaker per API: after several failures or 429 responses in a row, it leaves the rotation for a few minutes, and traffic goes straight to the others.\n\nI would also consider a ready-made library, such as cep-promise, used by BrasilAPI, which already queries several providers.",
+      "why": "It shows you treat a third-party API as a limited resource: caching, controlled usage and failure isolation.",
+      "watchOut": "Cache only valid answers, and \"CEP not found\" for a short time only: a new CEP may start to exist."
+    }
+  }
+}

@@ -197,7 +197,7 @@ describe('Requirement: Novidades', () => {
     jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
     answer(WEB, ['http'], 'known');
     await open('/');
-    expect(screen.getByRole('button', { name: 'Situações-problema, 6 casos, Nova área' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Situações-problema, 7 casos, Nova área' })).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: /^Pedido e pagamento em dobro, Nova$/ })).toBeNull();
   });
 
@@ -205,7 +205,7 @@ describe('Requirement: Novidades', () => {
     jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
     answer(WEB, ['http'], 'known');
     await open('/');
-    press('Situações-problema, 6 casos, Nova área');
+    press('Situações-problema, 7 casos, Nova área');
     expect(screen).toHavePathname('/area/simulacoes');
   });
 
@@ -215,7 +215,7 @@ describe('Requirement: Novidades', () => {
     answer(WEB, ['http'], 'known');
     await open('/');
     expect(screen.getByRole('header', { name: "What's new" })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Problem scenarios, 6 cases, New area' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Problem scenarios, 7 cases, New area' })).toBeOnTheScreen();
     useSettingsStore.setState({ language: 'pt-BR' });
   });
 });

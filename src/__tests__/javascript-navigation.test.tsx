@@ -77,7 +77,12 @@ describe('Requirement: Trilhas de JavaScript no catálogo', () => {
       'TypeScript essencial',
       'TypeScript avançado',
     ]);
-    expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
+    expect(buttons(FRAMEWORKS)).toEqual(['Next.js', 'Express', 'NestJS']);
+    for (const name of ['Next\\.js', 'Express', 'NestJS']) {
+      expect(
+        within(screen.getByRole('button', { name: new RegExp(`^${name},`) })).getByText('1 trilha'),
+      ).toBeOnTheScreen();
+    }
   });
 
   it('Contagem na tela da área', async () => {
