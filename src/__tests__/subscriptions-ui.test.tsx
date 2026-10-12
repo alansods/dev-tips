@@ -108,16 +108,16 @@ afterEach(() => {
   fetchMock.mockRestore();
 });
 
-describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
+describe('Requirement: Linha Dev Cards Pro no Perfil', () => {
   it('Usuário grátis', async () => {
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     expect(screen).toHavePathname('/paywall');
   });
 
   it('Usuário grátis mostra o convite', async () => {
     await open('/profile');
-    expect(button(/Dev Tips Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
+    expect(button(/Dev Cards Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
   });
 
   const withUsed = (used: number, extra = {}) => ({ ...PRO, ...extra, questions: { used, limit: 200 } });
@@ -125,7 +125,7 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     await signedIn(plan);
     api(plan);
     await open('/profile');
-    return button(/Dev Tips Pro|Pro \(admin\)/);
+    return button(/Dev Cards Pro|Pro \(admin\)/);
   }
 
   it('Usuário Pro', async () => {
@@ -136,7 +136,7 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
     expect(row).toHaveTextContent(/Restam 163 perguntas/);
     expect(row).toHaveAccessibleName(/37 de 200 perguntas usadas/);
     expect(screen.getByTestId('quota-bar')).toBeOnTheScreen();
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     expect(screen).toHavePathname('/plan');
   });
 
@@ -179,14 +179,14 @@ describe('Requirement: Linha Dev Tips Pro no Perfil', () => {
       const plan = useSubscriptionStore.getState().plan!;
       useSubscriptionStore.getState().setPlan({ ...plan, questions: { used: 38, limit: 200 } });
     });
-    expect(button(/Dev Tips Pro/)).toHaveTextContent(/38 \/ 200/);
+    expect(button(/Dev Cards Pro/)).toHaveTextContent(/38 \/ 200/);
   });
 
   it('iOS', async () => {
     setOS('ios');
     await open('/profile');
-    expect(button(/Dev Tips Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
-    await press(/Dev Tips Pro/);
+    expect(button(/Dev Cards Pro/)).toHaveTextContent(/Tire dúvidas sobre cada card/);
+    await press(/Dev Cards Pro/);
     expect(screen).toHavePathname('/paywall');
   });
 });
@@ -261,7 +261,7 @@ describe('Requirement: Paywall', () => {
 
   it('Fechar', async () => {
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     await press('Fechar');
     expect(screen).toHavePathname('/profile');
   });
@@ -272,7 +272,7 @@ describe('Requirement: Assinar pelo app', () => {
     jest.mocked(signInWithGoogle).mockResolvedValue({ type: 'success', idToken: 'id' });
     api(FREE, { 'POST /auth/google': () => json(200, { accessToken: 'a1', refreshToken: 'r1', user: ana }) });
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     await press('Assinar o Pro');
     expect(screen).toHavePathname('/login');
     await press('Entrar ou criar conta com o Google');
@@ -286,7 +286,7 @@ describe('Requirement: Assinar pelo app', () => {
     jest.mocked(purchaseMonthly).mockResolvedValue('purchased');
     api(FREE, { 'POST /me/subscription/sync': () => json(200, PRO) });
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     await press('Assinar o Pro');
     expect(screen.getByText('Pronto! Você agora é Pro.')).toBeOnTheScreen();
     expect(useSubscriptionStore.getState().plan).toEqual(PRO);
@@ -333,7 +333,7 @@ describe('Requirement: Restaurar compras', () => {
     jest.mocked(restorePurchases).mockResolvedValue('restored');
     api(FREE, { 'POST /me/subscription/sync': () => json(200, PRO) });
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     await press('Restaurar compras');
     expect(screen.getByText('Assinatura restaurada.')).toBeOnTheScreen();
     await waitFor(() => expect(screen).toHavePathname('/profile'), { timeout: 3000 });
@@ -358,7 +358,7 @@ describe('Requirement: Restaurar compras', () => {
 
   it('Sem sessão abre o login', async () => {
     await open('/profile');
-    await press(/Dev Tips Pro/);
+    await press(/Dev Cards Pro/);
     await press('Restaurar compras');
     expect(screen).toHavePathname('/login');
   });

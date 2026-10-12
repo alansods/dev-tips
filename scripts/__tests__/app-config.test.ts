@@ -10,9 +10,9 @@ const read = (file: string) => JSON.parse(fs.readFileSync(path.join(ROOT, file),
 describe('Requirement: Identidade visual (configuração)', () => {
   it('Configuração do app', () => {
     const { expo } = read('app.json');
-    expect(expo.name).toBe('Dev Tips');
+    expect(expo.name).toBe('Dev Cards');
     expect(expo.icon).toBe('./assets/icon.png');
-    expect(expo.android.adaptiveIcon.backgroundColor).toBe('#0C1015');
+    expect(expo.android.adaptiveIcon.backgroundColor).toBe('#2D4BE0');
     const splash = expo.plugins.find((p: unknown) => Array.isArray(p) && p[0] === 'expo-splash-screen');
     expect(splash?.[1]).toMatchObject({ image: './assets/splash-icon.png', backgroundColor: '#0C1015' });
   });

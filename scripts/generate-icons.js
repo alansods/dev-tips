@@ -1,31 +1,59 @@
 // Gera os ícones e a splash do app sem dependências (só Node + zlib).
-// Desenho: dois cards empilhados — o de trás em #273140 e o da frente no
-// acento do design (#8296FF) com três linhas de "texto". Determinístico: a
-// mesma entrada gera sempre os mesmos bytes.
+// Desenho (Dev Cards): um card branco com o símbolo </> em azul (#2D4BE0),
+// inclinado -4°, sobre um card azul-claro (#7F96FF) inclinado 11°.
+// Determinístico: a mesma entrada gera sempre os mesmos bytes.
 //
-// Uso: npm run icons   (grava em assets/)
+// Uso: npm run icons   (grava em assets/ e o ícone da loja em store/play/)
 
 const fs = require('node:fs');
 const path = require('node:path');
 const zlib = require('node:zlib');
 
-const BG = [0x0c, 0x10, 0x15];
-const BACK = [0x27, 0x31, 0x40];
-const FRONT = [0x82, 0x96, 0xff];
-const LINE = [0x0a, 0x0f, 0x1f];
+const BLUE = [0x2d, 0x4b, 0xe0];
+const BACK = [0x7f, 0x96, 0xff];
 const WHITE = [0xff, 0xff, 0xff];
 const SUPERSAMPLE = 3;
 
-/** Formas em coordenadas unitárias (0..1) da área de desenho, pintadas em ordem. */
+/** Os dois cards têm o mesmo tamanho e giram em torno do mesmo ponto. */
+const CARD = { x0: 28, y0: 24, x1: 72, y1: 78, r: 7 };
+const PIVOT = { cx: 50, cy: 51 };
+/** Traços do </>: os dois sinais e a barra, cada um uma linha de pontos. */
+const CODE = [
+  [
+    [43, 44],
+    [37, 51],
+    [43, 58],
+  ],
+  [
+    [57, 44],
+    [63, 51],
+    [57, 58],
+  ],
+  [
+    [52.5, 41],
+    [47.5, 61],
+  ],
+];
+
+/**
+ * Formas numa caixa de 100×100 (as mesmas medidas do SVG do design), pintadas em ordem.
+ * `rot` gira a forma, em graus no sentido horário, em torno de (cx, cy).
+ */
 function shapes(mono) {
-  const line = (y, x1) => ({ x0: 0.24, y0: y, x1, y1: y + 0.05, r: 0.025 });
   return [
-    { x0: 0.3, y0: 0.12, x1: 0.86, y1: 0.66, r: 0.08, color: mono ? WHITE : BACK, alpha: mono ? 0.5 : 1 },
-    { x0: 0.14, y0: 0.3, x1: 0.7, y1: 0.84, r: 0.08, color: mono ? WHITE : FRONT, alpha: 1 },
-    { ...line(0.43, 0.6), color: LINE, alpha: 1, erase: mono },
-    { ...line(0.54, 0.6), color: LINE, alpha: 1, erase: mono },
-    { ...line(0.65, 0.47), color: LINE, alpha: 1, erase: mono },
+    { kind: 'rect', ...CARD, ...PIVOT, rot: 11, color: mono ? WHITE : BACK, alpha: mono ? 0.5 : 1 },
+    { kind: 'rect', ...CARD, ...PIVOT, rot: -4, color: WHITE, alpha: 1 },
+    { kind: 'stroke', lines: CODE, width: 3.8, ...PIVOT, rot: -4, color: BLUE, alpha: 1, erase: mono },
   ];
+}
+
+/** Gira o ponto de volta pelo ângulo da forma, para testar contra a forma sem rotação. */
+function unrotate(px, py, s) {
+  if (!s.rot) return [px, py];
+  const a = (-s.rot * Math.PI) / 180;
+  const dx = px - s.cx;
+  const dy = py - s.cy;
+  return [s.cx + dx * Math.cos(a) - dy * Math.sin(a), s.cy + dx * Math.sin(a) + dy * Math.cos(a)];
 }
 
 function insideRoundRect(px, py, s) {
@@ -33,6 +61,29 @@ function insideRoundRect(px, py, s) {
   const dx = Math.max(s.x0 + s.r - px, 0, px - (s.x1 - s.r));
   const dy = Math.max(s.y0 + s.r - py, 0, py - (s.y1 - s.r));
   return dx * dx + dy * dy <= s.r * s.r;
+}
+
+/** Dentro do traço: a distância até algum segmento é no máximo metade da espessura (ponta redonda). */
+function insideStroke(px, py, s) {
+  const half = s.width / 2;
+  for (const line of s.lines) {
+    for (let k = 1; k < line.length; k++) {
+      const [ax, ay] = line[k - 1];
+      const [bx, by] = line[k];
+      const vx = bx - ax;
+      const vy = by - ay;
+      const t = Math.min(1, Math.max(0, ((px - ax) * vx + (py - ay) * vy) / (vx * vx + vy * vy)));
+      const ex = px - (ax + t * vx);
+      const ey = py - (ay + t * vy);
+      if (ex * ex + ey * ey <= half * half) return true;
+    }
+  }
+  return false;
+}
+
+function inside(px, py, s) {
+  const [x, y] = unrotate(px, py, s);
+  return s.kind === 'stroke' ? insideStroke(x, y, s) : insideRoundRect(x, y, s);
 }
 
 /**
@@ -54,15 +105,16 @@ function render(size, { background = null, area, mono = false }) {
         a = 0; // soma pré-multiplicada
       for (let sy = 0; sy < SUPERSAMPLE; sy++) {
         for (let sx = 0; sx < SUPERSAMPLE; sx++) {
-          const u = ((x + (sx + 0.5) / SUPERSAMPLE) / size - offset) / area;
-          const v = ((y + (sy + 0.5) / SUPERSAMPLE) / size - offset) / area;
+          // Coordenadas na caixa de 100×100 do desenho.
+          const u = (((x + (sx + 0.5) / SUPERSAMPLE) / size - offset) / area) * 100;
+          const v = (((y + (sy + 0.5) / SUPERSAMPLE) / size - offset) / area) * 100;
           let pr = 0,
             pg = 0,
             pb = 0,
             pa = 0;
           if (background) [pr, pg, pb, pa] = [background[0] / 255, background[1] / 255, background[2] / 255, 1];
           for (const s of list) {
-            if (!insideRoundRect(u, v, s)) continue;
+            if (!inside(u, v, s)) continue;
             if (s.erase) {
               [pr, pg, pb, pa] = [0, 0, 0, 0];
               continue;
@@ -140,29 +192,39 @@ function encodePng(rgba, size, withAlpha) {
   ]);
 }
 
+// A caixa de 100×100 já tem a margem do desenho, então o ícone cheio usa area 1.
+// Frente e monocromático do adaptativo usam 0,64 para o card caber na área segura
+// circular do Android (61% do lado).
 const ICONS = [
-  { file: 'icon.png', size: 1024, background: BG, area: 0.72, alpha: false },
-  { file: 'android-icon-foreground.png', size: 512, background: null, area: 0.5, alpha: true },
-  { file: 'android-icon-background.png', size: 512, background: BG, area: 0, alpha: false, solid: true },
-  { file: 'android-icon-monochrome.png', size: 432, background: null, area: 0.5, alpha: true, mono: true },
+  { file: 'icon.png', size: 1024, background: BLUE, area: 1, alpha: false },
+  { file: 'android-icon-foreground.png', size: 512, background: null, area: 0.64, alpha: true },
+  { file: 'android-icon-background.png', size: 512, background: BLUE, area: 0, alpha: false, solid: true },
+  { file: 'android-icon-monochrome.png', size: 432, background: null, area: 0.64, alpha: true, mono: true },
   { file: 'splash-icon.png', size: 1024, background: null, area: 0.8, alpha: true },
-  { file: 'favicon.png', size: 48, background: BG, area: 0.84, alpha: true },
+  { file: 'favicon.png', size: 48, background: BLUE, area: 1, alpha: true },
 ];
 
-function generateIcons(outDir) {
+/** Ícone da página do app na Play Store: o mesmo desenho do ícone principal. */
+const STORE_ICONS = [{ file: 'play-icon-512.png', size: 512, background: BLUE, area: 1, alpha: false }];
+
+function writeIcons(list, outDir) {
   fs.mkdirSync(outDir, { recursive: true });
-  for (const icon of ICONS) {
+  for (const icon of list) {
     const pixels = icon.solid
       ? render(icon.size, { background: icon.background, area: 1e-9 })
       : render(icon.size, { background: icon.background, area: icon.area, mono: icon.mono });
     fs.writeFileSync(path.join(outDir, icon.file), encodePng(pixels, icon.size, icon.alpha));
   }
-  return ICONS.map((i) => i.file);
+  return list.map((i) => i.file);
 }
 
-module.exports = { generateIcons };
+const generateIcons = (outDir) => writeIcons(ICONS, outDir);
+const generateStoreIcons = (outDir) => writeIcons(STORE_ICONS, outDir);
+
+module.exports = { generateIcons, generateStoreIcons };
 
 if (require.main === module) {
   const files = generateIcons(path.resolve(__dirname, '../assets'));
-  console.log(`ícones gerados em assets/: ${files.join(', ')}`);
+  const store = generateStoreIcons(path.resolve(__dirname, '../store/play'));
+  console.log(`ícones gerados em assets/: ${files.join(', ')}; em store/play/: ${store.join(', ')}`);
 }
