@@ -4,7 +4,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { radius } from '../theme/tokens';
 import { AppText } from './AppText';
 
-type Variant = 'primary' | 'secondary' | 'warn';
+type Variant = 'primary' | 'secondary' | 'warn' | 'danger' | 'dangerOutline' | 'accentOutline';
 
 type Props = {
   title: string;
@@ -24,6 +24,9 @@ export function Button({ title, onPress, variant = 'primary', accessibilityLabel
     primary: { bg: colors.accent, border: colors.accent, text: colors.onAccent },
     secondary: { bg: colors.surface, border: colors.line, text: colors.ink },
     warn: { bg: colors.warnSoft, border: colors.warn, text: colors.warn },
+    danger: { bg: colors.danger, border: colors.danger, text: colors.onDanger },
+    dangerOutline: { bg: colors.surface, border: colors.danger, text: colors.danger },
+    accentOutline: { bg: colors.surface, border: colors.accent, text: colors.accentText },
   }[variant];
   return (
     <Pressable

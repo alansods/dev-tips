@@ -122,7 +122,7 @@ export const useStudyStore = create<StudyState>()(
   ),
 );
 
-/** Volta o store ao estado inicial (usado nos testes). */
+/** Volta o store ao estado inicial (testes e apagar a conta). */
 export function resetStudyStore() {
   useStudyStore.setState(initialData());
 }

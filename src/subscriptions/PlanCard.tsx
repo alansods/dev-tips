@@ -1,4 +1,4 @@
-// Bloco "Plano" da tela Conta (tela 10 do design): plano grátis, assinante
+// Bloco da tela Plano: plano grátis, assinante
 // ou admin. No Android e no iOS; no iOS, sem "Gerenciar" e "Restaurar",
 // porque a assinatura é do Google Play.
 
@@ -9,8 +9,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { AppText } from '../components/AppText';
 import { Button } from '../components/Button';
 import { ProgressBar } from '../components/ProgressBar';
+import { TextLink } from '../components/TextLink';
 import { useT } from '../i18n';
-import { SectionTitle } from '../settings/SectionTitle';
 import { useTheme } from '../theme/ThemeProvider';
 import { radius, spacing } from '../theme/tokens';
 import { restore } from './actions';
@@ -129,31 +129,18 @@ export function PlanCard() {
           </View>
         ) : null}
         {storeActions ? (
-          <View style={{ gap: spacing.sm }}>
+          <View style={{ gap: 4 }}>
             <View style={{ flexDirection: 'row' }}>
-              <Button title={t.pro.manage} variant="secondary" onPress={() => void manageSubscriptions()} />
+              <Button title={t.pro.manage} variant="accentOutline" onPress={() => void manageSubscriptions()} />
             </View>
-            <View style={{ flexDirection: 'row' }}>
-              <Button
-                title={t.pro.restore}
-                variant="secondary"
-                disabled={busy}
-                loading={busy}
-                onPress={() => void onRestore()}
-              />
-            </View>
+            <TextLink title={t.pro.restore} tone="muted" underline disabled={busy} onPress={() => void onRestore()} />
           </View>
         ) : null}
       </View>
     );
   }
 
-  return (
-    <View style={{ gap: spacing.sm }}>
-      <SectionTitle>{t.pro.planSection}</SectionTitle>
-      {body}
-    </View>
-  );
+  return body;
 }
 
 const styles = StyleSheet.create({

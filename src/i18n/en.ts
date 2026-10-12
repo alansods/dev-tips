@@ -67,11 +67,11 @@ export const en: Messages = {
     signOutTitle: 'Sign out of your account?',
     signOutBody: 'Your progress stays on this device. To sync again, just sign in again.',
     delete: 'Delete account',
-    deleteHint: 'Deletes your data in the cloud. Progress on this device stays.',
+    deleteHint: 'Deletes your account and all your progress, in the cloud and on this device.',
     deleteTitle: 'Delete your account?',
     deleteBody:
       'Your data in the cloud (progress, reviews and preferences) will be deleted forever. This can’t be undone.',
-    deleteKeep: 'Progress on this device stays, and you can keep using the app without an account.',
+    deleteDevice: 'Progress on this device will be deleted too.',
     deleteSubscription:
       'If you subscribe to Pro, also cancel it on Google Play: deleting your account does not stop billing.',
     deleteConfirm: 'Delete my account',

@@ -109,7 +109,7 @@ export const useSyncStore = create<SyncState>()(
   ),
 );
 
-/** Volta ao estado inicial (usado nos testes). */
+/** Volta ao estado inicial (testes e apagar a conta). */
 export function resetSyncStore() {
   useSyncStore.setState({ ...initialData(), status: 'idle', firstSyncToast: false });
 }

@@ -66,11 +66,11 @@ export const ptBR = {
     signOutTitle: 'Sair da conta?',
     signOutBody: 'Seu progresso continua neste aparelho. Para sincronizar de novo, é só entrar outra vez.',
     delete: 'Apagar conta',
-    deleteHint: 'Apaga seus dados na nuvem. O progresso neste aparelho continua.',
+    deleteHint: 'Apaga sua conta e todo o seu progresso, na nuvem e neste aparelho.',
     deleteTitle: 'Apagar sua conta?',
     deleteBody:
       'Seus dados na nuvem (progresso, revisões e preferências) serão apagados para sempre. Isso não pode ser desfeito.',
-    deleteKeep: 'O progresso neste aparelho continua, e você pode seguir usando o app sem conta.',
+    deleteDevice: 'O progresso neste aparelho também será apagado.',
     deleteSubscription: 'Se você assina o Pro, cancele também no Google Play: apagar a conta não cancela a cobrança.',
     deleteConfirm: 'Apagar minha conta',
     deleteOffline: 'Sem conexão. Tente de novo quando estiver online.',
