@@ -141,7 +141,7 @@ describe('Requirement: Novidades', () => {
   it('Área nova', () => {
     const items = whatsNew(catalog, '2026-10-10');
     expect(items[0]).toEqual(expect.objectContaining({ kind: 'area', area: 'simulacoes', date: '2026-10-09' }));
-    if (items[0].kind === 'area') expect(items[0].tracks).toHaveLength(6);
+    if (items[0].kind === 'area') expect(items[0].tracks).toHaveLength(7);
     expect(trackItems(items).some(isSimulation)).toBe(false);
     expect(items).toHaveLength(3);
   });

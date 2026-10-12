@@ -6,7 +6,7 @@ Define como o usuário encontra as trilhas: a aba Trilhas lista as áreas, e cad
 ### Requirement: Home por áreas
 A aba Trilhas SHALL listar as áreas que têm pelo menos uma trilha no catálogo, na ordem Fundamentos, Git, Frontend, Backend, Banco de dados, Mobile, DevOps e Cloud e Situações-problema. Cada área SHALL aparecer como um card tocável com:
 - o nome da área;
-- a quantidade de trilhas ("2 trilhas", "1 trilha"); na área Situações-problema, a quantidade de casos ("6 casos", "1 caso");
+- a quantidade de trilhas ("2 trilhas", "1 trilha"); na área Situações-problema, a quantidade de casos ("7 casos", "1 caso");
 - uma barra de progresso e o texto "sei/total", somados sobre todos os cards das trilhas da área com a mesma regra de progresso da capability `study-flow`;
 - quando houver, "N para revisar hoje", somando os cards vencidos das trilhas da área.
 
@@ -34,11 +34,11 @@ Uma trilha em duas áreas SHALL contar nas duas. Tocar no card SHALL abrir a tel
 
 #### Scenario: Situações-problema por último
 - **WHEN** o catálogo tem trilhas nas sete áreas e simulações
-- **THEN** o card "Situações-problema" aparece depois de "DevOps e Cloud" e mostra "6 casos"
+- **THEN** o card "Situações-problema" aparece depois de "DevOps e Cloud" e mostra "7 casos"
 
 #### Scenario: Progresso das simulações
 - **WHEN** o usuário marcou 3 cards de simulações como "já sabia"
-- **THEN** o card "Situações-problema" mostra "3/25"
+- **THEN** o card "Situações-problema" mostra "3/30"
 
 ### Requirement: Tela da área
 Tocar numa área SHALL abrir a tela da área em tela cheia, sem a barra de abas, com botão de voltar e o nome da área como título. A tela SHALL mostrar, nesta ordem, as seções:
@@ -82,7 +82,7 @@ A área Situações-problema (`simulacoes`) é uma exceção: abaixo do título,
 
 #### Scenario: Área Situações-problema
 - **WHEN** o usuário abre a área Situações-problema
-- **THEN** a tela mostra o título "Situações-problema" uma única vez, a frase de introdução e os 6 casos, o primeiro sendo "Dashboard lento: de 8 s para menos de 2", e não mostra "Ordem sugerida" nem títulos de seção
+- **THEN** a tela mostra o título "Situações-problema" uma única vez, a frase de introdução e os 7 casos, o primeiro sendo "Dashboard lento: de 8 s para menos de 2", e não mostra "Ordem sugerida" nem títulos de seção
 
 #### Scenario: Abrir uma simulação
 - **WHEN** o usuário toca em "Pedido e pagamento em dobro" na área Situações-problema
@@ -140,7 +140,7 @@ Os nomes de linguagens e frameworks SHALL ser os do cadastro nos dois idiomas.
 
 #### Scenario: Área Situações-problema em inglês
 - **WHEN** o app está em inglês e a aba Trilhas é exibida
-- **THEN** o card da área Situações-problema mostra "Problem scenarios" e "6 cases"
+- **THEN** o card da área Situações-problema mostra "Problem scenarios" e "7 cases"
 
 ### Requirement: Ordem sugerida na área
 A seção "Ordem sugerida" da tela da área SHALL listar todas as trilhas da área, uma vez cada, numa linha do tempo. A ordem SHALL respeitar os pré-requisitos entre trilhas da mesma área: uma trilha só aparece depois dos seus pré-requisitos que também são da área. Pré-requisitos de outras áreas não contam para a ordem. Entre as trilhas que podem vir a seguir, SHALL vir primeiro a que aparece antes no catálogo.

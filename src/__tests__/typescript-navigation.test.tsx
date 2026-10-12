@@ -67,7 +67,7 @@ describe('Requirement: Trilhas de TypeScript no catálogo', () => {
       'Node.js',
       ...TS_CORE,
     ]);
-    expect(buttons(FRAMEWORKS)).toEqual(['Express', 'NestJS']);
+    expect(buttons(FRAMEWORKS)).toEqual(['Next.js', 'Express', 'NestJS']);
   });
 
   it.each(['frontend', 'backend'])('Rota antiga de TypeScript: %s', async (area) => {

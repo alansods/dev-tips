@@ -1,6 +1,7 @@
 // Testes parametrizados das trilhas de conteúdo de uma linguagem (ou grupo):
-// todas seguem o mesmo formato (3 decks de conteúdo com 6 cards e 1 deck de
-// perguntas com 6), autorais, ligadas ao glossário e com os três níveis.
+// todas seguem o mesmo formato (decks de conteúdo com 6 cards, em geral 3, e
+// por último 1 deck de perguntas com 6), autorais, ligadas ao glossário e com
+// os três níveis.
 
 import { catalog, getTrack } from '../catalog';
 import { LEVELS, placementOf, type Placement, type Track } from '../index';
@@ -10,7 +11,7 @@ export type TrackSpec = {
   title: string;
   areas: string[];
   placement: Placement;
-  /** Ids dos 3 decks de conteúdo, na ordem. */
+  /** Ids dos decks de conteúdo, na ordem (em geral 3). */
   decks: string[];
 };
 
@@ -52,16 +53,17 @@ export function describeContentTracks({ group, tracks, after, snippetLanguages }
     it.each(tracks.map((t) => [t.id, t] as const))('Contagem por deck: %s', (id, spec) => {
       const t = track(id);
       expect(t.decks.map((d) => d.id)).toEqual([...spec.decks, 'perguntas-de-entrevista']);
-      expect(t.decks.map((d) => d.cards.length)).toEqual([6, 6, 6, 6]);
-      expect(t.decks[3].title).toBe('Perguntas de entrevista');
-      expect(new Set(t.decks[3].cards.map((c) => c.type))).toEqual(new Set(['question']));
-      for (const deck of t.decks.slice(0, 3)) {
+      expect(t.decks.map((d) => d.cards.length)).toEqual(t.decks.map(() => 6));
+      const interview = t.decks[t.decks.length - 1];
+      expect(interview.title).toBe('Perguntas de entrevista');
+      expect(new Set(interview.cards.map((c) => c.type))).toEqual(new Set(['question']));
+      for (const deck of t.decks.slice(0, -1)) {
         expect(deck.cards.every((c) => c.type === 'concept' || c.type === 'code')).toBe(true);
       }
     });
 
     it.each(ids)('Conceitos em todo deck de conteúdo: %s', (id) => {
-      for (const deck of track(id).decks.slice(0, 3)) {
+      for (const deck of track(id).decks.slice(0, -1)) {
         expect(deck.cards.filter((c) => c.type === 'concept').length).toBeGreaterThanOrEqual(2);
       }
     });

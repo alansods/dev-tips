@@ -1,0 +1,86 @@
+{
+  "id": "sim-cep-com-fallback",
+  "kind": "simulation",
+  "title": "CEP com três APIs",
+  "description": "Fallback entre APIs externas instáveis: Promise.any, tempo limite, cancelamento e cache no backend.",
+  "areas": [
+    "simulacoes"
+  ],
+  "addedAt": "2026-10-12",
+  "scenario": {
+    "context": "No checkout de um app de e-commerce, o endereço é preenchido pelo CEP com uma API pública. Quando ela cai ou fica lenta, ninguém consegue finalizar a compra. Há outras duas APIs de CEP gratuitas disponíveis.",
+    "stack": [
+      "React Native",
+      "Node.js",
+      "ViaCEP, BrasilAPI e AwesomeAPI"
+    ]
+  },
+  "decks": [
+    {
+      "id": "conversa",
+      "title": "Conversa",
+      "cards": [
+        {
+          "type": "interview",
+          "id": "tres-apis-de-cep",
+          "level": "pleno",
+          "question": "Como você usaria as três APIs para o endereço não depender de uma só?",
+          "answer": "Primeiro criaria um formato único de endereço e um adaptador por API, porque cada uma responde com campos diferentes. O resto do app só conhece esse formato.\n\nDepois escolheria entre duas estratégias. Na primeira, disparo as três ao mesmo tempo e uso Promise.any: vale a primeira resposta válida, e a falha de uma não afeta as outras. É a mais rápida, mas triplica as chamadas.\n\nNa segunda, chamo uma por vez, em ordem de preferência, e só passo para a próxima quando a anterior falha. Gasta menos chamadas, mas no pior caso soma as esperas.\n\nNum checkout, onde cada segundo pesa, eu começaria com Promise.any e um tempo limite por chamada.",
+          "why": "Mostra que você separa o problema em duas partes, unificar as respostas e escolher a estratégia de fallback, e conhece o custo de cada estratégia.",
+          "snippet": {
+            "file": "src/address/lookup.ts",
+            "language": "ts",
+            "code": "type Address = { cep: string; street: string; district: string; city: string; state: string };\n\nconst providers: Array<(cep: string) => Promise<Address>> = [\n  async (cep) => {\n    const data = await getJson(`https://viacep.com.br/ws/${cep}/json/`);\n    if (data.erro) throw new Error('CEP não encontrado');\n    return { cep, street: data.logradouro, district: data.bairro, city: data.localidade, state: data.uf };\n  },\n  async (cep) => {\n    const data = await getJson(`https://brasilapi.com.br/api/cep/v2/${cep}`);\n    return { cep, street: data.street, district: data.neighborhood, city: data.city, state: data.state };\n  },\n  async (cep) => {\n    const data = await getJson(`https://cep.awesomeapi.com.br/json/${cep}`);\n    return { cep, street: data.address, district: data.district, city: data.city, state: data.state };\n  },\n];\n\nexport function lookupCep(cep: string): Promise<Address> {\n  return Promise.any(providers.map((fetchFrom) => fetchFrom(cep)));\n}\n\nasync function getJson(url: string) {\n  const response = await fetch(url);\n  if (!response.ok) throw new Error(`HTTP ${response.status}`);\n  return response.json();\n}",
+            "note": "Cada adaptador converte a resposta para o mesmo formato; quem chama lookupCep não sabe de qual API o endereço veio."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "race-ou-any",
+          "level": "pleno",
+          "question": "Um colega sugeriu usar Promise.race para ficar com a resposta mais rápida. Por que isso não resolve o problema?",
+          "answer": "Porque o race termina com a primeira Promise que terminar, mesmo que ela termine com erro. Se a API fora do ar recusar a conexão em 50 ms, o race rejeita na hora, e as outras duas, que iam responder em 300 ms, são ignoradas. É justamente o cenário que queremos evitar.\n\nO Promise.any ignora as falhas enquanto houver alguma chamada pendente e só rejeita se todas falharem. O race continua útil em outro ponto: correr cada chamada contra um timer, para que uma API lenta conte como falha.",
+          "why": "Mostra que você diferencia \"a primeira a terminar\" de \"a primeira a dar certo\", que é o que decide o comportamento quando uma API falha."
+        },
+        {
+          "type": "interview",
+          "id": "cep-inexistente",
+          "level": "pleno",
+          "question": "Com o CEP 00000-000, a ViaCEP responde 200 com {\"erro\": true}, e o app mostra um endereço vazio. O que está errado e como você trataria?",
+          "answer": "O código trata qualquer resposta 200 como sucesso. Como as três chamadas estão num Promise.any, essa resposta vence a corrida e um endereço vazio chega à tela.\n\nO adaptador da ViaCEP precisa transformar {\"erro\": true} em rejeição, do mesmo jeito que o 404 da BrasilAPI já vira erro. Também validaria o CEP antes de chamar qualquer API: 8 dígitos, sem traço.\n\nDepois separaria dois casos para o usuário. Se todas as APIs disseram que o CEP não existe, a mensagem é \"CEP não encontrado\". Se elas falharam por rede ou tempo esgotado, a mensagem é \"Não conseguimos buscar o endereço agora\", e o usuário preenche à mão. O AggregateError do Promise.any traz o motivo de cada falha, o que permite essa distinção.",
+          "why": "Mostra que você não confia só no status HTTP: o contrato de cada API define o que é sucesso.",
+          "watchOut": "Não bloqueie a compra: se a busca falhar, os campos de endereço precisam continuar editáveis."
+        },
+        {
+          "type": "interview",
+          "id": "cancelar-e-timeout",
+          "level": "senior",
+          "question": "Uma das APIs passou a ficar pendurada por 30 segundos, e as requisições que perderam a corrida continuam abertas depois que o endereço aparece. Como você resolveria?",
+          "answer": "Daria a cada chamada um prazo próprio, como 3 segundos, com AbortSignal.timeout. Uma API pendurada passa a contar como falha rápida, e o Promise.any não fica esperando por ela.\n\nPara as perdedoras, criaria um AbortController compartilhado: quando a primeira resposta válida chega, chamo abort() e cancelo as outras. Isso libera conexões, que no celular custam bateria e dados, e evita processar respostas que ninguém vai usar.\n\nJunto os dois sinais com AbortSignal.any, para cada fetch parar no que acontecer primeiro: o prazo dele ou a vitória de outra API.",
+          "why": "Mostra que você pensa no custo das requisições que perderam a corrida, e não só no resultado.",
+          "watchOut": "Em React Native, confira se AbortSignal.timeout e AbortSignal.any existem no runtime; se não existirem, use um setTimeout que chama controller.abort().",
+          "snippet": {
+            "file": "src/address/lookup.ts",
+            "language": "ts",
+            "code": "export async function lookupCep(cep: string): Promise<Address> {\n  const winner = new AbortController();\n\n  const attempts = providers.map((fetchFrom) =>\n    fetchFrom(cep, AbortSignal.any([winner.signal, AbortSignal.timeout(3000)])),\n  );\n\n  try {\n    return await Promise.any(attempts);\n  } finally {\n    winner.abort();\n  }\n}",
+            "note": "Cada adaptador recebe o signal e o repassa para o fetch."
+          }
+        },
+        {
+          "type": "interview",
+          "id": "mover-para-o-backend",
+          "level": "senior",
+          "question": "Com o tráfego crescendo, as APIs passaram a responder 429 (limite de requisições) para o app. O que você mudaria na arquitetura?",
+          "answer": "Tiraria a busca do app e levaria para um endpoint do nosso backend, que passa a ser o único cliente das APIs de CEP.\n\nNesse endpoint colocaria um cache, por exemplo no Redis, com validade de dias: CEP quase não muda, e os mais buscados se repetem muito. Assim a maior parte das buscas nem chega às APIs externas.\n\nAs chamadas externas passariam a ser em sequência, por ordem de preferência, em vez de sempre disparar as três: com o cache, a latência pesa menos e o consumo cai a um terço. Adicionaria um circuit breaker por API: depois de várias falhas ou respostas 429 seguidas, ela sai da rotação por alguns minutos, e o tráfego vai direto para as outras.\n\nTambém avaliaria uma biblioteca pronta, como a cep-promise, usada pela BrasilAPI, que já consulta vários provedores.",
+          "why": "Mostra que você trata a API de terceiros como um recurso limitado: cache, consumo controlado e isolamento de falhas.",
+          "watchOut": "Guarde em cache só respostas válidas, e \"CEP não encontrado\" por pouco tempo: um CEP novo pode passar a existir.",
+          "snippet": {
+            "file": "Fluxo",
+            "language": "text",
+            "code": "App → nosso backend (GET /cep/:cep)\n  ├─ cache (Redis, validade de dias) → achou? responde\n  └─ não achou:\n       ViaCEP ──falhou/429──► BrasilAPI ──falhou──► AwesomeAPI\n       (o circuit breaker pula a API que está fora)\n     → grava no cache e responde"
+          }
+        }
+      ]
+    }
+  ]
+}

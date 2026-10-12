@@ -1,0 +1,123 @@
+{
+  "title": "Next.js on the backend",
+  "description": "Using Next.js as a backend: Route Handlers, Server Actions, authentication, data access and when to split out a service of its own.",
+  "decks": {
+    "route-handlers": {
+      "title": "Route Handlers",
+      "description": "HTTP endpoints inside the app: parameters, validation, caching and webhooks."
+    },
+    "server-actions": {
+      "title": "Server Actions and mutations",
+      "description": "Writing data from the UI: validation, form state and cache."
+    },
+    "auth-e-dados": {
+      "title": "Authentication and data access",
+      "description": "Session, authorization close to the data and what may reach the client."
+    },
+    "perguntas-de-entrevista": {
+      "title": "Interview questions",
+      "description": "What interviewers usually ask about Next.js on the backend."
+    }
+  },
+  "cards": {
+    "route-handler": {
+      "term": "Route Handler",
+      "definition": "A route.ts file inside app/ that exports one function per HTTP method (GET, POST, PUT, PATCH, DELETE). Each function receives a standard Web API Request and returns a Response; NextRequest and NextResponse add shortcuts such as cookies and nextUrl. A segment cannot have both route.ts and page.tsx. It is the way in for clients that are not the app's own UI: a mobile app, integrations and webhooks."
+    },
+    "params-assincronos": {
+      "term": "Async params",
+      "definition": "Since Next 15, the handler's second argument holds params as a Promise: { params }: { params: Promise<{ id: string }> }, read with const { id } = await params. The query string comes from request.nextUrl.searchParams. Reading params without await is the most common mistake when migrating old code."
+    },
+    "cache-de-get": {
+      "term": "Route Handler caching",
+      "definition": "Route Handlers are not cached by default, not even GET (this changed in Next 15). To cache a GET, the old model uses export const dynamic = \"force-static\"; with Cache Components, the 'use cache' directive goes in a helper function the handler calls, not in the handler body. POST, PUT, PATCH and DELETE are never cached."
+    },
+    "webhook": {
+      "term": "Webhook",
+      "definition": "A POST endpoint that an external service calls to report an event, such as an approved payment. The handler reads the raw body with request.text(), because the signature (HMAC) is computed over the exact bytes, and only then parses it. It answers 2xx quickly and has to be idempotent: the provider resends the same event when it gets no response."
+    },
+    "get-com-params": {
+      "title": "GET with params and query string",
+      "body": "params arrives as a Promise and needs await; the query string comes from nextUrl. The response status tells the client what happened."
+    },
+    "post-com-validacao": {
+      "title": "POST validating the input",
+      "body": "The body is validated against a schema before touching the database, and invalid input becomes a 400 with errors per field. After writing, revalidateTag marks the list as stale.",
+      "snippet": {
+        "note": "In a Route Handler use revalidateTag; updateTag only works inside Server Actions."
+      }
+    },
+    "server-action": {
+      "term": "Server Action",
+      "definition": "An async function marked with 'use server' (at the top of the file or inside the function) that runs on the server and is called directly from a <form action> or a Client Component. Under the hood, Next creates a POST endpoint with a hard-to-guess id, but it is still public: anyone with the id can call it. That is why every action validates its input and checks session and permission."
+    },
+    "use-action-state": {
+      "term": "useActionState",
+      "definition": "A React hook for forms in Client Components: const [state, formAction, pending] = useActionState(action, initialState). The action then receives (prevState, formData), and whatever it returns becomes the new state, such as validation errors per field. pending signals an ongoing submission, to disable the button. The form keeps working before JavaScript loads."
+    },
+    "revalidacao-apos-mutacao": {
+      "term": "Revalidation after a mutation",
+      "definition": "After writing, the server tells Next which cached data went stale. updateTag(tag) only works in a Server Action and expires the cache right away: the user sees their own change. revalidateTag(tag, \"max\") also works in Route Handlers and uses stale-while-revalidate: it serves the old data while fetching the new one. In Next 16, revalidateTag without the second argument is deprecated. revalidatePath(path) invalidates a whole route."
+    },
+    "after": {
+      "term": "after()",
+      "definition": "A next/server function that schedules work for after the response is sent, such as a log, a metric or a confirmation email, without delaying the user. It works in Server Components, Server Actions and Route Handlers. It is not a queue: if the work fails, nobody retries it, and it still counts toward the function's time. Long work, or work that cannot be lost, goes to a real queue."
+    },
+    "action-com-validacao": {
+      "title": "Server Action with validation and permission",
+      "body": "The action checks the session, validates the FormData against a schema and returns errors per field. On success, updateTag makes the list show the new product right away."
+    },
+    "formulario-com-use-action-state": {
+      "title": "Form with useActionState",
+      "body": "The Client Component wires the form to the action, shows the returned errors and disables the button while submitting."
+    },
+    "data-access-layer": {
+      "term": "Data Access Layer (DAL)",
+      "definition": "A server-only module that centralizes data access and authorization checks. Each function checks the session and the permission before querying the database and returns only the needed fields (a DTO), never the whole record. Pages, Server Actions and Route Handlers call the DAL instead of the database directly, so the check cannot be forgotten in one place."
+    },
+    "server-only": {
+      "term": "server-only",
+      "definition": "A package that marks a module as server-exclusive: with import 'server-only' at the top, the build fails if any Client Component imports the file, which keeps database code and secrets out of the browser bundle. Environment variables without the NEXT_PUBLIC_ prefix never reach the client either."
+    },
+    "proxy-otimista": {
+      "term": "Proxy as an optimistic check",
+      "definition": "proxy.ts runs before the routes in its matcher and is good for redirecting users without a session early, reading only the cookie, without hitting the database. It is an optimistic check, not authorization: the matcher may leave routes out, Server Actions are POSTs to the page's route, and the proxy does not know whether the user may see that record. Real authorization lives in the DAL, close to the data."
+    },
+    "sessao-em-cookie": {
+      "term": "httpOnly cookie session",
+      "definition": "The session token (a signed JWT or the id of a session in the database) lives in an httpOnly, secure, sameSite=lax cookie: the page's JavaScript cannot read it, which limits the damage of an XSS. In Next, cookies() is async: (await cookies()).get(\"session\") reads it anywhere on the server, and set only works in Server Actions and Route Handlers. Clients that are not browsers, such as a mobile app, send the token in the Authorization header."
+    },
+    "verify-session": {
+      "title": "DAL with verifySession",
+      "body": "React's cache() avoids reading and decrypting the cookie several times in the same request. getProject checks the owner and returns only the fields the screen uses."
+    },
+    "proxy-de-sessao": {
+      "title": "proxy.ts with redirects",
+      "body": "It only reads the cookie and redirects: without a session, to login; already logged in, away from the public screens. The matcher leaves out the API and static files."
+    },
+    "next-substitui-express": {
+      "question": "Does Next.js replace a backend such as Express or NestJS?",
+      "answer": "For the web application's own backend, largely yes: I read data in Server Components, run mutations with Server Actions and expose endpoints with Route Handlers, all in the same deploy. But Next is built to serve the UI. It brings no dependency injection, modules or queues, and in a serverless environment each request has a time limit and may hit a cold start. If the domain is large, several clients consume the same API, or there is long-running or real-time work, a dedicated backend makes more sense, with Next as a BFF in front of it."
+    },
+    "proxy-nao-basta": {
+      "question": "Why is checking the session only in the proxy not enough?",
+      "answer": "Because the proxy is an optimistic check and sits far from the data. The matcher can leave a route out, Server Actions arrive as a POST to the page's route, and the proxy only knows whether there is a valid cookie, not whether that user may see that project. This has failed for real: in 2025, CVE-2025-29927 let attackers skip the middleware with a header. That is why I use the proxy only to redirect early and do authorization in the DAL, on every read and every action."
+    },
+    "proteger-server-action": {
+      "question": "How do you protect a Server Action?",
+      "answer": "I treat the action as a public POST endpoint. Inside it I check the session through the DAL and the permission over the resource, because being logged in is not enough: the user has to own the record. I validate the FormData against a schema, without trusting types or hidden form fields, and return only what the screen needs. Next helps by comparing Origin with Host against CSRF and by generating hard-to-guess ids, but that is not authorization."
+    },
+    "conexao-com-banco": {
+      "question": "How do you open the database connection in a Next.js app?",
+      "answer": "With a single reused client. In development, hot reload runs the modules again, and each reload would create a new pool until the database runs out of connections; that is why I keep the pool on globalThis. In serverless production, each function instance has its own pool, and under heavy traffic dozens of instances show up. So I use a small pool per instance and a pooler in front of the database, such as PgBouncer or the provider's pooled URL."
+    },
+    "mobile-route-handler-ou-action": {
+      "question": "The company's mobile app will use the same backend as the Next.js website. Route Handler or Server Action?",
+      "answer": "Route Handler. A Server Action is an internal React and Next mechanism: its id changes on every build and there is no stable contract, so it only serves the site's own UI. For the mobile app I expose versioned REST endpoints, with the token in the Authorization header instead of a cookie. To avoid duplicating rules, Server Actions and Route Handlers call the same DAL functions."
+    },
+    "quando-separar-backend": {
+      "question": "When would you split the backend out of Next.js into its own service?",
+      "answer": "When a concrete signal shows up: work that exceeds the function's time limit, queues, cron and workers, WebSockets or real time, several clients consuming the same API, a separate backend team, or a need to scale differently from the UI. Until then, starting in Next is faster. If data access is already centralized in a DAL, extracting it later means moving those functions to the service and keeping Next as a BFF that calls it."
+    }
+  }
+}

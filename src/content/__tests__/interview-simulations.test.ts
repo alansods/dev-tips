@@ -6,15 +6,24 @@ import { isSimulation, type InterviewCard, type Track } from '../index';
 import { localizeTrack, missingTranslations, type TrackTranslation } from '../translation';
 import { translationRegistry } from '../translations';
 
-const SIMULATIONS: [id: string, title: string, cards: number][] = [
-  ['sim-dashboard-lento', 'Dashboard lento: de 8 s para menos de 2', 5],
-  ['sim-pedidos-duplicados', 'Pedido e pagamento em dobro', 4],
-  ['sim-projetos-e-permissoes', 'Projetos, membros e permissões', 4],
-  ['sim-arquivos-em-segundo-plano', 'Processamento de arquivos em segundo plano', 4],
-  ['sim-funcionalidade-com-ia', 'Resumos de PDF com IA', 4],
-  ['sim-api-de-notificacoes', 'API de notificações', 4],
+const SIMULATIONS: [id: string, title: string, cards: number, addedAt: string][] = [
+  ['sim-dashboard-lento', 'Dashboard lento: de 8 s para menos de 2', 5, '2026-10-09'],
+  ['sim-pedidos-duplicados', 'Pedido e pagamento em dobro', 4, '2026-10-09'],
+  ['sim-projetos-e-permissoes', 'Projetos, membros e permissões', 4, '2026-10-09'],
+  ['sim-arquivos-em-segundo-plano', 'Processamento de arquivos em segundo plano', 4, '2026-10-09'],
+  ['sim-funcionalidade-com-ia', 'Resumos de PDF com IA', 4, '2026-10-09'],
+  ['sim-api-de-notificacoes', 'API de notificações', 4, '2026-10-09'],
+  ['sim-cep-com-fallback', 'CEP com três APIs', 5, '2026-10-12'],
 ];
-const SENIOR = ['timeout-no-provedor', 'evoluir-a-arquitetura', 'banco-e-fila', 'provar-o-valor', 'notificacoes-duplicadas'];
+const SENIOR = [
+  'timeout-no-provedor',
+  'evoluir-a-arquitetura',
+  'banco-e-fila',
+  'provar-o-valor',
+  'notificacoes-duplicadas',
+  'cancelar-e-timeout',
+  'mover-para-o-backend',
+];
 
 const simulation = (id: string): Track => {
   const t = getTrack(id);
@@ -31,16 +40,16 @@ describe('Requirement: Simulações do catálogo', () => {
     expect(catalog.filter(isSimulation).map((t) => t.id)).toEqual(ids);
   });
 
-  it.each(SIMULATIONS)('Quantidade de cards: %s', (id, title, count) => {
+  it.each(SIMULATIONS)('Quantidade de cards: %s', (id, title, count, addedAt) => {
     const sim = simulation(id);
     expect(sim.title).toBe(title);
-    expect(sim.addedAt).toBe('2026-10-09');
+    expect(sim.addedAt).toBe(addedAt);
     expect(sim.decks.map((d) => [d.id, d.title])).toEqual([['conversa', 'Conversa']]);
     expect(sim.decks[0].cards).toHaveLength(count);
   });
 
-  it('25 cards no total', () => {
-    expect(allCards()).toHaveLength(25);
+  it('30 cards no total', () => {
+    expect(allCards()).toHaveLength(30);
   });
 });
 
@@ -74,7 +83,7 @@ describe('Requirement: Qualidade das simulações', () => {
   it('Linguagens dos snippets', () => {
     const languages = allCards().flatMap((c) => (c.snippet ? [c.snippet.language] : []));
     expect(languages.length).toBeGreaterThan(0);
-    for (const language of languages) expect(['sql', 'text']).toContain(language);
+    for (const language of languages) expect(['sql', 'text', 'ts']).toContain(language);
   });
 });
 
@@ -88,6 +97,38 @@ describe('Requirement: Tradução das simulações', () => {
   it('Simulação em inglês', () => {
     expect(localizeTrack(simulation('sim-dashboard-lento'), english('sim-dashboard-lento')).title).toBe(
       'Slow dashboard: from 8 s to under 2',
+    );
+  });
+});
+
+describe('Requirement: Simulação de CEP com três APIs', () => {
+  const cards = () => simulation('sim-cep-com-fallback').decks[0].cards as InterviewCard[];
+
+  it('Cards na ordem', () => {
+    expect(cards().map((c) => [c.id, c.level])).toEqual([
+      ['tres-apis-de-cep', 'pleno'],
+      ['race-ou-any', 'pleno'],
+      ['cep-inexistente', 'pleno'],
+      ['cancelar-e-timeout', 'senior'],
+      ['mover-para-o-backend', 'senior'],
+    ]);
+  });
+
+  it('Pergunta com a nova condição', () => {
+    const card = cards().find((c) => c.id === 'cep-inexistente')!;
+    expect(card.question).toContain('200');
+    expect(card.question).toContain('"erro": true');
+  });
+
+  it('Snippet de fallback', () => {
+    const snippet = cards().find((c) => c.id === 'tres-apis-de-cep')!.snippet;
+    expect(snippet?.language).toBe('ts');
+    expect(snippet?.code).toContain('Promise.any');
+  });
+
+  it('Simulação em inglês', () => {
+    expect(localizeTrack(simulation('sim-cep-com-fallback'), english('sim-cep-com-fallback')).title).toBe(
+      'CEP lookup with three APIs',
     );
   });
 });

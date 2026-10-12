@@ -1,6 +1,6 @@
 {
   "title": "Asynchronous JavaScript",
-  "description": "How JavaScript does many things without blocking: the event loop, Promises and async/await.",
+  "description": "How JavaScript does many things without blocking: the event loop, Promises, async/await and Promise combinators.",
   "decks": {
     "event-loop": {
       "title": "Event loop",
@@ -13,6 +13,10 @@
     "async-await": {
       "title": "async/await",
       "description": "Asynchronous code that reads like synchronous code, and its errors."
+    },
+    "combinadores-de-promise": {
+      "title": "Promise combinators",
+      "description": "Waiting for several Promises at once: when each combinator resolves and when it rejects."
     },
     "perguntas-de-entrevista": {
       "title": "Interview questions",
@@ -91,6 +95,36 @@
     "await-em-loop": {
       "title": "await inside loops",
       "body": "forEach does not wait for async callbacks: the loop ends before the operations. Use for...of for a sequence or Promise.all with map for parallel work (careful not to fire thousands of requests at once)."
+    },
+    "combinador-all": {
+      "term": "Promise.all",
+      "definition": "Takes several Promises and resolves with an array of the values, in the same order as the input, when all of them succeed. It rejects on the first failure, with that error, and you lose the values of the ones that succeeded. The others are not cancelled: they keep running, but nobody waits for them. Use it when you need every result and any failure invalidates the whole set."
+    },
+    "combinador-allsettled": {
+      "term": "Promise.allSettled",
+      "definition": "Waits for all of them to finish and never rejects. It resolves with an array of objects: { status: \"fulfilled\", value } for the ones that succeeded and { status: \"rejected\", reason } for the ones that failed. Use it when the tasks are independent and one failure should not discard the others, such as sending several notifications and then reporting which ones failed."
+    },
+    "combinador-race": {
+      "term": "Promise.race",
+      "definition": "Settles together with the first Promise that settles, whether it succeeds or fails. If the fastest one fails, race rejects, even if the others would succeed later. The classic use is a timeout: racing the operation against a timer that rejects. With an empty array, it stays pending forever."
+    },
+    "combinador-any": {
+      "term": "Promise.any",
+      "definition": "Resolves with the first Promise that succeeds and ignores failures while any is still pending. It only rejects if all of them fail, with an AggregateError whose errors field holds each reason. It is the fallback combinator: query several equivalent sources and keep the first valid answer."
+    },
+    "race-com-timeout": {
+      "title": "Timeout with Promise.race",
+      "body": "Whoever finishes first decides: the response or the timer's error. race does not cancel the losing request; to actually cancel it, pass an AbortSignal to fetch.",
+      "snippet": {
+        "note": "AbortSignal.timeout aborts the fetch by itself after the deadline, without needing race."
+      }
+    },
+    "any-com-fallback": {
+      "title": "Fallback across three CEP APIs",
+      "body": "The three requests go out together, and the first valid answer wins. A 200 response with an error in the body must also become a rejection, otherwise it \"wins\" the wrong way. If all of them fail, the catch receives an AggregateError.",
+      "snippet": {
+        "note": "Each API answers in a different shape; in a real app, convert them to a single shape before returning."
+      }
     },
     "como-js-e-assincrono": {
       "question": "If JavaScript has a single thread, how does it do things at the same time?",
