@@ -12,6 +12,7 @@ import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import { useSettingsStore } from '../i18n';
 import { resetStudyStore } from '../study/store';
+import { showAllGlossaryItems } from '../test-utils';
 
 // Traduções reais de content/tracks/*/translations/en.json (sem mock).
 const APP = {
@@ -50,6 +51,7 @@ describe('Requirement: Tradução completa para inglês', () => {
 
   it('Card exibido em inglês: concept CORS', async () => {
     await open('/glossary');
+    showAllGlossaryItems();
     fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
     expect(within(screen.getByTestId('term-sheet')).getByText(/A browser security rule/)).toBeOnTheScreen();
   });

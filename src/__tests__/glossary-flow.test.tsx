@@ -10,7 +10,7 @@ import ProgressScreen from '../app/progress';
 import StudyScreen from '../app/study/[trackId]/[deckId]';
 import TrackScreen from '../app/track/[trackId]';
 import { resetStudyStore, useStudyStore } from '../study/store';
-import { crudTrack } from '../test-utils';
+import { crudTrack, showAllGlossaryItems } from '../test-utils';
 
 // Os cenários do glossário descrevem o catálogo com as trilhas CRUD e Fundamentos web.
 jest.mock('../content/catalog', () => jest.requireActual('../test-catalog').originalCatalogMock());
@@ -61,6 +61,7 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
 describe('Requirement: Aba Glossário', () => {
   it('Lista completa', async () => {
     await open('/glossary');
+    showAllGlossaryItems();
     expect(listed()).toHaveLength(45);
     expect(listed()[0]).toBe('API');
     expect(listed()[23]).toBe('venv (Python)');
@@ -71,6 +72,7 @@ describe('Requirement: Aba Glossário', () => {
 
   it('Trilha de cada termo', async () => {
     await open('/glossary');
+    showAllGlossaryItems();
     expect(
       within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
     ).toBeOnTheScreen();
@@ -81,6 +83,7 @@ describe('Requirement: Aba Glossário', () => {
     useStudyStore.getState().answer(TRACK, 'cors', 'known');
     useStudyStore.getState().answer(TRACK, 'dto', 'unknown');
     await open('/glossary');
+    showAllGlossaryItems();
     const item = (term: string) => within(screen.getByRole('button', { name: term }));
     expect(item('CORS').getByText('já sabia')).toBeOnTheScreen();
     expect(item('DTO (Data Transfer Object)').getByText('revisar')).toBeOnTheScreen();
@@ -89,6 +92,7 @@ describe('Requirement: Aba Glossário', () => {
 
   it('Abrir termo pela lista', async () => {
     await open('/glossary');
+    showAllGlossaryItems();
     press('Docker');
     expect(sheet().getByRole('header', { name: 'Docker' })).toBeOnTheScreen();
     expect(sheet().getByText(/caixinhas/)).toBeOnTheScreen();

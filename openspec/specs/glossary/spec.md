@@ -35,7 +35,7 @@ Tocar num chip de termo SHALL abrir uma gaveta sobre a tela com o nome do termo,
 - **THEN** a gaveta some e o verso do Passo 13 continua visível, com os botões "Não sabia" e "Já sabia"
 
 ### Requirement: Aba Glossário
-A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do catálogo, na ordem das trilhas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de uma trilha, cada item SHALL mostrar também o título da trilha a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquela trilha.
+A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do catálogo, na ordem das trilhas e do conteúdo, mostrando o nome do termo, o começo da definição e a quantidade de termos exibidos. Quando o catálogo tiver mais de uma trilha, cada item SHALL mostrar também o título da trilha a que pertence. Quando o card do termo tiver resposta registrada, o item SHALL mostrar o selo "já sabia" ou "revisar". Tocar num termo SHALL abrir a gaveta de definição, com os termos relacionados daquela trilha. A lista SHALL montar só os termos próximos da área visível, montando os demais conforme o usuário rola; a contagem continua mostrando o total de termos exibidos.
 
 #### Scenario: Lista completa
 - **WHEN** o catálogo tem só as trilhas CRUD e Fundamentos web e o usuário abre a aba Glossário sem busca
@@ -52,6 +52,10 @@ A aba Glossário SHALL listar todos os termos (cards `concept`) das trilhas do c
 #### Scenario: Abrir termo pela lista
 - **WHEN** o usuário toca em "Docker" na lista
 - **THEN** a gaveta abre com a definição de Docker
+
+#### Scenario: Lista longa
+- **WHEN** o catálogo completo é exibido na aba Glossário sem busca
+- **THEN** a contagem mostra o total de termos, menos itens do que esse total estão montados, e rolar até o fim mostra o último termo
 
 ### Requirement: Busca no glossário
 A aba Glossário SHALL ter um campo de busca, com rótulo acessível "Buscar termo", que filtra a lista por nome do termo, definição ou outros nomes (`aliases`), sem diferenciar maiúsculas, minúsculas e acentos. Com a busca vazia, todos os termos aparecem. Sem resultados, SHALL aparecer "Nenhum termo encontrado." A contagem SHALL refletir os termos exibidos.
