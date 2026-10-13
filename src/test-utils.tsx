@@ -38,7 +38,7 @@ function layoutGlossary(viewportHeight: number, offset: (contentHeight: number) 
   const viewport = { width: GLOSSARY_WIDTH, height: viewportHeight };
   act(() => {
     fireEvent(list, 'layout', { nativeEvent: { layout: { x: 0, y: 0, ...viewport } } });
-    screen.getAllByTestId('glossary-item').forEach((item, index) =>
+    screen.getAllByTestId(/^glossary-(item|letter)$/).forEach((item, index) =>
       fireEvent(item, 'layout', {
         nativeEvent: {
           layout: { x: 0, y: index * GLOSSARY_ITEM_HEIGHT, width: GLOSSARY_WIDTH, height: GLOSSARY_ITEM_HEIGHT },
@@ -59,11 +59,25 @@ function layoutGlossary(viewportHeight: number, offset: (contentHeight: number) 
 
 /** Rola a lista do Glossário até o fim (tela de celular). */
 export function scrollGlossaryToEnd() {
-  layoutGlossary(800, (contentHeight) => Math.max(0, contentHeight - 800));
+  untilStable(() => layoutGlossary(800, (contentHeight) => Math.max(0, contentHeight - 800)));
+}
+
+/** Repete o passo enquanto a lista monta linhas novas (cada rodada mede as que acabaram de montar). */
+function untilStable(step: () => void) {
+  const mounted = () =>
+    screen
+      .getAllByTestId(/^glossary-(item|letter)$/)
+      .map((el) => el.props.accessibilityLabel)
+      .join('|');
+  let before = '';
+  for (let i = 0; i < 20 && mounted() !== before; i++) {
+    before = mounted();
+    step();
+  }
 }
 
 /** Monta todos os termos da lista do Glossário, como numa tela alta o bastante para caber todos. */
 export function showAllGlossaryItems() {
   const total = screen.getByTestId('glossary-list').props.data.length;
-  layoutGlossary(total * GLOSSARY_ITEM_HEIGHT, () => 0);
+  untilStable(() => layoutGlossary(total * GLOSSARY_ITEM_HEIGHT, () => 0));
 }
