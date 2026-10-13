@@ -334,6 +334,13 @@ export const en: Messages = {
     openHint: 'Opens the definition',
     closeDefinition: 'Close definition',
     reviewBadge: 'review',
+    filters: (active) => (active ? `Filters · ${active}` : 'Filters'),
+    closeFilters: 'Close filters',
+    clearFilters: 'Clear',
+    showResults: (n) => `Show ${n} ${plural(n, 'term', 'terms')}`,
+    removeFilter: (label) => `Remove filter ${label}`,
+    filterGroups: { study: 'Your study', area: 'Area', level: 'Level', track: 'Track' },
+    study: { all: 'All', review: 'Review', known: 'I knew it', new: 'Not seen' },
   },
   progress: {
     ring: (percent) => `${percent}% of the track mastered`,

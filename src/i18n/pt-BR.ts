@@ -335,6 +335,13 @@ export const ptBR = {
     openHint: 'Abre a definição',
     closeDefinition: 'Fechar definição',
     reviewBadge: 'revisar',
+    filters: (active: number) => (active ? `Filtros · ${active}` : 'Filtros'),
+    closeFilters: 'Fechar filtros',
+    clearFilters: 'Limpar',
+    showResults: (n: number) => `Ver ${n} ${plural(n, 'termo', 'termos')}`,
+    removeFilter: (label: string) => `Remover filtro ${label}`,
+    filterGroups: { study: 'Seu estudo', area: 'Área', level: 'Nível', track: 'Trilha' },
+    study: { all: 'Todos', review: 'Revisar', known: 'Já sabia', new: 'Não vistos' },
   },
   progress: {
     ring: (percent: number) => `${percent}% da trilha dominada`,
