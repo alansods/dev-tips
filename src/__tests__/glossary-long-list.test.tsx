@@ -5,6 +5,7 @@ import TabsLayout from '../app/(tabs)/_layout';
 import GlossaryScreen from '../app/(tabs)/glossary';
 import { getGlossary } from '../content';
 import { getCatalog } from '../content/catalog';
+import { sortTerms } from '../glossary/search';
 import { resetStudyStore } from '../study/store';
 import { scrollGlossaryToEnd } from '../test-utils';
 
@@ -15,6 +16,9 @@ const APP = {
 };
 
 const terms = getCatalog('pt-BR').flatMap(getGlossary);
+const lastAlphabetical = sortTerms(
+  getCatalog('pt-BR').flatMap((track) => getGlossary(track).map((concept) => ({ trackId: track.id, concept }))),
+).at(-1)!.concept.term;
 
 beforeEach(() => resetStudyStore());
 
@@ -25,6 +29,6 @@ describe('Requirement: Aba Glossário', () => {
     expect(screen.getByText(`${terms.length} termos`)).toBeOnTheScreen();
     expect(screen.getAllByTestId('glossary-item').length).toBeLessThan(terms.length);
     scrollGlossaryToEnd();
-    expect(screen.getByRole('button', { name: terms.at(-1)!.term })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: lastAlphabetical })).toBeOnTheScreen();
   });
 });

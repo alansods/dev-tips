@@ -63,11 +63,24 @@ describe('Requirement: Aba Glossário', () => {
     await open('/glossary');
     showAllGlossaryItems();
     expect(listed()).toHaveLength(45);
-    expect(listed()[0]).toBe('API');
-    expect(listed()[23]).toBe('venv (Python)');
-    expect(listed()[24]).toBe('HTTP');
+    expect(listed().slice(0, 3)).toEqual(['API', 'Cabeçalho (header)', 'Cache HTTP']);
+    expect(listed().at(-1)).toBe('XSS (Cross-Site Scripting)');
     expect(screen.getByText('45 termos')).toBeOnTheScreen();
     expect(screen.queryByText(/em construção/i)).toBeNull();
+  });
+
+  it('Cabeçalhos de letra', async () => {
+    await open('/glossary');
+    showAllGlossaryItems();
+    const rows = screen
+      .getAllByTestId(/^glossary-(letter|item)$/)
+      .map((el) =>
+        el.props.testID === 'glossary-letter' ? `#${el.props.accessibilityLabel}` : el.props.accessibilityLabel,
+      );
+    expect(rows[rows.indexOf('Cabeçalho (header)') - 1]).toBe('#C');
+    expect(rows[rows.indexOf('Injeção de dependência') - 1]).toBe('#I');
+    const letters = rows.filter((r) => r.startsWith('#'));
+    expect(new Set(letters).size).toBe(letters.length);
   });
 
   it('Trilha de cada termo', async () => {
@@ -125,5 +138,102 @@ describe('Requirement: Busca no glossário (na tela)', () => {
     expect(screen.queryAllByTestId('glossary-item')).toHaveLength(0);
     expect(screen.getByText('Nenhum termo encontrado.')).toBeOnTheScreen();
     expect(screen.getByText('0 termos')).toBeOnTheScreen();
+  });
+});
+
+describe('Requirement: Filtros do glossário', () => {
+  const filtersButton = () => screen.getByRole('button', { name: /^Filtros/ });
+  const filters = () => within(screen.getByTestId('glossary-filters'));
+  const openFilters = () => fireEvent.press(filtersButton());
+  const choose = (name: string) => fireEvent.press(filters().getByLabelText(name));
+  const apply = () => fireEvent.press(filters().getByRole('button', { name: /^Ver \d+ termos?$/ }));
+  const all = () => {
+    showAllGlossaryItems();
+    return listed();
+  };
+
+  it('Filtrar por trilha', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Fundamentos web');
+    apply();
+    expect(screen.queryByTestId('glossary-filters')).toBeNull();
+    expect(all()).toHaveLength(21);
+    expect(screen.getByText('21 termos')).toBeOnTheScreen();
+    expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
+    expect(screen.getByRole('button', { name: 'Remover filtro Fundamentos web' })).toBeOnTheScreen();
+  });
+
+  it('Filtrar por nível', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Pleno');
+    apply();
+    expect(all()).toHaveLength(17);
+    expect(listed()).toContain('CORS');
+    expect(listed()).not.toContain('API');
+  });
+
+  it('Filtrar pelo estudo', async () => {
+    useStudyStore.getState().answer(TRACK, 'cors', 'known');
+    useStudyStore.getState().answer(TRACK, 'dto', 'unknown');
+    await open('/glossary');
+    openFilters();
+    choose('Revisar');
+    apply();
+    expect(listed()).toEqual(['DTO (Data Transfer Object)']);
+  });
+
+  it('Não vistos', async () => {
+    useStudyStore.getState().answer(TRACK, 'cors', 'known');
+    await open('/glossary');
+    openFilters();
+    choose('Não vistos');
+    apply();
+    expect(all()).toHaveLength(44);
+    expect(listed()).not.toContain('CORS');
+  });
+
+  it('Filtros combinados com a busca', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Fundamentos');
+    apply();
+    search('cors');
+    expect(listed()).toEqual(['Política de mesma origem']);
+  });
+
+  it('Remover filtro pelo chip', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Fundamentos web');
+    choose('Pleno');
+    apply();
+    expect(filtersButton()).toHaveAccessibleName('Filtros · 2');
+    fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pleno' }));
+    expect(screen.queryByRole('button', { name: 'Remover filtro Pleno' })).toBeNull();
+    expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
+    expect(all()).toHaveLength(21);
+  });
+
+  it('Limpar filtros', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Fundamentos web');
+    choose('Pleno');
+    choose('Limpar');
+    fireEvent.press(filters().getByRole('button', { name: 'Ver 45 termos' }));
+    expect(screen.queryByTestId('glossary-filters')).toBeNull();
+    expect(all()).toHaveLength(45);
+    expect(filtersButton()).toHaveAccessibleName('Filtros');
+  });
+
+  it('fechar tocando fora mantém os filtros escolhidos', async () => {
+    await open('/glossary');
+    openFilters();
+    choose('Pleno');
+    fireEvent.press(screen.getByRole('button', { name: 'Fechar filtros' }));
+    expect(screen.queryByTestId('glossary-filters')).toBeNull();
+    expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
   });
 });
