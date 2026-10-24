@@ -3,7 +3,9 @@
 ## Purpose
 
 Define o fluxo de estudo do app: abrir uma trilha, escolher um deck, estudar os cards como flashcards (frente e verso, "Já sabia"/"Não sabia"), ver o resumo da sessão e acompanhar o progresso.
+
 ## Requirements
+
 ### Requirement: Tela da trilha
 Tocar numa trilha em qualquer lista de trilhas SHALL abrir a tela da trilha em tela cheia, sem a barra de abas, com botão de voltar. A tela SHALL mostrar o título e a descrição da trilha, os frameworks (variantes) quando a trilha tiver, a quantidade de cards que o usuário marcou como "já sabia", o total de cards da trilha e a lista de decks na ordem do conteúdo.
 
@@ -162,11 +164,19 @@ No verso de um card `step`, as abas SHALL listar as variantes da trilha na ordem
 - **THEN** a aba FastAPI continua selecionada e o código é o snippet FastAPI do Passo 2
 
 ### Requirement: Exibição de código
-Snippets SHALL ser exibidos em fonte monoespaçada, preservando quebras de linha e indentação, sem quebra automática de linhas longas e com rolagem horizontal. Acima do código SHALL aparecer o rótulo `file`. Abaixo, quando houver, SHALL aparecer a `note`.
+Snippets SHALL ser exibidos em fonte monoespaçada, preservando quebras de linha e indentação, sem quebra automática de linhas longas e com rolagem horizontal. Acima do código SHALL aparecer o rótulo `file`. Abaixo, quando houver, SHALL aparecer a `note`. A área do código SHALL ser reservada à rolagem: um toque ou arrasto que começa sobre o código MUST NOT virar o card, e qualquer arrasto para o lado SHALL rolar o código.
 
 #### Scenario: Código preservado na tela
 - **WHEN** o verso do Passo 3 com FastAPI é exibido
 - **THEN** o texto do código na tela é idêntico ao `code` do snippet, e o rótulo `app/database.py` aparece acima dele
+
+#### Scenario: Arrastar o código para o lado
+- **WHEN** o verso mostra um código mais largo que o card e o usuário arrasta o código para o lado, mesmo num arrasto curto ou lento
+- **THEN** o código rola e o verso continua visível
+
+#### Scenario: Tocar no código
+- **WHEN** o verso mostra um código e o usuário toca sobre o código
+- **THEN** o verso continua visível, e tocar fora do código continua voltando para a frente
 
 ### Requirement: Resumo da sessão
 Ao responder o último card, a sessão SHALL mostrar o resumo:
@@ -284,4 +294,3 @@ Os textos da tela da simulação e do card `interview` SHALL seguir o idioma do 
 #### Scenario: Verso em inglês
 - **WHEN** o app está em inglês e o verso de um card interview com `why` e `watchOut` é exibido
 - **THEN** os rótulos são "Why it works" e "Watch out"
-
