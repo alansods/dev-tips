@@ -67,9 +67,13 @@ export function CodeBlock({ snippet }: { snippet: Snippet }) {
           </AppText>
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator contentContainerStyle={styles.codeScroll}>
-          <AppText font="mono" size={12} style={{ color: colors.codeInk, lineHeight: 19 }}>
-            {snippet.code}
-          </AppText>
+          {/* Reivindica o toque ao começar, para ele não ir ao Pressable que vira o card. Fica
+              dentro do ScrollView: no iOS, um ancestral dono do toque impede a rolagem. */}
+          <View testID="code-scroll-area" onStartShouldSetResponder={() => true} style={styles.codeTouch}>
+            <AppText font="mono" size={12} style={{ color: colors.codeInk, lineHeight: 19 }}>
+              {snippet.code}
+            </AppText>
+          </View>
         </ScrollView>
       </View>
       {snippet.note ? (
@@ -120,7 +124,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: '#222B37',
   },
-  codeScroll: { padding: spacing.md },
+  codeScroll: { flexGrow: 1 },
+  // Cobre a área preta inteira (por isso carrega o padding), para todo toque nela ficar com o código.
+  codeTouch: { flexGrow: 1, padding: spacing.md },
   note: { padding: spacing.md, borderRadius: radius.md },
   tabs: { flexDirection: 'row', padding: 4, borderRadius: radius.md, gap: 4 },
   tab: {
