@@ -30,7 +30,7 @@ const SIM_TITLES = [
 ];
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -78,7 +78,7 @@ describe('Requirement: Tela da área (Situações-problema)', () => {
 
   it('Abrir uma simulação', async () => {
     await open('/area/simulacoes');
-    fireEvent.press(trackCard('Pedido e pagamento em dobro')!);
+    await fireEvent.press(trackCard('Pedido e pagamento em dobro')!);
     expect(screen).toHavePathname('/track/sim-pedidos-duplicados');
   });
 });
@@ -86,14 +86,14 @@ describe('Requirement: Tela da área (Situações-problema)', () => {
 describe('Requirement: Simulações na busca', () => {
   it('Buscar uma simulação', async () => {
     await open('/tracks');
-    search('notificacoes');
+    await search('notificacoes');
     expect(screen.getByRole('header', { name: 'Situações-problema' })).toBeOnTheScreen();
     expect(trackCard('API de notificações')).toBeOnTheScreen();
   });
 
   it('Filtro de linguagem', async () => {
     await open('/tracks');
-    press('JavaScript');
+    await press('JavaScript');
     for (const title of SIM_TITLES) expect(trackCard(title)).toBeNull();
   });
 });

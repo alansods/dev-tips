@@ -17,28 +17,28 @@ function Harness({ card, side }: { card: Card; side: 'front' | 'back' }) {
 const show = (id: string, side: 'front' | 'back') => renderWithTheme(<Harness card={cardById(id)} side={side} />);
 
 describe('Requirement: Frente e verso por tipo de card', () => {
-  it('Endpoint', () => {
-    show('endpoint-create', 'front');
+  it('Endpoint', async () => {
+    await show('endpoint-create', 'front');
     expect(screen.getByText('POST')).toBeOnTheScreen();
     expect(screen.getByText('/products')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.endpoint)).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
 
-    show('endpoint-create', 'back');
+    await show('endpoint-create', 'back');
     expect(screen.getByText('C · Create')).toBeOnTheScreen();
     expect(screen.getByText('Cria um produto')).toBeOnTheScreen();
     expect(screen.getByText('201')).toBeOnTheScreen();
     expect(screen.getByText('400')).toBeOnTheScreen();
   });
 
-  it('Passo', () => {
-    show('step-07', 'front');
+  it('Passo', async () => {
+    await show('step-07', 'front');
     expect(screen.getByText('Passo 7')).toBeOnTheScreen();
     expect(screen.getByText('C: Criar produto')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.step)).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
 
-    show('step-07', 'back');
+    await show('step-07', 'back');
     expect(screen.getAllByRole('tab').map((t) => t.props.accessibilityLabel ?? '')).toEqual([
       'Express',
       'Spring Boot',
@@ -49,44 +49,44 @@ describe('Requirement: Frente e verso por tipo de card', () => {
     expect(screen.getByText(step.snippets.express.code)).toBeOnTheScreen();
   });
 
-  it('Comparação', () => {
-    show('cmp-dto', 'back');
+  it('Comparação', async () => {
+    await show('cmp-dto', 'back');
     for (const col of crudTrack.compareColumns!) expect(screen.getByText(col.label)).toBeOnTheScreen();
     expect(screen.getByText('modelo Pydantic')).toBeOnTheScreen();
     expect(screen.getByText('record')).toBeOnTheScreen();
   });
 
-  it('Conceito', () => {
-    show('cors', 'front');
+  it('Conceito', async () => {
+    await show('cors', 'front');
     expect(screen.getByText('CORS')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.concept)).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
 
-    show('cors', 'back');
+    await show('cors', 'back');
     expect(screen.getByText(/Regra de segurança do navegador/)).toBeOnTheScreen();
   });
 
-  it('Complemento', () => {
-    show('docker-compose', 'front');
+  it('Complemento', async () => {
+    await show('docker-compose', 'front');
     expect(screen.getByText('Complemento')).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
 
-    show('docker-compose', 'back');
+    await show('docker-compose', 'back');
     expect(screen.getByText('Complemento')).toBeOnTheScreen();
     expect(screen.getByText(/container_name: products-db/)).toBeOnTheScreen();
   });
 
-  it('cards originais não têm o selo', () => {
-    show('step-07', 'front');
+  it('cards originais não têm o selo', async () => {
+    await show('step-07', 'front');
     expect(screen.queryByText('Complemento')).toBeNull();
   });
 });
 
 describe('Requirement: Abas de framework', () => {
-  it('Trocar de framework', () => {
-    show('step-01', 'back');
+  it('Trocar de framework', async () => {
+    await show('step-01', 'back');
     expect(screen.getByRole('tab', { name: 'Express' })).toBeSelected();
-    fireEvent.press(screen.getByRole('tab', { name: 'FastAPI' }));
+    await fireEvent.press(screen.getByRole('tab', { name: 'FastAPI' }));
     expect(screen.getByRole('tab', { name: 'FastAPI' })).toBeSelected();
     expect(screen.getByRole('tab', { name: 'Express' })).not.toBeSelected();
     expect(screen.getByText(/python -m venv \.venv/)).toBeOnTheScreen();
@@ -94,7 +94,7 @@ describe('Requirement: Abas de framework', () => {
 });
 
 describe('Requirement: Exibição de código', () => {
-  it('Código preservado na tela', () => {
+  it('Código preservado na tela', async () => {
     function FastApi() {
       return (
         <CardFace
@@ -106,15 +106,15 @@ describe('Requirement: Exibição de código', () => {
         />
       );
     }
-    renderWithTheme(<FastApi />);
+    await renderWithTheme(<FastApi />);
     const snippet = (cardById('step-03') as StepCard).snippets.fastapi;
     expect(screen.getByText(snippet.code)).toBeOnTheScreen();
     expect(screen.getByText('app/database.py')).toBeOnTheScreen();
     expect(screen.getByText(snippet.note!)).toBeOnTheScreen();
   });
 
-  it('variante desconhecida cai na primeira da trilha', () => {
-    renderWithTheme(
+  it('variante desconhecida cai na primeira da trilha', async () => {
+    await renderWithTheme(
       <CardFace
         card={cardById('step-03')}
         track={crudTrack}
@@ -128,64 +128,64 @@ describe('Requirement: Exibição de código', () => {
 });
 
 describe('Requirement: Frente e verso por tipo de card (pergunta)', () => {
-  it('Pergunta de entrevista', () => {
-    show('put-vs-patch', 'front');
+  it('Pergunta de entrevista', async () => {
+    await show('put-vs-patch', 'front');
     expect(screen.getByText('Qual a diferença entre PUT e PATCH?')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.question)).toBeOnTheScreen();
     expect(screen.getByText('Complemento')).toBeOnTheScreen();
     expect(screen.getByText('O mesmo CRUD em quatro frameworks · Perguntas de entrevista')).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
 
-    show('put-vs-patch', 'back');
+    await show('put-vs-patch', 'back');
     expect(screen.getByText(/PUT substitui o recurso inteiro/)).toBeOnTheScreen();
     expect(screen.getByText(/curl -X PUT[\s\S]*curl -X PATCH/)).toBeOnTheScreen();
   });
 });
 
 describe('Requirement: Nível no card', () => {
-  it('Nível na frente', () => {
-    show('step-05', 'front'); // level: pleno
+  it('Nível na frente', async () => {
+    await show('step-05', 'front'); // level: pleno
     expect(screen.getByText('Pleno')).toBeOnTheScreen();
     expect(screen.getByText('Passo 5')).toBeOnTheScreen();
   });
 
-  it('Nível no verso', () => {
+  it('Nível no verso', async () => {
     const card = cardById('rest-vs-graphql', webTrack); // level: senior
-    renderWithTheme(<CardFace card={card} track={webTrack} side="back" variantId="" onSelectVariant={() => {}} />);
+    await renderWithTheme(<CardFace card={card} track={webTrack} side="back" variantId="" onSelectVariant={() => {}} />);
     expect(screen.getByText('Sênior')).toBeOnTheScreen();
   });
 
-  it('júnior', () => {
-    show('endpoint-create', 'front');
+  it('júnior', async () => {
+    await show('endpoint-create', 'front');
     expect(screen.getByText('Júnior')).toBeOnTheScreen();
   });
 
-  it('Nível em inglês', () => {
-    renderWithTheme(<Harness card={cardById('step-05')} side="front" />, { language: 'en' });
+  it('Nível em inglês', async () => {
+    await renderWithTheme(<Harness card={cardById('step-05')} side="front" />, { language: 'en' });
     expect(screen.getByText('Mid-level')).toBeOnTheScreen();
   });
 });
 
 describe('Requirement: Origem do card na sessão', () => {
-  it('Card de conceito', () => {
-    show('cors', 'front');
+  it('Card de conceito', async () => {
+    await show('cors', 'front');
     expect(screen.getByText('O mesmo CRUD em quatro frameworks · Glossário')).toBeOnTheScreen();
     // o tipo do card não aparece mais como selo
     expect(screen.queryByText(ptBR.card.types.concept)).toBeNull();
-    screen.unmount();
-    show('cors', 'back');
+    await screen.unmount();
+    await show('cors', 'back');
     expect(screen.getByText('O mesmo CRUD em quatro frameworks · Glossário')).toBeOnTheScreen();
   });
 
-  it('Card de passo', () => {
-    show('step-03', 'front');
+  it('Card de passo', async () => {
+    await show('step-03', 'front');
     expect(screen.getByText('O mesmo CRUD em quatro frameworks · Passo a passo')).toBeOnTheScreen();
     expect(screen.getByText('Passo 3')).toBeOnTheScreen();
   });
 
-  it('Card de outra trilha', () => {
+  it('Card de outra trilha', async () => {
     const card = webTrack.decks[0].cards[0];
-    renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
+    await renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
     expect(screen.getByText(`Fundamentos web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
   });
 });
@@ -197,16 +197,16 @@ describe('Requirement: Frente e verso por tipo de card (simulação)', () => {
       <CardFace card={cardById(id, track)} track={track} side={side} variantId="" onSelectVariant={() => {}} />,
     );
 
-  it('Pergunta de simulação', () => {
-    showSim('idempotencia-no-backend', 'front');
+  it('Pergunta de simulação', async () => {
+    await showSim('idempotencia-no-backend', 'front');
     expect(screen.getByText('Contexto')).toBeOnTheScreen();
     expect(screen.getByText(sim.scenario!.context)).toBeOnTheScreen();
     expect(screen.getByText('Como evitar que duas requisições simultâneas criem duas compras?')).toBeOnTheScreen();
     expect(screen.getByText(FRONT_PROMPT.interview)).toBeOnTheScreen();
     expect(screen.queryByText('Atenção')).toBeNull();
-    screen.unmount();
+    await screen.unmount();
 
-    showSim('idempotencia-no-backend', 'back');
+    await showSim('idempotencia-no-backend', 'back');
     const card = cardById('idempotencia-no-backend', sim) as InterviewCard;
     expect(screen.getByText(card.answer)).toBeOnTheScreen();
     expect(screen.getByText('Atenção')).toBeOnTheScreen();
@@ -214,30 +214,30 @@ describe('Requirement: Frente e verso por tipo de card (simulação)', () => {
     expect(screen.getByText(card.snippet!.code)).toBeOnTheScreen();
   });
 
-  it('Simulação sem por que', () => {
-    showSim('idempotencia-no-backend', 'back');
+  it('Simulação sem por que', async () => {
+    await showSim('idempotencia-no-backend', 'back');
     expect(screen.queryByText('Por que funciona')).toBeNull();
-    screen.unmount();
-    showSim('desabilitar-o-botao', 'back');
+    await screen.unmount();
+    await showSim('desabilitar-o-botao', 'back');
     expect(screen.getByText('Por que funciona')).toBeOnTheScreen();
     expect(screen.queryByText('Atenção')).toBeNull();
   });
 
-  it('Card de simulação (selo de origem)', () => {
-    showSim('desabilitar-o-botao', 'front');
+  it('Card de simulação (selo de origem)', async () => {
+    await showSim('desabilitar-o-botao', 'front');
     expect(screen.getByText('Caso · Pedido e pagamento em dobro')).toBeOnTheScreen();
   });
 
-  it('Verso em inglês', () => {
+  it('Verso em inglês', async () => {
     const en = getCatalog('en').find((t) => t.id === 'sim-dashboard-lento')!;
-    renderWithTheme(
+    await renderWithTheme(
       <CardFace card={cardById('query-lenta', en)} track={en} side="back" variantId="" onSelectVariant={() => {}} />,
       { language: 'en' },
     );
     expect(screen.getByText('Watch out')).toBeOnTheScreen();
     expect(screen.getByText('Case · Slow dashboard: from 8 s to under 2')).toBeOnTheScreen();
-    screen.unmount();
-    renderWithTheme(
+    await screen.unmount();
+    await renderWithTheme(
       <CardFace
         card={cardById('investigar-lentidao', en)}
         track={en}

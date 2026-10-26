@@ -34,15 +34,15 @@ const TRACK = crudTrack.id;
 const glossaryIds = crudTrack.decks.find((d) => d.id === 'glossario')!.cards.map((c) => c.id);
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const seed = (ids: string[], result: 'known' | 'unknown') =>
   ids.forEach((id) => useStudyStore.getState().answer(TRACK, id, result));
-function answer(result: 'Já sabia' | 'Não sabia') {
-  press('Mostrar resposta');
-  press(result);
+async function answer(result: 'Já sabia' | 'Não sabia') {
+  await press('Mostrar resposta');
+  await press(result);
 }
 
 beforeEach(() => {
@@ -91,7 +91,7 @@ describe('Requirement: Sessão de revisão', () => {
   it('Revisar os cards do dia', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open(`/track/${TRACK}`);
-    press('Revisar agora');
+    await press('Revisar agora');
     expect(screen).toHavePathname(`/review/${TRACK}`);
     expect(screen.getByText('Revisão de hoje')).toBeOnTheScreen();
     expect(screen.getByText('1 / 2')).toBeOnTheScreen();
@@ -100,19 +100,19 @@ describe('Requirement: Sessão de revisão', () => {
   it('Revisão concluída some do dia', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open(`/track/${TRACK}`);
-    press('Revisar agora');
-    answer('Já sabia');
-    answer('Já sabia');
-    press('Voltar à trilha');
+    await press('Revisar agora');
+    await answer('Já sabia');
+    await answer('Já sabia');
+    await press('Voltar à trilha');
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });
 
   it('Erro na revisão continua no dia', async () => {
     seed(glossaryIds.slice(0, 1), 'unknown');
     await open(`/track/${TRACK}`);
-    press('Revisar agora');
-    answer('Não sabia');
-    press('Voltar à trilha');
+    await press('Revisar agora');
+    await answer('Não sabia');
+    await press('Voltar à trilha');
     expect(screen.getByText('1 card para revisar hoje')).toBeOnTheScreen();
   });
 });
@@ -121,15 +121,15 @@ describe('Requirement: Zerar progresso de uma trilha (agendamento)', () => {
   it('Zerar apaga o agendamento da trilha', async () => {
     seed(glossaryIds.slice(0, 2), 'unknown');
     await open('/progress');
-    fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
+    await fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
     const crud = within(screen.getByTestId(`track-progress-${TRACK}`));
-    fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
-    fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
+    await fireEvent.press(crud.getByRole('button', { name: 'Zerar progresso' }));
+    await fireEvent.press(crud.getByRole('button', { name: 'Zerar' }));
     // o Progresso é tela cheia: volta para o Perfil e vai para a aba Trilhas
-    fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-    fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
-    press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    await fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
+    await press(/^Backend,/);
+    await press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     expect(screen.getByText('Nada para revisar hoje.')).toBeOnTheScreen();
   });
 });
@@ -148,7 +148,7 @@ describe('Requirement: Revisão de todas as trilhas', () => {
   it('Resposta na trilha certa', async () => {
     useStudyStore.getState().answer(WEB, 'http', 'unknown');
     await open('/review');
-    answer('Já sabia');
+    await answer('Já sabia');
     expect(useStudyStore.getState().progress[`${WEB}:http`]).toBe('known');
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
   });
@@ -162,7 +162,7 @@ describe('Requirement: Revisão de todas as trilhas', () => {
   it('sair volta para o Início', async () => {
     useStudyStore.getState().answer(WEB, 'http', 'unknown');
     await open('/review');
-    press('Sair da sessão');
+    await press('Sair da sessão');
     expect(screen).toHavePathname('/');
   });
 });

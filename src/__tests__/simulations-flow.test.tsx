@@ -27,15 +27,15 @@ const sim = getTrack(SIM)!;
 const cardIds = sim.decks[0].cards.map((c) => c.id);
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
 const seed = (ids: string[], result: 'known' | 'unknown') =>
   ids.forEach((id) => useStudyStore.getState().answer(SIM, id, result));
-function answer(result: 'Já sabia' | 'Não sabia') {
-  press('Mostrar resposta');
-  press(result);
+async function answer(result: 'Já sabia' | 'Não sabia') {
+  await press('Mostrar resposta');
+  await press(result);
 }
 
 beforeEach(() => resetStudyStore());
@@ -58,7 +58,7 @@ describe('Requirement: Tela da simulação', () => {
 
   it('Começar conversa', async () => {
     await open(`/track/${SIM}`);
-    press('Começar conversa');
+    await press('Começar conversa');
     expect(screen).toHavePathname(`/study/${SIM}/conversa`);
     expect(screen.getByText('1 / 4')).toBeOnTheScreen();
     expect(screen.getByText('Pedido e pagamento em dobro')).toBeOnTheScreen();
@@ -69,23 +69,23 @@ describe('Requirement: Tela da simulação', () => {
     seed([cardIds[1]], 'unknown');
     await open(`/track/${SIM}`);
     expect(screen.getByText('1/4')).toBeOnTheScreen();
-    press('Continuar');
+    await press('Continuar');
     expect(screen.getByText('1 / 3')).toBeOnTheScreen();
   });
 
   it('Simulação dominada', async () => {
     seed(cardIds, 'known');
     await open(`/track/${SIM}`);
-    press('Praticar de novo');
+    await press('Praticar de novo');
     expect(screen.getByText('1 / 4')).toBeOnTheScreen();
   });
 
   it('Voltar ao caso', async () => {
     await open(`/track/${SIM}`);
-    press('Começar conversa');
-    for (let i = 0; i < 4; i++) answer('Já sabia');
+    await press('Começar conversa');
+    for (let i = 0; i < 4; i++) await answer('Já sabia');
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
-    press('Voltar ao caso');
+    await press('Voltar ao caso');
     expect(screen).toHavePathname(`/track/${SIM}`);
     expect(screen.getByText('4/4')).toBeOnTheScreen();
   });

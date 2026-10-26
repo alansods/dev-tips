@@ -40,7 +40,7 @@ const flush = () =>
     for (let i = 0; i < 30; i++) await Promise.resolve();
   });
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await flush();
 }
 async function signIn() {
@@ -65,7 +65,7 @@ describe('Requirement: Aviso de offline', () => {
     await act(async () => network.__setNetworkState(false));
     expect(screen.getByText(OFFLINE)).toBeOnTheScreen();
     // os cards continuam abrindo normalmente
-    fireEvent.press(screen.getByRole('button', { name: /^Backend,/ }));
+    await fireEvent.press(screen.getByRole('button', { name: /^Backend,/ }));
     await flush();
     expect(screen).toHavePathname('/area/backend');
   });
@@ -92,7 +92,7 @@ describe('Requirement: Estado da sincronização', () => {
     await open('/profile');
     expect(useSyncStore.getState().lastSyncedAt).toEqual(expect.any(Number));
     expect(screen.getByText('Sincronizado agora há pouco')).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole('button', { name: /Ana Souza/ }));
+    await fireEvent.press(screen.getByRole('button', { name: /Ana Souza/ }));
     await flush();
     expect(screen.getByText('Sincronizado agora há pouco')).toBeOnTheScreen();
   });

@@ -28,7 +28,7 @@ const APP = {
 const TRACK = crudTrack.id;
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -44,13 +44,13 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
     await open(`/study/${TRACK}/passo-a-passo`);
     // avança até o Passo 13 (os complementos ficam entre os passos)
     while (!screen.queryByText('Passo 13')) {
-      press('Mostrar resposta');
-      press('Já sabia');
+      await press('Mostrar resposta');
+      await press('Já sabia');
     }
-    press('Mostrar resposta');
-    fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
+    await press('Mostrar resposta');
+    await fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
     expect(sheet().getByText(/Regra de segurança do navegador/)).toBeOnTheScreen();
-    fireEvent.press(sheet().getByRole('button', { name: 'Fechar' }));
+    await fireEvent.press(sheet().getByRole('button', { name: 'Fechar' }));
     expect(screen.queryByTestId('term-sheet')).toBeNull();
     expect(screen.getByText('Liberar o frontend (CORS)')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Não sabia' })).toBeOnTheScreen();
@@ -61,7 +61,7 @@ describe('Requirement: Gaveta de definição (na sessão)', () => {
 describe('Requirement: Aba Glossário', () => {
   it('Lista completa', async () => {
     await open('/glossary');
-    showAllGlossaryItems();
+    await showAllGlossaryItems();
     expect(listed()).toHaveLength(45);
     expect(listed().slice(0, 3)).toEqual(['API', 'Cabeçalho (header)', 'Cache HTTP']);
     expect(listed().at(-1)).toBe('XSS (Cross-Site Scripting)');
@@ -71,7 +71,7 @@ describe('Requirement: Aba Glossário', () => {
 
   it('Cabeçalhos de letra', async () => {
     await open('/glossary');
-    showAllGlossaryItems();
+    await showAllGlossaryItems();
     const rows = screen
       .getAllByTestId(/^glossary-(letter|item)$/)
       .map((el) =>
@@ -85,7 +85,7 @@ describe('Requirement: Aba Glossário', () => {
 
   it('Trilha de cada termo', async () => {
     await open('/glossary');
-    showAllGlossaryItems();
+    await showAllGlossaryItems();
     expect(
       within(screen.getByRole('button', { name: 'CORS' })).getByText('O mesmo CRUD em quatro frameworks'),
     ).toBeOnTheScreen();
@@ -96,7 +96,7 @@ describe('Requirement: Aba Glossário', () => {
     useStudyStore.getState().answer(TRACK, 'cors', 'known');
     useStudyStore.getState().answer(TRACK, 'dto', 'unknown');
     await open('/glossary');
-    showAllGlossaryItems();
+    await showAllGlossaryItems();
     const item = (term: string) => within(screen.getByRole('button', { name: term }));
     expect(item('CORS').getByText('já sabia')).toBeOnTheScreen();
     expect(item('DTO (Data Transfer Object)').getByText('revisar')).toBeOnTheScreen();
@@ -105,8 +105,8 @@ describe('Requirement: Aba Glossário', () => {
 
   it('Abrir termo pela lista', async () => {
     await open('/glossary');
-    showAllGlossaryItems();
-    press('Docker');
+    await showAllGlossaryItems();
+    await press('Docker');
     expect(sheet().getByRole('header', { name: 'Docker' })).toBeOnTheScreen();
     expect(sheet().getByText(/caixinhas/)).toBeOnTheScreen();
   });
@@ -115,26 +115,26 @@ describe('Requirement: Aba Glossário', () => {
 describe('Requirement: Busca no glossário (na tela)', () => {
   it('Buscar pelo nome', async () => {
     await open('/glossary');
-    search('cors');
+    await search('cors');
     expect(listed()).toEqual(['CORS', 'Política de mesma origem']);
     expect(screen.getByText('2 termos')).toBeOnTheScreen();
   });
 
   it('Buscar sem acento', async () => {
     await open('/glossary');
-    search('injecao');
+    await search('injecao');
     expect(listed()).toContain('Injeção de dependência');
   });
 
   it('Buscar pela definição', async () => {
     await open('/glossary');
-    search('caixinhas');
+    await search('caixinhas');
     expect(listed()).toEqual(['Docker']);
   });
 
   it('Sem resultados', async () => {
     await open('/glossary');
-    search('kubernetes');
+    await search('kubernetes');
     expect(screen.queryAllByTestId('glossary-item')).toHaveLength(0);
     expect(screen.getByText('Nenhum termo encontrado.')).toBeOnTheScreen();
     expect(screen.getByText('0 termos')).toBeOnTheScreen();
@@ -147,18 +147,18 @@ describe('Requirement: Filtros do glossário', () => {
   const openFilters = () => fireEvent.press(filtersButton());
   const choose = (name: string) => fireEvent.press(filters().getByLabelText(name));
   const apply = () => fireEvent.press(filters().getByRole('button', { name: /^Ver \d+ termos?$/ }));
-  const all = () => {
-    showAllGlossaryItems();
+  const all = async () => {
+    await showAllGlossaryItems();
     return listed();
   };
 
   it('Filtrar por trilha', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Fundamentos web');
-    apply();
+    await openFilters();
+    await choose('Fundamentos web');
+    await apply();
     expect(screen.queryByTestId('glossary-filters')).toBeNull();
-    expect(all()).toHaveLength(21);
+    expect(await all()).toHaveLength(21);
     expect(screen.getByText('21 termos')).toBeOnTheScreen();
     expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
     expect(screen.getByRole('button', { name: 'Remover filtro Fundamentos web' })).toBeOnTheScreen();
@@ -166,10 +166,10 @@ describe('Requirement: Filtros do glossário', () => {
 
   it('Filtrar por nível', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Pleno');
-    apply();
-    expect(all()).toHaveLength(17);
+    await openFilters();
+    await choose('Pleno');
+    await apply();
+    expect(await all()).toHaveLength(17);
     expect(listed()).toContain('CORS');
     expect(listed()).not.toContain('API');
   });
@@ -178,61 +178,61 @@ describe('Requirement: Filtros do glossário', () => {
     useStudyStore.getState().answer(TRACK, 'cors', 'known');
     useStudyStore.getState().answer(TRACK, 'dto', 'unknown');
     await open('/glossary');
-    openFilters();
-    choose('Revisar');
-    apply();
+    await openFilters();
+    await choose('Revisar');
+    await apply();
     expect(listed()).toEqual(['DTO (Data Transfer Object)']);
   });
 
   it('Não vistos', async () => {
     useStudyStore.getState().answer(TRACK, 'cors', 'known');
     await open('/glossary');
-    openFilters();
-    choose('Não vistos');
-    apply();
-    expect(all()).toHaveLength(44);
+    await openFilters();
+    await choose('Não vistos');
+    await apply();
+    expect(await all()).toHaveLength(44);
     expect(listed()).not.toContain('CORS');
   });
 
   it('Filtros combinados com a busca', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Fundamentos');
-    apply();
-    search('cors');
+    await openFilters();
+    await choose('Fundamentos');
+    await apply();
+    await search('cors');
     expect(listed()).toEqual(['Política de mesma origem']);
   });
 
   it('Remover filtro pelo chip', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Fundamentos web');
-    choose('Pleno');
-    apply();
+    await openFilters();
+    await choose('Fundamentos web');
+    await choose('Pleno');
+    await apply();
     expect(filtersButton()).toHaveAccessibleName('Filtros · 2');
-    fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pleno' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Remover filtro Pleno' }));
     expect(screen.queryByRole('button', { name: 'Remover filtro Pleno' })).toBeNull();
     expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
-    expect(all()).toHaveLength(21);
+    expect(await all()).toHaveLength(21);
   });
 
   it('Limpar filtros', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Fundamentos web');
-    choose('Pleno');
-    choose('Limpar');
-    fireEvent.press(filters().getByRole('button', { name: 'Ver 45 termos' }));
+    await openFilters();
+    await choose('Fundamentos web');
+    await choose('Pleno');
+    await choose('Limpar');
+    await fireEvent.press(filters().getByRole('button', { name: 'Ver 45 termos' }));
     expect(screen.queryByTestId('glossary-filters')).toBeNull();
-    expect(all()).toHaveLength(45);
+    expect(await all()).toHaveLength(45);
     expect(filtersButton()).toHaveAccessibleName('Filtros');
   });
 
   it('fechar tocando fora mantém os filtros escolhidos', async () => {
     await open('/glossary');
-    openFilters();
-    choose('Pleno');
-    fireEvent.press(screen.getByRole('button', { name: 'Fechar filtros' }));
+    await openFilters();
+    await choose('Pleno');
+    await fireEvent.press(screen.getByRole('button', { name: 'Fechar filtros' }));
     expect(screen.queryByTestId('glossary-filters')).toBeNull();
     expect(filtersButton()).toHaveAccessibleName('Filtros · 1');
   });

@@ -81,7 +81,7 @@ describe('useCardChat', () => {
       plan: { plan: 'pro', source: 'store', expiresAt: null, willRenew: true, questions: { used: 30, limit: 200 } },
     });
     authFetch.mockResolvedValue(OK);
-    const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
+    const { result } = await renderHook(() => useCardChat(card, 'pt-BR'));
     for (let i = 0; i < 4; i++) {
       await act(() => result.current.send(`pergunta ${i}`));
     }
@@ -96,8 +96,8 @@ describe('useCardChat', () => {
 
   it('mostra "enviando" enquanto espera', async () => {
     authFetch.mockReturnValue(new Promise(() => {}));
-    const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
-    act(() => void result.current.send('oi'));
+    const { result } = await renderHook(() => useCardChat(card, 'pt-BR'));
+    await act(() => void result.current.send('oi'));
     await flush();
     expect(result.current.status).toBe('sending');
     expect(result.current.messages).toEqual([{ role: 'user', text: 'oi' }]);
@@ -105,7 +105,7 @@ describe('useCardChat', () => {
 
   it('tentar de novo reenvia a mesma pergunta sem duplicar', async () => {
     authFetch.mockRejectedValueOnce(new NetworkError('x')).mockResolvedValueOnce(OK);
-    const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
+    const { result } = await renderHook(() => useCardChat(card, 'pt-BR'));
     await act(() => result.current.send('oi'));
     expect(result.current.status).toBe('offline');
     await act(() => result.current.retry());
@@ -116,14 +116,14 @@ describe('useCardChat', () => {
 
   it('fora do card marca a resposta', async () => {
     authFetch.mockResolvedValue({ ...OK, inScope: false, answer: 'Só consigo ajudar...' });
-    const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
+    const { result } = await renderHook(() => useCardChat(card, 'pt-BR'));
     await act(() => result.current.send('React?'));
     expect(result.current.messages[1]).toEqual({ role: 'assistant', text: 'Só consigo ajudar...', inScope: false });
   });
 
   it('cota e plano Pro expirado viram status', async () => {
     authFetch.mockRejectedValue(new ApiError(429, 'quota_exceeded'));
-    const { result } = renderHook(() => useCardChat(card, 'pt-BR'));
+    const { result } = await renderHook(() => useCardChat(card, 'pt-BR'));
     await act(() => result.current.send('oi'));
     expect(result.current.status).toBe('quota');
     authFetch.mockRejectedValue(new ApiError(403, 'pro_required'));
@@ -133,13 +133,13 @@ describe('useCardChat', () => {
 
   it('zera ao trocar de card e mantém no mesmo card', async () => {
     authFetch.mockResolvedValue(OK);
-    const { result, rerender } = renderHook(({ c }: { c: Card }) => useCardChat(c, 'pt-BR'), {
+    const { result, rerender } = await renderHook(({ c }: { c: Card }) => useCardChat(c, 'pt-BR'), {
       initialProps: { c: card },
     });
     await act(() => result.current.send('oi'));
-    rerender({ c: { ...card } as Card });
+    await rerender({ c: { ...card } as Card });
     expect(result.current.messages).toHaveLength(2);
-    rerender({ c: other });
+    await rerender({ c: other });
     expect(result.current.messages).toEqual([]);
     expect(result.current.status).toBe('idle');
   });

@@ -25,7 +25,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -43,7 +43,7 @@ const tab = (label: string) => screen.getByRole(TAB_ROLE, { name: new RegExp(`^$
 describe('Requirement: Aba Perfil', () => {
   it('Abrir o Perfil', async () => {
     await open('/tracks');
-    fireEvent.press(tab('Perfil'));
+    await fireEvent.press(tab('Perfil'));
     expect(screen).toHavePathname('/profile');
     expect(screen.getByRole('header', { name: 'Idioma' })).toBeOnTheScreen();
     expect(radio('Português (Brasil)')).toBeChecked();
@@ -53,18 +53,18 @@ describe('Requirement: Aba Perfil', () => {
 
   it('Abrir o progresso por trilha', async () => {
     await open('/tracks');
-    fireEvent.press(tab('Perfil'));
-    press('Progresso por trilha');
+    await fireEvent.press(tab('Perfil'));
+    await press('Progresso por trilha');
     expect(screen).toHavePathname('/progress');
     expect(screen.getByRole('header', { name: 'Progresso' })).toBeOnTheScreen();
     expect(tabLabels()).toEqual([]);
-    press('Voltar');
+    await press('Voltar');
     expect(screen).toHavePathname('/profile');
   });
 
   it('voltar do Progresso aberto por link vai para o Perfil', async () => {
     await open('/progress');
-    press('Voltar');
+    await press('Voltar');
     expect(screen).toHavePathname('/profile');
   });
 });
@@ -106,7 +106,7 @@ describe('Requirement: Idiomas disponíveis', () => {
 describe('Requirement: Trocar o idioma', () => {
   it('Troca imediata', async () => {
     await open('/profile');
-    fireEvent.press(radio('English'));
+    await fireEvent.press(radio('English'));
     expect(screen.getByRole('header', { name: 'Language' })).toBeOnTheScreen();
     expect(useSettingsStore.getState().language).toBe('en');
     expect(tabLabels()).toEqual(['Home', 'Tracks', 'Glossary', 'Profile']);
@@ -123,12 +123,12 @@ describe('Requirement: Trocar o idioma (progresso)', () => {
     ids.forEach((id) => useStudyStore.getState().answer(crudTrack.id, id, 'known'));
     await open('/progress');
     expect(screen.getByTestId(`track-progress-${crudTrack.id}`)).toBeOnTheScreen();
-    fireEvent.press(screen.getByTestId(`track-progress-header-${crudTrack.id}`));
+    await fireEvent.press(screen.getByTestId(`track-progress-header-${crudTrack.id}`));
     expect(screen.getAllByLabelText('4 já sabia').length).toBeGreaterThan(0);
-    press('Voltar');
-    fireEvent.press(radio('English'));
-    press('Progress by track');
-    fireEvent.press(screen.getByTestId(`track-progress-header-${crudTrack.id}`));
+    await press('Voltar');
+    await fireEvent.press(radio('English'));
+    await press('Progress by track');
+    await fireEvent.press(screen.getByTestId(`track-progress-header-${crudTrack.id}`));
     expect(screen.getAllByLabelText('4 I knew it').length).toBeGreaterThan(0);
   });
 });
@@ -143,12 +143,12 @@ describe('Requirement: Aba Perfil (seções)', () => {
 
 describe('Requirement: Seção Sobre', () => {
   it('Abrir a política de privacidade', async () => {
-    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
+    const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(undefined);
     await open('/profile');
-    press('Política de privacidade');
+    await press('Política de privacidade');
     expect(openURL).toHaveBeenCalledWith(Constants.expoConfig?.extra?.legal?.privacyUrl);
     expect(String(openURL.mock.calls[0][0])).toMatch(/^https:\/\//);
-    press('Termos de uso');
+    await press('Termos de uso');
     expect(openURL).toHaveBeenLastCalledWith(Constants.expoConfig?.extra?.legal?.termsUrl);
     openURL.mockRestore();
   });

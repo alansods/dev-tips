@@ -30,7 +30,7 @@ const TRACK = 'crud-4-frameworks';
 const deckIds = (id: string) => crudTrack.decks.find((d) => d.id === id)!.cards.map((c) => c.id);
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -46,7 +46,7 @@ describe('Requirement: Interface traduzida', () => {
     expect(screen.getByText('Tap to see the answer')).toBeOnTheScreen();
     // Origem do card na sessão: em inglês
     expect(screen.getByText("The same CRUD in four frameworks · What we'll build")).toBeOnTheScreen();
-    press('Show answer');
+    await press('Show answer');
     expect(screen.getByRole('button', { name: "I didn't know" })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'I knew it' })).toBeOnTheScreen();
   });
@@ -55,8 +55,8 @@ describe('Requirement: Interface traduzida', () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
     const n = deckIds('o-que-vamos-criar').length;
     for (let i = 0; i < n; i++) {
-      press('Show answer');
-      press(i < 3 ? 'I knew it' : "I didn't know");
+      await press('Show answer');
+      await press(i < 3 ? 'I knew it' : "I didn't know");
     }
     expect(screen.getByText('Session complete')).toBeOnTheScreen();
     expect(screen.getByLabelText('3 I knew it')).toBeOnTheScreen();
@@ -72,7 +72,7 @@ describe('Requirement: Interface traduzida', () => {
     expect(screen.getByText('1 card to review today')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: "Study What we'll build" })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: /^Continue / })).toBeOnTheScreen();
-    press('Review now');
+    await press('Review now');
     expect(screen.getAllByText("Today's review").length).toBeGreaterThan(0);
   });
 
@@ -83,9 +83,9 @@ describe('Requirement: Interface traduzida', () => {
 
   it('aba Progresso em inglês', async () => {
     await open('/progress');
-    fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
+    await fireEvent.press(screen.getByTestId(`track-progress-header-${TRACK}`));
     expect(screen.getAllByRole('button', { name: 'Reset progress' }).length).toBeGreaterThan(0);
-    fireEvent.press(screen.getAllByRole('button', { name: 'Reset progress' })[0]);
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Reset progress' })[0]);
     expect(screen.getByRole('button', { name: 'Reset' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeOnTheScreen();
     expect(screen.getAllByText('to review').length).toBeGreaterThan(0);

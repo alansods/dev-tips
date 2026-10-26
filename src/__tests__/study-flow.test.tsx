@@ -34,7 +34,7 @@ const TOTAL_CARDS = crudTrack.decks.reduce((n, d) => n + d.cards.length, 0);
 const deckIds = (id: string) => crudTrack.decks.find((d) => d.id === id)!.cards.map((c) => c.id);
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -42,9 +42,9 @@ const seed = (cardIds: string[], result: 'known' | 'unknown') =>
   cardIds.forEach((id) => useStudyStore.getState().answer(TRACK, id, result));
 
 /** Vira o card atual e responde. */
-function answer(result: 'Já sabia' | 'Não sabia') {
-  press('Mostrar resposta');
-  press(result);
+async function answer(result: 'Já sabia' | 'Não sabia') {
+  await press('Mostrar resposta');
+  await press(result);
 }
 
 beforeEach(() => resetStudyStore());
@@ -58,7 +58,7 @@ const term = (id: string) => {
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
     await open('/area/backend');
-    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
+    await press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
       expect(screen.getByText(name)).toBeOnTheScreen();
     const titles = ['O que vamos criar', 'Passo a passo', 'Mapa mental', 'Glossário', 'Perguntas de entrevista'];
@@ -69,9 +69,9 @@ describe('Requirement: Tela da trilha', () => {
 
   it('Voltar para as trilhas', async () => {
     await open('/tracks');
-    press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
-    press('Voltar');
+    await press(/^Backend,/);
+    await press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
+    await press('Voltar');
     expect(screen).toHavePathname('/area/backend');
   });
 
@@ -85,7 +85,7 @@ describe('Requirement: Deck com progresso e ação', () => {
   it('Deck nunca estudado', async () => {
     await open(`/track/${TRACK}`);
     expect(screen.getByText('0/24')).toBeOnTheScreen();
-    press('Estudar Glossário');
+    await press('Estudar Glossário');
     expect(screen).toHavePathname(`/study/${TRACK}/glossario`);
     expect(screen.getByText('1 / 24')).toBeOnTheScreen();
   });
@@ -96,7 +96,7 @@ describe('Requirement: Deck com progresso e ação', () => {
     seed([c], 'unknown');
     await open(`/track/${TRACK}`);
     expect(screen.getByText('2/5')).toBeOnTheScreen();
-    press('Continuar O que vamos criar');
+    await press('Continuar O que vamos criar');
     expect(screen.getByText('1 / 3')).toBeOnTheScreen();
   });
 
@@ -104,7 +104,7 @@ describe('Requirement: Deck com progresso e ação', () => {
     seed(deckIds('o-que-vamos-criar'), 'known');
     await open(`/track/${TRACK}`);
     expect(screen.getByText('5/5')).toBeOnTheScreen();
-    press('Estudar de novo O que vamos criar');
+    await press('Estudar de novo O que vamos criar');
     expect(screen.getByText('1 / 5')).toBeOnTheScreen();
   });
 });
@@ -112,7 +112,7 @@ describe('Requirement: Deck com progresso e ação', () => {
 describe('Requirement: Sessão de estudo', () => {
   it('Primeiro card', async () => {
     await open(`/track/${TRACK}`);
-    press('Estudar Passo a passo');
+    await press('Estudar Passo a passo');
     expect(screen.getByText('1 / 20')).toBeOnTheScreen();
     expect(screen.getByText('Passo 1')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: /^Trilhas, tab/ })).toBeNull();
@@ -120,17 +120,17 @@ describe('Requirement: Sessão de estudo', () => {
 
   it('mostra o nível do card na sessão', async () => {
     await open(`/track/${TRACK}`);
-    press('Estudar Passo a passo');
+    await press('Estudar Passo a passo');
     expect(screen.getByText('Júnior')).toBeOnTheScreen(); // step-01
   });
 
   it('Sair no meio', async () => {
     await open(`/track/${TRACK}`);
-    press('Estudar O que vamos criar');
-    answer('Já sabia');
-    answer('Já sabia');
-    answer('Não sabia');
-    press('Sair da sessão');
+    await press('Estudar O que vamos criar');
+    await answer('Já sabia');
+    await answer('Já sabia');
+    await answer('Não sabia');
+    await press('Sair da sessão');
     expect(screen).toHavePathname(`/track/${TRACK}`);
     expect(Object.keys(useStudyStore.getState().progress)).toHaveLength(3);
     expect(screen.getByText('2/5')).toBeOnTheScreen();
@@ -148,11 +148,11 @@ describe('Requirement: Sessão de estudo', () => {
   it('Nova ordem a cada sessão', async () => {
     const [first, second] = deckIds('glossario');
     await open(`/track/${TRACK}`);
-    press('Estudar Glossário');
+    await press('Estudar Glossário');
     expect(screen.getByText(term(first))).toBeOnTheScreen();
-    press('Sair da sessão');
+    await press('Sair da sessão');
     jest.spyOn(chance, 'random').mockReturnValue(0);
-    press('Estudar Glossário');
+    await press('Estudar Glossário');
     expect(screen.getByText(term(second))).toBeOnTheScreen();
   });
 
@@ -160,7 +160,7 @@ describe('Requirement: Sessão de estudo', () => {
     jest.spyOn(chance, 'random').mockReturnValue(0);
     await open(`/study/${TRACK}/passo-a-passo`);
     expect(screen.getByText('Passo 1')).toBeOnTheScreen();
-    answer('Já sabia');
+    await answer('Já sabia');
     expect(screen.getByText('Passo 2')).toBeOnTheScreen();
   });
 
@@ -169,9 +169,9 @@ describe('Requirement: Sessão de estudo', () => {
     seed(ids.slice(0, 2), 'known');
     jest.spyOn(chance, 'random').mockReturnValue(0);
     await open(`/track/${TRACK}`);
-    press('Continuar O que vamos criar');
+    await press('Continuar O que vamos criar');
     expect(screen.getByText('1 / 3')).toBeOnTheScreen();
-    for (let i = 0; i < 3; i++) answer('Já sabia');
+    for (let i = 0; i < 3; i++) await answer('Já sabia');
     const known = Object.entries(useStudyStore.getState().progress).filter(([, r]) => r === 'known');
     expect(known.map(([k]) => k).sort()).toEqual(ids.map((id) => progressKey(TRACK, id)).sort());
   });
@@ -187,20 +187,20 @@ describe('Requirement: Virar e responder (na tela)', () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
     expect(screen.queryByRole('button', { name: 'Já sabia' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Não sabia' })).toBeNull();
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
     expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
   });
 
   it('tocar no card também vira', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Virar card');
+    await press('Virar card');
     expect(screen.getByText('C · Create')).toBeOnTheScreen();
   });
 
   it('Voltar para a pergunta', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
-    press('Ver pergunta');
+    await press('Mostrar resposta');
+    await press('Ver pergunta');
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Já sabia' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Não sabia' })).toBeNull();
@@ -209,8 +209,8 @@ describe('Requirement: Virar e responder (na tela)', () => {
 
   it('Tocar no verso', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
-    fireEvent.press(screen.getByTestId('card-back'));
+    await press('Mostrar resposta');
+    await fireEvent.press(screen.getByTestId('card-back'));
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
     expect(screen.queryByText('C · Create')).toBeNull();
   });
@@ -232,13 +232,13 @@ describe('Requirement: Virar e responder (na tela)', () => {
     expect(pressable.flexGrow).toBe(1);
     expect(pressable.padding).toBeGreaterThan(0);
     expect(content.padding).toBeUndefined();
-    fireEvent.press(screen.getByTestId('card-front'));
+    await fireEvent.press(screen.getByTestId('card-front'));
     expect(screen.getByText('C · Create')).toBeOnTheScreen();
   });
 
   it('Tocar no espaço vazio do verso', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
     const { pressable, content } = touchArea('card-back');
     expect(pressable.flexGrow).toBe(1);
     expect(pressable.padding).toBeGreaterThan(0);
@@ -247,18 +247,18 @@ describe('Requirement: Virar e responder (na tela)', () => {
 
   it('Virar de novo', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
-    press('Ver pergunta');
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
+    await press('Ver pergunta');
+    await press('Mostrar resposta');
     expect(screen.getByText('C · Create')).toBeOnTheScreen();
-    press('Já sabia');
+    await press('Já sabia');
     expect(screen.getByText('2 / 5')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(TRACK, 'endpoint-create')]).toBe('known');
   });
 
   it('Responder e avançar', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    answer('Já sabia');
+    await answer('Já sabia');
     expect(screen.getByText('2 / 5')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(TRACK, 'endpoint-create')]).toBe('known');
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
@@ -268,10 +268,10 @@ describe('Requirement: Virar e responder (na tela)', () => {
 describe('Requirement: Abas de framework (na sessão)', () => {
   it('Escolha mantida entre passos', async () => {
     await open(`/study/${TRACK}/passo-a-passo`);
-    press('Mostrar resposta');
-    fireEvent.press(screen.getByRole('tab', { name: 'FastAPI' }));
-    press('Já sabia');
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
+    await fireEvent.press(screen.getByRole('tab', { name: 'FastAPI' }));
+    await press('Já sabia');
+    await press('Mostrar resposta');
     expect(screen.getByText('Passo 2')).toBeOnTheScreen();
     expect(screen.getByRole('tab', { name: 'FastAPI' })).toBeSelected();
     expect(screen.getByText(/pip install "fastapi\[standard\]"/)).toBeOnTheScreen();
@@ -281,24 +281,24 @@ describe('Requirement: Abas de framework (na sessão)', () => {
 describe('Requirement: Resumo da sessão', () => {
   it('Resumo com erros', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    (['Já sabia', 'Não sabia', 'Já sabia', 'Não sabia', 'Já sabia'] as const).forEach(answer);
+    for (const result of ['Já sabia', 'Não sabia', 'Já sabia', 'Não sabia', 'Já sabia'] as const) await answer(result);
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
     expect(screen.getByLabelText('3 já sabia')).toBeOnTheScreen();
     expect(screen.getByLabelText('2 não sabia')).toBeOnTheScreen();
     expect(screen.getByText(/3 de 5 cards como "já sabia"/)).toBeOnTheScreen();
     expect(screen.getByText('GET /products')).toBeOnTheScreen();
     expect(screen.getByText('PUT /products/{id}')).toBeOnTheScreen();
-    press('Revisar os que errei');
+    await press('Revisar os que errei');
     expect(screen.getByText('1 / 2')).toBeOnTheScreen();
   });
 
   it('Resumo sem erros', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    for (let i = 0; i < 5; i++) answer('Já sabia');
+    for (let i = 0; i < 5; i++) await answer('Já sabia');
     expect(screen.getByText('Sessão concluída')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Revisar os que errei' })).toBeNull();
     expect(screen.queryByText('Para revisar')).toBeNull();
-    press('Voltar à trilha');
+    await press('Voltar à trilha');
   });
 });
 
@@ -306,10 +306,10 @@ describe('Requirement: Progresso enquanto o app está aberto', () => {
   it('Progresso refletido na tela da trilha', async () => {
     await open(`/track/${TRACK}`);
     expect(screen.getByLabelText(`0 de ${TOTAL_CARDS} cards que você sabe`)).toBeOnTheScreen();
-    press('Estudar Glossário');
-    answer('Já sabia');
-    answer('Já sabia');
-    press('Sair da sessão');
+    await press('Estudar Glossário');
+    await answer('Já sabia');
+    await answer('Já sabia');
+    await press('Sair da sessão');
     expect(screen.getByText('2/24')).toBeOnTheScreen();
     expect(screen.getByLabelText(`2 de ${TOTAL_CARDS} cards que você sabe`)).toBeOnTheScreen();
   });
@@ -339,7 +339,7 @@ describe('Requirement: Identidade da trilha (Fundamentos web)', () => {
 describe('Requirement: Animação de virar o card (na sessão)', () => {
   it('Botões disponíveis durante a animação', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
     // sem avançar timers: a animação ainda está em curso, mas os botões já existem
     expect(screen.getByRole('button', { name: 'Não sabia' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Já sabia' })).toBeOnTheScreen();
@@ -347,8 +347,8 @@ describe('Requirement: Animação de virar o card (na sessão)', () => {
 
   it('Voltar para a frente com animação', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
-    press('Mostrar resposta');
-    press('Ver pergunta');
+    await press('Mostrar resposta');
+    await press('Ver pergunta');
     // sem avançar timers: a volta ainda anima, mas "Mostrar resposta" já existe
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
     expect(screen.getByTestId('card-front')).toBeOnTheScreen();
