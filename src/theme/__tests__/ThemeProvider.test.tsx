@@ -15,7 +15,7 @@ function Probe() {
 }
 
 async function renderWithTheme() {
-  render(
+  await render(
     <ThemeProvider>
       <Probe />
       <ThemeSection />
@@ -41,7 +41,7 @@ describe('Requirement: Tema claro e escuro', () => {
   it('Alternar manualmente', async () => {
     await renderWithTheme();
     expect(screen.getByTestId('probe')).toHaveTextContent(/^light:#F3F4F7:/);
-    fireEvent.press(screen.getByRole('radio', { name: 'Escuro' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Escuro' }));
     expect(screen.getByTestId('probe')).toHaveTextContent('dark:#0C1015:dark');
     expect(screen.getByRole('radio', { name: 'Escuro' })).toBeChecked();
     await act(async () => {});
@@ -59,7 +59,7 @@ describe('Requirement: Tema claro e escuro', () => {
     await AsyncStorage.setItem(COLOR_SCHEME_KEY, 'dark');
     useColorScheme.mockReturnValue('light');
     await renderWithTheme();
-    fireEvent.press(screen.getByRole('radio', { name: 'Automático' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Automático' }));
     expect(screen.getByTestId('probe')).toHaveTextContent('light:#F3F4F7:system');
     await act(async () => {});
     expect(await AsyncStorage.getItem(COLOR_SCHEME_KEY)).toBeNull();

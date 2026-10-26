@@ -35,7 +35,7 @@ const CRUD = 'crud-4-frameworks';
 const WEB = 'fundamentos-web';
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -104,7 +104,7 @@ describe('Requirement: Revisão de hoje no Início', () => {
   it('Começar revisão', async () => {
     answer(WEB, cards(WEB).slice(0, 2), 'unknown');
     await open('/');
-    press('Começar revisão');
+    await press('Começar revisão');
     expect(screen).toHavePathname('/review');
     expect(screen.getByText('1 / 2')).toBeOnTheScreen();
   });
@@ -135,7 +135,7 @@ describe('Requirement: Continue de onde parou', () => {
   it('Continuar o deck', async () => {
     answer(CRUD, [deck.cards[0].id], 'known');
     await open('/');
-    press(`Continuar O mesmo CRUD em quatro frameworks, ${deck.title}`);
+    await press(`Continuar O mesmo CRUD em quatro frameworks, ${deck.title}`);
     expect(screen).toHavePathname(`/study/${CRUD}/${deck.id}`);
   });
 
@@ -146,7 +146,7 @@ describe('Requirement: Continue de onde parou', () => {
     expect(screen.getAllByText('Dashboard lento: de 8 s para menos de 2').length).toBeGreaterThan(0);
     expect(screen.getByText('Situação-problema')).toBeOnTheScreen();
     expect(screen.queryByText(/deck 1 de 1/)).toBeNull();
-    press('Continuar Dashboard lento: de 8 s para menos de 2, Situação-problema');
+    await press('Continuar Dashboard lento: de 8 s para menos de 2, Situação-problema');
     expect(screen).toHavePathname('/study/sim-dashboard-lento/conversa');
   });
 
@@ -164,7 +164,7 @@ describe('Requirement: Próximo passo', () => {
     answer('react', cards('react').slice(0, 1), 'known');
     await open('/');
     expect(screen.getByRole('header', { name: 'Próximo passo depois de React' })).toBeOnTheScreen();
-    press('Estado e dados no React');
+    await press('Estado e dados no React');
     expect(screen).toHavePathname('/track/estado-e-dados-no-react');
   });
 
@@ -182,7 +182,7 @@ describe('Requirement: Novidades', () => {
     await open('/');
     expect(screen.getByRole('header', { name: 'Novidades' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Módulos nativos no Expo, Nova' })).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole('link', { name: 'Ver todas' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Ver todas' }));
     expect(screen).toHavePathname('/tracks');
   });
 
@@ -205,7 +205,7 @@ describe('Requirement: Novidades', () => {
     jest.spyOn(clock, 'today').mockReturnValue('2026-10-10');
     answer(WEB, ['http'], 'known');
     await open('/');
-    press('Situações-problema, 7 casos, Nova área');
+    await press('Situações-problema, 7 casos, Nova área');
     expect(screen).toHavePathname('/area/simulacoes');
   });
 
@@ -225,13 +225,13 @@ describe('Requirement: Primeiro acesso', () => {
     await open('/');
     expect(screen.getByRole('header', { name: 'Comece por aqui' })).toBeOnTheScreen();
     expect(screen.getByText('Fundamentos de programação')).toBeOnTheScreen();
-    press('Começar a trilha');
+    await press('Começar a trilha');
     expect(screen).toHavePathname('/track/fundamentos-de-programacao');
   });
 
   it('Interesse em Backend', async () => {
     await open('/');
-    fireEvent.press(screen.getByRole('checkbox', { name: 'Backend' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Backend' }));
     expect(screen.getByRole('checkbox', { name: 'Backend' })).toBeChecked();
     expect(useSettingsStore.getState().interests).toEqual(['backend']);
     expect(screen.queryByText('Fundamentos de programação')).toBeNull();
@@ -249,7 +249,7 @@ describe('Requirement: Primeiro acesso (simulações)', () => {
 describe('Requirement: Áreas de interesse', () => {
   it('Mudar no Perfil', async () => {
     await open('/profile');
-    fireEvent.press(screen.getByRole('checkbox', { name: 'Mobile' }));
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Mobile' }));
     expect(useSettingsStore.getState().interests).toEqual(['mobile']);
   });
 });

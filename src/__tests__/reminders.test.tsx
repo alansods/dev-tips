@@ -32,7 +32,7 @@ const flush = () =>
     for (let i = 0; i < 50; i++) await Promise.resolve();
   });
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await flush();
 }
 const toggle = () => screen.getByRole('switch', { name: 'Lembrete diário' });
@@ -85,7 +85,7 @@ describe('Requirement: Permissão sob demanda', () => {
     N.requestPermissionsAsync.mockResolvedValue(grant(true));
     N.getPermissionsAsync.mockResolvedValueOnce(grant(false)).mockResolvedValue(grant(true));
     await open('/profile');
-    fireEvent(toggle(), 'valueChange', true);
+    await fireEvent(toggle(), 'valueChange', true);
     await flush();
     expect(N.requestPermissionsAsync).toHaveBeenCalledTimes(1);
     expect(toggle()).toHaveProp('value', true);
@@ -100,11 +100,11 @@ describe('Requirement: Permissão sob demanda', () => {
   it('Permissão negada', async () => {
     const openSettings = jest.spyOn(Linking, 'openSettings').mockResolvedValue();
     await open('/profile');
-    fireEvent(toggle(), 'valueChange', true);
+    await fireEvent(toggle(), 'valueChange', true);
     await flush();
     expect(toggle()).toHaveProp('value', false);
     expect(screen.getByText('Ative as notificações nas configurações do aparelho.')).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole('button', { name: 'Abrir ajustes' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Abrir ajustes' }));
     expect(openSettings).toHaveBeenCalled();
     expect(N.scheduleNotificationAsync).not.toHaveBeenCalled();
     openSettings.mockRestore();
@@ -128,7 +128,7 @@ describe('Requirement: Reagendamento', () => {
     useRemindersStore.setState({ enabled: true });
     await open('/profile');
     N.scheduleNotificationAsync.mockClear();
-    fireEvent.press(radio('Almoço 12:30')!);
+    await fireEvent.press(radio('Almoço 12:30')!);
     await flush();
     expect(useRemindersStore.getState().time).toBe('12:30');
     const times = N.scheduleNotificationAsync.mock.calls.map(([req]) => {
@@ -143,7 +143,7 @@ describe('Requirement: Reagendamento', () => {
     useRemindersStore.setState({ enabled: true });
     await open('/profile');
     N.cancelAllScheduledNotificationsAsync.mockClear();
-    fireEvent(toggle(), 'valueChange', false);
+    await fireEvent(toggle(), 'valueChange', false);
     await flush();
     expect(useRemindersStore.getState().enabled).toBe(false);
     expect(N.cancelAllScheduledNotificationsAsync).toHaveBeenCalled();

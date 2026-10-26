@@ -38,7 +38,7 @@ const total = (track: typeof crudTrack) => track.decks.reduce((n, d) => n + d.ca
 const glossaryIds = crudTrack.decks.find((d) => d.id === 'glossario')!.cards.map((c) => c.id);
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -74,7 +74,7 @@ describe('Requirement: Home por áreas', () => {
 
   it('Tocar na área', async () => {
     await open('/tracks');
-    press(/^Backend,/);
+    await press(/^Backend,/);
     expect(screen).toHavePathname('/area/backend');
   });
 });
@@ -120,7 +120,7 @@ describe('Requirement: Tela da área', () => {
 
   it('Abrir trilha pela área', async () => {
     await open('/area/backend');
-    press(/^O mesmo CRUD em quatro frameworks,/);
+    await press(/^O mesmo CRUD em quatro frameworks,/);
     expect(screen).toHavePathname(`/track/${crudTrack.id}`);
   });
 
@@ -139,19 +139,19 @@ describe('Requirement: Tela da área', () => {
 describe('Requirement: Tela da trilha', () => {
   it('Abrir a trilha', async () => {
     await open('/tracks');
-    press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks,/);
+    await press(/^Backend,/);
+    await press(/^O mesmo CRUD em quatro frameworks,/);
     for (const name of ['Express', 'Spring Boot', 'NestJS', 'FastAPI'])
       expect(screen.getByText(name)).toBeOnTheScreen();
   });
 
   it('Voltar para as trilhas', async () => {
     await open('/tracks');
-    press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks,/);
-    press('Voltar');
+    await press(/^Backend,/);
+    await press(/^O mesmo CRUD em quatro frameworks,/);
+    await press('Voltar');
     expect(screen).toHavePathname('/area/backend');
-    press('Voltar');
+    await press('Voltar');
     expect(screen).toHavePathname('/tracks');
   });
 });

@@ -11,6 +11,7 @@ import {
   StyleSheet,
   TextInput,
   View,
+  type ScrollViewInstance,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -44,7 +45,7 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
   const language = useLanguage();
   const expiresAt = useSubscriptionStore((s) => s.plan?.expiresAt ?? null);
   const [draft, setDraft] = useState('');
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
   const sending = status === 'sending';
   const canSend = draft.trim().length > 0 && !sending;
 
@@ -91,7 +92,7 @@ export function ChatSheet({ visible, cardLabel, cardTitle, messages, status, onS
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       {/* "padding" também no Android: com edge-to-edge a janela não encolhe sozinha com o teclado. */}
-      <KeyboardAvoidingView style={styles.root} behavior="padding">
+      <KeyboardAvoidingView testID="chat-keyboard-avoiding" style={styles.root} behavior="padding">
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t.common.close}

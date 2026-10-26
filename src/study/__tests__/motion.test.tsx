@@ -21,20 +21,20 @@ describe('Requirement: Animação de virar o card', () => {
   it('Reduzir movimento', async () => {
     expect(flipDuration(true)).toBe(0);
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockResolvedValue(true);
-    render(<Probe />);
+    await render(<Probe />);
     await waitFor(() => expect(screen.getByTestId('reduced')).toHaveTextContent('true'));
   });
 
   it('falha ao consultar o sistema conta como movimento normal', async () => {
     jest.spyOn(AccessibilityInfo, 'isReduceMotionEnabled').mockRejectedValue(new Error('indisponível'));
-    render(<Probe />);
+    await render(<Probe />);
     await waitFor(() => expect(screen.getByTestId('reduced')).toHaveTextContent('false'));
   });
 });
 
 describe('Requirement: Alvos de toque mínimos', () => {
-  it('Chips de termos relacionados', () => {
-    renderWithTheme(<TermChips track={crudTrack} termIds={['cors']} onOpen={() => {}} />);
+  it('Chips de termos relacionados', async () => {
+    await renderWithTheme(<TermChips track={crudTrack} termIds={['cors']} onOpen={() => {}} />);
     const chip = screen.getByRole('button', { name: 'CORS' });
     const style = StyleSheet.flatten(
       typeof chip.props.style === 'function' ? chip.props.style({ pressed: false }) : chip.props.style,

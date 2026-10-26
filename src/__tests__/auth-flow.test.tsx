@@ -65,12 +65,12 @@ const flush = () =>
     for (let i = 0; i < 20; i++) await Promise.resolve();
   });
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await flush();
 }
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const press = async (name: string | RegExp) => {
-  fireEvent.press(button(name));
+  await fireEvent.press(button(name));
   await flush();
 };
 const signedIn = async () => {

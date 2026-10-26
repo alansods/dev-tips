@@ -1,5 +1,5 @@
 import { act, fireEvent, renderRouter, screen, within } from 'expo-router/testing-library';
-import { Keyboard, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Keyboard, Platform, ScrollView, StyleSheet } from 'react-native';
 
 import RootLayout from '../app/_layout';
 import TabsLayout from '../app/(tabs)/_layout';
@@ -54,12 +54,12 @@ const flush = () =>
     for (let i = 0; i < 20; i++) await Promise.resolve();
   });
 async function open(url = SESSION) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await flush();
 }
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const press = async (name: string | RegExp) => {
-  fireEvent.press(button(name));
+  await fireEvent.press(button(name));
   await flush();
 };
 async function subscriber() {
@@ -68,7 +68,7 @@ async function subscriber() {
   useSubscriptionStore.setState({ plan: PRO });
 }
 async function typeAndSend(text: string) {
-  fireEvent.changeText(screen.getByLabelText('Sua pergunta'), text);
+  await fireEvent.changeText(screen.getByLabelText('Sua pergunta'), text);
   await press('Enviar pergunta');
 }
 const lastAction = () => within(screen.getByTestId('session-actions')).getAllByRole('button').at(-1);
@@ -144,8 +144,11 @@ describe('Requirement: Chat do card', () => {
       await open();
       await press('Perguntar sobre este card');
       // No Android edge-to-edge a janela não encolhe com o teclado: sem behavior, o campo fica embaixo dele.
-      expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe('padding');
-      screen.unmount();
+      // behavior="padding" não aparece em props (a View interna não recebe essa prop): o efeito observável
+      // é a View ganhar `paddingBottom` no estilo (0 sem teclado), que só os behaviors "padding"/"height" aplicam.
+      const style = StyleSheet.flatten(screen.getByTestId('chat-keyboard-avoiding').props.style);
+      expect(style).toHaveProperty('paddingBottom');
+      await screen.unmount();
     }
   });
 
@@ -261,7 +264,7 @@ describe('Requirement: Enviar pergunta no app', () => {
     // A conversa rola até o fim quando o conteúdo cresce (pergunta, "digitando…", resposta).
     const scrollToEnd = ScrollView.prototype.scrollToEnd as jest.Mock;
     scrollToEnd.mockClear();
-    fireEvent(screen.getByTestId('chat-messages'), 'contentSizeChange', 320, 1200);
+    await fireEvent(screen.getByTestId('chat-messages'), 'contentSizeChange', 320, 1200);
     expect(scrollToEnd).toHaveBeenCalledWith({ animated: true });
   });
 

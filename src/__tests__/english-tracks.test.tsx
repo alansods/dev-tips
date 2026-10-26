@@ -29,7 +29,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -51,8 +51,8 @@ describe('Requirement: Tradução completa para inglês', () => {
 
   it('Card exibido em inglês: concept CORS', async () => {
     await open('/glossary');
-    showAllGlossaryItems();
-    fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
+    await showAllGlossaryItems();
+    await fireEvent.press(screen.getByRole('button', { name: 'CORS' }));
     expect(within(screen.getByTestId('term-sheet')).getByText(/A browser security rule/)).toBeOnTheScreen();
   });
 
@@ -60,7 +60,7 @@ describe('Requirement: Tradução completa para inglês', () => {
     await open('/study/crud-4-frameworks/passo-a-passo');
     expect(screen.getByText('Create the project')).toBeOnTheScreen();
     expect(screen.getByText('Create the project folder with the initial structure.')).toBeOnTheScreen();
-    press('Show answer');
+    await press('Show answer');
     expect(screen.getByText(/No generator\. You start with an empty folder/)).toBeOnTheScreen();
   });
 
@@ -68,8 +68,8 @@ describe('Requirement: Tradução completa para inglês', () => {
     await open('/track/fundamentos-web');
     expect(screen.getByRole('button', { name: 'Study Interview questions' })).toBeOnTheScreen();
     await open('/glossary');
-    fireEvent.changeText(screen.getByLabelText('Search term'), 'Set-Cookie');
-    fireEvent.press(screen.getByRole('button', { name: 'Cookie' }));
+    await fireEvent.changeText(screen.getByLabelText('Search term'), 'Set-Cookie');
+    await fireEvent.press(screen.getByRole('button', { name: 'Cookie' }));
     expect(
       within(screen.getByTestId('term-sheet')).getByText(/A small piece of data the server stores/),
     ).toBeOnTheScreen();
