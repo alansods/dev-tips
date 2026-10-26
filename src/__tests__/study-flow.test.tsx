@@ -278,6 +278,37 @@ describe('Requirement: Abas de framework (na sessão)', () => {
   });
 });
 
+// O fireEvent não simula a disputa do toque (sobe até o primeiro onPress) nem o pan nativo.
+// Confere a estrutura que garante o comportamento no app: a área do código reivindica o toque
+// ao começar (ganha do Pressable do card, porque o mais profundo que pede o toque ganha), fica
+// DENTRO do ScrollView horizontal (no iOS, um ancestral dono do toque impede a rolagem) e
+// carrega o padding (cobre a área preta inteira).
+describe('Requirement: Exibição de código (na sessão)', () => {
+  const codeArea = async () => {
+    jest.spyOn(chance, 'random').mockReturnValue(0);
+    await open(`/study/${TRACK}/passo-a-passo`);
+    press('Mostrar resposta');
+    return screen.getByTestId('code-scroll-area');
+  };
+
+  it('Arrastar o código para o lado', async () => {
+    const area = await codeArea();
+    expect(area.props.onStartShouldSetResponder()).toBe(true);
+    let ancestor = area.parent;
+    while (ancestor && ancestor.props.horizontal !== true) ancestor = ancestor.parent;
+    expect(ancestor).not.toBeNull();
+    expect(StyleSheet.flatten(area.props.style)).toMatchObject({ flexGrow: 1, padding: expect.any(Number) });
+  });
+
+  it('Tocar no código', async () => {
+    const area = await codeArea();
+    expect(area.props.onStartShouldSetResponder()).toBe(true);
+    expect(area.props.onPress).toBeUndefined();
+    fireEvent.press(screen.getByTestId('card-back'));
+    expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
+  });
+});
+
 describe('Requirement: Resumo da sessão', () => {
   it('Resumo com erros', async () => {
     await open(`/study/${TRACK}/o-que-vamos-criar`);
