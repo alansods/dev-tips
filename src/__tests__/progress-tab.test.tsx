@@ -40,9 +40,9 @@ const header = (trackId = TRACK) => screen.getByTestId(`track-progress-header-${
 const togglePanel = (trackId = TRACK) => fireEvent.press(header(trackId));
 
 async function openProgress({ expandCrud = true } = {}) {
-  renderRouter(APP, { initialUrl: '/progress' });
+  await renderRouter(APP, { initialUrl: '/progress' });
   await act(async () => {});
-  if (expandCrud) togglePanel();
+  if (expandCrud) await togglePanel();
 }
 
 beforeEach(() => resetStudyStore());
@@ -62,12 +62,12 @@ describe('Requirement: Tela Progresso', () => {
 
   it('Abrir e fechar um painel', async () => {
     await openProgress({ expandCrud: false });
-    togglePanel();
+    await togglePanel();
     expect(header()).toBeExpanded();
     expect(crud().getByLabelText(`${TOTAL} não vistos`)).toBeOnTheScreen();
     expect(crud().getByText('O que vamos criar')).toBeOnTheScreen();
     expect(crud().getByRole('button', { name: 'Zerar progresso' })).toBeOnTheScreen();
-    togglePanel();
+    await togglePanel();
     expect(header()).toBeCollapsed();
     expect(crud().queryByLabelText(`${TOTAL} não vistos`)).toBeNull();
     expect(crud().queryByRole('button', { name: 'Zerar progresso' })).toBeNull();
@@ -79,7 +79,7 @@ describe('Requirement: Tela Progresso', () => {
       .getAllByTestId(/^track-progress-header-/)
       .map((h) => h.props.testID.replace('track-progress-header-', ''))
       .find((id: string) => id !== TRACK)!;
-    togglePanel(other);
+    await togglePanel(other);
     expect(header()).toBeExpanded();
     expect(header(other)).toBeExpanded();
     expect(screen.getAllByRole('button', { name: 'Zerar progresso' })).toHaveLength(2);
@@ -127,17 +127,17 @@ describe('Requirement: Zerar progresso de uma trilha', () => {
   it('Zerar com confirmação', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     await openProgress();
-    pressInCrud('Zerar progresso');
+    await pressInCrud('Zerar progresso');
     expect(crud().getByText('Zerar o progresso desta trilha?')).toBeOnTheScreen();
-    pressInCrud('Zerar');
+    await pressInCrud('Zerar');
     expect(crud().getByLabelText('0% da trilha dominada')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress).toEqual({});
 
     // o Progresso é tela cheia: volta para o Perfil e vai para a aba Trilhas
-    fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-    fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
-    press(/^Backend,/);
-    press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
+    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
+    await fireEvent.press(screen.getByRole('button', { name: /^Trilhas, tab/ }));
+    await press(/^Backend,/);
+    await press(/^O mesmo CRUD em quatro frameworks, \d+ de/);
     for (const deck of crudTrack.decks) {
       expect(screen.getByRole('button', { name: `Estudar ${deck.title}` })).toBeOnTheScreen();
     }
@@ -146,8 +146,8 @@ describe('Requirement: Zerar progresso de uma trilha', () => {
   it('Cancelar', async () => {
     seed(deckIds('glossario').slice(0, 4), 'known');
     await openProgress();
-    pressInCrud('Zerar progresso');
-    pressInCrud('Cancelar');
+    await pressInCrud('Zerar progresso');
+    await pressInCrud('Cancelar');
     expect(crud().queryByText('Zerar o progresso desta trilha?')).toBeNull();
     expect(crud().getByLabelText('4 já sabia')).toBeOnTheScreen();
     expect(useStudyStore.getState().progress[progressKey(TRACK, 'api')]).toBe('known');

@@ -29,7 +29,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 /** Nomes dos botões cujo rótulo começa por um dos nomes dados, na ordem da tela. */

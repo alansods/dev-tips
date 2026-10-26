@@ -29,7 +29,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -54,7 +54,7 @@ describe('Requirement: Erro inesperado', () => {
   it('Tentar de novo', async () => {
     await open('/flaky');
     failing = false;
-    press('Tentar de novo');
+    await press('Tentar de novo');
     await act(async () => {});
     expect(screen.queryByText('Algo deu errado')).toBeNull();
     expect(screen).toHavePathname('/flaky');
@@ -62,7 +62,7 @@ describe('Requirement: Erro inesperado', () => {
 
   it('Voltar ao início', async () => {
     await open('/flaky');
-    press('Voltar ao início');
+    await press('Voltar ao início');
     await act(async () => {});
     expect(screen).toHavePathname('/');
     expect(screen.queryByText('Algo deu errado')).toBeNull();
@@ -78,7 +78,7 @@ describe('Requirement: Página não encontrada', () => {
 
   it('Ir para Trilhas', async () => {
     await open('/nao-existe');
-    fireEvent.press(screen.getByRole('link', { name: 'Ir para Trilhas' }));
+    await fireEvent.press(screen.getByRole('link', { name: 'Ir para Trilhas' }));
     await act(async () => {});
     expect(screen).toHavePathname('/');
   });

@@ -42,7 +42,7 @@ afterEach(() => {
 
 describe('Requirement: Permissão sob demanda', () => {
   it('Nada é pedido ao abrir', async () => {
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     expect(N.requestPermissionsAsync).not.toHaveBeenCalled();
     expect(N.scheduleNotificationAsync).not.toHaveBeenCalled();
@@ -51,7 +51,7 @@ describe('Requirement: Permissão sob demanda', () => {
   it('permissão revogada com o lembrete ligado: desliga e avisa', async () => {
     useRemindersStore.setState({ enabled: true });
     N.getPermissionsAsync.mockResolvedValue({ granted: false, status: 'denied', canAskAgain: false } as never);
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     expect(useRemindersStore.getState()).toMatchObject({ enabled: false, permissionDenied: true });
     expect(N.requestPermissionsAsync).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe('Requirement: Permissão sob demanda', () => {
 describe('Requirement: Reagendamento', () => {
   it('reagenda ao abrir com o lembrete ligado', async () => {
     useRemindersStore.setState({ enabled: true });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     expect(N.cancelAllScheduledNotificationsAsync).toHaveBeenCalled();
     expect(scheduled()).toHaveLength(7);
@@ -70,7 +70,7 @@ describe('Requirement: Reagendamento', () => {
 
   it('Trocar o horário', async () => {
     useRemindersStore.setState({ enabled: true });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     N.scheduleNotificationAsync.mockClear();
     await act(async () => {
@@ -83,7 +83,7 @@ describe('Requirement: Reagendamento', () => {
 
   it('Trocar o idioma', async () => {
     useRemindersStore.setState({ enabled: true });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     N.scheduleNotificationAsync.mockClear();
     await act(async () => {
@@ -95,7 +95,7 @@ describe('Requirement: Reagendamento', () => {
 
   it('Desligar', async () => {
     useRemindersStore.setState({ enabled: true });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     N.cancelAllScheduledNotificationsAsync.mockClear();
     N.scheduleNotificationAsync.mockClear();
@@ -115,7 +115,7 @@ describe('Requirement: Reagendamento', () => {
         'crud-4-frameworks:cors': { box: 1, due: '2026-10-03' },
       },
     });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     const tomorrow = () => scheduled().find(({ trigger }) => (trigger as { date: Date }).date.getDate() === 3);
     expect(tomorrow()?.content.body).toBe('Revisão do dia: 2 cards esperando por você');
@@ -132,7 +132,7 @@ describe('Requirement: Reagendamento', () => {
 
   it('Estudou antes do horário: sem notificação hoje', async () => {
     useRemindersStore.setState({ enabled: true });
-    renderHook(() => useReminderSync());
+    await renderHook(() => useReminderSync());
     await flush();
     N.scheduleNotificationAsync.mockClear();
     useStudyStore.getState().answer('crud-4-frameworks', 'api', 'known');

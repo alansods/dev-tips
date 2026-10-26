@@ -24,11 +24,11 @@ beforeEach(() => resetStudyStore());
 
 describe('Requirement: Aba Glossário', () => {
   it('Lista longa', async () => {
-    renderRouter(APP, { initialUrl: '/glossary' });
+    await renderRouter(APP, { initialUrl: '/glossary' });
     await act(async () => {});
     expect(screen.getByText(`${terms.length} termos`)).toBeOnTheScreen();
     expect(screen.getAllByTestId('glossary-item').length).toBeLessThan(terms.length);
-    scrollGlossaryToEnd();
+    await scrollGlossaryToEnd();
     expect(screen.getByRole('button', { name: lastAlphabetical })).toBeOnTheScreen();
   });
 });

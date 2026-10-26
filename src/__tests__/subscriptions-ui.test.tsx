@@ -76,13 +76,13 @@ const flush = () =>
     for (let i = 0; i < 20; i++) await Promise.resolve();
   });
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await flush();
 }
 const UNAVAILABLE = 'A assinatura está indisponível no momento. Tente de novo mais tarde.';
 const button = (name: string | RegExp) => screen.getByRole('button', { name });
 const press = async (name: string | RegExp) => {
-  fireEvent.press(button(name));
+  await fireEvent.press(button(name));
   await flush();
 };
 async function signedIn(plan: unknown) {
@@ -175,7 +175,7 @@ describe('Requirement: Linha Dev Cards Pro no Perfil', () => {
   it('Uso atualizado pelo chat', async () => {
     await profileWith(withUsed(37));
     // o chat grava o `questions` da resposta no plano guardado
-    act(() => {
+    await act(() => {
       const plan = useSubscriptionStore.getState().plan!;
       useSubscriptionStore.getState().setPlan({ ...plan, questions: { used: 38, limit: 200 } });
     });

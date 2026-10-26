@@ -38,7 +38,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 
@@ -64,7 +64,7 @@ describe('Requirement: Busca do glossário no idioma exibido', () => {
   it('Buscar em inglês', async () => {
     useSettingsStore.setState({ language: 'en' });
     await open('/glossary');
-    fireEvent.changeText(screen.getByLabelText('Search term'), 'browser');
+    await fireEvent.changeText(screen.getByLabelText('Search term'), 'browser');
     const items = screen.getAllByTestId('glossary-item');
     expect(items.map((el) => el.props.accessibilityLabel)).toContain('CORS');
   });

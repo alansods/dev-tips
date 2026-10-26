@@ -15,7 +15,18 @@ import { reminderTarget } from './plan';
 let handledTap: string | null = null;
 
 function openTarget() {
-  router.navigate(reminderTarget(getCatalog(currentLanguage()), useStudyStore.getState().schedule, today()));
+  try {
+    router.navigate(reminderTarget(getCatalog(currentLanguage()), useStudyStore.getState().schedule, today()));
+  } catch (error) {
+    // O roteador do expo-router é religado por um layout effect; numa reconexão de
+    // efeitos do React esse effect pode rodar antes disso. Tenta de novo na próxima
+    // microtarefa em vez de perder a navegação do toque.
+    if (error instanceof Error && error.message.includes('unavailable before the first render')) {
+      Promise.resolve().then(openTarget);
+      return;
+    }
+    throw error;
+  }
 }
 
 export function useReminderTapNavigation() {

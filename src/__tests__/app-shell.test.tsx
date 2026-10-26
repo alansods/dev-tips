@@ -25,7 +25,7 @@ const APP = {
 const TAB_LABELS = ['Início', 'Trilhas', 'Glossário', 'Perfil'];
 
 async function renderApp() {
-  renderRouter(APP, { initialUrl: '/' });
+  await renderRouter(APP, { initialUrl: '/' });
   await act(async () => {}); // leitura assíncrona da preferência de tema
 }
 
@@ -49,14 +49,14 @@ describe('Requirement: Navegação por abas', () => {
     expect(screen).toHavePathname('/');
     expect(tab('Início')).toBeSelected();
     expect(tab('Trilhas')).not.toBeSelected();
-    fireEvent.press(tab('Trilhas'));
+    await fireEvent.press(tab('Trilhas'));
     expect(screen).toHavePathname('/tracks');
     expect(tab('Trilhas')).toBeSelected();
   });
 
   it('Trocar de aba', async () => {
     await renderApp();
-    fireEvent.press(tab('Glossário'));
+    await fireEvent.press(tab('Glossário'));
     expect(screen).toHavePathname('/glossary');
     expect(tab('Glossário')).toBeSelected();
     expect(tab('Trilhas')).not.toBeSelected();
@@ -72,7 +72,7 @@ describe('Requirement: Navegação por abas', () => {
 describe('Requirement: Home por áreas', () => {
   it('a aba Trilhas lista as áreas', async () => {
     await renderApp();
-    fireEvent.press(tab('Trilhas'));
+    await fireEvent.press(tab('Trilhas'));
     expect(screen.getByRole('button', { name: /^Backend,/ })).toBeOnTheScreen();
   });
 });
@@ -96,7 +96,7 @@ describe('Requirement: Fontes do design', () => {
   it('mantém a splash enquanto as fontes carregam', async () => {
     (useFonts as jest.Mock).mockReturnValue([false, null]);
     (SplashScreen.hideAsync as jest.Mock).mockClear();
-    renderRouter(APP, { initialUrl: '/' });
+    await renderRouter(APP, { initialUrl: '/' });
     await act(async () => {});
     expect(SplashScreen.hideAsync).not.toHaveBeenCalled();
     expect(screen.queryByText('Backend')).toBeNull();
@@ -109,7 +109,7 @@ describe('Requirement: Navegação por abas (cabeçalho)', () => {
     // o nome da aba aparece só uma vez: na barra de abas
     expect(screen.getAllByText('Início')).toHaveLength(1);
     for (const label of ['Trilhas', 'Perfil']) {
-      fireEvent.press(tab(label));
+      await fireEvent.press(tab(label));
       expect(screen.getAllByText(label)).toHaveLength(1);
     }
   });
@@ -118,7 +118,7 @@ describe('Requirement: Navegação por abas (cabeçalho)', () => {
     await renderApp();
     expect(screen.queryByRole('button', { name: /^Usar tema/ })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Ajustes' })).toBeNull();
-    fireEvent.press(tab('Perfil'));
+    await fireEvent.press(tab('Perfil'));
     expect(screen).toHavePathname('/profile');
     expect(screen.queryByRole('button', { name: 'Ajustes' })).toBeNull();
   });

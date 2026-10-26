@@ -56,6 +56,7 @@ export async function replaceAll(plans: ReminderPlan[], channelName: string): Pr
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
         name: channelName,
+        // eslint-disable-next-line import/namespace -- re-exported via `export *`, plugin can't resolve it
         importance: Notifications.AndroidImportance.DEFAULT,
       });
     }

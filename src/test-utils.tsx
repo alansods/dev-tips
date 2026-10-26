@@ -32,21 +32,22 @@ export function renderWithTheme(ui: ReactElement, { language }: { language?: Lan
 const GLOSSARY_ITEM_HEIGHT = 72;
 const GLOSSARY_WIDTH = 400;
 
-function layoutGlossary(viewportHeight: number, offset: (contentHeight: number) => number) {
+async function layoutGlossary(viewportHeight: number, offset: (contentHeight: number) => number) {
   const list = screen.getByTestId('glossary-list');
   const contentHeight = list.props.data.length * GLOSSARY_ITEM_HEIGHT;
   const viewport = { width: GLOSSARY_WIDTH, height: viewportHeight };
-  act(() => {
-    fireEvent(list, 'layout', { nativeEvent: { layout: { x: 0, y: 0, ...viewport } } });
-    screen.getAllByTestId(/^glossary-(item|letter)$/).forEach((item, index) =>
-      fireEvent(item, 'layout', {
+  await act(async () => {
+    await fireEvent(list, 'layout', { nativeEvent: { layout: { x: 0, y: 0, ...viewport } } });
+    const items = screen.getAllByTestId(/^glossary-(item|letter)$/);
+    for (let index = 0; index < items.length; index++) {
+      await fireEvent(items[index], 'layout', {
         nativeEvent: {
           layout: { x: 0, y: index * GLOSSARY_ITEM_HEIGHT, width: GLOSSARY_WIDTH, height: GLOSSARY_ITEM_HEIGHT },
         },
-      }),
-    );
-    fireEvent(list, 'contentSizeChange', GLOSSARY_WIDTH, contentHeight);
-    fireEvent.scroll(list, {
+      });
+    }
+    await fireEvent(list, 'contentSizeChange', GLOSSARY_WIDTH, contentHeight);
+    await fireEvent.scroll(list, {
       nativeEvent: {
         contentOffset: { x: 0, y: offset(contentHeight) },
         contentSize: { width: GLOSSARY_WIDTH, height: contentHeight },
@@ -58,12 +59,12 @@ function layoutGlossary(viewportHeight: number, offset: (contentHeight: number) 
 }
 
 /** Rola a lista do Glossário até o fim (tela de celular). */
-export function scrollGlossaryToEnd() {
-  untilStable(() => layoutGlossary(800, (contentHeight) => Math.max(0, contentHeight - 800)));
+export async function scrollGlossaryToEnd() {
+  await untilStable(() => layoutGlossary(800, (contentHeight) => Math.max(0, contentHeight - 800)));
 }
 
 /** Repete o passo enquanto a lista monta linhas novas (cada rodada mede as que acabaram de montar). */
-function untilStable(step: () => void) {
+async function untilStable(step: () => Promise<void>) {
   const mounted = () =>
     screen
       .getAllByTestId(/^glossary-(item|letter)$/)
@@ -72,12 +73,12 @@ function untilStable(step: () => void) {
   let before = '';
   for (let i = 0; i < 20 && mounted() !== before; i++) {
     before = mounted();
-    step();
+    await step();
   }
 }
 
 /** Monta todos os termos da lista do Glossário, como numa tela alta o bastante para caber todos. */
-export function showAllGlossaryItems() {
+export async function showAllGlossaryItems() {
   const total = screen.getByTestId('glossary-list').props.data.length;
-  untilStable(() => layoutGlossary(total * GLOSSARY_ITEM_HEIGHT, () => 0));
+  await untilStable(() => layoutGlossary(total * GLOSSARY_ITEM_HEIGHT, () => 0));
 }

@@ -20,7 +20,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const cardIds = (trackId: string) => getTrack(trackId)!.decks.flatMap((d) => d.cards.map((c) => c.id));
@@ -70,7 +70,7 @@ describe('Requirement: Ordem sugerida na área (na tela)', () => {
 
   it('Abrir pela ordem sugerida', async () => {
     await open('/area/fundamentos');
-    fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos de programação, Não iniciada' }));
+    await fireEvent.press(screen.getByRole('button', { name: '1. Fundamentos de programação, Não iniciada' }));
     expect(screen).toHavePathname('/track/fundamentos-de-programacao');
   });
 });

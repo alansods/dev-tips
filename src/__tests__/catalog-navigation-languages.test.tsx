@@ -42,7 +42,7 @@ const APP = {
 };
 
 async function open(url: string) {
-  renderRouter(APP, { initialUrl: url });
+  await renderRouter(APP, { initialUrl: url });
   await act(async () => {});
 }
 const press = (name: string | RegExp) => fireEvent.press(screen.getByRole('button', { name }));
@@ -58,7 +58,7 @@ describe('Requirement: Tela da área', () => {
 
   it('tocar na linguagem abre a tela da linguagem', async () => {
     await open('/area/backend');
-    press(/^Java,/);
+    await press(/^Java,/);
     expect(screen).toHavePathname('/area/backend/java');
   });
 
@@ -90,7 +90,7 @@ describe('Requirement: Tela da linguagem', () => {
 
   it('tocar no framework abre a tela do framework', async () => {
     await open('/area/backend/java');
-    press(/^Spring Boot,/);
+    await press(/^Spring Boot,/);
     expect(screen).toHavePathname('/area/backend/java/spring');
   });
 });
@@ -111,7 +111,7 @@ describe('Requirement: Tela do framework', () => {
 
   it('abrir a trilha pelo framework', async () => {
     await open('/area/backend/java/spring');
-    press(/^Injeção no Spring,/);
+    await press(/^Injeção no Spring,/);
     expect(screen).toHavePathname('/track/spring-di');
   });
 });
