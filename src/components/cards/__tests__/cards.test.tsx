@@ -151,7 +151,9 @@ describe('Requirement: Nível no card', () => {
 
   it('Nível no verso', async () => {
     const card = cardById('rest-vs-graphql', webTrack); // level: senior
-    await renderWithTheme(<CardFace card={card} track={webTrack} side="back" variantId="" onSelectVariant={() => {}} />);
+    await renderWithTheme(
+      <CardFace card={card} track={webTrack} side="back" variantId="" onSelectVariant={() => {}} />,
+    );
     expect(screen.getByText('Sênior')).toBeOnTheScreen();
   });
 
@@ -185,7 +187,9 @@ describe('Requirement: Origem do card na sessão', () => {
 
   it('Card de outra trilha', async () => {
     const card = webTrack.decks[0].cards[0];
-    await renderWithTheme(<CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />);
+    await renderWithTheme(
+      <CardFace card={card} track={webTrack} side="front" variantId="" onSelectVariant={() => {}} />,
+    );
     expect(screen.getByText(`Fundamentos web · ${webTrack.decks[0].title}`)).toBeOnTheScreen();
   });
 });
