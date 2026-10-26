@@ -287,7 +287,7 @@ describe('Requirement: Exibição de código (na sessão)', () => {
   const codeArea = async () => {
     jest.spyOn(chance, 'random').mockReturnValue(0);
     await open(`/study/${TRACK}/passo-a-passo`);
-    press('Mostrar resposta');
+    await press('Mostrar resposta');
     return screen.getByTestId('code-scroll-area');
   };
 
@@ -304,7 +304,7 @@ describe('Requirement: Exibição de código (na sessão)', () => {
     const area = await codeArea();
     expect(area.props.onStartShouldSetResponder()).toBe(true);
     expect(area.props.onPress).toBeUndefined();
-    fireEvent.press(screen.getByTestId('card-back'));
+    await fireEvent.press(screen.getByTestId('card-back'));
     expect(screen.getByRole('button', { name: 'Mostrar resposta' })).toBeOnTheScreen();
   });
 });
