@@ -60,7 +60,7 @@
     "tech-icons": "node scripts/generate-tech-icons.mjs"
   },
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
