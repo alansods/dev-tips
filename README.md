@@ -181,4 +181,6 @@ The privacy policy and terms of use live in [`docs/legal/`](docs/legal/) and are
 
 ## License
 
-Copyright (c) 2026 Alan Santos. All rights reserved. The code is published for reading only: no license is granted to copy, modify, distribute or reuse any part of it, including the card content and the "Dev Cards" brand. See [`LICENSE`](LICENSE).
+Released under the [MIT License](LICENSE), covering both the code and the card content.
+
+The MIT License does not grant rights to the "Dev Cards" name or app icon: forks and derived apps must use their own name and icon.
